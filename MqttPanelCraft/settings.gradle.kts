@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MqttPanelCraft_beta"
+rootProject.name = "MqttPanelCraft"
 include(":app")
