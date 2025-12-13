@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">物聯網儀表板</string>
+    <string name="nav_header_title">我的物聯網應用</string>
+    <string name="nav_header_subtitle">user@example.com</string>
+
+    <!-- Setup Activity -->
+    <string name="title_project_setup">專案設定</string>
+    <string name="label_project_name">專案名稱</string>
+    <string name="hint_project_name">我的智慧家庭</string>
+    <string name="label_mqtt_broker">MQTT 代理伺服器</string>
+    <string name="hint_broker">wss://broker.emqx.io:8083</string>
+    <string name="label_theme">主題 / 類型</string>
+    <string name="btn_test_connection">測試連線</string>
+    <string name="btn_save_start">儲存並開始</string>
+    <string name="theme_home">家庭</string>
+    <string name="theme_factory">工廠</string>
+    <string name="error_name_required">必須填寫名稱</string>
+    <string name="error_broker_required">必須填寫代理伺服器 URL</string>
+
+    <!-- Project View Activity -->
+    <string name="title_project_editor">專案編輯器</string>
+    <string name="sidebar_components">元件</string>
+    <string name="category_display">顯示</string>
+    <string name="component_text">文字數值</string>
+    <string name="component_gauge">儀表</string>
+    <string name="sidebar_properties">屬性</string>
+    <string name="prop_helper">選擇一個元件以編輯</string>
+    <string name="prop_topic">MQTT 主題</string>
+    <string name="prop_label">標籤</string>
+    <string name="console_title">MQTT 控制台</string>
+    <string name="hint_topic">主題</string>
+    <string name="hint_payload">訊息內容</string>
+    <string name="btn_send">發送</string>
+</resources>

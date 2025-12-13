@@ -1,0 +1,322 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootCoordinator"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ProjectViewActivity">
+
+    <!-- AppBar (Z-Order: Top) -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Theme.Helloworld.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/Theme.Helloworld.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Draggable Trash Bin (Overlay) -->
+    <ImageView
+        android:id="@+id/binTrash"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:padding="13dp"
+        app:tint="@android:color/white"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="60dp"
+        android:elevation="10dp"
+        android:visibility="visible" />
+
+    <!-- Settings Wrench (Overlay - replacing Custom Gear) -->
+    <ImageView
+        android:id="@+id/btnSettings"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:src="@android:drawable/ic_menu_preferences"
+        android:padding="13dp"
+        app:tint="@android:color/white"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="0dp"
+        android:elevation="10dp"
+        android:visibility="visible" />
+
+    <!-- DrawerLayout (Below AppBar) -->
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- DRAWER CONTENT: Inner Coordinator for Canvas & BottomSheet -->
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/innerCoordinator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- CONTENT: Editor Canvas -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/editorCanvas"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    
+                    <!-- Background Pattern -->
+                    <com.example.mqttpanelcraft_beta.ui.GridPatternView
+                        android:id="@+id/backgroundGrid"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                    
+                    <!-- Guidelines Overlay -->
+                     <com.example.mqttpanelcraft_beta.ui.AlignmentOverlayView
+                        android:id="@+id/guideOverlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </FrameLayout>
+
+            <!-- Scrim (Dark Overlay) -->
+            <View
+                android:id="@+id/bottomSheetScrim"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#7F000000"
+                android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <!-- Add Button (Only in Edit Mode) -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="90dp"  
+                app:srcCompat="@android:drawable/ic_input_add"
+                app:tint="@android:color/white"
+                app:layout_anchor="@id/bottomSheet"
+                app:layout_anchorGravity="top|end"
+                android:visibility="gone"/>
+
+            <!-- Bottom Sheet (Logs or Properties) -->
+            <FrameLayout
+                android:id="@+id/bottomSheet"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:background="@drawable/bg_bottom_sheet"
+                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+                app:behavior_peekHeight="30dp">
+                
+                <!-- Drag Handle / Header -->
+                 <LinearLayout
+                    android:id="@+id/bottomSheetHeader"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    
+                     <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="4dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="8dp"
+                        android:src="@drawable/ic_drag_handle" 
+                        app:tint="#CCCCCC" /> 
+                     
+                     <!-- CONTAINER: Logs -->
+                     <LinearLayout
+                         android:id="@+id/containerLogs"
+                         android:layout_width="match_parent"
+                         android:layout_height="match_parent"
+                         android:orientation="vertical"
+                         android:padding="8dp">
+                         
+                         <TextView
+                             android:text="MQTT/System Logs"
+                             android:textStyle="bold"
+                             android:textColor="@color/sidebar_section_header"
+                             android:padding="8dp"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"/>
+                             
+                         <androidx.recyclerview.widget.RecyclerView
+                             android:id="@+id/rvConsoleLogs"
+                             android:layout_width="match_parent"
+                             android:layout_height="0dp"
+                             android:layout_weight="1"/>
+                             
+                         <LinearLayout
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:orientation="horizontal">
+                             <EditText android:id="@+id/etConsoleTopic" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:hint="Topic"/>
+                             <EditText android:id="@+id/etConsolePayload" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:hint="Payload"/>
+                             <Button android:id="@+id/btnConsoleSend" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Send"/>
+                         </LinearLayout>
+                     </LinearLayout>
+                     
+                     <!-- CONTAINER: Properties (Hidden by default) -->
+                     <ScrollView
+                         android:id="@+id/containerProperties"
+                         android:layout_width="match_parent"
+                         android:layout_height="match_parent"
+                         android:visibility="gone"
+                         android:padding="16dp">
+                         
+                         <LinearLayout
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:orientation="vertical">
+                             
+                             <TextView 
+                                 android:text="Component Properties" 
+                                 android:textSize="18sp" 
+                                 android:textStyle="bold" 
+                                 android:textColor="@color/sidebar_section_header"
+                                 android:layout_marginBottom="16dp"
+                                 android:layout_width="wrap_content"
+                                 android:layout_height="wrap_content"/>
+                                 
+                             <!-- Name -->
+                             <com.google.android.material.textfield.TextInputLayout
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:hint="Name / Label"
+                                 android:layout_marginBottom="8dp">
+                                 <com.google.android.material.textfield.TextInputEditText
+                                     android:id="@+id/etPropName"
+                                     android:layout_width="match_parent"
+                                     android:layout_height="wrap_content"/>
+                             </com.google.android.material.textfield.TextInputLayout>
+                             
+                             <!-- W/H Row -->
+                              <LinearLayout
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:orientation="horizontal"
+                                 android:baselineAligned="false"
+                                 android:layout_marginBottom="8dp">
+                                  <com.google.android.material.textfield.TextInputLayout
+                                     android:layout_width="0dp"
+                                     android:layout_weight="1"
+                                     android:layout_height="wrap_content"
+                                     android:hint="Width (dp)"
+                                     android:layout_marginEnd="8dp">
+                                     <com.google.android.material.textfield.TextInputEditText
+                                         android:id="@+id/etPropWidth"
+                                         android:inputType="number"
+                                         android:layout_width="match_parent"
+                                         android:layout_height="wrap_content"/>
+                                 </com.google.android.material.textfield.TextInputLayout>
+                                 
+                                 <com.google.android.material.textfield.TextInputLayout
+                                     android:layout_width="0dp"
+                                     android:layout_weight="1"
+                                     android:layout_height="wrap_content"
+                                     android:hint="Height (dp)">
+                                     <com.google.android.material.textfield.TextInputEditText
+                                         android:id="@+id/etPropHeight"
+                                         android:inputType="number"
+                                         android:layout_width="match_parent"
+                                         android:layout_height="wrap_content"/>
+                                 </com.google.android.material.textfield.TextInputLayout>
+                             </LinearLayout>
+                             
+                             <!-- Color -->
+                             <com.google.android.material.textfield.TextInputLayout
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:hint="Color (Hex #RRGGBB)"
+                                 android:layout_marginBottom="8dp">
+                                 <com.google.android.material.textfield.TextInputEditText
+                                     android:id="@+id/etPropColor"
+                                     android:layout_width="match_parent"
+                                     android:layout_height="wrap_content"/>
+                             </com.google.android.material.textfield.TextInputLayout>
+        
+                             <!-- Topic (Control) -->
+                              <com.google.android.material.textfield.TextInputLayout
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:hint="MQTT Topic"
+                                 android:layout_marginBottom="8dp">
+                                 <com.google.android.material.textfield.TextInputEditText
+                                     android:id="@+id/etPropTopic"
+                                     android:layout_width="match_parent"
+                                     android:layout_height="wrap_content"/>
+                             </com.google.android.material.textfield.TextInputLayout>
+        
+                             <Button
+                                 android:id="@+id/btnSaveProps"
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:text="Apply Changes"/>
+                             
+                         </LinearLayout>
+                     </ScrollView>
+        
+                 </LinearLayout>
+            </FrameLayout>
+            
+            <!-- Mode Toggle FAB -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_anchor="@id/bottomSheet"
+                app:layout_anchorGravity="top|end"
+                android:layout_margin="16dp" 
+                app:tint="@android:color/white"
+                app:srcCompat="@android:drawable/ic_media_play"/> 
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <!-- LEFT SIDEBAR: Components (Drawer) -->
+    <LinearLayout
+        android:id="@+id/sidebarContainer"
+        android:layout_width="320dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/sidebar_background_color"
+        android:orientation="vertical">
+        
+         <!-- Edit Mode Content: Components -->
+         <LinearLayout
+             android:id="@+id/sidebarEditMode"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="vertical">
+             <include layout="@layout/layout_sidebar_components" />
+         </LinearLayout>
+         
+         <!-- Run Mode Content: Actions -->
+         <LinearLayout
+             android:id="@+id/sidebarRunMode"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="vertical"
+             android:visibility="gone">
+             <include layout="@layout/layout_sidebar_run_mode" />
+         </LinearLayout>
+         
+    </LinearLayout>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
