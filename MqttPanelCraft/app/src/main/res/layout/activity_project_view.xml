@@ -17,7 +17,35 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Theme.Helloworld.PopupOverlay" />
+            app:popupTheme="@style/Theme.Helloworld.PopupOverlay">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/tvToolbarTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Project"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="8dp"/>
+
+                <!-- Status Dot -->
+                <View
+                    android:id="@+id/viewStatusDot"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/shape_circle_green"
+                    android:backgroundTint="@android:color/darker_gray"/>
+            </LinearLayout>
+
+        </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -164,10 +192,41 @@
                          <LinearLayout
                              android:layout_width="match_parent"
                              android:layout_height="wrap_content"
-                             android:orientation="horizontal">
-                             <EditText android:id="@+id/etConsoleTopic" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:hint="Topic"/>
-                             <EditText android:id="@+id/etConsolePayload" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:hint="Payload"/>
-                             <Button android:id="@+id/btnConsoleSend" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Send"/>
+                             android:orientation="vertical">
+                             
+                             <LinearLayout
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:orientation="horizontal">
+                                 <EditText 
+                                     android:id="@+id/etConsoleTopic" 
+                                     android:layout_width="0dp" 
+                                     android:layout_weight="1" 
+                                     android:layout_height="wrap_content" 
+                                     android:hint="Topic"/>
+                                 <Button 
+                                     android:id="@+id/btnConsoleSubscribe" 
+                                     android:layout_width="wrap_content" 
+                                     android:layout_height="wrap_content" 
+                                     android:text="Sub"/>
+                             </LinearLayout>
+
+                             <LinearLayout
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:orientation="horizontal">
+                                 <EditText 
+                                     android:id="@+id/etConsolePayload" 
+                                     android:layout_width="0dp" 
+                                     android:layout_weight="1" 
+                                     android:layout_height="wrap_content" 
+                                     android:hint="Payload"/>
+                                 <Button 
+                                     android:id="@+id/btnConsoleSend" 
+                                     android:layout_width="wrap_content" 
+                                     android:layout_height="wrap_content" 
+                                     android:text="Send"/>
+                             </LinearLayout>
                          </LinearLayout>
                      </LinearLayout>
                      

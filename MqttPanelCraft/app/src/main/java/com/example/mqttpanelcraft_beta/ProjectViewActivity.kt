@@ -92,6 +92,31 @@ class ProjectViewActivity : AppCompatActivity() {
             projectId = intent.getStringExtra("PROJECT_ID")
             if (projectId != null) {
                 loadProjectDetails(projectId!!)
+                
+                // v18: Start Background Service
+                val project = com.example.mqttpanelcraft_beta.data.ProjectRepository.getProjectById(projectId!!)
+                if (project != null) {
+                    // v19: Save Last Project ID
+                    val prefs = getSharedPreferences("MqttPanelPrefs", android.content.Context.MODE_PRIVATE)
+                    prefs.edit().putString("LAST_PROJECT_ID", projectId).apply()
+
+                    val serviceIntent = android.content.Intent(this, com.example.mqttpanelcraft_beta.service.MqttService::class.java)
+                    serviceIntent.action = "CONNECT"
+                    serviceIntent.putExtra("BROKER", project.broker)
+                    serviceIntent.putExtra("PORT", project.port)
+                    serviceIntent.putExtra("USER", project.username)
+                    serviceIntent.putExtra("PASSWORD", project.password)
+                    serviceIntent.putExtra("CLIENT_ID", project.clientId)
+                    try {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            startForegroundService(serviceIntent)
+                        } else {
+                            startService(serviceIntent)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
             } else {
                 finish()
             }
@@ -188,10 +213,28 @@ class ProjectViewActivity : AppCompatActivity() {
 
     private fun setupUI() {
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-    setSupportActionBar(toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false) // Hide default title
+        
+        val tvToolbarTitle = findViewById<TextView>(R.id.tvToolbarTitle)
+        val viewStatusDot = findViewById<View>(R.id.viewStatusDot)
+        
+        if (project != null) {
+            tvToolbarTitle.text = project!!.name
+        }
+        
+        // Observe Connection Status
+        MqttRepository.connectionStatus.observe(this) { status ->
+             val color = when(status) {
+                 MqttStatus.CONNECTED -> 0xFF00E676.toInt() // Green
+                 MqttStatus.FAILED -> 0xFFFF5252.toInt()    // Red
+                 else -> 0xFFAAAAAA.toInt()                 // Gray
+             }
+             viewStatusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(color)
+        }
     
-    // Add Hamburger Menu Icon
-    toolbar.setNavigationIcon(R.drawable.ic_menu)
+        // Add Hamburger Menu Icon
+        toolbar.setNavigationIcon(R.drawable.ic_menu)
     toolbar.setNavigationOnClickListener { 
         // Allow opening drawer even if bottom sheet is expanded
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -215,7 +258,7 @@ class ProjectViewActivity : AppCompatActivity() {
                      val intent = android.content.Intent(this, Class.forName("com.example.mqttpanelcraft_beta.SetupActivity"))
                      intent.putExtra("PROJECT_ID", projectId)
                      startActivity(intent)
-                     finish()
+                     // finish() // Removed v21: Keep activity in stack
                 } catch (e: Exception) {
                     android.widget.Toast.makeText(this, "Setup Activity not found", android.widget.Toast.LENGTH_SHORT).show()
                 }
@@ -469,6 +512,8 @@ class ProjectViewActivity : AppCompatActivity() {
         etTopic = findViewById(R.id.etConsoleTopic)
         etPayload = findViewById(R.id.etConsolePayload)
         btnSend = findViewById(R.id.btnConsoleSend)
+        val btnSubscribe = findViewById<Button>(R.id.btnConsoleSubscribe) // New v18
+        
         logAdapter = LogAdapter()
         rvLogs.layoutManager = LinearLayoutManager(this)
         rvLogs.adapter = logAdapter
@@ -476,22 +521,29 @@ class ProjectViewActivity : AppCompatActivity() {
             logAdapter.submitList(logs)
             if (logs.isNotEmpty()) rvLogs.smoothScrollToPosition(logs.size - 1)
         }
+        
         btnSend.setOnClickListener {
-             val topic = etTopic.text.toString()
+            val topic = etTopic.text.toString()
             val payload = etPayload.text.toString()
             if (topic.isNotEmpty() && payload.isNotEmpty()) {
-                val client = MqttRepository.mqttClient
-                if (client != null && client.isConnected) {
-                    try {
-                        val message = org.eclipse.paho.client.mqttv3.MqttMessage(payload.toByteArray())
-                        client.publish(topic, message)
-                        MqttRepository.addLog("TX [$topic]: $payload", java.text.SimpleDateFormat("HH:mm:ss").format(java.util.Date()))
-                    } catch (e: Exception) {
-                        Toast.makeText(this, "Publish Failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    Toast.makeText(this, "Not Connected.", Toast.LENGTH_SHORT).show()
-                }
+                val serviceIntent = android.content.Intent(this, com.example.mqttpanelcraft_beta.service.MqttService::class.java)
+                serviceIntent.action = "PUBLISH"
+                serviceIntent.putExtra("TOPIC", topic)
+                serviceIntent.putExtra("PAYLOAD", payload)
+                startService(serviceIntent) // Send via service
+            }
+        }
+        
+        btnSubscribe.setOnClickListener {
+            val topic = etTopic.text.toString()
+            if (topic.isNotEmpty()) {
+                val serviceIntent = android.content.Intent(this, com.example.mqttpanelcraft_beta.service.MqttService::class.java)
+                serviceIntent.action = "SUBSCRIBE"
+                serviceIntent.putExtra("TOPIC", topic)
+                startService(serviceIntent)
+                Toast.makeText(this, "Subscribing to $topic...", Toast.LENGTH_SHORT).show()
+            } else {
+                 etTopic.error = "Topic required"
             }
         }
     }

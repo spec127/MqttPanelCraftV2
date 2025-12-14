@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.mqttpanelcraft_beta.data.ProjectRepository
 import com.example.mqttpanelcraft_beta.model.Project
 import com.example.mqttpanelcraft_beta.model.ProjectType
@@ -56,6 +58,16 @@ class SetupActivity : AppCompatActivity() {
         projectId = intent.getStringExtra("PROJECT_ID")
         if (projectId != null) {
             setupEditMode(projectId!!)
+        }
+        
+        setupWindowInsets()
+    }
+    
+    private fun setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+            WindowInsetsCompat.CONSUMED
         }
     }
     

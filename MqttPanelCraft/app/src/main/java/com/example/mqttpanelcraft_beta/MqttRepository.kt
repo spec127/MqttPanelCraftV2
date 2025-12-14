@@ -97,10 +97,24 @@ object MqttRepository {
             addLog("Error processing message: ${e.message}", timestamp)
         }
     }
+    // Connection Status
+    private val _connectionStatus = MutableLiveData<Int>(0) // 0:Connecting/Gray, 1:Connected/Green, 2:Failed/Red
+    val connectionStatus: LiveData<Int> = _connectionStatus
+
+    fun setStatus(status: Int) {
+        _connectionStatus.postValue(status)
+    }
 }
 
 sealed class LogItem {
     data class Text(val content: String, val timestamp: String) : LogItem()
     data class Image(val base64: String, val timestamp: String) : LogItem()
     data class Led(val isOn: Boolean, val timestamp: String) : LogItem()
+}
+
+// Status Constants
+object MqttStatus {
+    const val CONNECTING = 0
+    const val CONNECTED = 1
+    const val FAILED = 2
 }
