@@ -15,6 +15,9 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        // Init Data Layer
+        com.example.mqttpanelcraft_beta.data.ProjectRepository.initialize(this)
+
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             handleUncaughtException(thread, throwable)
         }

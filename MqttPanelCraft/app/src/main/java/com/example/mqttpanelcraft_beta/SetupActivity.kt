@@ -3,11 +3,11 @@ package com.example.mqttpanelcraft_beta
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.mqttpanelcraft_beta.data.ProjectRepository
@@ -15,6 +15,13 @@ import com.example.mqttpanelcraft_beta.model.Project
 import com.example.mqttpanelcraft_beta.model.ProjectType
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.eclipse.paho.client.mqttv3.MqttClient
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 
 class SetupActivity : AppCompatActivity() {
 
@@ -22,10 +29,18 @@ class SetupActivity : AppCompatActivity() {
     private var projectId: String? = null
     
     // UI Elements
+    private lateinit var etName: TextInputEditText
+    private lateinit var etBroker: TextInputEditText
+    private lateinit var etPort: TextInputEditText
+    private lateinit var etUser: TextInputEditText
+    private lateinit var etPassword: TextInputEditText
+    private lateinit var btnTest: MaterialButton
+    private lateinit var btnSave: MaterialButton
+    
+    // Theme Cards
     private lateinit var cardHome: LinearLayout
     private lateinit var ivHome: ImageView
     private lateinit var tvHome: TextView
-    
     private lateinit var cardFactory: LinearLayout
     private lateinit var ivFactory: ImageView
     private lateinit var tvFactory: TextView
@@ -47,20 +62,20 @@ class SetupActivity : AppCompatActivity() {
     private fun setupEditMode(id: String) {
         val project = ProjectRepository.getProjectById(id) ?: return
         
-        findViewById<TextInputEditText>(R.id.etProjectName).setText(project.name)
-        findViewById<TextInputEditText>(R.id.etBroker).setText(project.broker)
+        etName.setText(project.name)
+        etBroker.setText(project.broker)
+        etPort.setText(project.port.toString())
+        etUser.setText(project.username)
+        etPassword.setText(project.password)
+        
         selectType(project.type)
-        findViewById<MaterialButton>(R.id.btnSaveProject).text = "Update Project"
+        btnSave.text = "Update & Start"
         supportActionBar?.title = "Edit Project"
     }
 
     private fun setupToolbar() {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back) // Need this icon, or use standard back
-        // For now use default if arrow back not custom created, or create one. 
-        // Standard Android usually has one if displayHomeAsUp is true.
-        // If not creating specific drawable, system default works.
     }
     
     override fun onSupportNavigateUp(): Boolean {
@@ -69,10 +84,14 @@ class SetupActivity : AppCompatActivity() {
     }
 
     private fun setupViews() {
-        val etName = findViewById<TextInputEditText>(R.id.etProjectName)
-        val etBroker = findViewById<TextInputEditText>(R.id.etBroker)
-        val btnTest = findViewById<MaterialButton>(R.id.btnTestConnection)
-        val btnSave = findViewById<MaterialButton>(R.id.btnSaveProject)
+        etName = findViewById(R.id.etProjectName)
+        etBroker = findViewById(R.id.etBroker)
+        etPort = findViewById(R.id.etPort)
+        etUser = findViewById(R.id.etUser)
+        etPassword = findViewById(R.id.etPassword)
+        
+        btnTest = findViewById(R.id.btnTestConnection)
+        btnSave = findViewById(R.id.btnSaveProject)
 
         cardHome = findViewById(R.id.cardHome)
         ivHome = findViewById(R.id.ivHome)
@@ -86,50 +105,114 @@ class SetupActivity : AppCompatActivity() {
         cardHome.setOnClickListener { selectType(ProjectType.HOME) }
         cardFactory.setOnClickListener { selectType(ProjectType.FACTORY) }
 
-        // Test Connection (Mock)
+        // Test Connection (Real)
         btnTest.setOnClickListener {
-            btnTest.isEnabled = false
-            btnTest.text = "Testing..."
-            
-            Handler(Looper.getMainLooper()).postDelayed({
-                btnTest.text = "OK"
-                btnTest.isEnabled = true
-                btnTest.setTextColor(Color.GREEN)
-                btnTest.strokeColor = ColorStateList.valueOf(Color.GREEN)
-            }, 1000)
+           testConnection()
         }
 
         // Save
         btnSave.setOnClickListener {
-            val name = etName.text.toString()
-            val broker = etBroker.text.toString()
-
-            if (name.isBlank()) {
-                etName.error = getString(R.string.error_name_required)
-                return@setOnClickListener
-            }
-            if (broker.isBlank()) {
-                etBroker.error = getString(R.string.error_broker_required)
-                return@setOnClickListener
-            }
-
-            val newProject = Project(
-                id = projectId ?: ProjectRepository.generateId(),
-                name = name,
-                broker = broker,
-                type = selectedType,
-                isConnected = false
-            )
-            
-            if (projectId != null) {
-                ProjectRepository.updateProject(newProject)
-            } else {
-                ProjectRepository.addProject(newProject)
-            }
-            
-            // Finish SetupActivity to return to previous screen (Dashboard)
-            finish()
+            saveProject()
         }
+    }
+    
+    private fun testConnection() {
+        val broker = etBroker.text.toString()
+        val portStr = etPort.text.toString()
+        val user = etUser.text.toString()
+        val pass = etPassword.text.toString()
+        
+        if (broker.isBlank()) {
+            etBroker.error = "Required"
+            return
+        }
+        
+        val port = portStr.toIntOrNull() ?: 1883
+        val uri = "tcp://$broker:$port"
+        
+        btnTest.isEnabled = false
+        btnTest.text = "Connecting..."
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val clientId = "TestClient_" + System.currentTimeMillis()
+                val client = MqttClient(uri, clientId, MemoryPersistence())
+                val options = MqttConnectOptions()
+                options.isCleanSession = true
+                options.connectionTimeout = 5
+                options.keepAliveInterval = 10
+                
+                if (user.isNotEmpty()) {
+                    options.userName = user
+                    options.password = pass.toCharArray()
+                }
+                
+                client.connect(options)
+                
+                withContext(Dispatchers.Main) {
+                    btnTest.text = "Connected!"
+                    btnTest.isEnabled = true
+                    btnTest.setTextColor(Color.GREEN)
+                    btnTest.strokeColor = ColorStateList.valueOf(Color.GREEN)
+                    
+                    if (client.isConnected) {
+                        try { client.disconnect() } catch (e: Exception) {}
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    btnTest.text = "Test Connection"
+                    btnTest.isEnabled = true
+                    btnTest.setTextColor(Color.RED) // Or default
+                    btnTest.strokeColor = ColorStateList.valueOf(Color.RED)
+                    
+                    AlertDialog.Builder(this@SetupActivity)
+                        .setTitle("Connection Failed")
+                        .setMessage(e.message ?: "Unknown Error")
+                        .setPositiveButton("OK", null)
+                        .show()
+                }
+            }
+        }
+    }
+    
+    private fun saveProject() {
+        val name = etName.text.toString()
+        val broker = etBroker.text.toString()
+        val portStr = etPort.text.toString()
+        
+        if (name.isBlank()) {
+            etName.error = getString(R.string.error_name_required)
+            return
+        }
+        if (broker.isBlank()) {
+            etBroker.error = getString(R.string.error_broker_required)
+            return
+        }
+        
+        val port = portStr.toIntOrNull() ?: 1883
+        val user = etUser.text.toString()
+        val pass = etPassword.text.toString()
+
+        val newProject = Project(
+            id = projectId ?: ProjectRepository.generateId(),
+            name = name,
+            broker = broker,
+            port = port,
+            username = user,
+            password = pass,
+            type = selectedType,
+            isConnected = false
+        )
+        
+        if (projectId != null) {
+            ProjectRepository.updateProject(newProject)
+        } else {
+            ProjectRepository.addProject(newProject)
+        }
+        
+        // Finish SetupActivity to return to previous screen
+        finish()
     }
 
     private fun selectType(type: ProjectType) {

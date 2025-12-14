@@ -38,6 +38,15 @@ class DashboardActivity : AppCompatActivity() {
             setupDrawer()
             setupRecyclerView()
             setupFab()
+            
+            // Fix Status Bar Overlap
+            androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.drawerLayout) { view, insets ->
+                val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+                // Apply padding to the content container inside Drawer (CoordinatorLayout is usually first child)
+                val content = binding.drawerLayout.getChildAt(0)
+                content.setPadding(0, bars.top, 0, 0)
+                androidx.core.view.WindowInsetsCompat.CONSUMED
+            }
         } catch (e: Exception) {
             CrashLogger.logError(this, "Dashboard Init Failed", e)
         }
