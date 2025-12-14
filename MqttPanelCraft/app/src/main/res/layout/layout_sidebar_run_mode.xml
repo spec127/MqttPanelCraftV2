@@ -14,14 +14,23 @@
         android:textStyle="bold"
         android:layout_marginBottom="16dp"/>
 
+    <!-- Show Grid Toggle Switch -->
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switchGridToggleRunMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Show Grid"
+        android:checked="false"
+        android:textSize="14sp"
+        android:layout_marginBottom="12dp" />
+
     <!-- Dark Mode Toggle Switch -->
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/switchDarkMode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Dark Mode"
-        android:checked="false"
         android:textSize="14sp"
-        android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="16dp" />
 
 </LinearLayout>

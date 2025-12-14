@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta
+package com.example.mqttpanelcraft
 
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -10,9 +10,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.mqttpanelcraft_beta.data.ProjectRepository
-import com.example.mqttpanelcraft_beta.model.Project
-import com.example.mqttpanelcraft_beta.model.ProjectType
+import com.example.mqttpanelcraft.data.ProjectRepository
+import com.example.mqttpanelcraft.model.Project
+import com.example.mqttpanelcraft.model.ProjectType
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 

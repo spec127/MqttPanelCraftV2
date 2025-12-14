@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mqttpanelcraft_beta"
+    namespace = "com.example.mqttpanelcraft"
     compileSdk {
         version = release(36)
     }
@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.spec127.mqttpanelcraft_beta"
+        applicationId = "com.spec127.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

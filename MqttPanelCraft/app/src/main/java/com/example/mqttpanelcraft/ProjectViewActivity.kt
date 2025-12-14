@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta
+package com.example.mqttpanelcraft
 
 import android.content.ClipData
 import android.content.ClipDescription
@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Point
 import android.graphics.Shader
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.DragEvent
 import android.view.Gravity
@@ -24,21 +23,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mqttpanelcraft_beta.data.ProjectRepository
-import com.example.mqttpanelcraft_beta.ui.AlignmentOverlayView
-import com.example.mqttpanelcraft_beta.utils.CrashLogger
+import com.example.mqttpanelcraft.data.ProjectRepository
+import com.example.mqttpanelcraft.ui.AlignmentOverlayView
+import com.example.mqttpanelcraft.utils.CrashLogger
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
-import kotlin.math.roundToInt
 
 class ProjectViewActivity : AppCompatActivity() {
 
@@ -67,7 +64,7 @@ class ProjectViewActivity : AppCompatActivity() {
 
     private var isEditMode = false 
     private var projectId: String? = null
-    private var project: com.example.mqttpanelcraft_beta.model.Project? = null
+    private var project: com.example.mqttpanelcraft.model.Project? = null
     
     private var selectedView: View? = null
     private val snapThreshold = 16f // dp
@@ -212,18 +209,27 @@ class ProjectViewActivity : AppCompatActivity() {
                 // val intent = android.content.Intent(this, SetupActivity::class.java) 
                 // ERROR: SetupActivity import might be missing, using fully qualified or resolving
                 try {
-                     val intent = android.content.Intent(this, Class.forName("com.example.mqttpanelcraft_beta.SetupActivity"))
+                     val intent = android.content.Intent(this, Class.forName("com.example.mqttpanelcraft.SetupActivity"))
                      intent.putExtra("PROJECT_ID", projectId)
                      startActivity(intent)
                      finish()
                 } catch (e: Exception) {
-                    android.widget.Toast.makeText(this, "Setup Activity not found", android.widget.Toast.LENGTH_SHORT).show()
+                    android.widget.Toast.makeText(this, "Setup Activity not found: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
                 }
             }
         }
         
         // Run Mode Sidebar Actions
         try {
+            // Show Grid Toggle (Run Mode)
+            val switchGridToggleRunMode = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchGridToggleRunMode)
+            val backgroundGrid = findViewById<View>(R.id.backgroundGrid)
+            
+            switchGridToggleRunMode?.setOnCheckedChangeListener { _, isChecked ->
+                backgroundGrid?.visibility = if (isChecked) View.VISIBLE else View.GONE
+            }
+            
+            // Dark Mode Toggle
             val switchDarkMode = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchDarkMode)
             
             // Set initial state
@@ -272,6 +278,12 @@ class ProjectViewActivity : AppCompatActivity() {
                                       .setTitle("Delete Component")
                                       .setMessage("Are you sure you want to delete this component?")
                                       .setPositiveButton("Delete") { _, _ ->
+                                          // Find and remove the label first
+                                          val labelView = findLabelView(component)
+                                          if (labelView != null) {
+                                              editorCanvas.removeView(labelView)
+                                          }
+                                          // Remove the component
                                           editorCanvas.removeView(component)
                                           guideOverlay.clear() // Clear lines
                                       }
@@ -408,9 +420,11 @@ class ProjectViewActivity : AppCompatActivity() {
                         } catch (e: Exception) {}
                     }
                     
-                    if (view is TextView) view.text = etPropName.text.toString()
-                    else if (view is Button) view.text = etPropName.text.toString()
-                    else if (view is SwitchMaterial) view.text = etPropName.text.toString()
+                    // Update the label text
+                    val labelView = findLabelView(view)
+                    if (labelView != null) {
+                        labelView.text = etPropName.text.toString()
+                    }
                     
                     Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
@@ -512,6 +526,7 @@ class ProjectViewActivity : AppCompatActivity() {
     private fun updateModeUI() {
         val sidebarEditMode = findViewById<View>(R.id.sidebarEditMode)
         val sidebarRunMode = findViewById<View>(R.id.sidebarRunMode)
+        val backgroundGrid = findViewById<View>(R.id.backgroundGrid)
 
         if (isEditMode) {
              fabMode.setImageResource(android.R.drawable.ic_media_play) 
@@ -527,6 +542,11 @@ class ProjectViewActivity : AppCompatActivity() {
              containerProperties.visibility = View.VISIBLE 
              guideOverlay.visibility = View.VISIBLE 
              guideOverlay.bringToFront()
+             
+             // Sync Edit Mode grid toggle with actual grid visibility
+             val switchGridToggle = findViewById<SwitchMaterial>(R.id.switchGridToggle)
+             switchGridToggle?.isChecked = (backgroundGrid?.visibility == View.VISIBLE)
+             
              Toast.makeText(this, "Edit Mode", Toast.LENGTH_SHORT).show()
         } else {
              fabMode.setImageResource(android.R.drawable.ic_menu_edit)
@@ -543,6 +563,11 @@ class ProjectViewActivity : AppCompatActivity() {
              
              containerLogs.visibility = View.VISIBLE
              containerProperties.visibility = View.GONE
+             
+             // Sync Run Mode grid toggle with actual grid visibility
+             val switchGridToggleRunMode = findViewById<SwitchMaterial>(R.id.switchGridToggleRunMode)
+             switchGridToggleRunMode?.isChecked = (backgroundGrid?.visibility == View.VISIBLE)
+             
              Toast.makeText(this, "Run Mode", Toast.LENGTH_SHORT).show()
         }
     }
@@ -550,9 +575,34 @@ class ProjectViewActivity : AppCompatActivity() {
     private fun setupSidebarInteraction() {
         val touchListener = View.OnTouchListener { view, event ->
              if (event.action == MotionEvent.ACTION_DOWN) {
-                 val item = ClipData.Item(view.tag as? CharSequence)
-                 val dragData = ClipData(view.tag as? CharSequence, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), item)
-                 val shadow = View.DragShadowBuilder(view)
+                 val tag = view.tag as? String ?: return@OnTouchListener false
+                 
+                 // Create a preview of the actual component
+                 val previewView = createComponentView(tag)
+                 val density = resources.displayMetrics.density
+                 val sizePx = (50 * density).toInt()
+                 
+                 // Measure and layout the preview (including all children)
+                 previewView.measure(
+                     View.MeasureSpec.makeMeasureSpec(sizePx, View.MeasureSpec.EXACTLY),
+                     View.MeasureSpec.makeMeasureSpec(sizePx, View.MeasureSpec.EXACTLY)
+                 )
+                 previewView.layout(0, 0, sizePx, sizePx)
+                 
+                 // Force layout of children
+                 if (previewView is FrameLayout && previewView.childCount > 0) {
+                     val child = previewView.getChildAt(0)
+                     child.measure(
+                         View.MeasureSpec.makeMeasureSpec(sizePx - 8, View.MeasureSpec.EXACTLY),
+                         View.MeasureSpec.makeMeasureSpec(sizePx - 8, View.MeasureSpec.EXACTLY)
+                     )
+                     child.layout(4, 4, sizePx - 4, sizePx - 4)
+                 }
+                 
+                 // Create drag data and shadow
+                 val item = ClipData.Item(tag)
+                 val dragData = ClipData(tag, arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN), item)
+                 val shadow = View.DragShadowBuilder(previewView)
                  view.startDragAndDrop(dragData, shadow, view, 0)
                  
                  drawerLayout.closeDrawer(GravityCompat.START)
@@ -570,6 +620,42 @@ class ProjectViewActivity : AppCompatActivity() {
         findViewById<View>(R.id.cardLed).apply { tag="LED"; setOnTouchListener(touchListener) }
         findViewById<View>(R.id.cardThermometer).apply { tag="THERMOMETER"; setOnTouchListener(touchListener) }
 
+        // Component Search Filter
+        val etSearchComponents = findViewById<EditText>(R.id.etSearchComponents)
+        val componentCards = listOf(
+            findViewById<View>(R.id.cardText),
+            findViewById<View>(R.id.cardImage),
+            findViewById<View>(R.id.cardButton),
+            findViewById<View>(R.id.cardSlider),
+            findViewById<View>(R.id.cardLed),
+            findViewById<View>(R.id.cardThermometer)
+        )
+        
+        // Handle Clear Button (DrawableEnd) Click
+        etSearchComponents?.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                if (event.rawX >= (etSearchComponents.right - etSearchComponents.compoundDrawables[2].bounds.width())) {
+                    etSearchComponents.text.clear()
+                    v.performClick()
+                    return@setOnTouchListener true
+                }
+            }
+            false
+        }
+
+        etSearchComponents?.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                val searchText = s.toString().lowercase().trim()
+                componentCards.forEach { card ->
+                    val componentTag = card.tag as? String ?: ""
+                    val isVisible = componentTag.lowercase().contains(searchText)
+                    card.visibility = if (isVisible) View.VISIBLE else View.GONE
+                }
+            }
+        })
+
         editorCanvas.setOnDragListener { v, event ->
             if (!isEditMode) return@setOnDragListener false
             when (event.action) {
@@ -586,6 +672,12 @@ class ProjectViewActivity : AppCompatActivity() {
                     guideOverlay.clear()
                     val localState = event.localState as? View
                     localState?.visibility = View.VISIBLE
+                    
+                    // Also show the label
+                    if (localState != null) {
+                        val labelView = findLabelView(localState)
+                        labelView?.visibility = View.VISIBLE
+                    }
                 }
             }
             true
@@ -611,6 +703,13 @@ class ProjectViewActivity : AppCompatActivity() {
              localView.x = finalX
              localView.y = finalY
              localView.visibility = View.VISIBLE
+             
+             // Update label position
+             val labelView = findLabelView(localView)
+             if (labelView != null) {
+                 labelView.x = finalX
+                 labelView.y = finalY + localView.height + 4
+             }
         } else {
             val tag = event.clipData?.getItemAt(0)?.text?.toString() ?: "TEXT"
             val newView = createComponentView(tag)
@@ -628,12 +727,31 @@ class ProjectViewActivity : AppCompatActivity() {
             newView.id = View.generateViewId()
             
             editorCanvas.addView(newView)
-            makeDraggable(newView) 
+            makeDraggable(newView)
+            
+            // Add label below component
+            val labelView = TextView(this).apply {
+                id = View.generateViewId()
+                text = tag
+                textSize = 10f
+                gravity = Gravity.CENTER
+                setTextColor(Color.DKGRAY)
+                setTag("LABEL_FOR_${newView.id}") // Link to component
+                
+                val labelParams = ConstraintLayout.LayoutParams(
+                    sizePx, // Match component width
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                )
+                layoutParams = labelParams
+                this.x = newView.x // Align with component
+                this.y = newView.y + sizePx + 4 // Position below component
+            }
+            editorCanvas.addView(labelView)
         }
     }
     
     private fun createComponentView(tag: String): View {
-        return when (tag) {
+        val innerView = when (tag) {
             "TEXT" -> TextView(this).apply {
                 text = "Txt"
                 setBackgroundColor(0xFFE1F5FE.toInt())
@@ -655,16 +773,24 @@ class ProjectViewActivity : AppCompatActivity() {
                 value = 50f
             }
             "LED" -> View(this).apply {
-                setBackgroundResource(R.drawable.shape_circle_green) // Using existing circle shape
+                setBackgroundResource(R.drawable.shape_circle_green)
             }
             "THERMOMETER" -> android.widget.ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
                 progress = 50
                 max = 100
-                // Hack to make it look vertical? Or just horizontal for now.
-                // Or use a simple View that looks like a bar.
-                // For simplicity, let's use a narrow view with a background.
             }
             else -> TextView(this).apply { text = "?" }
+        }
+        
+        // Just return the bordered component - label will be added separately
+        return FrameLayout(this).apply {
+            setBackgroundResource(R.drawable.component_border)
+            setPadding(4, 4, 4, 4)
+            setTag(tag) // Store the tag for creating label later
+            addView(innerView, FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            ))
         }
     }
     
@@ -684,7 +810,12 @@ class ProjectViewActivity : AppCompatActivity() {
              val data = ClipData.newPlainText("id", view.id.toString()) 
              val shadow = View.DragShadowBuilder(view)
              view.startDragAndDrop(data, shadow, view, 0)
-             view.visibility = View.INVISIBLE 
+             view.visibility = View.INVISIBLE
+             
+             // Also hide the label during drag
+             val labelView = findLabelView(view)
+             labelView?.visibility = View.INVISIBLE
+             
              true
         }
     }
@@ -740,8 +871,25 @@ class ProjectViewActivity : AppCompatActivity() {
         etPropWidth.setText((params.width / density).toInt().toString())
         etPropHeight.setText((params.height / density).toInt().toString())
         
-        if (view is TextView) etPropName.setText(view.text)
-        else if (view is Button) etPropName.setText(view.text)
-        else if (view is SwitchMaterial) etPropName.setText(view.text)
+        // Find the label TextView and display its text
+        val labelView = findLabelView(view)
+        if (labelView != null) {
+            etPropName.setText(labelView.text)
+        } else {
+            etPropName.setText("")
+        }
+     }
+     
+     // Helper function to find the label TextView in the component hierarchy
+     private fun findLabelView(view: View): TextView? {
+         // Labels are now separate views on the canvas with tag "LABEL_FOR_{componentId}"
+         val targetTag = "LABEL_FOR_${view.id}"
+         for (i in 0 until editorCanvas.childCount) {
+             val child = editorCanvas.getChildAt(i)
+             if (child is TextView && child.tag == targetTag) {
+                 return child
+             }
+         }
+         return null
      }
 }

@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta.utils
+package com.example.mqttpanelcraft.utils
 
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
