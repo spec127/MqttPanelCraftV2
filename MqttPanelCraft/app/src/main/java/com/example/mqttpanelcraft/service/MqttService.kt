@@ -1,17 +1,15 @@
-package com.example.mqttpanelcraft_beta.service
+package com.example.mqttpanelcraft.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import com.example.mqttpanelcraft_beta.MqttRepository
-import com.example.mqttpanelcraft_beta.MqttStatus
-import com.example.mqttpanelcraft_beta.R
+import com.example.mqttpanelcraft.MqttRepository
+import com.example.mqttpanelcraft.MqttStatus
+import com.example.mqttpanelcraft.R
 import org.eclipse.paho.client.mqttv3.*
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import kotlinx.coroutines.*
@@ -66,7 +64,7 @@ class MqttService : Service() {
         if (broker.isNullOrEmpty()) return
 
         serviceScope.launch {
-            MqttRepository.setStatus(com.example.mqttpanelcraft_beta.MqttStatus.CONNECTING) // Gray
+            MqttRepository.setStatus(com.example.mqttpanelcraft.MqttStatus.CONNECTING) // Gray
             
             var attempt = 1
             val maxAttempts = 3

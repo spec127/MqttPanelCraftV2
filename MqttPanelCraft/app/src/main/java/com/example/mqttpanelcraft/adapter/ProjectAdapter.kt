@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta.adapter
+package com.example.mqttpanelcraft.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mqttpanelcraft_beta.R
-import com.example.mqttpanelcraft_beta.model.Project
+import com.example.mqttpanelcraft.R
+import com.example.mqttpanelcraft.model.Project
 import com.google.android.material.chip.Chip
 
 import android.widget.PopupMenu

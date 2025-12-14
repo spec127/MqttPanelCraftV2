@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta
+package com.example.mqttpanelcraft
 
 import android.content.ClipData
 import android.content.ClipDescription
@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Point
 import android.graphics.Shader
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.DragEvent
 import android.view.Gravity
@@ -24,21 +23,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mqttpanelcraft_beta.data.ProjectRepository
-import com.example.mqttpanelcraft_beta.ui.AlignmentOverlayView
-import com.example.mqttpanelcraft_beta.utils.CrashLogger
+import com.example.mqttpanelcraft.data.ProjectRepository
+import com.example.mqttpanelcraft.ui.AlignmentOverlayView
+import com.example.mqttpanelcraft.utils.CrashLogger
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
-import kotlin.math.roundToInt
 
 class ProjectViewActivity : AppCompatActivity() {
 
@@ -67,7 +64,7 @@ class ProjectViewActivity : AppCompatActivity() {
 
     private var isEditMode = false 
     private var projectId: String? = null
-    private var project: com.example.mqttpanelcraft_beta.model.Project? = null
+    private var project: com.example.mqttpanelcraft.model.Project? = null
     
     private var selectedView: View? = null
     private val snapThreshold = 16f // dp
@@ -94,13 +91,13 @@ class ProjectViewActivity : AppCompatActivity() {
                 loadProjectDetails(projectId!!)
                 
                 // v18: Start Background Service
-                val project = com.example.mqttpanelcraft_beta.data.ProjectRepository.getProjectById(projectId!!)
+                val project = com.example.mqttpanelcraft.data.ProjectRepository.getProjectById(projectId!!)
                 if (project != null) {
                     // v19: Save Last Project ID
                     val prefs = getSharedPreferences("MqttPanelPrefs", android.content.Context.MODE_PRIVATE)
                     prefs.edit().putString("LAST_PROJECT_ID", projectId).apply()
 
-                    val serviceIntent = android.content.Intent(this, com.example.mqttpanelcraft_beta.service.MqttService::class.java)
+                    val serviceIntent = android.content.Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java)
                     serviceIntent.action = "CONNECT"
                     serviceIntent.putExtra("BROKER", project.broker)
                     serviceIntent.putExtra("PORT", project.port)
@@ -253,9 +250,9 @@ class ProjectViewActivity : AppCompatActivity() {
         btnSettings.setOnClickListener {
              if (projectId != null) {
                 // val intent = android.content.Intent(this, SetupActivity::class.java) 
-                // ERROR: SetupActivity import might be missing, using fully qualified or resolving
+                // Using direct class reference is safer
                 try {
-                     val intent = android.content.Intent(this, Class.forName("com.example.mqttpanelcraft_beta.SetupActivity"))
+                     val intent = android.content.Intent(this, SetupActivity::class.java)
                      intent.putExtra("PROJECT_ID", projectId)
                      startActivity(intent)
                      // finish() // Removed v21: Keep activity in stack
@@ -526,7 +523,7 @@ class ProjectViewActivity : AppCompatActivity() {
             val topic = etTopic.text.toString()
             val payload = etPayload.text.toString()
             if (topic.isNotEmpty() && payload.isNotEmpty()) {
-                val serviceIntent = android.content.Intent(this, com.example.mqttpanelcraft_beta.service.MqttService::class.java)
+                val serviceIntent = android.content.Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java)
                 serviceIntent.action = "PUBLISH"
                 serviceIntent.putExtra("TOPIC", topic)
                 serviceIntent.putExtra("PAYLOAD", payload)
@@ -537,7 +534,7 @@ class ProjectViewActivity : AppCompatActivity() {
         btnSubscribe.setOnClickListener {
             val topic = etTopic.text.toString()
             if (topic.isNotEmpty()) {
-                val serviceIntent = android.content.Intent(this, com.example.mqttpanelcraft_beta.service.MqttService::class.java)
+                val serviceIntent = android.content.Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java)
                 serviceIntent.action = "SUBSCRIBE"
                 serviceIntent.putExtra("TOPIC", topic)
                 startService(serviceIntent)

@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta
+package com.example.mqttpanelcraft
 
 import android.app.Application
 import android.os.Handler
@@ -16,7 +16,7 @@ class MyApplication : Application() {
         super.onCreate()
 
         // Init Data Layer
-        com.example.mqttpanelcraft_beta.data.ProjectRepository.initialize(this)
+        com.example.mqttpanelcraft.data.ProjectRepository.initialize(this)
 
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             handleUncaughtException(thread, throwable)

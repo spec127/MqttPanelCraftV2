@@ -101,13 +101,13 @@
                     android:layout_height="match_parent">
                     
                     <!-- Background Pattern -->
-                    <com.example.mqttpanelcraft_beta.ui.GridPatternView
+                    <com.example.mqttpanelcraft.ui.GridPatternView
                         android:id="@+id/backgroundGrid"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
                     
                     <!-- Guidelines Overlay -->
-                     <com.example.mqttpanelcraft_beta.ui.AlignmentOverlayView
+                     <com.example.mqttpanelcraft.ui.AlignmentOverlayView
                         android:id="@+id/guideOverlay"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"

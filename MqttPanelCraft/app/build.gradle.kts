@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mqttpanelcraft_beta"
+    namespace = "com.example.mqttpanelcraft"
     compileSdk {
         version = release(36)
     }

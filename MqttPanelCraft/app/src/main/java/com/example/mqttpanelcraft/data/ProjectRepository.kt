@@ -1,8 +1,8 @@
-package com.example.mqttpanelcraft_beta.data
+package com.example.mqttpanelcraft.data
 
 import android.content.Context
-import com.example.mqttpanelcraft_beta.model.Project
-import com.example.mqttpanelcraft_beta.model.ProjectType
+import com.example.mqttpanelcraft.model.Project
+import com.example.mqttpanelcraft.model.ProjectType
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File

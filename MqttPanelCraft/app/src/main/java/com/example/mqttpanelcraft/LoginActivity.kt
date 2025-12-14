@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta
+package com.example.mqttpanelcraft
 
 import android.content.Intent
 import android.os.Bundle
@@ -17,7 +17,7 @@ import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.util.Locale
-import com.example.mqttpanelcraft_beta.utils.CrashLogger
+import com.example.mqttpanelcraft.utils.CrashLogger
 
 class LoginActivity : AppCompatActivity() {
 
