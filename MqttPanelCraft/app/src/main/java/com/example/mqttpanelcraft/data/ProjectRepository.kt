@@ -1,7 +1,7 @@
-package com.example.mqttpanelcraft_beta.data
+package com.example.mqttpanelcraft.data
 
-import com.example.mqttpanelcraft_beta.model.Project
-import com.example.mqttpanelcraft_beta.model.ProjectType
+import com.example.mqttpanelcraft.model.Project
+import com.example.mqttpanelcraft.model.ProjectType
 
 object ProjectRepository {
     private val projects = mutableListOf<Project>()

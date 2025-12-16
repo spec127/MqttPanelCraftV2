@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta
+package com.example.mqttpanelcraft
 
 import android.content.ClipData
 import android.content.ClipDescription
@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Point
 import android.graphics.Shader
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.DragEvent
 import android.view.Gravity
@@ -24,21 +23,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mqttpanelcraft_beta.data.ProjectRepository
-import com.example.mqttpanelcraft_beta.ui.AlignmentOverlayView
-import com.example.mqttpanelcraft_beta.utils.CrashLogger
+import com.example.mqttpanelcraft.data.ProjectRepository
+import com.example.mqttpanelcraft.ui.AlignmentOverlayView
+import com.example.mqttpanelcraft.utils.CrashLogger
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
-import kotlin.math.roundToInt
 
 class ProjectViewActivity : AppCompatActivity() {
 
@@ -67,7 +64,7 @@ class ProjectViewActivity : AppCompatActivity() {
 
     private var isEditMode = false 
     private var projectId: String? = null
-    private var project: com.example.mqttpanelcraft_beta.model.Project? = null
+    private var project: com.example.mqttpanelcraft.model.Project? = null
     
     private var selectedView: View? = null
     private val snapThreshold = 16f // dp

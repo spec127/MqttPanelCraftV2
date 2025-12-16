@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta.model
+package com.example.mqttpanelcraft.model
 
 data class Project(
     val id: String,
