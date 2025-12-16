@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta.ui
+package com.example.mqttpanelcraft.ui
 
 import android.content.Context
 import android.graphics.Canvas

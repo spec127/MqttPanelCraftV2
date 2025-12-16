@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta
+package com.example.mqttpanelcraft
 
 import android.app.Application
 import android.os.Handler

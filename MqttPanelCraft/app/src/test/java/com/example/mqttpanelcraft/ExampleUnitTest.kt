@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta
+package com.example.mqttpanelcraft
 
 import org.junit.Test
 

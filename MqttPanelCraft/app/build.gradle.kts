@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mqttpanelcraft_beta"
+    namespace = "com.example.mqttpanelcraft"
     compileSdk {
         version = release(36)
     }
@@ -50,4 +50,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("com.google.android.gms:play-services-ads:23.0.0")
 }

@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta
+package com.example.mqttpanelcraft
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,13 +6,13 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.mqttpanelcraft_beta.adapter.ProjectAdapter
-import com.example.mqttpanelcraft_beta.data.ProjectRepository
-import com.example.mqttpanelcraft_beta.databinding.ActivityDashboardBinding
+import com.example.mqttpanelcraft.adapter.ProjectAdapter
+import com.example.mqttpanelcraft.data.ProjectRepository
+import com.example.mqttpanelcraft.databinding.ActivityDashboardBinding
 
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.mqttpanelcraft_beta.utils.CrashLogger
+import com.example.mqttpanelcraft.utils.CrashLogger
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import android.widget.AutoCompleteTextView
@@ -38,6 +38,14 @@ class DashboardActivity : AppCompatActivity() {
             setupDrawer()
             setupRecyclerView()
             setupFab()
+            
+            // Initialize Data
+            ProjectRepository.initialize(this)
+
+            // Initialize Ads
+            com.example.mqttpanelcraft.utils.AdManager.initialize(this)
+            com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, binding.bannerAdContainer)
+
         } catch (e: Exception) {
             CrashLogger.logError(this, "Dashboard Init Failed", e)
         }
@@ -139,7 +147,7 @@ class DashboardActivity : AppCompatActivity() {
                         .setMessage("Are you sure you want to delete '${project.name}'?")
                         .setPositiveButton("Delete") { _, _ ->
                             try {
-                                ProjectRepository.deleteProject(project.id)
+                                ProjectRepository.deleteProject(this@DashboardActivity, project.id)
                                 loadProjects() // Refresh list
                                 Toast.makeText(this, "Project deleted", Toast.LENGTH_SHORT).show()
                             } catch (e: Exception) {

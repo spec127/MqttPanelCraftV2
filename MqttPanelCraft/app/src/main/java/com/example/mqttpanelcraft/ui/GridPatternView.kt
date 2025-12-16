@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta.ui
+package com.example.mqttpanelcraft.ui
 
 import android.content.Context
 import android.graphics.Canvas
@@ -6,7 +6,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
-import com.example.mqttpanelcraft_beta.R
+import com.example.mqttpanelcraft.R
 
 class GridPatternView @JvmOverloads constructor(
     context: Context,

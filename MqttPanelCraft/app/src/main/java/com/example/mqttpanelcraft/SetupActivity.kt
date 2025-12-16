@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta
+package com.example.mqttpanelcraft
 
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -10,9 +10,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.mqttpanelcraft_beta.data.ProjectRepository
-import com.example.mqttpanelcraft_beta.model.Project
-import com.example.mqttpanelcraft_beta.model.ProjectType
+import com.example.mqttpanelcraft.data.ProjectRepository
+import com.example.mqttpanelcraft.model.Project
+import com.example.mqttpanelcraft.model.ProjectType
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 
@@ -42,6 +42,12 @@ class SetupActivity : AppCompatActivity() {
         if (projectId != null) {
             setupEditMode(projectId!!)
         }
+        
+        // Initialize Data (in case started directly or process restoration)
+        ProjectRepository.initialize(this)
+
+        com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, findViewById(R.id.bannerAdContainer))
+        com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
     }
     
     private fun setupEditMode(id: String) {
@@ -121,14 +127,38 @@ class SetupActivity : AppCompatActivity() {
                 isConnected = false
             )
             
-            if (projectId != null) {
-                ProjectRepository.updateProject(newProject)
+            // Unified Flow: Always Show Rewarded
+            val targetProjectId = newProject.id
+            var isRewardEarned = false 
+
+            if (com.example.mqttpanelcraft.utils.AdManager.isRewardedReady()) {
+                com.example.mqttpanelcraft.utils.AdManager.showRewarded(this, 
+                    onReward = { 
+                        isRewardEarned = true
+                    },
+                    onClosed = {
+                        if (isRewardEarned) {
+                            if (projectId != null) {
+                                ProjectRepository.updateProject(this, newProject)
+                            } else {
+                                ProjectRepository.addProject(this, newProject)
+                            }
+                            
+                            val intent = android.content.Intent(this, ProjectViewActivity::class.java)
+                            intent.putExtra("PROJECT_ID", targetProjectId)
+                            intent.putExtra("IS_EDIT_MODE", true)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            android.widget.Toast.makeText(this, "You must watch the full ad to save/update!", android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    }
+                )
             } else {
-                ProjectRepository.addProject(newProject)
+                android.widget.Toast.makeText(this, "Ad is loading, please wait...", android.widget.Toast.LENGTH_SHORT).show()
+                // Retry loading just in case
+                com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
             }
-            
-            // Finish SetupActivity to return to previous screen (Dashboard)
-            finish()
         }
     }
 

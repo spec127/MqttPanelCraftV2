@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft_beta
+package com.example.mqttpanelcraft
 
 import android.content.ClipData
 import android.content.ClipDescription
@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Point
 import android.graphics.Shader
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.DragEvent
 import android.view.Gravity
@@ -24,21 +23,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mqttpanelcraft_beta.data.ProjectRepository
-import com.example.mqttpanelcraft_beta.ui.AlignmentOverlayView
-import com.example.mqttpanelcraft_beta.utils.CrashLogger
+import com.example.mqttpanelcraft.data.ProjectRepository
+import com.example.mqttpanelcraft.ui.AlignmentOverlayView
+import com.example.mqttpanelcraft.utils.CrashLogger
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
-import kotlin.math.roundToInt
 
 class ProjectViewActivity : AppCompatActivity() {
 
@@ -67,7 +64,7 @@ class ProjectViewActivity : AppCompatActivity() {
 
     private var isEditMode = false 
     private var projectId: String? = null
-    private var project: com.example.mqttpanelcraft_beta.model.Project? = null
+    private var project: com.example.mqttpanelcraft.model.Project? = null
     
     private var selectedView: View? = null
     private val snapThreshold = 16f // dp
@@ -106,12 +103,94 @@ class ProjectViewActivity : AppCompatActivity() {
                 }
             }
             
+            
             // Ensure UI reflects restored mode
             updateModeUI()
+            
+            // Initialize Data
+            ProjectRepository.initialize(this)
+            
+            // Initialize Ads
+            com.example.mqttpanelcraft.utils.AdManager.initialize(this)
+            com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, findViewById(R.id.bannerAdContainer))
+            
+            // Start/Stop Idle Controller based on initial mode
+            if (!isEditMode) {
+                idleAdController.start()
+            }
             
         } catch (e: Exception) {
             CrashLogger.logError(this, "Project View Init Failed", e)
             finish()
+        }
+    }
+    
+    // --- Idle Ad Controller ---
+    private val idleAdController = IdleAdController()
+    
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        idleAdController.onUserInteraction()
+        return super.dispatchTouchEvent(ev)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        idleAdController.stop()
+    }
+    
+    inner class IdleAdController {
+        private val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        private val intervals = listOf(30L, 60L, 180L, 300L, 600L) // Seconds
+        private var currentIntervalIndex = 0
+        private var isRunning = false
+        
+        private val idleRunnable = Runnable {
+            showAdAndScheduleNext()
+        }
+        
+        fun start() {
+            if (isRunning) return
+            isRunning = true
+            currentIntervalIndex = 0 // Reset sequence on entry? User said "First time is 30s...".
+            // If user toggles modes, should we reset? Usually yes.
+            scheduleNext(intervals[0])
+        }
+        
+        fun stop() {
+            if (!isRunning) return
+            isRunning = false
+            handler.removeCallbacks(idleRunnable)
+        }
+        
+        fun onUserInteraction() {
+            if (isRunning) {
+                // Reset timer for CURRENT interval
+                handler.removeCallbacks(idleRunnable)
+                val delay = if (currentIntervalIndex < intervals.size) intervals[currentIntervalIndex] else 600L
+                scheduleNext(delay)
+            }
+        }
+        
+        private fun scheduleNext(delaySeconds: Long) {
+            handler.removeCallbacks(idleRunnable)
+            handler.postDelayed(idleRunnable, delaySeconds * 1000)
+            android.util.Log.d("IdleAd", "Scheduled ad in ${delaySeconds}s")
+        }
+        
+        private fun showAdAndScheduleNext() {
+            if (!isRunning) return
+            
+            com.example.mqttpanelcraft.utils.AdManager.showInterstitial(this@ProjectViewActivity) {
+                // On Ad Closed
+                // Advance to next interval
+                if (currentIntervalIndex < intervals.size - 1) {
+                    currentIntervalIndex++
+                }
+                val nextDelay = intervals[currentIntervalIndex] // or last one if maxed
+                // If maxed, it stays at 60m (3600L)
+                val delay = if (currentIntervalIndex < intervals.size) intervals[currentIntervalIndex] else 600L
+                scheduleNext(delay)
+            }
         }
     }
     
@@ -209,18 +288,13 @@ class ProjectViewActivity : AppCompatActivity() {
         val btnSettings = findViewById<ImageView>(R.id.btnSettings)
         btnSettings.setOnClickListener {
              if (projectId != null) {
-                // val intent = android.content.Intent(this, SetupActivity::class.java) 
-                // ERROR: SetupActivity import might be missing, using fully qualified or resolving
-                try {
-                     val intent = android.content.Intent(this, Class.forName("com.example.mqttpanelcraft_beta.SetupActivity"))
-                     intent.putExtra("PROJECT_ID", projectId)
-                     startActivity(intent)
-                     finish()
-                } catch (e: Exception) {
-                    android.widget.Toast.makeText(this, "Setup Activity not found", android.widget.Toast.LENGTH_SHORT).show()
-                }
+                val intent = android.content.Intent(this, SetupActivity::class.java)
+                intent.putExtra("PROJECT_ID", projectId)
+                startActivity(intent)
+                finish()
             }
         }
+
         
         // Run Mode Sidebar Actions
         try {
@@ -520,14 +594,10 @@ class ProjectViewActivity : AppCompatActivity() {
              // User wants to open sidebar in Edit mode (Components). 
              drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
              
-             sidebarEditMode?.visibility = View.VISIBLE
-             sidebarRunMode?.visibility = View.GONE
-             
-             containerLogs.visibility = View.GONE
-             containerProperties.visibility = View.VISIBLE 
-             guideOverlay.visibility = View.VISIBLE 
              guideOverlay.bringToFront()
              Toast.makeText(this, "Edit Mode", Toast.LENGTH_SHORT).show()
+             
+             idleAdController.stop() // Pause ads in Edit Mode
         } else {
              fabMode.setImageResource(android.R.drawable.ic_menu_edit)
              editorCanvas.background = null
@@ -544,6 +614,8 @@ class ProjectViewActivity : AppCompatActivity() {
              containerLogs.visibility = View.VISIBLE
              containerProperties.visibility = View.GONE
              Toast.makeText(this, "Run Mode", Toast.LENGTH_SHORT).show()
+             
+             idleAdController.start() // Resume/Start ads in Run Mode
         }
     }
 
