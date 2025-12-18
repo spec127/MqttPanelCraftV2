@@ -298,19 +298,54 @@ class ProjectViewActivity : AppCompatActivity() {
         
         // Run Mode Sidebar Actions
         try {
-            val switchDarkMode = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchDarkMode)
+            val prefs = getSharedPreferences("ProjectViewPrefs", MODE_PRIVATE)
             
-            // Set initial state
-            val currentNightMode = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
-            switchDarkMode?.isChecked = (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES)
+            // Orientation Lock Switch
+            val switchOrientationLock = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchOrientationLock)
+            
+            // Restore saved state
+            val isOrientationLocked = prefs.getBoolean("orientation_locked", false)
+            switchOrientationLock?.isChecked = isOrientationLocked
+            
+            // Apply saved orientation setting
+            if (isOrientationLocked) {
+                requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED
+            } else {
+                requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            }
 
-            switchDarkMode?.setOnCheckedChangeListener { _, isChecked ->
+            switchOrientationLock?.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES)
+                    requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED
                 } else {
-                    androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO)
+                    requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
                 }
-                // Do NOT close drawer; let onSaveInstanceState handle state persistence
+                // Save state
+                prefs.edit().putBoolean("orientation_locked", isChecked).apply()
+            }
+            
+            // Keep Screen On Switch
+            val switchKeepScreenOn = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchKeepScreenOn)
+            
+            // Restore saved state
+            val isKeepScreenOn = prefs.getBoolean("keep_screen_on", false)
+            switchKeepScreenOn?.isChecked = isKeepScreenOn
+            
+            // Apply saved screen-on setting
+            if (isKeepScreenOn) {
+                window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+
+            switchKeepScreenOn?.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                } else {
+                    window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                }
+                // Save state
+                prefs.edit().putBoolean("keep_screen_on", isChecked).apply()
             }
         } catch (e: Exception) {
             e.printStackTrace()
