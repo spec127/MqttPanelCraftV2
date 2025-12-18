@@ -22,7 +22,7 @@ object ProjectRepository {
              // Defaults if empty
             projects.add(Project("1", "Smart Home", "broker.emqx.io", 1883, "", "", "", ProjectType.HOME, false))
             projects.add(Project("2", "Office Env", "test.mosquitto.org", 1883, "", "", "", ProjectType.FACTORY, false))
-            saveProjects() 
+            saveProjects()
             return
         }
 
@@ -40,7 +40,7 @@ object ProjectRepository {
                 val client = obj.optString("clientId", "")
                 val typeStr = obj.optString("type", "HOME")
                 val type = try { ProjectType.valueOf(typeStr) } catch (e: Exception) { ProjectType.HOME }
-                
+
                 projects.add(Project(id, name, broker, port, user, pass, client, type, false))
             }
         } catch (e: Exception) {
@@ -68,6 +68,12 @@ object ProjectRepository {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
+    init {
+        // Add some mock data for v1 visualization
+        projects.add(Project("1", "Smart Home", "broker.emqx.io", ProjectType.HOME, true))
+        projects.add(Project("2", "Office Env", "test.mosquitto.org", ProjectType.FACTORY, false))
+        projects.add(Project("3", "Factory A", "mqtt.eclipseprojects.io", ProjectType.FACTORY, false))
     }
 
     fun getAllProjects(): List<Project> {
@@ -112,5 +118,6 @@ object ProjectRepository {
         return projects.any {
             it.name.equals(name, ignoreCase = true) && it.id != excludeId
         }
+        return (projects.size + 1).toString()
     }
 }

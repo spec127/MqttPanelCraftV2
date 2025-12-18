@@ -7,13 +7,15 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+
+
     <!-- Grid Toggle Switch -->
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/switchGridToggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Show Grid"
-        android:checked="true"
+        android:checked="false"
         android:textSize="14sp"
         android:layout_marginBottom="12dp" />
 
@@ -28,6 +30,7 @@
         android:layout_marginBottom="16dp">
 
         <EditText
+            android:id="@+id/etSearchComponents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@null"
@@ -45,6 +48,7 @@
         android:scrollbars="none">
 
         <LinearLayout
+            android:id="@+id/cardsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -68,9 +72,8 @@
                 <!-- Text Card (Value) -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardText"
-                    android:layout_width="0dp"
+                    android:layout_width="116dp"
                     android:layout_height="100dp"
-                    android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="6dp"
@@ -102,9 +105,8 @@
                 <!-- Image Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardImage"
-                    android:layout_width="0dp"
+                    android:layout_width="116dp"
                     android:layout_height="100dp"
-                    android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="6dp"
@@ -153,9 +155,8 @@
                 <!-- Button Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardButton"
-                    android:layout_width="0dp"
+                    android:layout_width="116dp"
                     android:layout_height="100dp"
-                    android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="6dp"
@@ -186,9 +187,8 @@
                 <!-- Slider Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardSlider"
-                    android:layout_width="0dp"
+                    android:layout_width="116dp"
                     android:layout_height="100dp"
-                    android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="6dp"
@@ -237,9 +237,8 @@
                 <!-- LED Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardLed"
-                    android:layout_width="0dp"
+                    android:layout_width="116dp"
                     android:layout_height="100dp"
-                    android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="6dp"
@@ -270,9 +269,8 @@
                 <!-- Thermometer Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardThermometer"
-                    android:layout_width="0dp"
+                    android:layout_width="116dp"
                     android:layout_height="100dp"
-                    android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="6dp"
@@ -293,7 +291,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Thermo"
+                            android:text="Level Indicator"
                             android:textSize="12sp"
                             android:layout_marginTop="8dp"
                             android:textColor="@color/sidebar_text_secondary"/>

@@ -3,6 +3,8 @@ package com.example.mqttpanelcraft
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -37,11 +39,12 @@ class SetupActivity : AppCompatActivity() {
     private lateinit var etPassword: TextInputEditText
     private lateinit var btnTest: MaterialButton
     private lateinit var btnSave: MaterialButton
-    
+
     // Theme Cards
     private lateinit var cardHome: LinearLayout
     private lateinit var ivHome: ImageView
     private lateinit var tvHome: TextView
+
     private lateinit var cardFactory: LinearLayout
     private lateinit var ivFactory: ImageView
     private lateinit var tvFactory: TextView
@@ -58,10 +61,10 @@ class SetupActivity : AppCompatActivity() {
         if (projectId != null) {
             setupEditMode(projectId!!)
         }
-        
+
         setupWindowInsets()
     }
-    
+
     private fun setupWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -78,15 +81,15 @@ class SetupActivity : AppCompatActivity() {
         etPort.setText(project.port.toString())
         etUser.setText(project.username)
         etPassword.setText(project.password)
-        
+
         // v2: Show Project ID + Change Button
         val containerProjectId = findViewById<android.view.View>(R.id.containerProjectId)
         val tvProjectId = findViewById<TextView>(R.id.tvProjectId)
         val btnChangeId = findViewById<MaterialButton>(R.id.btnChangeId)
-        
+
         containerProjectId.visibility = android.view.View.VISIBLE
         tvProjectId.text = id
-        
+
         btnChangeId.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Change Project ID")
@@ -98,7 +101,7 @@ class SetupActivity : AppCompatActivity() {
                 .setNegativeButton("Cancel", null)
                 .show()
         }
-        
+
         // v38: Copy ID to Clipboard
         tvProjectId.setOnClickListener {
             val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
@@ -115,6 +118,10 @@ class SetupActivity : AppCompatActivity() {
     private fun setupToolbar() {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back) // Need this icon, or use standard back
+        // For now use default if arrow back not custom created, or create one.
+        // Standard Android usually has one if displayHomeAsUp is true.
+        // If not creating specific drawable, system default works.
     }
     
     override fun onSupportNavigateUp(): Boolean {
@@ -128,7 +135,7 @@ class SetupActivity : AppCompatActivity() {
         etPort = findViewById(R.id.etPort)
         etUser = findViewById(R.id.etUser)
         etPassword = findViewById(R.id.etPassword)
-        
+
         btnTest = findViewById(R.id.btnTestConnection)
         btnSave = findViewById(R.id.btnSaveProject)
 
@@ -154,24 +161,24 @@ class SetupActivity : AppCompatActivity() {
             saveProject()
         }
     }
-    
+
     private fun testConnection() {
         val broker = etBroker.text.toString()
         val portStr = etPort.text.toString()
         val user = etUser.text.toString()
         val pass = etPassword.text.toString()
-        
+
         if (broker.isBlank()) {
             etBroker.error = "Required"
             return
         }
-        
+
         val port = portStr.toIntOrNull() ?: 1883
         val uri = "tcp://$broker:$port"
-        
+
         btnTest.isEnabled = false
         btnTest.text = "Connecting..."
-        
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val clientId = "TestClient_" + System.currentTimeMillis()
@@ -180,20 +187,20 @@ class SetupActivity : AppCompatActivity() {
                 options.isCleanSession = true
                 options.connectionTimeout = 5
                 options.keepAliveInterval = 10
-                
+
                 if (user.isNotEmpty()) {
                     options.userName = user
                     options.password = pass.toCharArray()
                 }
-                
+
                 client.connect(options)
-                
+
                 withContext(Dispatchers.Main) {
                     btnTest.text = "Connected!"
                     btnTest.isEnabled = true
                     btnTest.setTextColor(Color.GREEN)
                     btnTest.strokeColor = ColorStateList.valueOf(Color.GREEN)
-                    
+
                     if (client.isConnected) {
                         try { client.disconnect() } catch (e: Exception) {}
                     }
@@ -204,7 +211,7 @@ class SetupActivity : AppCompatActivity() {
                     btnTest.isEnabled = true
                     btnTest.setTextColor(Color.RED) // Or default
                     btnTest.strokeColor = ColorStateList.valueOf(Color.RED)
-                    
+
                     AlertDialog.Builder(this@SetupActivity)
                         .setTitle("Connection Failed")
                         .setMessage(e.message ?: "Unknown Error")
@@ -214,23 +221,23 @@ class SetupActivity : AppCompatActivity() {
             }
         }
     }
-    
+
     private fun saveProject() {
         val name = etName.text.toString()
         val broker = etBroker.text.toString()
         val portStr = etPort.text.toString()
-        
+
         if (name.isBlank()) {
             etName.error = getString(R.string.error_name_required)
             return
         }
-        
+
         // Regex Validation
         if (!name.matches(Regex("^[A-Za-z0-9_]+$"))) {
             etName.error = "Only letters, numbers, and underscores allowed"
             return
         }
-        
+
         // Duplicate Name Check
         if (ProjectRepository.isProjectNameTaken(name, projectId)) {
             etName.error = "Project name already exists"
@@ -241,14 +248,14 @@ class SetupActivity : AppCompatActivity() {
             etBroker.error = getString(R.string.error_broker_required)
             return
         }
-        
+
         val port = portStr.toIntOrNull() ?: 1883
         val user = etUser.text.toString()
         val pass = etPassword.text.toString()
 
         // Determine ID
         var finalId = projectId ?: ProjectRepository.generateId()
-        
+
         // Check if ID was changed in UI (Only in Edit Mode)
         if (projectId != null) {
              val tvProjectId = findViewById<TextView>(R.id.tvProjectId)
@@ -268,13 +275,13 @@ class SetupActivity : AppCompatActivity() {
             type = selectedType,
             isConnected = false
         )
-        
+
         if (projectId != null) {
             if (finalId != projectId) {
                 // ID Changed: Delete old, Add new
                 ProjectRepository.deleteProject(projectId!!)
                 ProjectRepository.addProject(newProject)
-                
+
                 // Return result to Caller
                 val resultIntent = android.content.Intent()
                 resultIntent.putExtra("NEW_ID", finalId)
@@ -289,7 +296,7 @@ class SetupActivity : AppCompatActivity() {
             // Caller usually reloads list.
             setResult(RESULT_OK)
         }
-        
+
         // Finish SetupActivity to return to previous screen
         finish()
     }

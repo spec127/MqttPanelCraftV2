@@ -104,7 +104,8 @@
                     <com.example.mqttpanelcraft.ui.GridPatternView
                         android:id="@+id/backgroundGrid"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
+                        android:layout_height="match_parent"
+                        android:visibility="gone"/>
                     
                     <!-- Guidelines Overlay -->
                      <com.example.mqttpanelcraft.ui.AlignmentOverlayView
