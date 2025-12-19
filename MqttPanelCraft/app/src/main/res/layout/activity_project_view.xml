@@ -4,6 +4,7 @@
     android:id="@+id/rootCoordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     tools:context=".ProjectViewActivity">
 
     <!-- AppBar (Z-Order: Top) -->
@@ -30,7 +31,7 @@
                     android:id="@+id/tvToolbarTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Project"
+                    android:text=""
                     android:textColor="@android:color/white"
                     android:textSize="20sp"
                     android:textStyle="bold"
@@ -49,19 +50,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Draggable Trash Bin (Overlay) -->
-    <ImageView
-        android:id="@+id/binTrash"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:src="@android:drawable/ic_menu_delete"
-        android:padding="13dp"
-        app:tint="@android:color/white"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_gravity="top|end"
-        android:layout_marginEnd="60dp"
-        android:elevation="10dp"
-        android:visibility="visible" />
+    <!-- Draggable Trash Bin REMOVED -->
 
     <!-- Settings Wrench (Overlay - replacing Custom Gear) -->
     <ImageView
@@ -76,6 +65,26 @@
         android:layout_marginEnd="0dp"
         android:elevation="10dp"
         android:visibility="visible" />
+        
+    <!-- Drop to Delete Zone (Overlay) -->
+    <FrameLayout
+        android:id="@+id/dropDeleteZone"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_delete_zone_circle"
+        android:visibility="gone"
+        android:elevation="20dp"
+        android:layout_gravity="center_horizontal|bottom">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✕"
+            android:textColor="#FFFFFF"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"/>
+    </FrameLayout>
 
     <!-- DrawerLayout (Below AppBar) -->
     <androidx.drawerlayout.widget.DrawerLayout
@@ -330,7 +339,25 @@
                                  android:layout_height="wrap_content"
                                  android:text="Apply Changes"/>
                              
-                         </LinearLayout>
+                             <LinearLayout
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:orientation="horizontal"
+                         android:layout_marginTop="8dp">
+
+                         <Button
+                             android:id="@+id/btnClone"
+                             android:layout_width="0dp"
+                             android:layout_weight="1"
+                             android:layout_height="wrap_content"
+                             android:text="Clone"
+                             android:layout_marginEnd="8dp"
+                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+
+                     </LinearLayout>
+                     
+                 </LinearLayout>
                      </ScrollView>
         
                  </LinearLayout>

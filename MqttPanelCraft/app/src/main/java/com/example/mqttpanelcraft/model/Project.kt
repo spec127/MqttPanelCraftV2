@@ -9,7 +9,8 @@ data class Project(
     val password: String = "",
     val clientId: String = "",
     val type: ProjectType,
-    val isConnected: Boolean = false
+    val isConnected: Boolean = false,
+    val components: MutableList<ComponentData> = mutableListOf()
 )
 
 enum class ProjectType {

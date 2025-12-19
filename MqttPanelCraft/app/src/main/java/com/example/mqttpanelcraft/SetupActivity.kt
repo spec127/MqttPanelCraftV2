@@ -185,8 +185,8 @@ class SetupActivity : AppCompatActivity() {
                 val client = MqttClient(uri, clientId, MemoryPersistence())
                 val options = MqttConnectOptions()
                 options.isCleanSession = true
-                options.connectionTimeout = 5
-                options.keepAliveInterval = 10
+                options.connectionTimeout = 30
+                options.keepAliveInterval = 60
 
                 if (user.isNotEmpty()) {
                     options.userName = user
@@ -207,16 +207,18 @@ class SetupActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    btnTest.text = "Test Connection"
-                    btnTest.isEnabled = true
-                    btnTest.setTextColor(Color.RED) // Or default
-                    btnTest.strokeColor = ColorStateList.valueOf(Color.RED)
+                    if (!isFinishing && !isDestroyed) {
+                        btnTest.text = "Test Connection"
+                        btnTest.isEnabled = true
+                        btnTest.setTextColor(Color.RED) // Or default
+                        btnTest.strokeColor = ColorStateList.valueOf(Color.RED)
 
-                    AlertDialog.Builder(this@SetupActivity)
-                        .setTitle("Connection Failed")
-                        .setMessage(e.message ?: "Unknown Error")
-                        .setPositiveButton("OK", null)
-                        .show()
+                        AlertDialog.Builder(this@SetupActivity)
+                            .setTitle("Connection Failed")
+                            .setMessage(e.message ?: "Unknown Error")
+                            .setPositiveButton("OK", null)
+                            .show()
+                    }
                 }
             }
         }

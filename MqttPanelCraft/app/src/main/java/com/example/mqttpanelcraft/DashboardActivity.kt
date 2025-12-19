@@ -236,10 +236,10 @@ class DashboardActivity : AppCompatActivity() {
     
     private fun checkBrokerConnectivity(broker: String, port: Int): Boolean {
         return try {
-            val socket = java.net.Socket()
-            socket.connect(java.net.InetSocketAddress(broker, port), 2000) // 2s timeout
-            socket.close()
-            true
+            java.net.Socket().use { socket ->
+                socket.connect(java.net.InetSocketAddress(broker, port), 2000) // 2s timeout
+                true
+            }
         } catch (e: Exception) {
             false
         }

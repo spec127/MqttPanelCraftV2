@@ -38,8 +38,23 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.*
+import android.content.Intent
 
-// 定義主要的 Activity 類別，繼承自 AppCompatActivity 以獲得向後相容性
+/**
+ * 主要的專案視圖 Activity (Project Main View).
+ * 
+ * 此 Activity 負責：
+ * 1. 顯示專案的畫布與元件 (UI Canvas & Components).
+ * 2. 處理編輯模式 (Edit Mode) 與運行模式 (Run Mode) 的切換.
+ * 3. 管理 MQTT 連線、訂閱與訊息處理 (MQTT Logic).
+ * 4. 提供屬性編輯面板 (Properties Panel) 與 Log 控制台 (Console).
+ * 
+ * 核心功能：
+ * - 拖放 (Drag & Drop) 新增與刪除元件.
+ * - 點擊元件進行屬性編輯 (Topic, Color, Size).
+ * - 即時接收 MQTT 訊息並更新 UI (Observer Pattern).
+ */
 class ProjectViewActivity : AppCompatActivity() {
 
     // 宣告延遲初始化的 UI 元件變數，這些變數稍後會在 onCreate 中綁定
@@ -60,6 +75,13 @@ class ProjectViewActivity : AppCompatActivity() {
     private lateinit var etPropHeight: TextInputEditText // 輸入組件高度的編輯框
     private lateinit var etPropColor: TextInputEditText // 輸入組件顏色的編輯框
     private lateinit var btnSaveProps: Button // 儲存屬性變更的按鈕
+    private lateinit var tvPropTopic: TextView // v49
+    
+    // v65: Component Index Map (ViewID -> Index)
+    // v65: Component Index Map (ViewID -> Index)
+    // Maps a View's ID to its logical Type Index (e.g. Button 1, Button 2)
+    private val componentIndices = mutableMapOf<Int, Int>()
+    private lateinit var dropDeleteZone: FrameLayout
     
     // 控制台輸入欄位（用於手動發送 MQTT 訊息）
     private lateinit var etTopic: EditText // 輸入 MQTT 主題的編輯框
@@ -71,7 +93,7 @@ class ProjectViewActivity : AppCompatActivity() {
     private var project: com.example.mqttpanelcraft.model.Project? = null // 儲存當前專案的資料模型
     
     private var selectedView: View? = null // 儲存當前被選中（點擊）的組件 View
-    private val snapThreshold = 16f // 定義磁吸對齊的閾值（單位：dp）
+    // ConstraintLayout 編輯區畫布，組件將被放置於此
 
     // Activity 創建時的生命週期方法
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,6 +134,7 @@ class ProjectViewActivity : AppCompatActivity() {
             
         } catch (e: Exception) {
             CrashLogger.logError(this, "Project View Init Failed", e) // 記錄錯誤到 CrashLogger
+            Toast.makeText(this, "Init Error: ${e.message}", Toast.LENGTH_LONG).show() // v45: Show error to user
             finish() // 發生錯誤時結束 Activity
         }
     }
@@ -143,16 +166,31 @@ class ProjectViewActivity : AppCompatActivity() {
     }
 
     // 載入專案詳細資訊並設定標題
+    // 載入專案詳細資訊並設定標題
     private fun loadProjectDetails(id: String) {
         // ProjectRepository is a singleton object
         project = ProjectRepository.getProjectById(id)
         if (project != null) {
-            supportActionBar?.title = project!!.name
+            // v39: Center Project Title
+            findViewById<TextView>(R.id.tvToolbarTitle).text = project!!.name
+            supportActionBar?.setDisplayShowTitleEnabled(false) // Hide default left title
+            
+            // v29: Set active project for filtering
+            MqttRepository.activeProjectId = id
+            // v37: Clear logs when switching projects (to avoid confusion)
+            MqttRepository.clear()
+            
+            // vFix: Restore Components!
+            restoreProjectState()
+
         } else {
             Toast.makeText(this, "Project not found", Toast.LENGTH_SHORT).show()
             finish()
         }
     }
+    
+    // v31: Refresh UI from cache when returning to activity
+    // v31: Refresh UI logic merged into bottom onResume
     
     // 設定側邊抽屜的狀態監聽器
     private fun setupDrawerListener() { // 設定側邊抽屜的狀態監聽器
@@ -202,18 +240,60 @@ class ProjectViewActivity : AppCompatActivity() {
         containerProperties = findViewById(R.id.containerProperties)
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottomSheet))
         
-        // 點擊底部面板標題欄切換展開/收起
+        // v49: Ensure tvPropTopic is accessible if declared as lateinit property
+        // But better to verify variable declaration first. I will assume I need to declare it.
+        // Wait, I didn't see tvPropTopic declared in class vars. I should declare it.
+        // Since I'm using multi-chunk, I can check later. For now, I'll localize it in setupPropertiesPanel 
+        // OR add it as a lateinit var if I can find the vars section. 
+        // Actually, viewing the lines above, lateinit vars are at top.
+        // SAFE APPROACH: Use findViewById locally in populateProperties if not declared, 
+        // BUT layout optimization suggests keeping references.
+        // I will add declaration at line 98 (approx) or wherever other lateinits are.
+        // Re-reading file lines 218...
+        // lines 218-226 init vars. I will assume I can just use findViewById every time in populateProperties if I don't want to mess up class structure blindly.
+        // NO, inefficient. I will add lateinit var declaration in a separate chunk.
+
         findViewById<View>(R.id.bottomSheetHeader).setOnClickListener {
-            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            // Refinement 2: Disable header toggle in Edit Mode (Strict Lock)
+            if (!isEditMode) {
+                if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                } else {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
             } else {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                // In Edit Mode, clicking header does nothing (or maybe collapse/expand logs?)
+                // User requested: "cannot be directly clicked open", so we allow CLOSE but not OPEN via header?
+                // Actually safer to just ignore or allow toggle ONLY if it's already open? 
+                // Let's implement: Click to COLLAPSE is allowed, Click to EXPAND is BLOCKED.
+                 if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
             }
         }
-
-        // Set FAB Mode Click Listener
+        
+        // Refinement 1: Canvas Click to Collapse
+        editorCanvas.setOnClickListener {
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                resetCanvasPan() // Reset Pan
+            }
+        }
+        
+        // Restore FAB Listener
         fabMode.setOnClickListener {
             toggleMode()
+        }
+
+        // v39: Center Project Title & v43: Click to Retry
+        val tvTitle = findViewById<TextView>(R.id.tvToolbarTitle)
+        // REMOVED: tvTitle.text = project!!.name (Project is null here! Set in loadProjectDetails)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        
+        // Click Title to Reconnect
+        tvTitle.setOnClickListener {
+             Toast.makeText(this, "Retrying Connection...", Toast.LENGTH_SHORT).show()
+             startMqttConnection() // v46: Use shared helper to restart connection properly
         }
 
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar) // 獲取 Toolbar 物件
@@ -234,6 +314,35 @@ class ProjectViewActivity : AppCompatActivity() {
                 drawerLayout.openDrawer(androidx.core.view.GravityCompat.START) // 開啟抽屜
             }
         }
+
+        // Status Dot Logic (Restored)
+        val viewStatusDot = findViewById<View>(R.id.viewStatusDot)
+        
+        // v47: Global Component Update Observer
+        MqttRepository.latestMessage.observe(this) { msgPair ->
+             if (project != null && msgPair != null) {
+                 val (topic, payload) = msgPair
+                 updateComponentFromMqtt(topic, payload)
+             }
+        }
+        
+        MqttRepository.connectionStatus.observe(this) { status ->
+             when (status) {
+                 com.example.mqttpanelcraft.MqttStatus.CONNECTED -> {
+                     viewStatusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.GREEN)
+                 }
+                 com.example.mqttpanelcraft.MqttStatus.CONNECTING -> {
+                     viewStatusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.LTGRAY) // Gray
+                 }
+                 MqttStatus.FAILED -> {
+                     viewStatusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.RED)
+                     // Removed Dialog to prevent blocking/annoyance. Red light is sufficient feedback.
+                 }
+                 else -> {
+                     viewStatusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.GRAY)
+                 }
+             }
+        } // End of observe
         
         // 設定按鈕（自定義 View，位於 Toolbar 上）
         val btnSettings = findViewById<ImageView>(R.id.btnSettings) // 獲取設定按鈕
@@ -244,7 +353,7 @@ class ProjectViewActivity : AppCompatActivity() {
                      val intent = android.content.Intent(this, Class.forName("com.example.mqttpanelcraft.SetupActivity"))
                      intent.putExtra("PROJECT_ID", projectId) // 傳遞專案 ID
                      startActivity(intent) // 啟動設定頁面
-                     finish() // 結束當前頁面，避免返回時狀態混亂（或根據需求保留）
+
                 } catch (e: Exception) {
                     android.widget.Toast.makeText(this, "Setup Activity not found: ${e.message}", android.widget.Toast.LENGTH_SHORT).show() // 顯示錯誤訊息
                 }
@@ -288,61 +397,154 @@ class ProjectViewActivity : AppCompatActivity() {
         } catch (e: Exception) {
             // Log or ignore errors in dynamic UI setup
         }
-        // 垃圾桶拖曳監聽器（刪除組件功能）
-        val binTrash = findViewById<ImageView>(R.id.binTrash) // 獲取垃圾桶 ImageView
-        binTrash.setOnDragListener { v, event -> // 設定拖曳監聽器
-            when (event.action) { // 根據拖曳事件的動作類型進行處理
-                DragEvent.ACTION_DRAG_STARTED -> true // 拖曳開始，返回 true 表示接收拖曳事件
-                DragEvent.ACTION_DRAG_ENTERED -> { // 當拖曳的組件進入垃圾桶區域時
-                    (v as? ImageView)?.setColorFilter(Color.RED) // 將垃圾桶圖標變更為紅色，表示高亮
-                    true // 返回 true 表示已處理此事件
+        // Drop Zone Listener (Delete)
+        dropDeleteZone = findViewById(R.id.dropDeleteZone)
+        dropDeleteZone.setOnDragListener { v, event ->
+            when (event.action) {
+                DragEvent.ACTION_DRAG_STARTED -> true
+                DragEvent.ACTION_DRAG_ENTERED -> {
+                    // v72: Fix "Square Background" bug by using ColorFilter on existing Shape
+                    v.background.colorFilter = android.graphics.PorterDuffColorFilter(
+                        android.graphics.Color.RED, 
+                        android.graphics.PorterDuff.Mode.SRC_ATOP
+                    )
+                    true
                 }
-                DragEvent.ACTION_DRAG_EXITED -> { // 當拖曳的組件離開垃圾桶區域時
-                    (v as? ImageView)?.clearColorFilter() // 清除垃圾桶圖標的顏色濾鏡
-                    (v as? ImageView)?.setColorFilter(Color.WHITE) // 將垃圾桶圖標恢復為白色
-                    true // 返回 true 表示已處理此事件
+                DragEvent.ACTION_DRAG_EXITED -> {
+                    v.background.clearColorFilter() // Restore original circle color
+                    true
                 }
-                DragEvent.ACTION_DROP -> { // 當拖曳的組件被放置在垃圾桶上時（執行刪除動作）
-                     (v as? ImageView)?.clearColorFilter() // 清除垃圾桶圖標的顏色濾鏡
-                     (v as? ImageView)?.setColorFilter(Color.WHITE) // 將垃圾桶圖標恢復為白色
-                     
-                     val clipData = event.clipData // 獲取拖曳事件中包含的資料
-                     if (clipData != null && clipData.itemCount > 0) { // 如果拖曳資料不為空且包含項目
-                         val idStr = clipData.getItemAt(0).text.toString() // 獲取拖曳資料中的第一個項目，並將其轉換為字串（預期為組件ID）
-                         // 檢查是否為有效 ID（View ID 通常為整數，這裡以字串形式傳遞）
+                DragEvent.ACTION_DROP -> {
+                     val clipData = event.clipData
+                     if (clipData != null && clipData.itemCount > 0) {
+                         val idStr = clipData.getItemAt(0).text.toString()
                          try {
-                             val viewId = idStr.toInt() // 嘗試將字串 ID 轉換為整數
-                             val component = editorCanvas.findViewById<View>(viewId) // 在編輯畫布上根據 ID 查找對應的組件
-                             if (component != null) { // 如果找到了該組件
-                                  // 顯示確認刪除的對話框
-                                  AlertDialog.Builder(this) // 創建一個 AlertDialog.Builder 實例
-                                      .setTitle("Delete Component") // 設定對話框標題
-                                      .setMessage("Are you sure you want to delete this component?") // 設定對話框訊息
-                                      .setPositiveButton("Delete") { _, _ -> // 設定「刪除」按鈕及其點擊事件
-                                          // 首先查找並移除組件的標籤 (Label)
-                                          val labelView = findLabelView(component) // 查找與該組件關聯的標籤 View
-                                          if (labelView != null) { // 如果找到了標籤 View
-                                              editorCanvas.removeView(labelView) // 從編輯畫布中移除標籤 View
-                                          }
-                                          // 移除組件本身
-                                          editorCanvas.removeView(component) // 從編輯畫布中移除組件 View
-                                          guideOverlay.clear() // 清除對齊輔助線
-                                      }
-                                      .setNegativeButton("Cancel", null) // 設定「取消」按鈕（不執行任何操作）
-                                      .show() // 顯示對話框
+                             val viewId = idStr.toInt()
+                             val component = editorCanvas.findViewById<View>(viewId)
+                             if (component != null) {
+                                  // Direct Delete without Dialog (User requested intuitive drag-to-delete)
+                                  val labelView = findLabelView(component)
+                                  if (labelView != null) editorCanvas.removeView(labelView)
+                                  editorCanvas.removeView(component)
+                                  guideOverlay.clear()
+                                  
+                                  // Clean up index map
+                                  componentIndices.remove(viewId)
+                                  
+                                  Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show()
                              }
-                         } catch (e: NumberFormatException) { // 捕獲 NumberFormatException，表示字串無法轉換為整數
-                             // 如果不是有效 ID（例如，可能是從側邊欄拖出的新組件，而不是畫布上的現有組件），則忽略此拖曳事件
-                         }
+                         } catch (e: Exception) {}
                      }
-                     true // Drop event handled
+                     true
+                }
+                DragEvent.ACTION_DRAG_ENDED -> {
+                     dropDeleteZone.visibility = View.GONE // Hide zone on end
+                     true
                 }
                 else -> false
             }
-            true
+        }
+
+
+    } // End of setupUI
+    
+    // v47: Update UI Components based on MQTT Topic
+    private fun updateComponentFromMqtt(topic: String, payload: String) {
+        if (project == null) return
+        val baseTopic = "${project!!.name.lowercase()}/${project!!.id}"
+        
+        // Optimization: Quick check if topic belongs to this project
+        if (!topic.startsWith(baseTopic)) return
+        
+        for (i in 0 until editorCanvas.childCount) {
+            val container = editorCanvas.getChildAt(i) as? FrameLayout ?: continue
+            val type = container.tag as? String ?: continue // e.g., "BUTTON", "LED"
+            
+            // Expected Topic: project/id/type/index/state
+            // Index logic reuse: Container ID
+            // Refactored to use helper:
+            val expectedTopic = getComponentTopic(type, container.id, isCommand = false)
+            
+            if (topic == expectedTopic) {
+                val innerView = container.getChildAt(0)
+                try {
+                    when (type) {
+                        "TEXT" -> (innerView as? TextView)?.text = payload
+                        "SLIDER" -> (innerView as? com.google.android.material.slider.Slider)?.value = payload.toFloatOrNull() ?: 0f
+                        "LED" -> {
+                            // v48: Strict Logic
+                            val p = payload.trim().lowercase()
+                            val color = when (p) {
+                                "1", "true", "on" -> Color.GREEN
+                                "0", "false", "off" -> Color.RED
+                                else -> null // Ignore
+                            }
+                            if (color != null) {
+                                innerView.background = android.graphics.drawable.GradientDrawable().apply {
+                                    shape = android.graphics.drawable.GradientDrawable.OVAL
+                                    setColor(color)
+                                    setStroke(2, Color.DKGRAY) 
+                                }
+                            }
+                        }
+                        "THERMOMETER" -> (innerView as? ProgressBar)?.progress = payload.toIntOrNull()?.coerceIn(0, 100) ?: 0
+                        "IMAGE" -> {
+                             try {
+                                 val decodedString = android.util.Base64.decode(payload, android.util.Base64.DEFAULT)
+                                 val decodedByte = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                                 (innerView as? ImageView)?.setImageBitmap(decodedByte)
+                             } catch (e: Exception) { }
+                        }
+                    }
+                } catch (e: Exception) { }
+            }
         }
     }
 
+
+    // region Topic Generation Helper
+    
+    /**
+     * 產生標準化的 MQTT Topic 字串.
+     * 
+     * 格式規則: {project_name}/{project_id}/{type}/{component_id}/{direction}
+     * 
+     * @param type 元件類型 (e.g., "BUTTON", "LED").
+     * @param id 元件的 View ID (整數).
+     * @param isCommand true 為發送指令 (cmd), false 為接收狀態 (state).
+     * @return 完整的 Topic 字串, 若專案為空則返回空字串.
+     */
+    private fun getComponentTopic(type: String, id: Int, isCommand: Boolean): String {
+        if (project == null) return ""
+        val direction = if (isCommand) "cmd" else "state"
+        
+        // v65: Use Smart Index if available
+        val index = componentIndices[id] ?: id
+        
+        return "${project!!.name.lowercase()}/${project!!.id}/${type.lowercase()}/$index/$direction"
+    }
+    
+    // v65: Smart Index Helper
+    private fun getNextIndex(type: String): Int {
+        // Find existing indices for this type
+        val existingIndices = mutableSetOf<Int>()
+        for (i in 0 until editorCanvas.childCount) {
+             val child = editorCanvas.getChildAt(i)
+             if (child.tag == type) {
+                 val idx = componentIndices[child.id]
+                 if (idx != null) existingIndices.add(idx)
+             }
+        }
+        
+        // Find first gap (starting from 1)
+        var next = 1
+        while (existingIndices.contains(next)) {
+            next++
+        }
+        return next
+    }
+    
+    // endregion
 
     // 初始化屬性編輯面板
     private fun setupPropertiesPanel() {
@@ -352,8 +554,11 @@ class ProjectViewActivity : AppCompatActivity() {
         etPropColor = findViewById(R.id.etPropColor) // 獲取顏色輸入框
         btnSaveProps = findViewById(R.id.btnSaveProps) // 獲取儲存按鈕
         
+        // v49: Initialize Topic Display
+        tvPropTopic = findViewById(R.id.tvPropTopic)
+        
         etPropColor.setOnClickListener { showGradientColorPicker() } // 設定顏色輸入框的點擊事件（顯示顏色選擇器）
-        etPropColor.focusable = View.FOCUSABLE_AUTO // 自動處理焦點
+        etPropColor.isFocusable = false // v41: Fix API 26 requirement (was FOCUSABLE_AUTO)
         etPropColor.isFocusableInTouchMode = false // 禁止觸控模式下取得焦點（強制使用點擊事件）
         
         btnSaveProps.setOnClickListener { // 設定儲存按鈕的點擊事件
@@ -458,8 +663,17 @@ class ProjectViewActivity : AppCompatActivity() {
         
         // 發送按鈕點擊事件
         btnSend.setOnClickListener {
-             val topic = etTopic.text.toString() // 獲取主題
+             var topic = etTopic.text.toString() // 獲取主題
             val payload = etPayload.text.toString() // 獲取訊息內容
+            
+            // v38: Auto-Prefix for Console (Restore)
+            if (project != null && topic.isNotEmpty()) {
+                val prefix = "${project!!.name.lowercase()}/${project!!.id}/"
+                if (!topic.startsWith(prefix)) {
+                    topic = prefix + topic
+                }
+            }
+            
             if (topic.isNotEmpty() && payload.isNotEmpty()) { // 確保不為空
                 val client = MqttRepository.mqttClient // 獲取 MQTT 客戶端
                 if (client != null && client.isConnected) { // 檢查是否已連線
@@ -471,9 +685,49 @@ class ProjectViewActivity : AppCompatActivity() {
                         Toast.makeText(this, "Publish Failed: ${e.message}", Toast.LENGTH_SHORT).show() // 發送失敗提示
                     }
                 } else {
-                    Toast.makeText(this, "Not Connected.", Toast.LENGTH_SHORT).show() // 未連線提示
+                    Toast.makeText(this, "Not Connected.", Toast.LENGTH_SHORT).show()
                 }
+            } else {
+                 Toast.makeText(this, "Topic and Payload required", Toast.LENGTH_SHORT).show() // v39: Feedback
             }
+        }
+        
+        // v39: Subscribe Button Logic (Missing previously)
+        val btnSubscribe = findViewById<Button>(R.id.btnConsoleSubscribe)
+        if (btnSubscribe != null) {
+            btnSubscribe.setOnClickListener {
+                 var topic = etTopic.text.toString()
+                 if (project != null && topic.isNotEmpty()) {
+                     val prefix = "${project!!.name.lowercase()}/${project!!.id}/"
+                     if (!topic.startsWith(prefix)) {
+                         topic = prefix + topic
+                     }
+                 }
+                 
+                 if (topic.isNotEmpty()) {
+                      val client = MqttRepository.mqttClient
+                      if (client != null && client.isConnected) {
+                          try {
+                              // Start Service Action for Subscribe (Robustness) or Direct
+                              val intent = Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java)
+                              intent.action = "SUBSCRIBE"
+                              intent.putExtra("TOPIC", topic)
+                              startService(intent) // Delegate to Service
+                              
+                              MqttRepository.addLog("Subscribing to [$topic]...", java.text.SimpleDateFormat("HH:mm:ss").format(java.util.Date()))
+                          } catch (e: Exception) {
+                               Toast.makeText(this, "Sub Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                          }
+                      } else {
+                          Toast.makeText(this, "Not Connected.", Toast.LENGTH_SHORT).show()
+                      }
+                 } else {
+                      Toast.makeText(this, "Topic required", Toast.LENGTH_SHORT).show()
+                 }
+            }
+        } else {
+            // Log warning or ignore if button missing in layout variant
+            CrashLogger.logError(this, "Warning: btnConsoleSubscribe not found in layout", java.lang.Exception("View Missing"))
         }
     }
     
@@ -481,10 +735,29 @@ class ProjectViewActivity : AppCompatActivity() {
     private fun checkMqttConnection() {
         val client = MqttRepository.mqttClient
         if (client == null || !client.isConnected) {
-            MqttRepository.addLog("System: Editor opened without active MQTT connection.", "")
+            MqttRepository.addLog("System: Starting MQTT Connection...", "")
+            startMqttConnection() // v46: Trigger connection on load if not connected
         } else {
             MqttRepository.addLog("System: Connected to broker.", "")
         }
+    }
+    
+    // v46: Helper to start MQTT Service with CONNECT action
+    private fun startMqttConnection() {
+        if (project == null) return
+        
+        val intent = Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java)
+        // Stop previous instance to ensure clean retry state (requested by user for retry logic)
+        stopService(intent) 
+        
+        intent.action = "CONNECT"
+        intent.putExtra("BROKER", project!!.broker)
+        intent.putExtra("PORT", project!!.port)
+        intent.putExtra("USER", project!!.username)
+        intent.putExtra("PASSWORD", project!!.password)
+        intent.putExtra("CLIENT_ID", project!!.clientId)
+        
+        startService(intent)
     }
 
     // 切換編輯/運行模式
@@ -764,11 +1037,27 @@ class ProjectViewActivity : AppCompatActivity() {
             
             val params = ConstraintLayout.LayoutParams(wPx, hPx) // 創建布局參數
             newView.layoutParams = params // 設定布局參數
-            newView.x = x - (wPx / 2) // 設定 X 座標（居中放下點）
-            newView.y = y - (hPx / 2) // 設定 Y 座標（居中放下點）
+            
+            var rawX = x - (wPx / 2) // 設定 X 座標（居中放下點）
+            var rawY = y - (hPx / 2) // 設定 Y 座標（居中放下點）
+            
+            // vRefinement: Calculate Snap for NEW components too
+            // Note: View is not added yet, passing newView is fine
+            val snapPt = calculateSnap(rawX, rawY, wPx, hPx, newView)
+            if (snapPt != null) {
+                rawX = snapPt.x.toFloat()
+                rawY = snapPt.y.toFloat()
+            }
+            
+            newView.x = rawX
+            newView.y = rawY
             
             // v16: Unique ID Fix
             newView.id = View.generateViewId() // 生成唯一的 View ID
+            
+            // v65: Smart Index Generation
+            val index = getNextIndex(tag)
+            componentIndices[newView.id] = index
             
             editorCanvas.addView(newView) // 將新組件添加到畫布
             makeDraggable(newView) // 讓新組件可拖曳
@@ -789,14 +1078,17 @@ class ProjectViewActivity : AppCompatActivity() {
                 id = View.generateViewId() // 標籤也需要唯一的 ID
                 
                 // Fix: Map tags to human readable names
-                text = when (tag) {
-                    "THERMOMETER" -> "Level Indicator"
+                // v65: Append Index
+                val typeName = when (tag) {
+                    "THERMOMETER" -> "Thermometer"
                     "BUTTON" -> "Button"
                     "SLIDER" -> "Slider"
                     "TEXT" -> "Text"
                     "IMAGE" -> "Image"
+                    "LED" -> "LED"
                     else -> tag
                 }
+                text = "$typeName $index"
                 
                 textSize = 10f // 設定文字大小
                 gravity = Gravity.CENTER // 設定文字置中
@@ -815,6 +1107,8 @@ class ProjectViewActivity : AppCompatActivity() {
         }
     }
     
+    // region UI Creation logic
+    
     // 根據標籤類型創建組件視圖
     private fun createComponentView(tag: String): View {
         val context = this
@@ -831,32 +1125,85 @@ class ProjectViewActivity : AppCompatActivity() {
 
         // 根據類型創建物件內的實際 View
         val view = when (tag) {
-            "BUTTON" -> Button(context).apply { text = "BTN" } // 按鈕
-            "TEXT" -> TextView(context).apply { text = "Text"; gravity = Gravity.CENTER } // 文字
+            "BUTTON" -> Button(context).apply { 
+                text = "BTN"
+                setOnClickListener {
+                    // v40: Restore Topic Logic for Button
+                    if (!isEditMode && project != null) {
+                         // Format: name/id/type/index/cmd
+                         // Refactored to use helper:
+                         val index = (parent as? View)?.id ?: id
+                         val topic = getComponentTopic("button", index, isCommand = true)
+                         val payload = "1" // Default payload
+                         
+                         MqttRepository.mqttClient?.let { client ->
+                             if (client.isConnected) {
+                                 try {
+                                     val message = org.eclipse.paho.client.mqttv3.MqttMessage(payload.toByteArray())
+                                     client.publish(topic, message)
+                                     MqttRepository.addLog("TX [$topic]: $payload", java.text.SimpleDateFormat("HH:mm:ss").format(java.util.Date()))
+                                 } catch (e: Exception) {
+                                     Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                                 }
+                             }
+                         }
+                    }
+                }
+            } 
+            "TEXT" -> TextView(context).apply { text = "Text"; gravity = Gravity.CENTER } 
             "IMAGE" -> ImageView(context).apply { 
-                setImageResource(android.R.drawable.ic_menu_gallery) // 圖片
-                scaleType = ImageView.ScaleType.FIT_CENTER // 縮放模式
+                setImageResource(android.R.drawable.ic_menu_gallery) 
+                scaleType = ImageView.ScaleType.FIT_CENTER 
             }
             "SLIDER" -> com.google.android.material.slider.Slider(context).apply { 
                 valueFrom = 0f
                 valueTo = 100f
                 value = 50f
                 stepSize = 1f
-            } // 滑塊
-            "LED" -> View(context).apply { // LED 指示燈
+                
+                // v48: Publish only on release (Stop Tracking)
+                addOnSliderTouchListener(object : com.google.android.material.slider.Slider.OnSliderTouchListener {
+                    override fun onStartTrackingTouch(slider: com.google.android.material.slider.Slider) {
+                        // Optional: Disable updates from MQTT while dragging to prevent jumping
+                    }
+
+                    override fun onStopTrackingTouch(slider: com.google.android.material.slider.Slider) {
+                         if (!isEditMode && project != null) {
+                            val index = (parent as? View)?.id ?: id
+                            // Refactored to use helper:
+                            val topic = getComponentTopic("slider", index, isCommand = true)
+                            val payload = slider.value.toInt().toString()
+                            
+                            MqttRepository.mqttClient?.let { client ->
+                                 if (client.isConnected) {
+                                     try {
+                                         val message = org.eclipse.paho.client.mqttv3.MqttMessage(payload.toByteArray())
+                                         message.isRetained = true
+                                         client.publish(topic, message)
+                                     } catch (e: Exception) {}
+                                 }
+                             }
+                         }
+                    }
+                })
+            } 
+            "LED" -> View(context).apply { 
                 // Use GradientDrawable for reliable Oval shape
                 background = android.graphics.drawable.GradientDrawable().apply {
                     shape = android.graphics.drawable.GradientDrawable.OVAL
                     setColor(Color.RED)
-                    setStroke(2, Color.DKGRAY) // Optional: Add a subtle border to the LED itself
+                    setStroke(2, Color.DKGRAY) 
                 }
+                // LED is a follower/subscriber component. 
+                // Color update logic handled in MqttRepository observer (setupUI/refreshUI) if we had mapped it.
+                // For now, it stays static Red until mapped.
             }
             "THERMOMETER" -> ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal).apply { 
                 max = 100
                 progress = 75
                 progressTintList = android.content.res.ColorStateList.valueOf(Color.GREEN)
-            } // 電量/水平指示 (Level Indicator)
-            else -> TextView(context).apply { text = tag } // 默認文字
+            } 
+            else -> TextView(context).apply { text = tag } 
         }
         
         // 確保內部 View 填滿容器
@@ -869,107 +1216,577 @@ class ProjectViewActivity : AppCompatActivity() {
         return container // 返回容器（作為組件）
     }
 
-    // 讓 View 變為可拖曳，並設定點擊監聽器
+    // 讓 View 變為可拖曳 (Rewrite for Touch & Live Snap)
     private fun makeDraggable(view: View) {
+        // Click for Properties
         view.setOnClickListener {
-            if (!isEditMode) return@setOnClickListener // 僅在編輯模式下響應
-            
-            // 處理選取變更
-            selectedView?.setBackgroundResource(R.drawable.component_border) // 還原之前選取組件的背景
-            selectedView = view // 更新選取組件
-            // 這裡可以更改選取視圖的背景以顯示選取狀態（例如變色邊框），目前暫時保持原樣
+            if (!isEditMode) return@setOnClickListener
+            selectedView?.setBackgroundResource(R.drawable.component_border)
+            selectedView = view
             // view.setBackgroundResource(R.drawable.component_border_selected) 
-            
-            // 彈出屬性面板
             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                populateProperties(view) // 填充屬性資料
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED // 展開底部面板
+                populateProperties(view)
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             } else {
-                 populateProperties(view) // 如果已經展開，刷新資料
+                 populateProperties(view)
             }
         }
-        
-        view.setOnLongClickListener {
-            if (!isEditMode) return@setOnLongClickListener false // 僅在編輯模式下響應長按
-             val data = ClipData.newPlainText("id", view.id.toString()) // 傳遞 View ID
-             val shadow = View.DragShadowBuilder(view) // 創建拖曳陰影
-             view.startDragAndDrop(data, shadow, view, 0) // 開始拖曳
-             view.visibility = View.INVISIBLE // 隱藏原 View
-             
-             // Also hide the label during drag
-             // 在拖曳期間也隱藏關聯的標籤
-             val labelView = findLabelView(view)
-             labelView?.visibility = View.INVISIBLE
-             
-             true // 已處理長按事件
-        }
-    }
 
-    // 檢查對齊線並繪製輔助線
-    private fun checkAlignment(x: Float, y: Float, currentView: View) {
-        guideOverlay.clear() // 清除之前的線
-        val threshold = snapThreshold * resources.displayMetrics.density // 計算閾值
-        
-        for (i in 0 until editorCanvas.childCount) { // 遍歷所有元件
-            val other = editorCanvas.getChildAt(i)
-            if (other == currentView || other == guideOverlay) continue // 跳過自己和 Overlay
+        // Touch for Dragging (Live Snap & Bounds)
+        view.setOnTouchListener(object : View.OnTouchListener {
+            var dX = 0f
+            var dY = 0f
+            var startRawX = 0f
+            var startRawY = 0f
+            var isDragging = false
             
-            val otherCx = other.x + other.width/2 // 計算其他元件中心 X
-            val otherCy = other.y + other.height/2 // 計算其他元件中心 Y
-            
-            // 檢查 X 軸對齊
-            if (kotlin.math.abs(x - otherCx) < threshold) {
-                guideOverlay.addLine(otherCx, 0f, otherCx, editorCanvas.height.toFloat()) // 繪製垂直線
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                 if (!isEditMode) return false
+                 
+                 when (event.action) {
+                     MotionEvent.ACTION_DOWN -> {
+                         dX = v.x - event.rawX
+                         dY = v.y - event.rawY
+                         startRawX = event.rawX
+                         startRawY = event.rawY
+                         isDragging = false // Wait for move threshold?
+                         
+                         // Show Drop Zone
+                         dropDeleteZone.visibility = View.VISIBLE
+                         dropDeleteZone.animate().scaleX(1f).scaleY(1f).start()
+                         
+                         // Shadow/Highlight?
+                         v.alpha = 0.8f
+                     }
+                     MotionEvent.ACTION_MOVE -> {
+                         // Threshold check
+                         if (kotlin.math.hypot(event.rawX - startRawX, event.rawY - startRawY) > 10) {
+                             isDragging = true
+                         }
+                         if (!isDragging) return true
+                         
+                         // 1. Calculate Raw New Position
+                         var newX = event.rawX + dX
+                         var newY = event.rawY + dY
+                         
+                         // 2. Boundary Constraint (Strict)
+                         val maxX = (editorCanvas.width - v.width).toFloat()
+                         val maxY = (editorCanvas.height - v.height).toFloat()
+                         newX = newX.coerceIn(0f, maxX)
+                         newY = newY.coerceIn(0f, maxY)
+                         
+                         // 3. Live Snap
+                         val snapPt = calculateSnap(newX, newY, v.width, v.height, v)
+                         if (snapPt != null) {
+                             newX = snapPt.x.toFloat()
+                             newY = snapPt.y.toFloat()
+                         }
+                         
+                         // Apply Position
+                         v.x = newX
+                         v.y = newY
+                         
+                         // Move Label
+                         val labelView = findLabelView(v)
+                         if (labelView != null) {
+                             labelView.x = newX
+                             labelView.y = newY + v.height + 4
+                         }
+                         
+                         // 4. Guide Logic
+                         checkAlignment(newX + v.width/2f, newY + v.height/2f, v)
+                         
+                         // 5. Check Delete Zone Overlap
+                         val locations = IntArray(2)
+                         dropDeleteZone.getLocationOnScreen(locations)
+                         val zoneRect = android.graphics.Rect(locations[0], locations[1], locations[0]+dropDeleteZone.width, locations[1]+dropDeleteZone.height)
+                         
+                         val vRawX = event.rawX
+                         val vRawY = event.rawY
+                         val pointerRect = android.graphics.Rect(vRawX.toInt(), vRawY.toInt(), vRawX.toInt()+1, vRawY.toInt()+1)
+                         
+                         if (android.graphics.Rect.intersects(zoneRect, pointerRect)) {
+                              dropDeleteZone.animate().scaleX(1.3f).scaleY(1.3f).setDuration(100).start()
+                              v.alpha = 0.3f // Fade component to show it will be deleted
+                         } else {
+                              dropDeleteZone.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
+                              v.alpha = 0.8f
+                         }
+                     }
+                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                         dropDeleteZone.visibility = View.GONE
+                         guideOverlay.clear()
+                         v.alpha = 1.0f
+                         
+                         // Delete Check
+                         val locations = IntArray(2)
+                         dropDeleteZone.getLocationOnScreen(locations)
+                         val zoneRect = android.graphics.Rect(locations[0], locations[1], locations[0]+dropDeleteZone.width, locations[1]+dropDeleteZone.height)
+                         val vRawX = event.rawX
+                         val vRawY = event.rawY
+                         
+                         // Basic hit test on pointer
+                         if (vRawX >= zoneRect.left && vRawX <= zoneRect.right && vRawY >= zoneRect.top && vRawY <= zoneRect.bottom) {
+                              // Delete
+                              editorCanvas.removeView(v)
+                              val label = findLabelView(v)
+                              if (label != null) editorCanvas.removeView(label)
+                              componentIndices.remove(v.id)
+                              Toast.makeText(this@ProjectViewActivity, "Deleted", Toast.LENGTH_SHORT).show()
+                         } else {
+                             // Save State?
+                             saveProjectState()
+                         }
+                         
+                         if (!isDragging) {
+                             v.performClick() // Handle Click check
+                         }
+                     }
+                 }
+                 return true
             }
-            // 檢查 Y 軸對齊
-            if (kotlin.math.abs(y - otherCy) < threshold) {
-                guideOverlay.addLine(0f, otherCy, editorCanvas.width.toFloat(), otherCy) // 繪製水平線
-            }
-        }
-    }
-
-    // 計算吸附位置
-    private fun calculateSnap(rawX: Float, rawY: Float, w: Int, h: Int, currentView: View): Point? {
-        var bestX = rawX - w/2 // 預設為原始位置（中心點修正後）
-        var bestY = rawY - h/2
-        var snapped = false
-        val threshold = snapThreshold * resources.displayMetrics.density
-        
-        for (i in 0 until editorCanvas.childCount) {
-            val other = editorCanvas.getChildAt(i)
-            if (other == currentView || other == guideOverlay) continue
-            
-            val otherCx = other.x + other.width/2
-            val otherCy = other.y + other.height/2
-            
-            // 檢查是否在大致位置附近，如果是則吸附
-            if (kotlin.math.abs(rawX - otherCx) < threshold) {
-                bestX = otherCx - w/2
-                snapped = true
-            }
-            if (kotlin.math.abs(rawY - otherCy) < threshold) {
-                bestY = otherCy - h/2
-                snapped = true
-            }
-        }
-        return if (snapped) Point(bestX.toInt(), bestY.toInt()) else null // 返回吸附後的點或 null
+        })
     }
     
-     // 填充屬性面板資料
-     private fun populateProperties(view: View) {
-         val params = view.layoutParams
+    // endregion
+
+    // region Alignment Logic
+    
+    // 計算吸附位置 (Component-to-Component)
+    private fun calculateSnap(rawX: Float, rawY: Float, w: Int, h: Int, currentView: View): Point? {
+        val density = resources.displayMetrics.density
+        val threshold = 16f * density // 16dp snap threshold
+        
+        var snapX = rawX
+        var snapY = rawY
+        var hasSnapX = false
+        var hasSnapY = false
+        
+        val myLeft = rawX
+        val myRight = rawX + w
+        val myTop = rawY
+        val myBottom = rawY + h
+        val myCenterX = rawX + w / 2f
+        val myCenterY = rawY + h / 2f
+        
+        var minDiffX = threshold
+        var minDiffY = threshold
+        
+        for (i in 0 until editorCanvas.childCount) {
+            val target = editorCanvas.getChildAt(i)
+            if (target == currentView) continue
+            // Skip labels if possible, though labels are usually non-interactive
+             val tag = target.tag as? String ?: continue 
+             if (tag.startsWith("LABEL_FOR_")) continue
+            
+            val tLeft = target.x
+            val tRight = target.x + target.width
+            val tTop = target.y
+            val tBottom = target.y + target.height
+            val tCenterX = target.x + target.width / 2f
+            val tCenterY = target.y + target.height / 2f
+            
+            // --- X Axis Alignment ---
+            // Left to Left
+            if (kotlin.math.abs(myLeft - tLeft) < minDiffX) {
+                snapX = tLeft
+                minDiffX = kotlin.math.abs(myLeft - tLeft)
+                hasSnapX = true
+            }
+            // Left to Right
+            if (kotlin.math.abs(myLeft - tRight) < minDiffX) {
+                snapX = tRight
+                minDiffX = kotlin.math.abs(myLeft - tRight)
+                hasSnapX = true
+            }
+             // Right to Left
+            if (kotlin.math.abs(myRight - tLeft) < minDiffX) {
+                snapX = tLeft - w
+                minDiffX = kotlin.math.abs(myRight - tLeft)
+                hasSnapX = true
+            }
+            // Right to Right
+            if (kotlin.math.abs(myRight - tRight) < minDiffX) {
+                snapX = tRight - w
+                minDiffX = kotlin.math.abs(myRight - tRight)
+                hasSnapX = true
+            }
+             // Center to Center
+            if (kotlin.math.abs(myCenterX - tCenterX) < minDiffX) {
+                snapX = tCenterX - w / 2f
+                minDiffX = kotlin.math.abs(myCenterX - tCenterX)
+                hasSnapX = true
+            }
+
+            // --- Y Axis Alignment ---
+            // Top to Top
+            if (kotlin.math.abs(myTop - tTop) < minDiffY) {
+                snapY = tTop
+                minDiffY = kotlin.math.abs(myTop - tTop)
+                hasSnapY = true
+            }
+             // Top to Bottom
+            if (kotlin.math.abs(myTop - tBottom) < minDiffY) {
+                snapY = tBottom
+                minDiffY = kotlin.math.abs(myTop - tBottom)
+                hasSnapY = true
+            }
+             // Bottom to Top
+            if (kotlin.math.abs(myBottom - tTop) < minDiffY) {
+                snapY = tTop - h
+                minDiffY = kotlin.math.abs(myBottom - tTop)
+                hasSnapY = true
+            }
+             // Bottom to Bottom
+            if (kotlin.math.abs(myBottom - tBottom) < minDiffY) {
+                snapY = tBottom - h
+                minDiffY = kotlin.math.abs(myBottom - tBottom)
+                hasSnapY = true
+            }
+             // Center to Center
+            if (kotlin.math.abs(myCenterY - tCenterY) < minDiffY) {
+                snapY = tCenterY - h / 2f
+                minDiffY = kotlin.math.abs(myCenterY - tCenterY)
+                hasSnapY = true
+            }
+        }
+        
+        if (hasSnapX || hasSnapY) {
+            return Point(if(hasSnapX) snapX.toInt() else rawX.toInt(), if(hasSnapY) snapY.toInt() else rawY.toInt())
+        }
+
+        return null // No snap
+    }
+  
+    // 檢查對齊並繪製輔助線 (Component Integration)
+    // Note: Arguments x, y are "Center" coordinates in current call usage.
+    // BUT we need Top/Left for component logic. The caller calls checkAlignment(newX + v.width/2f, newY + v.height/2f, v)
+    // So x,y are indeed centers.
+    // We should use v.x and v.y ideally if they are updated, OR calculate from center passed in.
+    // However, the caller sets v.x and v.y BEFORE calling checkAlignment!
+    // See line 1271: v.x = newX; v.y = newY
+    // So we can trust `currentView.x`.
+    private fun checkAlignment(centerX: Float, centerY: Float, currentView: View) {
+        guideOverlay.clear()
+        
+        val density = resources.displayMetrics.density
+        val threshold = 2f * density // Drawing tolerance (smaller than snap to show exact match)
+        
+        val myLeft = currentView.x
+        val myRight = currentView.x + currentView.width
+        val myTop = currentView.y
+        val myBottom = currentView.y + currentView.height
+        val myCenterX = currentView.x + currentView.width / 2f
+        val myCenterY = currentView.y + currentView.height / 2f
+        
+        for (i in 0 until editorCanvas.childCount) {
+            val target = editorCanvas.getChildAt(i)
+            if (target == currentView) continue
+             val tag = target.tag as? String ?: continue 
+             if (tag.startsWith("LABEL_FOR_")) continue
+            
+            val tLeft = target.x
+            val tRight = target.x + target.width
+            val tTop = target.y
+            val tBottom = target.y + target.height
+            val tCenterX = target.x + target.width / 2f
+            val tCenterY = target.y + target.height / 2f
+            
+            // X Matches
+            if (kotlin.math.abs(myLeft - tLeft) < threshold || kotlin.math.abs(myLeft - tRight) < threshold || 
+                kotlin.math.abs(myRight - tLeft) < threshold || kotlin.math.abs(myRight - tRight) < threshold) {
+                // Draw vertical line at the match X
+                // Which X? Use current view's matched edge
+                val matchX = if (kotlin.math.abs(myLeft - tLeft) < threshold) tLeft else if (kotlin.math.abs(myLeft - tRight) < threshold) tRight else if (kotlin.math.abs(myRight - tLeft) < threshold) tLeft else tRight
+                
+                // Draw line covering vertical span
+                val minY = kotlin.math.min(myTop, tTop)
+                val maxY = kotlin.math.max(myBottom, tBottom)
+                guideOverlay.addLine(matchX, minY - 100, matchX, maxY + 100)
+            }
+            
+            if (kotlin.math.abs(myCenterX - tCenterX) < threshold) {
+                 val minY = kotlin.math.min(myTop, tTop)
+                 val maxY = kotlin.math.max(myBottom, tBottom)
+                 guideOverlay.addLine(tCenterX, minY - 100, tCenterX, maxY + 100)
+            }
+            
+            // Y Matches
+             if (kotlin.math.abs(myTop - tTop) < threshold || kotlin.math.abs(myTop - tBottom) < threshold || 
+                kotlin.math.abs(myBottom - tTop) < threshold || kotlin.math.abs(myBottom - tBottom) < threshold) {
+                
+                val matchY = if (kotlin.math.abs(myTop - tTop) < threshold) tTop else if (kotlin.math.abs(myTop - tBottom) < threshold) tBottom else if (kotlin.math.abs(myBottom - tTop) < threshold) tTop else tBottom
+                
+                val minX = kotlin.math.min(myLeft, tLeft)
+                val maxX = kotlin.math.max(myRight, tRight)
+                guideOverlay.addLine(minX - 100, matchY, maxX + 100, matchY)
+            }
+            
+            if (kotlin.math.abs(myCenterY - tCenterY) < threshold) {
+                 val minX = kotlin.math.min(myLeft, tLeft)
+                 val maxX = kotlin.math.max(myRight, tRight)
+                 guideOverlay.addLine(minX - 100, tCenterY, maxX + 100, tCenterY)
+            }
+        }
+    }
+    
+    // --- Persistence Logic ---
+    
+    private fun saveProjectState() {
+        val currentProject = project ?: return
+        currentProject.components.clear()
+        
+        android.util.Log.d("Persistence", "Saving Project: ${currentProject.name}")
+        
+        for (i in 0 until editorCanvas.childCount) {
+             val view = editorCanvas.getChildAt(i)
+             val tag = view.tag as? String ?: continue 
+             if (tag.startsWith("LABEL_FOR_")) continue
+             
+             val labelView = findLabelView(view)
+             val labelText = labelView?.text?.toString() ?: ""
+             
+             val compData = com.example.mqttpanelcraft.model.ComponentData(
+                 id = view.id,
+                 type = tag,
+                 x = view.x,
+                 y = view.y,
+                 width = view.width,
+                 height = view.height,
+                 label = labelText
+             )
+             currentProject.components.add(compData)
+        }
+        
+        com.example.mqttpanelcraft.data.ProjectRepository.updateProject(currentProject)
+        android.util.Log.d("Persistence", "Saved ${currentProject.components.size} components to Repo")
+        // Toast.makeText(this, "Project Saved (${currentProject.components.size})", Toast.LENGTH_SHORT).show()
+    }
+    
+    private fun restoreProjectState() {
+        val currentProject = project ?: return
+        android.util.Log.d("Persistence", "Restoring Project: ${currentProject.id}, Components: ${currentProject.components.size}")
+        
+        if (currentProject.components.isEmpty()) return
+        
+        // editorCanvas.removeAllViews() // Danger: Removes GuideOverlay? 
+        // GuideOverlay is separate view? Check layout.
+        // XML shows editorCanvas is a FrameLayout. It likely has GuideOverlay as a child if added dynamically?
+        // Actually GuideOverlay is com.example.mqttpanelcraft.view.GuideOverlay in XML?
+        // Let's assume we clean up components.
+        // Better: Remove all views that have a Component Tag.
+        val toRemove = mutableListOf<View>()
+        for (i in 0 until editorCanvas.childCount) {
+            val v = editorCanvas.getChildAt(i)
+            if (v.tag is String) toRemove.add(v)
+        }
+        toRemove.forEach { editorCanvas.removeView(it) }
+        
+        componentIndices.clear()
+        
+        for (comp in currentProject.components) {
+            val newView = createComponentView(comp.type)
+            newView.id = comp.id
+            if (newView.id == View.NO_ID) newView.id = View.generateViewId()
+            
+            // Restore Indices logic
+            if (newView.id != View.NO_ID) {
+                // Try to parse index from label "Name 123"
+                val idx = comp.label.filter { it.isDigit() }.toIntOrNull() ?: 1
+                componentIndices[newView.id] = idx
+            }
+             
+            val params = FrameLayout.LayoutParams(comp.width, comp.height)
+            newView.layoutParams = params
+            newView.x = comp.x
+            newView.y = comp.y
+            
+            editorCanvas.addView(newView)
+            makeDraggable(newView)
+            
+            // Recreate Label
+            val labelView = TextView(this).apply {
+                id = View.generateViewId()
+                text = comp.label
+                textSize = 10f
+                gravity = Gravity.CENTER
+                setTextColor(Color.DKGRAY)
+                setTag("LABEL_FOR_${newView.id}")
+                
+                val labelParams = FrameLayout.LayoutParams(
+                    comp.width, 
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
+                )
+                layoutParams = labelParams
+                this.x = newView.x
+                this.y = newView.y + comp.height + 4
+            }
+            editorCanvas.addView(labelView)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshUIFromCache() // Merged from v31
+        
+        // Reload project to check for changes
+        if (project != null) {
+            val fresh = com.example.mqttpanelcraft.data.ProjectRepository.getProjectById(project!!.id)
+            if (fresh != null) {
+                // If critical params changed, we imply a change in environment
+                val oldBroker = project!!.broker
+                val oldPort = project!!.port
+                project = fresh // Update local reference
+                performFullSync() // Merged from v35
+                
+                // Connection Check
+                val currentUri = MqttRepository.mqttClient?.serverURI ?: ""
+                val targetUri = "tcp://${project!!.broker}:${project!!.port}"
+                val isConnected = MqttRepository.mqttClient?.isConnected == true
+                
+                // Reconnect if disconnected OR params changed
+                if (!isConnected || project!!.broker != oldBroker || project!!.port != oldPort) {
+                    val intent = android.content.Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java).apply {
+                        action = "CONNECT"
+                        putExtra("BROKER", project!!.broker)
+                        putExtra("PORT", project!!.port)
+                        putExtra("USER", project!!.username)
+                        putExtra("PASSWORD", project!!.password)
+                        putExtra("CLIENT_ID", project!!.clientId)
+                    }
+                    startService(intent)
+                }
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveProjectState()
+    }
+
+    private fun checkOverlap(v1: View, v2: View): Boolean {
+        val r1 = android.graphics.Rect()
+        v1.getHitRect(r1)
+        val r2 = android.graphics.Rect()
+        v2.getHitRect(r2)
+        return android.graphics.Rect.intersects(r1, r2)
+    }
+    private fun duplicateComponent(original: View) {
+        if (project == null) return
+        val container = original as? FrameLayout ?: return
+        val type = container.tag as? String ?: return
+        
+        // 1. Create View (Raw)
+        val newView = createComponentView(type)
+        
+        // 2. Assign ID and Index
+        newView.id = View.generateViewId()
+        val index = getNextIndex(type)
+        componentIndices[newView.id] = index
+        
+        // 3. Apply Params (Offset)
+        val params = original.layoutParams as? ConstraintLayout.LayoutParams ?: return
+        val newParams = ConstraintLayout.LayoutParams(params)
+        newParams.width = params.width
+        newParams.height = params.height
+        newView.x = original.x + 40f
+        newView.y = original.y + 40f
+        newView.layoutParams = newParams
+        
+        makeDraggable(newView)
+        editorCanvas.addView(newView)
+        
+        // 4. Create Label
+        val newLabel = TextView(this)
+        newLabel.id = View.generateViewId()
+        val typeName = when (type) {
+             "THERMOMETER" -> "Thermometer"
+             "BUTTON" -> "Button"
+             "SLIDER" -> "Slider"
+             "TEXT" -> "Text"
+             "IMAGE" -> "Image"
+             "LED" -> "LED"
+             else -> type
+        }
+        newLabel.text = "$typeName $index"
+        newLabel.tag = "LABEL_FOR_${newView.id}"
+        newLabel.setTextColor(Color.WHITE)
+        newLabel.textSize = 10f // Consistent size
+        newLabel.gravity = Gravity.CENTER
+        
+        val lParams = ConstraintLayout.LayoutParams(newParams.width, ConstraintLayout.LayoutParams.WRAP_CONTENT)
+        newLabel.x = newView.x
+        newLabel.y = newView.y + newView.height + 4
+        newLabel.layoutParams = lParams
+        
+        editorCanvas.addView(newLabel)
+        
+        Toast.makeText(this, "Duplicated", Toast.LENGTH_SHORT).show()
+    }
+
+    // 填充屬性面板資料
+    private fun populateProperties(view: View) {
+        val params = view.layoutParams
         val density = resources.displayMetrics.density
         etPropWidth.setText((params.width / density).toInt().toString()) // 顯示寬度
         etPropHeight.setText((params.height / density).toInt().toString()) // 顯示高度
-        
+
         // Find the label TextView and display its text
-        // 查找關聯的標籤 TextView 並顯示其文字
         val labelView = findLabelView(view)
         if (labelView != null) {
             etPropName.setText(labelView.text)
         } else {
-            etPropName.setText("") // 如果沒有標籤，清空名稱
+            etPropName.setText("")
         }
+
+        if (project != null) {
+            val container = view as? FrameLayout
+            val type = container?.tag as? String ?: "UNKNOWN"
+            val id = container?.id ?: view.id
+
+            val isInput = (type == "BUTTON" || type == "SLIDER")
+            val topicUrl = getComponentTopic(type, id, isInput)
+
+            val prefix = if (isInput) "TX" else "RX"
+            val tvTopic = findViewById<TextView>(R.id.tvPropTopic)
+            if (tvTopic != null) {
+                tvTopic.text = "Topic: $prefix: $topicUrl"
+            }
+        }
+
+        // Setup Clone Button Only (Delete Removed)
+        val btnClone = findViewById<Button>(R.id.btnClone)
+
+        btnClone?.setOnClickListener {
+            duplicateComponent(view)
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+
+        // Refinement 3: Auto-Pan if component is low (Improved Buffer)
+        view.post {
+            val location = IntArray(2)
+            view.getLocationOnScreen(location)
+            val viewY = location[1]
+            val viewH = view.height
+
+            val displayMetrics = resources.displayMetrics
+            val screenHeight = displayMetrics.heightPixels
+            val sheetHeight = (550 * displayMetrics.density).toInt() // v72: Increased Buffer (+150dp)
+
+            val viewBottom = viewY + viewH
+            val safeBottom = screenHeight - sheetHeight - 50 // 50px buffer
+
+            if (viewBottom > safeBottom) {
+                val scrollAmount = viewBottom - safeBottom
+                editorCanvas.animate().translationY(-scrollAmount.toFloat()).setDuration(300).start()
+            }
+        }
+    }
+     
+     // Reset Pan on Collapse
+     private fun resetCanvasPan() {
+         editorCanvas.animate().translationY(0f).setDuration(300).start()
      }
      
      // Helper function to find the label TextView in the component hierarchy
@@ -986,4 +1803,76 @@ class ProjectViewActivity : AppCompatActivity() {
          }
          return null // 未找到
      }
+
+    // v31: Helper to refresh UI from cached states
+    private fun refreshUIFromCache() {
+        if (projectId == null) return
+        
+        // Loop through all components on canvas
+        // This is a simplified approach. Ideally we map components to topics.
+        // For now, we rely on the fact that MqttRepository holds the latest state.
+        // But since components are dynamically created, we might need to query the repository 
+        // using the topic derived from the component tag/id.
+        
+        // Current implementation of MqttRepository.cachedStates is Topic -> Payload
+        // We can iterate over components and check if their Topic has a cached value.
+        
+        // However, extracting Topic from View is tricky unless we stored it.
+        // In this prototype, we constructed topics dynamically in setupConsole sending.
+        // The components themselves (Button, Slider) don't store their topic reference in current code 
+        // (except if we added it to tag, but tag is used for TYPE).
+        
+        // If we assumed a convention like "{project}/{id}/{type}/{index}/state"
+        // we could reconstruct it.
+        
+        // For v31, we will just ensure that IF we receive a message while paused (background),
+        // MqttRepository updates the cache. When we resume, if we relied on LiveData,
+        // it *should* receive the latest value if it's sticky.
+        // MqttRepository._latestMessage is MutableLiveData. LiveData only emits *latest* value to new observers.
+        // But for *multiple* topics, LiveData only holds the very last single message.
+        // So MqttRepository.cachedStates is the source of truth.
+        
+        // Since we don't have a map of View -> Topic in this activity (yet), 
+        // we can't easily iterate views to update them from cache without more metadata.
+        // For now, this function is a placeholder or can trigger a re-subscription/check.
+        
+        // In a real app, each component View would have its Topic stored in `tag` or a map.
+        // We will leave this empty/placeholder for now as per v31 scope, 
+        // effectively relying on new messages arriving or retained messages handling.
+        
+        // Updated v31: If we want to support "Background Resume", we might want to 
+        // ask the Service to re-publish or re-deliver states? 
+        // Or simply wait for Retained messages which come on Subscribe.
+    }
+
+    // v35: Perform Full Sync (Subscribe Active, Unsubscribe Inactive)
+    private fun performFullSync() {
+        val currentProject = project ?: return
+        val currentId = currentProject.id
+        
+        // 1. Subscribe to Current Project
+        val baseTopic = "${currentProject.name.lowercase()}/$currentId/#"
+        val intentSub = Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java)
+        intentSub.action = "SUBSCRIBE"
+        intentSub.putExtra("TOPIC", baseTopic)
+        startService(intentSub)
+        
+        // 2. Unsubscribe from Inactive Projects
+        // Run in background to avoid UI thread block if list is huge (unlikely here but good practice)
+        CoroutineScope(Dispatchers.IO).launch {
+            // Give a small buffer for the subscribe to go out first
+            delay(500) 
+            
+            val allProjects = ProjectRepository.getAllProjects()
+            for (p in allProjects) {
+                if (p.id != currentId) {
+                    val pTopic = "${p.name.lowercase()}/${p.id}/#"
+                    val intentUnsub = Intent(this@ProjectViewActivity, com.example.mqttpanelcraft.service.MqttService::class.java)
+                    intentUnsub.action = "UNSUBSCRIBE" // New Action
+                    intentUnsub.putExtra("TOPIC", pTopic)
+                    startService(intentUnsub)
+                }
+            }
+        }
+    }
 }

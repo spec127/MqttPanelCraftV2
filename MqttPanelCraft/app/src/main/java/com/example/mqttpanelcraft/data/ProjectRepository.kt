@@ -3,6 +3,7 @@ package com.example.mqttpanelcraft.data
 import android.content.Context
 import com.example.mqttpanelcraft.model.Project
 import com.example.mqttpanelcraft.model.ProjectType
+import com.example.mqttpanelcraft.model.ComponentData
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -41,7 +42,27 @@ object ProjectRepository {
                 val typeStr = obj.optString("type", "HOME")
                 val type = try { ProjectType.valueOf(typeStr) } catch (e: Exception) { ProjectType.HOME }
 
-                projects.add(Project(id, name, broker, port, user, pass, client, type, false))
+                val project = Project(id, name, broker, port, user, pass, client, type, false)
+                
+                // Load Components
+                val compsArray = obj.optJSONArray("components")
+                if (compsArray != null) {
+                    for (k in 0 until compsArray.length()) {
+                        val cObj = compsArray.getJSONObject(k)
+                        val cId = cObj.getInt("id")
+                        val cType = cObj.getString("type")
+                        val cX = cObj.getDouble("x").toFloat()
+                        val cY = cObj.getDouble("y").toFloat()
+                        val cW = cObj.getInt("width")
+                        val cH = cObj.getInt("height")
+                        val cLabel = cObj.optString("label", "")
+                        
+                        val comp = ComponentData(cId, cType, cX, cY, cW, cH, cLabel)
+                        project.components.add(comp)
+                    }
+                }
+                
+                projects.add(project)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -62,19 +83,30 @@ object ProjectRepository {
                 obj.put("password", p.password)
                 obj.put("clientId", p.clientId)
                 obj.put("type", p.type.name)
+                
+                // Save Components
+                val compsArray = JSONArray()
+                for (c in p.components) {
+                    val cObj = JSONObject()
+                    cObj.put("id", c.id)
+                    cObj.put("type", c.type)
+                    cObj.put("x", c.x)
+                    cObj.put("y", c.y)
+                    cObj.put("width", c.width)
+                    cObj.put("height", c.height)
+                    cObj.put("label", c.label)
+                    compsArray.put(cObj)
+                }
+                obj.put("components", compsArray)
+                
                 jsonArray.put(obj)
             }
             file!!.writeText(jsonArray.toString())
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        }
 
-    init {
-        // Add some mock data for v1 visualization
-        projects.add(Project("1", "Smart Home", "broker.emqx.io", ProjectType.HOME, true))
-        projects.add(Project("2", "Office Env", "test.mosquitto.org", ProjectType.FACTORY, false))
-        projects.add(Project("3", "Factory A", "mqtt.eclipseprojects.io", ProjectType.FACTORY, false))
-    }
 
     fun getAllProjects(): List<Project> {
         return projects.toList()
@@ -118,6 +150,6 @@ object ProjectRepository {
         return projects.any {
             it.name.equals(name, ignoreCase = true) && it.id != excludeId
         }
-        return (projects.size + 1).toString()
+
     }
 }
