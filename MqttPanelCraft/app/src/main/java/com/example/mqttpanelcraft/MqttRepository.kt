@@ -59,8 +59,30 @@ object MqttRepository {
         return cachedStates[topic]
     }
 
+    // Listener Interface for Zero-Loss Message Handling
+    interface MessageListener {
+        fun onMessageReceived(topic: String, payload: String)
+    }
+    
+    private val listeners = java.util.concurrent.CopyOnWriteArrayList<MessageListener>()
+    
+    fun registerListener(listener: MessageListener) {
+        if (!listeners.contains(listener)) listeners.add(listener)
+    }
+    
+    fun unregisterListener(listener: MessageListener) {
+        listeners.remove(listener)
+    }
+
     fun processMessage(topic: String?, payload: String, timestamp: String) {
         if (topic == null) return
+        
+        // Notify Listeners (Direct Call - Background Thread)
+        for (listener in listeners) {
+            try { 
+                listener.onMessageReceived(topic, payload) 
+            } catch (e: Exception) { e.printStackTrace() }
+        }
         
         _latestMessage.postValue(RawMessage(topic, payload))
         

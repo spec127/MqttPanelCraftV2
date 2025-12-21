@@ -35,6 +35,39 @@
             android:orientation="vertical"
             android:padding="24dp">
 
+            <!-- Import/Export Actions -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnImportJson"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Import JSON" 
+                    android:textSize="14sp"
+                    android:textColor="@color/primary"
+                    android:contentDescription="Import Configuration"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnExportJson"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Export JSON" 
+                    android:textSize="14sp"
+                    android:textColor="@color/primary"
+                    android:visibility="gone"
+                    android:contentDescription="Export Configuration"/>
+            </LinearLayout>
+
             <!-- Project Name -->
             <TextView
                 android:layout_width="wrap_content"
@@ -280,6 +313,35 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
+            </LinearLayout>
+
+            <!-- Advanced (WebView) Card -->
+            <LinearLayout
+                android:id="@+id/cardWebview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_card_unselected"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/ivWebview"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_webview"
+                    app:tint="#757575"
+                    android:contentDescription="Advanced Webview"/>
+
+                <TextView
+                    android:id="@+id/tvWebview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Advanced (Webview)"
+                    android:textColor="#757575"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <!-- Save Button -->

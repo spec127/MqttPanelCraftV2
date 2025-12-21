@@ -13,6 +13,7 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -55,7 +56,7 @@ import android.content.Intent
  * - 點擊元件進行屬性編輯 (Topic, Color, Size).
  * - 即時接收 MQTT 訊息並更新 UI (Observer Pattern).
  */
-class ProjectViewActivity : AppCompatActivity() {
+class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
 
     // 宣告延遲初始化的 UI 元件變數，這些變數稍後會在 onCreate 中綁定
     private lateinit var drawerLayout: DrawerLayout // 側邊抽屜佈局
@@ -80,13 +81,140 @@ class ProjectViewActivity : AppCompatActivity() {
     // v65: Component Index Map (ViewID -> Index)
     // v65: Component Index Map (ViewID -> Index)
     // Maps a View's ID to its logical Type Index (e.g. Button 1, Button 2)
+    // Maps a View's ID to its logical Type Index (e.g. Button 1, Button 2)
     private val componentIndices = mutableMapOf<Int, Int>()
+    
+    // v80: Full Component Data Map (ViewID -> ComponentData)
+    // Persists 'topicConfig', 'props' (compression), etc. while editing
+    private val componentDataMap = mutableMapOf<Int, com.example.mqttpanelcraft.model.ComponentData>()
+    
     private lateinit var dropDeleteZone: FrameLayout
     
     // 控制台輸入欄位（用於手動發送 MQTT 訊息）
     private lateinit var etTopic: EditText // 輸入 MQTT 主題的編輯框
     private lateinit var etPayload: EditText // 輸入 MQTT 訊息內容的編輯框
+    // v80: Image Picker
+    private var selectedCameraComponentId: Int? = null
+    private val pickImageLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.GetContent()) { uri: android.net.Uri? ->
+        if (uri != null && selectedCameraComponentId != null) {
+            processAndSendImage(uri, selectedCameraComponentId!!)
+        }
+    }
+    
+    private fun openGallery() {
+        pickImageLauncher.launch("image/*")
+    }
+
+    // v80: Process Image (Compression levels 1-5)
+    // Level 1: Very Low (10%)
+    // Level 2: Low (25%)
+    // Level 3: Medium (50%)
+    // Level 4: High (1920x1080 approx, 75%)
+    // Level 5: Original (100%)
+    private fun processAndSendImage(uri: android.net.Uri, viewId: Int) {
+        if (project == null) return
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // 1. Resolve Settings
+                val compData = componentDataMap[viewId]
+                // Default Level 3
+                val level = compData?.props?.get("compression")?.toIntOrNull() ?: 3
+                
+                // Get Topic Override (Test Topic)
+                // User requirement: "Sender also sends to BOTH topics"
+                // User requirement: "Test topic naming rule: name/id/test/USER_DEFINED"
+                val defaultTopic = getComponentTopic("camera", viewId, isCommand = true)
+                val testSuffix = compData?.topicConfig
+                val testTopic = if (!testSuffix.isNullOrEmpty()) {
+                    "${project!!.name.lowercase()}/${project!!.id}/test/$testSuffix"
+                } else null
+
+                // 2. Load Bitmap
+                val bitmap = android.provider.MediaStore.Images.Media.getBitmap(contentResolver, uri)
+                
+                // 3. Resize/Compress (Preserving Aspect Ratio)
+                val maxDim = when(level) {
+                   1 -> 320
+                   2 -> 640
+                   3 -> 800
+                   4 -> 1024 // Cap High at 1024
+                   5 -> 1280 // Cap Original at 1280 (1.2MP Max)
+                   else -> 800
+                }
+                
+                val ratio = bitmap.width.toFloat() / bitmap.height.toFloat()
+                val (w, h) = if (ratio > 1) {
+                    // Landscape
+                    Pair(maxDim, (maxDim / ratio).toInt())
+                } else {
+                    // Portrait
+                    Pair((maxDim * ratio).toInt(), maxDim)
+                }
+                
+                val quality = when(level) {
+                   1 -> 20
+                   2 -> 40
+                   3 -> 60
+                   4 -> 80
+                   5 -> 90
+                   else -> 60
+                }
+                
+                val scaledBitmap = android.graphics.Bitmap.createScaledBitmap(bitmap, w, h, true)
+                val outputStream = java.io.ByteArrayOutputStream()
+                scaledBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, quality, outputStream)
+                val byteArray = outputStream.toByteArray()
+                val base64 = android.util.Base64.encodeToString(byteArray, android.util.Base64.NO_WRAP)
+                
+                // 4. Send (Chunked) - DUAL SEND
+                val chunkSize = 16000 // Reduced to 16KB for stability
+                val totalLength = base64.length
+                val totalChunks = kotlin.math.ceil(totalLength.toDouble() / chunkSize).toInt()
+
+                for (i in 0 until totalChunks) {
+                    val start = i * chunkSize
+                    val end = (start + chunkSize).coerceAtMost(totalLength)
+                    val chunkData = base64.substring(start, end)
+                    
+                    val payload = "${i + 1}|$totalChunks|$chunkData"
+                    
+                    val message = org.eclipse.paho.client.mqttv3.MqttMessage(payload.toByteArray())
+                    message.qos = 0
+                    
+                    // Send to Default
+                    MqttRepository.mqttClient?.publish(defaultTopic, message)
+                    
+                    // Send to Test (if exists)
+                    if (testTopic != null) {
+                         val testMsg = org.eclipse.paho.client.mqttv3.MqttMessage(payload.toByteArray())
+                         testMsg.qos = 0
+                         MqttRepository.mqttClient?.publish(testTopic, testMsg)
+                    }
+                    
+                    MqttRepository.addLog("TX Img Part ${i+1}/$totalChunks", java.text.SimpleDateFormat("HH:mm:ss").format(java.util.Date()))
+                    // Throttle (Prevent Flood)
+                    delay(100) // 100ms delay (More conservative)
+                }
+                
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@ProjectViewActivity, "Sent Image ($totalChunks chunks)", Toast.LENGTH_SHORT).show()
+                }
+
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@ProjectViewActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     private lateinit var btnSend: Button // 發送 MQTT 訊息的按鈕
+    
+    // v75: Image Buffering (Ported from helloworld)
+    // Topic -> (Index -> Data)
+    private val imageBuffer = java.util.concurrent.ConcurrentHashMap<String, MutableMap<Int, String>>()
+    private val imageTotals = java.util.concurrent.ConcurrentHashMap<String, Int>()
 
     private var isEditMode = false // 標記當前是否處於編輯模式，預設為 false (運行模式)
     private var projectId: String? = null // 儲存當前專案的 ID
@@ -129,6 +257,7 @@ class ProjectViewActivity : AppCompatActivity() {
                 }
             }
             
+            // 確保 UI 反映當前的模式（編輯或運行）
             // 確保 UI 反映當前的模式（編輯或運行）
             updateModeUI()
             
@@ -463,9 +592,32 @@ class ProjectViewActivity : AppCompatActivity() {
             // Expected Topic: project/id/type/index/state
             // Index logic reuse: Container ID
             // Refactored to use helper:
+            // Expected Topic: project/id/type/index/state
+            // Index logic reuse: Container ID
+            // Refactored to use helper:
+            // v80: Loopback Check - Test Topic Support
+            // User Request: "If Test Topic is not empty, component will simultaneously subscribe to this topic"
             val expectedTopic = getComponentTopic(type, container.id, isCommand = false)
+            var matches = (topic == expectedTopic)
             
-            if (topic == expectedTopic) {
+            // Check Test Topic (Concurrent Subscription)
+            if (!matches) {
+                val compData = componentDataMap[container.id]
+                if (compData != null && !compData.topicConfig.isNullOrEmpty()) {
+                    // Treat topicConfig as "Test Topic Suffix"
+                    // Protocol: "project/id/test/testTopic"
+                    val testSuffix = compData.topicConfig
+                    val projectBase = "${project!!.name.lowercase()}/${project!!.id}"
+                    
+                    val expectedTestTopic = "$projectBase/test/$testSuffix"
+                    
+                    if (topic == expectedTestTopic) {
+                        matches = true
+                    }
+                }
+            }
+            
+            if (matches) {
                 val innerView = container.getChildAt(0)
                 try {
                     when (type) {
@@ -489,11 +641,54 @@ class ProjectViewActivity : AppCompatActivity() {
                         }
                         "THERMOMETER" -> (innerView as? ProgressBar)?.progress = payload.toIntOrNull()?.coerceIn(0, 100) ?: 0
                         "IMAGE" -> {
-                             try {
-                                 val decodedString = android.util.Base64.decode(payload, android.util.Base64.DEFAULT)
-                                 val decodedByte = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                                 (innerView as? ImageView)?.setImageBitmap(decodedByte)
-                             } catch (e: Exception) { }
+                             // v75: Chunk Support
+                             var fullBase64: String? = null
+                             
+                             // Try to parse as chunk: index|total|data
+                             val parts = payload.split("|", limit = 3)
+                             if (parts.size == 3) {
+                                 val index = parts[0].toIntOrNull()
+                                 val total = parts[1].toIntOrNull()
+                                 val data = parts[2]
+                                 
+                                 if (index != null && total != null) {
+                                     val buffer = imageBuffer.getOrPut(topic) { java.util.concurrent.ConcurrentHashMap() }
+                                     
+                                     // Fix: If index 1 arrives, assume new transmission (most likely) and clear potentially stale buffer
+                                     if (index == 1) {
+                                         buffer.clear()
+                                     }
+                                     
+                                     buffer[index] = data
+                                     imageTotals[topic] = total
+                                     
+                                     // Check if complete
+                                     if (buffer.size == total) {
+                                         val sb = StringBuilder()
+                                         for (k in 1..total) {
+                                             sb.append(buffer[k] ?: "")
+                                         }
+                                         fullBase64 = sb.toString()
+                                         
+                                         // Cleanup
+                                         imageBuffer.remove(topic)
+                                         imageTotals.remove(topic)
+                                     }
+                                 }
+                             } else {
+                                 // Not a chunk, treat as full payload
+                                 fullBase64 = payload
+                             }
+
+                             if (fullBase64 != null) {
+                                 try {
+                                     val decodedString = android.util.Base64.decode(fullBase64, android.util.Base64.DEFAULT)
+                                     val decodedByte = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                                     (innerView as? ImageView)?.setImageBitmap(decodedByte)
+                                 } catch (e: Exception) { 
+                                     // e.printStackTrace() 
+                                 }
+                             }
                         }
                     }
                 } catch (e: Exception) { }
@@ -556,43 +751,64 @@ class ProjectViewActivity : AppCompatActivity() {
         
         // v49: Initialize Topic Display
         tvPropTopic = findViewById(R.id.tvPropTopic)
+        val etPropTopicConfig = findViewById<TextInputEditText>(R.id.etPropTopicConfig)
+        val containerCompression = findViewById<LinearLayout>(R.id.containerCompression)
+        val sliderCompression = findViewById<com.google.android.material.slider.Slider>(R.id.sliderCompression)
         
+
         etPropColor.setOnClickListener { showGradientColorPicker() } // 設定顏色輸入框的點擊事件（顯示顏色選擇器）
         etPropColor.isFocusable = false // v41: Fix API 26 requirement (was FOCUSABLE_AUTO)
         etPropColor.isFocusableInTouchMode = false // 禁止觸控模式下取得焦點（強制使用點擊事件）
         
-        btnSaveProps.setOnClickListener { // 設定儲存按鈕的點擊事件
+        
+        btnSaveProps.setOnClickListener {
             selectedView?.let { view -> // 確保有選中的組件 View
                 try {
-                    val w = etPropWidth.text.toString().toIntOrNull() // 嘗試將寬度文字轉為整數
-                    val h = etPropHeight.text.toString().toIntOrNull() // 嘗試將高度文字轉為整數
-                    if (w != null && h != null) { // 如果寬高都有效
-                        val params = view.layoutParams as ConstraintLayout.LayoutParams // 獲取佈局參數
-                        val density = resources.displayMetrics.density // 獲取螢幕密度
-                        params.width = (w * density).toInt() // 設定寬度（dp 轉 px）
-                        params.height = (h * density).toInt() // 設定高度（dp 轉 px）
-                        view.layoutParams = params // 應用新的佈局參數
+                    val w = etPropWidth.text.toString().toIntOrNull()
+                    val h = etPropHeight.text.toString().toIntOrNull()
+                    
+                    // ... Layout Params update (w, h) omitted for brevity as it is unchanged ...
+                    if (w != null && h != null) { 
+                        val params = view.layoutParams as ConstraintLayout.LayoutParams
+                        val density = resources.displayMetrics.density
+                        params.width = (w * density).toInt()
+                        params.height = (h * density).toInt() 
+                        view.layoutParams = params
                     }
                     
-                    val colorStr = etPropColor.text.toString() // 獲取顏色文字
+                    val colorStr = etPropColor.text.toString()
                     if (colorStr.isNotEmpty()) {
                         try {
-                             view.setBackgroundColor(Color.parseColor(colorStr)) // 嘗試解析並設定背景顏色
-                        } catch (e: Exception) {} // 解析失敗則忽略
+                             view.setBackgroundColor(Color.parseColor(colorStr))
+                        } catch (e: Exception) {}
                     }
                     
-                    // 更新關聯的標籤文字
-                    val labelView = findLabelView(view) // 查找標籤 View
+                    val labelView = findLabelView(view)
                     if (labelView != null) {
-                        labelView.text = etPropName.text.toString() // 更新標籤文字
+                        labelView.text = etPropName.text.toString()
                     }
                     
-                    Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show() // 顯示更新成功訊息
+                    // v80: Save Advanced Props to Map
+                    val currentData = componentDataMap.getOrPut(view.id) {
+                         com.example.mqttpanelcraft.model.ComponentData(view.id, view.tag as String, 0f,0f,0,0,"")
+                    }
+                    
+                    // Save Topc Config
+                    currentData.topicConfig = etPropTopicConfig.text.toString()
+                    
+                    // Save Compression (If visible)
+                    if (containerCompression.visibility == View.VISIBLE) {
+                        currentData.props["compression"] = sliderCompression.value.toInt().toString()
+                    }
+                    
+                    Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
-                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show() // 顯示錯誤訊息
+                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
+    
+
     }
 
     // 顯示顏色選擇器（漸層色盤）
@@ -822,17 +1038,25 @@ class ProjectViewActivity : AppCompatActivity() {
     private fun setComponentsInteractive(enable: Boolean) {
         for (i in 0 until editorCanvas.childCount) {
              val child = editorCanvas.getChildAt(i)
-             // Only target component containers (FrameLayouts with our specific tag or structure)
-             // Checking if it has the component_border background is one way, or checking tags.
-             // Our components are FrameLayouts.
              if (child is FrameLayout && child.childCount > 0) {
+                 // 1. Handle Main Content (Child 0)
                  val innerView = child.getChildAt(0)
                  if (innerView is Button || innerView is com.google.android.material.slider.Slider) {
                      innerView.isEnabled = enable
                      innerView.isClickable = enable
                      innerView.isFocusable = enable
                  }
-                 // For custom views or others, isEnabled often propagates or handles visual state
+                 
+                 // 2. Handle Overlays (e.g. CLEAR_BTN)
+                 for (k in 0 until child.childCount) {
+                     val sub = child.getChildAt(k)
+                     if (sub.tag == "CLEAR_BTN") {
+                         // Show only in Run Mode (enable=true -> Run Mode)
+                         // Wait, setComponentsInteractive is called with (!isEditMode).
+                         // So enable == True means Run Mode.
+                         sub.visibility = if (enable) View.VISIBLE else View.GONE
+                     }
+                 }
              }
         }
     }
@@ -899,6 +1123,8 @@ class ProjectViewActivity : AppCompatActivity() {
         
         findViewById<View>(R.id.cardLed).apply { tag="LED"; setOnTouchListener(touchListener) }
         findViewById<View>(R.id.cardThermometer).apply { tag="THERMOMETER"; setOnTouchListener(touchListener) }
+        // Fix: Enable Camera Drag
+        findViewById<View>(R.id.cardCamera).apply { tag="CAMERA"; setOnTouchListener(touchListener) }
 
 
 
@@ -1202,9 +1428,26 @@ class ProjectViewActivity : AppCompatActivity() {
                 max = 100
                 progress = 75
                 progressTintList = android.content.res.ColorStateList.valueOf(Color.GREEN)
+            }
+            "IMAGE" -> ImageView(context).apply {
+                scaleType = ImageView.ScaleType.FIT_CENTER
+                setImageResource(android.R.drawable.ic_menu_gallery) // Standard Placeholder
+                setImageResource(R.drawable.ic_webview) // Placeholder
+                // background = android.graphics.drawable.ColorDrawable(Color.LTGRAY)
+            }
+            "CAMERA" -> Button(context).apply {
+                text = "CAM"
+                setOnClickListener {
+                    if (!isEditMode) {
+                        // v80: Trigger Image Picker
+                        selectedCameraComponentId = (parent as? View)?.id ?: id
+                        openGallery()
+                    }
+                }
             } 
             else -> TextView(context).apply { text = tag } 
         }
+        
         
         // 確保內部 View 填滿容器
         val params = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
@@ -1212,6 +1455,38 @@ class ProjectViewActivity : AppCompatActivity() {
         
         container.addView(view) // 將內部 View 添加到容器
         container.tag = tag // 設定容器的 Tag 為組件類型
+        
+        // v91: Image Clear Overlay Button
+        if (tag == "IMAGE") {
+             val clearBtn = ImageButton(context).apply {
+                 setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+                 background = null // Default / Transparent
+                 // setColorFilter(Color.DKGRAY) // Optional: If icon is dark
+                 setPadding(4, 4, 4, 4)
+                 
+                 // Size 32dp
+                 val density = resources.displayMetrics.density
+                 val size = (32 * density).toInt()
+                 val flParams = FrameLayout.LayoutParams(size, size)
+                 flParams.gravity = Gravity.TOP or Gravity.END
+                 flParams.setMargins(8, 8, 8, 8)
+                 layoutParams = flParams
+                 
+                 this.tag = "CLEAR_BTN" // Identify for mode switching
+                 
+                 setOnClickListener {
+                     if (!isEditMode) {
+                         // Reset Image
+                         (view as? ImageView)?.let { iv ->
+                             iv.setImageResource(android.R.drawable.ic_menu_gallery)
+                             iv.background = null // Transparent
+                             Toast.makeText(context, "Image Cleared", Toast.LENGTH_SHORT).show()
+                         }
+                     }
+                 }
+             }
+             container.addView(clearBtn)
+        }
         
         return container // 返回容器（作為組件）
     }
@@ -1546,6 +1821,9 @@ class ProjectViewActivity : AppCompatActivity() {
              val labelView = findLabelView(view)
              val labelText = labelView?.text?.toString() ?: ""
              
+             // v80: Retrieve existing data or create new
+             val oldData = componentDataMap[view.id]
+             
              val compData = com.example.mqttpanelcraft.model.ComponentData(
                  id = view.id,
                  type = tag,
@@ -1553,7 +1831,10 @@ class ProjectViewActivity : AppCompatActivity() {
                  y = view.y,
                  width = view.width,
                  height = view.height,
-                 label = labelText
+                 label = labelText,
+                 // Preserve advanced props
+                 topicConfig = oldData?.topicConfig ?: "",
+                 props = oldData?.props ?: mutableMapOf()
              )
              currentProject.components.add(compData)
         }
@@ -1582,7 +1863,10 @@ class ProjectViewActivity : AppCompatActivity() {
         }
         toRemove.forEach { editorCanvas.removeView(it) }
         
+
+        
         componentIndices.clear()
+        componentDataMap.clear() // v80: Clear map
         
         for (comp in currentProject.components) {
             val newView = createComponentView(comp.type)
@@ -1602,7 +1886,11 @@ class ProjectViewActivity : AppCompatActivity() {
             newView.y = comp.y
             
             editorCanvas.addView(newView)
+
             makeDraggable(newView)
+            
+            // v80: Populate Map
+            componentDataMap[newView.id] = comp
             
             // Recreate Label
             val labelView = TextView(this).apply {
@@ -1627,6 +1915,9 @@ class ProjectViewActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // v95: Register Listener (Zero-Drop)
+        MqttRepository.registerListener(this)
+        
         refreshUIFromCache() // Merged from v31
         
         // Reload project to check for changes
@@ -1662,6 +1953,8 @@ class ProjectViewActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        // v95: Unregister Listener
+        MqttRepository.unregisterListener(this)
         saveProjectState()
     }
 
@@ -1753,6 +2046,25 @@ class ProjectViewActivity : AppCompatActivity() {
             if (tvTopic != null) {
                 tvTopic.text = "Topic: $prefix: $topicUrl"
             }
+            
+            // v80: Load Advanced Props
+            val compData = componentDataMap[view.id]
+            val etPropTopicConfig = findViewById<EditText>(R.id.etPropTopicConfig)
+            etPropTopicConfig.setText(compData?.topicConfig ?: "")
+            
+            // Camera Specific
+            val containerCompression = findViewById<LinearLayout>(R.id.containerCompression)
+            val sliderCompression = findViewById<com.google.android.material.slider.Slider>(R.id.sliderCompression)
+            
+            // Camera Specific
+            if (type == "CAMERA") {
+                containerCompression.visibility = View.VISIBLE
+                val level = compData?.props?.get("compression")?.toFloatOrNull() ?: 3.0f
+                sliderCompression.value = level
+            } else {
+                containerCompression.visibility = View.GONE
+            }
+
         }
 
         // Setup Clone Button Only (Delete Removed)
@@ -1873,6 +2185,13 @@ class ProjectViewActivity : AppCompatActivity() {
                     startService(intentUnsub)
                 }
             }
+            }
+        }
+
+    // v95: Listener Implementation
+    override fun onMessageReceived(topic: String, payload: String) {
+        runOnUiThread {
+            updateComponentFromMqtt(topic, payload)
         }
     }
 }

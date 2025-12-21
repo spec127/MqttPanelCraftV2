@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mqttpanelcraft.adapter.ProjectAdapter
 import com.example.mqttpanelcraft.data.ProjectRepository
 import com.example.mqttpanelcraft.databinding.ActivityDashboardBinding
+import com.example.mqttpanelcraft.model.Project
 
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
@@ -27,6 +28,10 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var projectAdapter: ProjectAdapter
     private var isGuest = false
+    
+    // v85: Sorting State
+    // 0: Custom, 1: Name, 2: Date, 3: Last Opened
+    private var currentSortMode = 3 // Default: Last Opened (User feedback implies preference for simply finding projects)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,6 +110,45 @@ class DashboardActivity : AppCompatActivity() {
         val currentLang = if (resources.configuration.locales[0].language == "zh") "繁體中文" else "English"
         dropdownLanguage?.setText(currentLang, false)
         
+        // Setup Sort RadioGroup
+        val radioGroupSort = bottomSheetDialog.findViewById<android.widget.RadioGroup>(R.id.radioGroupSort)
+        
+        // Initialize radio state (check based on simple logic or leave unchecked? Let's check "Name" by default if user asks, but strictly we don't know state.
+        // Actually, user just wants to SORT. 
+        // We can leave checks alone or manage currentSortMode as "Last Action" indicator if we want.
+        // For simplicity:
+        when (currentSortMode) {
+            1 -> radioGroupSort?.check(R.id.rbSortNameAsc) // Default to Asc?
+            2 -> radioGroupSort?.check(R.id.rbSortDateNew)
+            3 -> radioGroupSort?.check(R.id.rbSortLastOpened)
+        }
+        
+        radioGroupSort?.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.rbSortNameAsc -> {
+                    ProjectRepository.sortProjects(compareBy { it.name })
+                    currentSortMode = 1
+                }
+                R.id.rbSortNameDesc -> {
+                    ProjectRepository.sortProjects(compareByDescending { it.name })
+                    currentSortMode = 1
+                }
+                R.id.rbSortDateNew -> {
+                    ProjectRepository.sortProjects(compareByDescending { it.createdAt })
+                    currentSortMode = 2
+                }
+                R.id.rbSortDateOld -> {
+                    ProjectRepository.sortProjects(compareBy { it.createdAt })
+                    currentSortMode = 2
+                }
+                R.id.rbSortLastOpened -> {
+                    ProjectRepository.sortProjects(compareByDescending { it.lastOpenedAt })
+                    currentSortMode = 3
+                }
+            }
+            loadProjects() // Reload list (now sorted in Repo)
+        }
+
         dropdownLanguage?.setOnItemClickListener { _, _, position, _ ->
             val selected = languages[position]
             if (selected != currentLang) {
@@ -134,9 +178,19 @@ class DashboardActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         projectAdapter = ProjectAdapter(emptyList(), 
             onProjectClick = { project ->
-                // On Item Click -> Open Project View
+                // Update Last Opened
+                project.lastOpenedAt = System.currentTimeMillis()
+                ProjectRepository.updateProject(project) // Save timestamp
+                
+                // On Item Click -> Open Project View or WebView
                 Toast.makeText(this, "Opening ${project.name}...", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, ProjectViewActivity::class.java)
+                val targetActivity = if (project.type == com.example.mqttpanelcraft.model.ProjectType.WEBVIEW) {
+                    WebViewActivity::class.java
+                } else {
+                    ProjectViewActivity::class.java
+                }
+                
+                val intent = Intent(this, targetActivity)
                 intent.putExtra("PROJECT_ID", project.id)
                 startActivity(intent)
             },
@@ -167,6 +221,26 @@ class DashboardActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@DashboardActivity)
             adapter = projectAdapter
         }
+        
+        // v85: Drag & Drop (Project Reordering) - Restored
+        val itemTouchHelper = androidx.recyclerview.widget.ItemTouchHelper(object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(
+            androidx.recyclerview.widget.ItemTouchHelper.UP or androidx.recyclerview.widget.ItemTouchHelper.DOWN, 
+            0 
+        ) {
+            override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
+                val fromPos = viewHolder.adapterPosition
+                val toPos = target.adapterPosition
+                
+                try {
+                     ProjectRepository.swapProjects(fromPos, toPos)
+                     projectAdapter.notifyItemMoved(fromPos, toPos)
+                     return true
+                } catch (e: Exception) { return false }
+            }
+
+            override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {}
+        })
+        itemTouchHelper.attachToRecyclerView(binding.rvProjects)
     }
 
     private fun setupFab() {
@@ -179,6 +253,10 @@ class DashboardActivity : AppCompatActivity() {
     private fun loadProjects() {
         try {
             val projects = ProjectRepository.getAllProjects()
+            
+            // v85: Sorting is now persistent in Repository (Action-based)
+            // No need to sort here dynamically.
+            
             // v38: Don't just set data, allow connection check to update it.
             // But we need initial data.
             projectAdapter.updateData(projects)

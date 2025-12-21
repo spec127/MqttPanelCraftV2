@@ -39,6 +39,15 @@ class SetupActivity : AppCompatActivity() {
     private lateinit var etPassword: TextInputEditText
     private lateinit var btnTest: MaterialButton
     private lateinit var btnSave: MaterialButton
+    private lateinit var btnImport: MaterialButton
+    private lateinit var btnExport: MaterialButton
+
+    // Data State
+    private var originalProject: Project? = null // For Edit Mode
+    private var pendingComponents: MutableList<com.example.mqttpanelcraft.model.ComponentData>? = null
+    private var pendingCustomCode: String? = null // Store imported code
+    private var pendingExportJson: String? = null // Temporary hold for export
+
 
     // Theme Cards
     private lateinit var cardHome: LinearLayout
@@ -48,6 +57,10 @@ class SetupActivity : AppCompatActivity() {
     private lateinit var cardFactory: LinearLayout
     private lateinit var ivFactory: ImageView
     private lateinit var tvFactory: TextView
+
+    private lateinit var cardWebview: LinearLayout
+    private lateinit var ivWebview: ImageView
+    private lateinit var tvWebview: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +73,8 @@ class SetupActivity : AppCompatActivity() {
         projectId = intent.getStringExtra("PROJECT_ID")
         if (projectId != null) {
             setupEditMode(projectId!!)
+        } else {
+             // Create Mode: Import is visible, Export is gone (default in XML)
         }
 
         setupWindowInsets()
@@ -75,6 +90,10 @@ class SetupActivity : AppCompatActivity() {
     
     private fun setupEditMode(id: String) {
         val project = ProjectRepository.getProjectById(id) ?: return
+        originalProject = project
+        
+        // Show Export
+        btnExport.visibility = android.view.View.VISIBLE
         
         etName.setText(project.name)
         etBroker.setText(project.broker)
@@ -129,6 +148,34 @@ class SetupActivity : AppCompatActivity() {
         return true
     }
 
+    private val saveJsonLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        if (uri != null && pendingExportJson != null) {
+            try {
+                contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.write(pendingExportJson!!.toByteArray())
+                }
+                android.widget.Toast.makeText(this, "Saved to file!", android.widget.Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                android.widget.Toast.makeText(this, "Save Failed: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private val openJsonLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            try {
+                contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val json = inputStream.bufferedReader().use { it.readText() }
+                    processImportedJson(json)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                android.widget.Toast.makeText(this, "Read Failed: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun setupViews() {
         etName = findViewById(R.id.etProjectName)
         etBroker = findViewById(R.id.etBroker)
@@ -138,6 +185,11 @@ class SetupActivity : AppCompatActivity() {
 
         btnTest = findViewById(R.id.btnTestConnection)
         btnSave = findViewById(R.id.btnSaveProject)
+        btnImport = findViewById(R.id.btnImportJson)
+        btnExport = findViewById(R.id.btnExportJson)
+        
+        btnImport.setOnClickListener { showImportDialog() }
+        btnExport.setOnClickListener { showExportDialog() }
 
         cardHome = findViewById(R.id.cardHome)
         ivHome = findViewById(R.id.ivHome)
@@ -147,9 +199,14 @@ class SetupActivity : AppCompatActivity() {
         ivFactory = findViewById(R.id.ivFactory)
         tvFactory = findViewById(R.id.tvFactory)
 
+        cardWebview = findViewById(R.id.cardWebview)
+        ivWebview = findViewById(R.id.ivWebview)
+        tvWebview = findViewById(R.id.tvWebview)
+
         // Theme Selection
         cardHome.setOnClickListener { selectType(ProjectType.HOME) }
         cardFactory.setOnClickListener { selectType(ProjectType.FACTORY) }
+        cardWebview.setOnClickListener { selectType(ProjectType.WEBVIEW) }
 
         // Test Connection (Real)
         btnTest.setOnClickListener {
@@ -160,6 +217,113 @@ class SetupActivity : AppCompatActivity() {
         btnSave.setOnClickListener {
             saveProject()
         }
+    }
+
+    private fun showImportDialog() {
+        val context = this
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Import Configuration Payload")
+        
+        val input = android.widget.EditText(context)
+        input.hint = "Paste JSON here..."
+        input.isSingleLine = false
+        input.minLines = 10
+        input.gravity = android.view.Gravity.TOP or android.view.Gravity.START
+        input.setPadding(40, 40, 40, 40)
+        input.textSize = 12f
+        
+        builder.setView(input)
+        
+        builder.setPositiveButton("Load Text") { _, _ ->
+            val json = input.text.toString()
+            if (json.isNotBlank()) {
+                processImportedJson(json)
+            }
+        }
+        
+        builder.setNeutralButton("Load File") { _, _ ->
+             // MIME types: json, text, or any
+             openJsonLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
+        }
+
+        builder.setNegativeButton("Cancel", null)
+        
+        val dialog = builder.create()
+        // Fix: Set input mode on the dialog's window, not via view
+        dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        dialog.show()
+    }
+
+    private fun processImportedJson(json: String) {
+        val imported = ProjectRepository.parseProjectJson(json)
+        if (imported != null) {
+            // Populate Fields with "Copy" suffix
+            var newName = imported.name + "_copy"
+            // Simple check to avoid loop, though repository check later handles strict uniqueness
+            if (ProjectRepository.isProjectNameTaken(newName)) {
+                 newName += "_" + System.currentTimeMillis() % 1000
+            }
+            etName.setText(newName)
+            
+            // Set Imported ID - DISABLED to prevent ID Collision/Duplication bugs
+            // Importing configuration should NOT change the Project's Identity (ID).
+            // if (imported.id.isNotEmpty()) {
+            //    val containerProjectId = findViewById<android.view.View>(R.id.containerProjectId)
+            //    val tvProjectId = findViewById<TextView>(R.id.tvProjectId)
+            //    containerProjectId.visibility = android.view.View.VISIBLE
+            //    tvProjectId.text = imported.id
+            // }
+            
+            etBroker.setText(imported.broker)
+            etPort.setText(imported.port.toString())
+            etUser.setText(imported.username)
+            // Password usually ignored
+            selectType(imported.type)
+            
+            // Store Structure
+            pendingComponents = imported.components
+            pendingCustomCode = imported.customCode
+            
+            android.widget.Toast.makeText(this, "Loaded ${imported.components.size} components!", android.widget.Toast.LENGTH_SHORT).show()
+        } else {
+             android.widget.Toast.makeText(this, "Invalid JSON", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showExportDialog() {
+        if (originalProject == null) return
+        
+        val json = ProjectRepository.exportProjectToJson(originalProject!!)
+        val context = this
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Export Configuration")
+        
+        val input = android.widget.EditText(context)
+        input.setText(json)
+        input.isSingleLine = false
+        input.minLines = 10
+        input.maxLines = 15
+        input.isFocusable = false // Read only-ish
+        input.setPadding(40, 40, 40, 40)
+        input.textSize = 10f
+        input.typeface = android.graphics.Typeface.MONOSPACE
+        
+        builder.setView(input)
+        
+        builder.setPositiveButton("Copy") { _, _ ->
+             val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+             val clip = android.content.ClipData.newPlainText("Config JSON", json)
+             clipboard.setPrimaryClip(clip)
+             android.widget.Toast.makeText(context, "Copied to Clipboard", android.widget.Toast.LENGTH_SHORT).show()
+        }
+        
+        builder.setNeutralButton("Save File") { _, _ ->
+             pendingExportJson = json
+             saveJsonLauncher.launch("${originalProject?.name ?: "config"}.json")
+        }
+        
+        builder.setNegativeButton("Close", null)
+        builder.show()
     }
 
     private fun testConnection() {
@@ -267,6 +431,20 @@ class SetupActivity : AppCompatActivity() {
              }
         }
 
+        // Determine Components & Custom Code
+        // Logic: 
+        // 1. If pendingComponents is set (Import happened), use it.
+        // 2. Else if originalProject exists (Edit Mode), keep its components.
+        // 3. Else (New Project), empty list.
+        
+        val finalComponents = pendingComponents 
+            ?: originalProject?.components?.toMutableList() // Copy to avoid mutation issues
+            ?: mutableListOf()
+            
+        val finalCustomCode = pendingCustomCode
+            ?: originalProject?.customCode
+            ?: ""
+
         val newProject = Project(
             id = finalId,
             name = name,
@@ -275,7 +453,9 @@ class SetupActivity : AppCompatActivity() {
             username = user,
             password = pass,
             type = selectedType,
-            isConnected = false
+            isConnected = false,
+            components = finalComponents,
+            customCode = finalCustomCode
         )
 
         if (projectId != null) {
@@ -308,22 +488,37 @@ class SetupActivity : AppCompatActivity() {
         val primaryColor = ContextCompat.getColor(this, R.color.primary)
         val greyColor = Color.parseColor("#757575")
 
-        if (type == ProjectType.HOME) {
-            cardHome.setBackgroundResource(R.drawable.bg_card_selected)
-            ivHome.setColorFilter(primaryColor)
-            tvHome.setTextColor(primaryColor)
+        // Reset all to unselected state
+        cardHome.setBackgroundResource(R.drawable.bg_card_unselected)
+        ivHome.setColorFilter(greyColor)
+        tvHome.setTextColor(greyColor)
 
-            cardFactory.setBackgroundResource(R.drawable.bg_card_unselected)
-            ivFactory.setColorFilter(greyColor)
-            tvFactory.setTextColor(greyColor)
-        } else {
-            cardHome.setBackgroundResource(R.drawable.bg_card_unselected)
-            ivHome.setColorFilter(greyColor)
-            tvHome.setTextColor(greyColor)
+        cardFactory.setBackgroundResource(R.drawable.bg_card_unselected)
+        ivFactory.setColorFilter(greyColor)
+        tvFactory.setTextColor(greyColor)
 
-            cardFactory.setBackgroundResource(R.drawable.bg_card_selected)
-            ivFactory.setColorFilter(primaryColor)
-            tvFactory.setTextColor(primaryColor)
+        cardWebview.setBackgroundResource(R.drawable.bg_card_unselected)
+        ivWebview.setColorFilter(greyColor)
+        tvWebview.setTextColor(greyColor)
+
+        // Highlight selected
+        when (type) {
+            ProjectType.HOME -> {
+                cardHome.setBackgroundResource(R.drawable.bg_card_selected)
+                ivHome.setColorFilter(primaryColor)
+                tvHome.setTextColor(primaryColor)
+            }
+            ProjectType.FACTORY -> {
+                cardFactory.setBackgroundResource(R.drawable.bg_card_selected)
+                ivFactory.setColorFilter(primaryColor)
+                tvFactory.setTextColor(primaryColor)
+            }
+            ProjectType.WEBVIEW -> {
+                cardWebview.setBackgroundResource(R.drawable.bg_card_selected)
+                ivWebview.setColorFilter(primaryColor)
+                tvWebview.setTextColor(primaryColor)
+            }
+            else -> {} // Handle OTHER if needed
         }
     }
 }

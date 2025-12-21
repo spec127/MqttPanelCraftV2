@@ -41,8 +41,11 @@ object ProjectRepository {
                 val client = obj.optString("clientId", "")
                 val typeStr = obj.optString("type", "HOME")
                 val type = try { ProjectType.valueOf(typeStr) } catch (e: Exception) { ProjectType.HOME }
+                val customCode = obj.optString("customCode", "")
+                val createdAt = obj.optLong("createdAt", System.currentTimeMillis())
+                val lastOpenedAt = obj.optLong("lastOpenedAt", System.currentTimeMillis())
 
-                val project = Project(id, name, broker, port, user, pass, client, type, false)
+                val project = Project(id, name, broker, port, user, pass, client, type, false, mutableListOf(), customCode, createdAt, lastOpenedAt)
                 
                 // Load Components
                 val compsArray = obj.optJSONArray("components")
@@ -56,8 +59,17 @@ object ProjectRepository {
                         val cW = cObj.getInt("width")
                         val cH = cObj.getInt("height")
                         val cLabel = cObj.optString("label", "")
+                        val cTopicConfig = cObj.optString("topicConfig", "")
                         
-                        val comp = ComponentData(cId, cType, cX, cY, cW, cH, cLabel)
+                        val cProps = mutableMapOf<String, String>()
+                        val propsObj = cObj.optJSONObject("props")
+                        if (propsObj != null) {
+                            for (key in propsObj.keys()) {
+                                cProps[key] = propsObj.getString(key)
+                            }
+                        }
+                        
+                        val comp = ComponentData(cId, cType, cX, cY, cW, cH, cLabel, cTopicConfig, cProps)
                         project.components.add(comp)
                     }
                 }
@@ -83,6 +95,9 @@ object ProjectRepository {
                 obj.put("password", p.password)
                 obj.put("clientId", p.clientId)
                 obj.put("type", p.type.name)
+                obj.put("customCode", p.customCode)
+                obj.put("createdAt", p.createdAt)
+                obj.put("lastOpenedAt", p.lastOpenedAt)
                 
                 // Save Components
                 val compsArray = JSONArray()
@@ -95,6 +110,12 @@ object ProjectRepository {
                     cObj.put("width", c.width)
                     cObj.put("height", c.height)
                     cObj.put("label", c.label)
+                    cObj.put("topicConfig", c.topicConfig)
+                    val propsObj = JSONObject()
+                    for ((k, v) in c.props) {
+                        propsObj.put(k, v)
+                    }
+                    cObj.put("props", propsObj)
                     compsArray.put(cObj)
                 }
                 obj.put("components", compsArray)
@@ -117,7 +138,14 @@ object ProjectRepository {
     }
 
     fun addProject(project: Project) {
-        projects.add(project)
+        // Safety: Ensure ID is unique. If collision, auto-generate new ID.
+        var finalProject = project
+        if (getProjectById(project.id) != null) {
+            val newId = generateId()
+            android.util.Log.w("Repo", "Duplicate ID detected [${project.id}]. Re-assigning to [$newId].")
+            finalProject = project.copy(id = newId)
+        }
+        projects.add(finalProject)
         saveProjects()
     }
     
@@ -133,6 +161,8 @@ object ProjectRepository {
         projects.removeIf { it.id == id }
         saveProjects()
     }
+    
+
     
     fun generateId(): String {
         val secureRandom = java.security.SecureRandom()
@@ -150,6 +180,135 @@ object ProjectRepository {
         return projects.any {
             it.name.equals(name, ignoreCase = true) && it.id != excludeId
         }
+    }
 
+    // === Import / Export Logic ===
+
+    fun exportProjectToJson(project: Project): String {
+        try {
+            val root = JSONObject()
+            root.put("schemaVersion", 1)
+            
+            val meta = JSONObject()
+            meta.put("exportedAt", System.currentTimeMillis())
+            meta.put("appVersion", "1.0")
+            root.put("meta", meta)
+
+            val pObj = JSONObject()
+            // Optional: Export Name? User might want to rename on import. Let's export it as suggestion.
+            pObj.put("name", project.name)
+            pObj.put("id", project.id) // Export ID
+            pObj.put("broker", project.broker)
+            pObj.put("port", project.port)
+            pObj.put("username", project.username)
+            // SECURITY: Do NOT export password by default
+            // pObj.put("password", project.password) 
+            pObj.put("type", project.type.name)
+            pObj.put("customCode", project.customCode)
+            pObj.put("createdAt", project.createdAt)
+            pObj.put("lastOpenedAt", project.lastOpenedAt)
+
+            val compsArray = JSONArray()
+            for (c in project.components) {
+                val cObj = JSONObject()
+                cObj.put("id", c.id)
+                cObj.put("type", c.type)
+                cObj.put("x", c.x.toDouble()) // Ensure double for precision
+                cObj.put("y", c.y.toDouble())
+                cObj.put("width", c.width)
+                cObj.put("height", c.height)
+                cObj.put("label", c.label)
+                cObj.put("topicConfig", c.topicConfig)
+                val propsObj = JSONObject()
+                for ((k, v) in c.props) {
+                    propsObj.put(k, v)
+                }
+                cObj.put("props", propsObj)
+                compsArray.put(cObj)
+            }
+            pObj.put("components", compsArray)
+            
+            root.put("project", pObj)
+            
+            // Format with indentation = 2 for readability
+            return root.toString(2)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return ""
+        }
+    }
+
+    // Returns a "Template" Project. ID will be empty or temp. Caller must assign real ID and Name.
+    fun parseProjectJson(jsonStr: String): Project? {
+        try {
+            val root = JSONObject(jsonStr)
+            // schemaVersion check could go here
+            
+            val pObj = root.getJSONObject("project")
+            
+            val id = pObj.optString("id", "")
+            val name = pObj.optString("name", "Imported Project")
+            val broker = pObj.optString("broker", "")
+            val port = pObj.optInt("port", 1883)
+            val user = pObj.optString("username", "")
+            // Password usually valid empty on import
+            val typeStr = pObj.optString("type", "HOME")
+            val type = try { ProjectType.valueOf(typeStr) } catch (e: Exception) { ProjectType.HOME }
+            val customCode = pObj.optString("customCode", "")
+
+            val project = Project(
+                id = id, 
+                name = name, 
+                broker = broker, 
+                port = port, 
+                username = user, 
+                password = "", 
+                type = type,
+                customCode = customCode,
+                createdAt = pObj.optLong("createdAt", System.currentTimeMillis()),
+                lastOpenedAt = pObj.optLong("lastOpenedAt", System.currentTimeMillis())
+            )
+
+            val compsArray = pObj.optJSONArray("components")
+            if (compsArray != null) {
+                for (k in 0 until compsArray.length()) {
+                     val cObj = compsArray.getJSONObject(k)
+                     val cId = cObj.getInt("id")
+                     val cType = cObj.getString("type")
+                     val cX = cObj.getDouble("x").toFloat()
+                     val cY = cObj.getDouble("y").toFloat()
+                     val cW = cObj.getInt("width")
+                     val cH = cObj.getInt("height")
+                     val cLabel = cObj.optString("label", "")
+                     val cTopicConfig = cObj.optString("topicConfig", "")
+                     
+                     val cProps = mutableMapOf<String, String>()
+                     val propsObj = cObj.optJSONObject("props")
+                     if (propsObj != null) {
+                         for (key in propsObj.keys()) {
+                             cProps[key] = propsObj.getString(key)
+                         }
+                     }
+                     
+                     project.components.add(ComponentData(cId, cType, cX, cY, cW, cH, cLabel, cTopicConfig, cProps))
+                }
+            }
+            return project
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
+    fun swapProjects(fromIndex: Int, toIndex: Int) {
+        if (fromIndex in projects.indices && toIndex in projects.indices) {
+            java.util.Collections.swap(projects, fromIndex, toIndex)
+            saveProjects()
+        }
+    }
+
+    fun sortProjects(comparator: Comparator<Project>) {
+        java.util.Collections.sort(projects, comparator)
+        saveProjects()
     }
 }

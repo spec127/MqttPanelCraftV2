@@ -63,6 +63,11 @@
             android:name=".MainActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".WebViewActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>
