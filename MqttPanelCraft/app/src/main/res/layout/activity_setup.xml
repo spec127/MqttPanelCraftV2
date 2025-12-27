@@ -68,11 +68,11 @@
                     android:contentDescription="Export Configuration"/>
             </LinearLayout>
 
-            <!-- Project Name -->
+            <!-- Project ID -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/label_project_name"
+                android:text="Project ID"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -94,12 +94,7 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Project ID"
-                        android:textColor="#757575"
-                        android:textSize="14sp" />
+                    <!-- Removed Small Label -->
                     
                     <TextView
                         android:id="@+id/tvProjectId"

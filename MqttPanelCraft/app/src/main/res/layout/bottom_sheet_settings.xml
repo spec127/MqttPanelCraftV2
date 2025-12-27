@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="@android:color/white">
+    android:background="?attr/colorSurface">
 
     <TextView
         android:layout_width="wrap_content"
@@ -13,10 +13,11 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginBottom="24dp"
-        android:textColor="@android:color/black"/>
+        android:textColor="?attr/colorOnSurface"/>
 
     <!-- Sort Order -->
     <TextView
+        android:id="@+id/tvSortLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sort Projects By"

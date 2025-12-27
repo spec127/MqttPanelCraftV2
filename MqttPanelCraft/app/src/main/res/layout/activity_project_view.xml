@@ -4,7 +4,7 @@
     android:id="@+id/rootCoordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="?attr/colorSurface"
     tools:context=".ProjectViewActivity">
 
     <!-- AppBar (Z-Order: Top) -->
@@ -157,96 +157,112 @@
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
                 android:background="@drawable/bg_bottom_sheet"
-                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+                app:layout_behavior="com.example.mqttpanelcraft.ui.LockableBottomSheetBehavior"
                 app:behavior_peekHeight="30dp">
                 
-                <!-- Drag Handle / Header -->
-                 <LinearLayout
-                    android:id="@+id/bottomSheetHeader"
-                    android:clickable="true"
-                    android:focusable="true"
+                <!-- Wrapper for all content -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
                     
-                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="4dp"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="8dp"
-                        android:src="@drawable/ic_drag_handle" 
-                        app:tint="#CCCCCC" /> 
-                     
-                     <!-- CONTAINER: Logs -->
-                     <LinearLayout
-                         android:id="@+id/containerLogs"
-                         android:layout_width="match_parent"
-                         android:layout_height="match_parent"
-                         android:orientation="vertical"
-                         android:padding="8dp">
-                         
-                         <TextView
-                             android:text="MQTT/System Logs"
-                             android:textStyle="bold"
-                             android:textColor="@color/sidebar_section_header"
-                             android:padding="8dp"
-                             android:layout_width="match_parent"
-                             android:layout_height="wrap_content"/>
-                             
-                         <androidx.recyclerview.widget.RecyclerView
-                             android:id="@+id/rvConsoleLogs"
-                             android:layout_width="match_parent"
-                             android:layout_height="0dp"
-                             android:layout_weight="1"/>
-                             
-                         <LinearLayout
-                             android:layout_width="match_parent"
-                             android:layout_height="wrap_content"
-                             android:orientation="vertical">
-                             
-                             <LinearLayout
-                                 android:layout_width="match_parent"
-                                 android:layout_height="wrap_content"
-                                 android:orientation="horizontal">
-                                 <EditText 
-                                     android:id="@+id/etConsoleTopic" 
-                                     android:layout_width="0dp" 
-                                     android:layout_weight="1" 
-                                     android:layout_height="wrap_content" 
-                                     android:hint="Topic"/>
-                                 <Button 
-                                     android:id="@+id/btnConsoleSubscribe" 
-                                     android:layout_width="wrap_content" 
-                                     android:layout_height="wrap_content" 
-                                     android:text="Sub"/>
-                             </LinearLayout>
+                    <!-- Drag Handle / Header (ONLY this part should be interactive) -->
+                    <FrameLayout
+                        android:id="@+id/bottomSheetHeader"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp">
+                        
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="4dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="8dp"
+                            android:src="@drawable/ic_drag_handle" 
+                            app:tint="#CCCCCC" />
+                    </FrameLayout>
+                    
+                    <!-- Content Area (NOT part of header) -->
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+                        
+                        <!-- CONTAINER: Logs -->
+                        <LinearLayout
+                            android:id="@+id/containerLogs"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:padding="8dp"
+                            android:clickable="true"
+                            android:focusable="true">
+                            
+                            <TextView
+                                android:text="MQTT/System Logs"
+                                android:textStyle="bold"
+                                android:textColor="@color/sidebar_section_header"
+                                android:padding="8dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"/>
+                                
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rvConsoleLogs"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"/>
+                                
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+                                
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+                                    <EditText 
+                                        android:id="@+id/etConsoleTopic" 
+                                        android:layout_width="0dp" 
+                                        android:layout_weight="1" 
+                                        android:layout_height="wrap_content" 
+                                        android:hint="Topic"/>
+                                    <Button 
+                                        android:id="@+id/btnConsoleSubscribe" 
+                                        android:layout_width="wrap_content" 
+                                        android:layout_height="wrap_content" 
+                                        android:text="Sub"/>
+                                </LinearLayout>
 
-                             <LinearLayout
-                                 android:layout_width="match_parent"
-                                 android:layout_height="wrap_content"
-                                 android:orientation="horizontal">
-                                 <EditText 
-                                     android:id="@+id/etConsolePayload" 
-                                     android:layout_width="0dp" 
-                                     android:layout_weight="1" 
-                                     android:layout_height="wrap_content" 
-                                     android:hint="Payload"/>
-                                 <Button 
-                                     android:id="@+id/btnConsoleSend" 
-                                     android:layout_width="wrap_content" 
-                                     android:layout_height="wrap_content" 
-                                     android:text="Send"/>
-                             </LinearLayout>
-                         </LinearLayout>
-                     </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+                                    <EditText 
+                                        android:id="@+id/etConsolePayload" 
+                                        android:layout_width="0dp" 
+                                        android:layout_weight="1" 
+                                        android:layout_height="wrap_content" 
+                                        android:hint="Payload"/>
+                                    <Button 
+                                        android:id="@+id/btnConsoleSend" 
+                                        android:layout_width="wrap_content" 
+                                        android:layout_height="wrap_content" 
+                                        android:text="Send"/>
+                                </LinearLayout>
+                            </LinearLayout>
+                        </LinearLayout>
                      
-                     <!-- CONTAINER: Properties (Hidden by default) -->
-                     <ScrollView
-                         android:id="@+id/containerProperties"
-                         android:layout_width="match_parent"
-                         android:layout_height="match_parent"
-                         android:visibility="gone"
-                         android:padding="16dp">
+                        <!-- CONTAINER: Properties (Hidden by default) -->
+                        <ScrollView
+                            android:id="@+id/containerProperties"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="gone"
+                            android:padding="16dp"
+                            android:clickable="true"
+                            android:focusable="true">
                          
                          <LinearLayout
                              android:layout_width="match_parent"
@@ -395,8 +411,9 @@
                      
                  </LinearLayout>
                      </ScrollView>
-        
-                 </LinearLayout>
+                     
+                   </FrameLayout>
+               </LinearLayout>
             </FrameLayout>
             
             <!-- Mode Toggle FAB -->

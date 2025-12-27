@@ -65,6 +65,9 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
     private lateinit var fabMode: FloatingActionButton // 切換編輯/運行模式的浮動按鈕
     private lateinit var logAdapter: LogAdapter // 用於顯示 MQTT 日誌的適配器
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<FrameLayout> // 控制底部面板行為（展開/收起）的物件
+    
+    // vFix: Grid Sync State
+    private var isGridVisible = false // Default OFF
 
     // 底部面板的容器
     private lateinit var containerLogs: LinearLayout // 包含日誌顯示區域的容器（運行模式用）
@@ -232,6 +235,7 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
             // 恢復之前的狀態（例如螢幕旋轉後）
             if (savedInstanceState != null) {
                 isEditMode = savedInstanceState.getBoolean("IS_EDIT_MODE", false) // 讀取是否為編輯模式
+                isGridVisible = savedInstanceState.getBoolean("IS_GRID_VISIBLE", false) // Restore grid state
             }
 
             setupUI() // 初始化 UI 元件與基本事件監聽
@@ -353,6 +357,7 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState) // 呼叫父類別方法
         outState.putBoolean("IS_EDIT_MODE", isEditMode) // 儲存當前模式
+        outState.putBoolean("IS_GRID_VISIBLE", isGridVisible) // Save grid state
         if (::drawerLayout.isInitialized) {
             outState.putBoolean("IS_DRAWER_OPEN", drawerLayout.isDrawerOpen(GravityCompat.START)) // 儲存抽屜開啟狀態
         }
@@ -382,6 +387,8 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
         project = ProjectRepository.getProjectById(id)
         if (project != null) {
             supportActionBar?.title = project!!.name
+            // vFix: Set Custom Title View
+            findViewById<android.widget.TextView>(R.id.tvToolbarTitle).text = project!!.name
         }
     }
 
@@ -437,6 +444,28 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
         containerLogs = findViewById(R.id.containerLogs)
         containerProperties = findViewById(R.id.containerProperties)
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottomSheet))
+        // vFix: Configure custom LockableBottomSheetBehavior
+        if (bottomSheetBehavior is com.example.mqttpanelcraft.ui.LockableBottomSheetBehavior) {
+            (bottomSheetBehavior as com.example.mqttpanelcraft.ui.LockableBottomSheetBehavior<*>).headerViewId = R.id.bottomSheetHeader
+        }
+        bottomSheetBehavior.isDraggable = true // Must be true for custom behavior to work
+        
+        // vFix: Add callback to prevent ANY state changes except programmatic ones
+        var allowStateChange = false
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                // Only allow COLLAPSED and EXPANDED states, block DRAGGING/SETTLING from user swipes
+                if (!allowStateChange && newState == BottomSheetBehavior.STATE_DRAGGING) {
+                    // Force back to current state
+                    bottomSheetBehavior.state = if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                        BottomSheetBehavior.STATE_EXPANDED
+                    } else {
+                        BottomSheetBehavior.STATE_COLLAPSED
+                    }
+                }
+            }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
 
         // Setup Toolbar
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
@@ -470,32 +499,46 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
         // lines 218-226 init vars. I will assume I can just use findViewById every time in populateProperties if I don't want to mess up class structure blindly.
         // NO, inefficient. I will add lateinit var declaration in a separate chunk.
 
-        findViewById<View>(R.id.bottomSheetHeader).setOnClickListener {
-            // Refinement 2: Disable header toggle in Edit Mode (Strict Lock)
-            if (!isEditMode) {
-                if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                } else {
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
-            } else {
-                // In Edit Mode, clicking header does nothing (or maybe collapse/expand logs?)
-                // User requested: "cannot be directly clicked open", so we allow CLOSE but not OPEN via header?
-                // Actually safer to just ignore or allow toggle ONLY if it's already open?
-                // Let's implement: Click to COLLAPSE is allowed, Click to EXPAND is BLOCKED.
-                 if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
-            }
+        findViewById<View>(R.id.bottomSheetHeader).setOnTouchListener { v, event ->
+             // vFix: Toggle on Click / Drag Header
+             if (event.action == android.view.MotionEvent.ACTION_UP) {
+                 if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                     // Only allow expanding if NOT in Edit Mode or if a component is selected
+                     if (!isEditMode || selectedView != null) {
+                         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                     } else {
+                         Toast.makeText(this@ProjectViewActivity, "Select a component to edit properties", Toast.LENGTH_SHORT).show()
+                     }
+                 } else {
+                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                 }
+                 v.performClick()
+             }
+             true
         }
 
-        // Refinement 1: Canvas Click to Collapse
+
+        // Refinement 1: Canvas Click to Collapse and Deselect
         editorCanvas.setOnClickListener {
+            if (isEditMode && selectedView != null) {
+                // Deselect
+                selectedView?.setBackgroundResource(R.drawable.component_border)
+                selectedView = null
+            }
             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 resetCanvasPan() // Reset Pan
             }
         }
+        
+        // vFix: Disable nested scrolling on content containers to prevent BottomSheetBehavior from detecting swipes
+        // This preserves internal scrolling (RecyclerView, ScrollView) but prevents drag-to-close
+        ViewCompat.setNestedScrollingEnabled(containerLogs, false)
+        ViewCompat.setNestedScrollingEnabled(containerProperties, false)
+        
+        // Also disable on RecyclerView specifically
+        val rvLogs = findViewById<RecyclerView>(R.id.rvConsoleLogs)
+        ViewCompat.setNestedScrollingEnabled(rvLogs, false)
 
         // Restore FAB Listener
         fabMode.setOnClickListener {
@@ -504,7 +547,7 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
 
         // v39: Center Project Title & v43: Click to Retry
         val tvTitle = findViewById<TextView>(R.id.tvToolbarTitle)
-        // REMOVED: tvTitle.text = project!!.name (Project is null here! Set in loadProjectDetails)
+        // REMOVED: tvTitle.text = project!!.name (Project is set in loadProjectDetails)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         // Click Title to Reconnect
@@ -566,7 +609,7 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
             if (isKeepScreenOn) {
                 window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             } else {
-                drawerLayout.openDrawer(androidx.core.view.GravityCompat.START) // 開啟抽屜
+                window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
 
 
@@ -606,18 +649,34 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
             val backgroundGrid = findViewById<View>(R.id.backgroundGrid) // 獲取背景網格 View
 
             // 顯示網格開關（編輯模式）
-            val switchGridToggle = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchGridToggle)
+            // Grid Toggle Listener (Edit Mode)
+            val switchGridToggle = findViewById<SwitchMaterial>(R.id.switchGridToggle)
+            switchGridToggle?.isChecked = isGridVisible // Set initial state
             switchGridToggle?.setOnCheckedChangeListener { _, isChecked ->
+                isGridVisible = isChecked
                 backgroundGrid?.visibility = if (isChecked) View.VISIBLE else View.GONE
+                
+                // Sync Run Mode Switch if it exists
+                val switchRun = findViewById<SwitchMaterial>(R.id.switchGridToggleRunMode)
+                if (switchRun != null && switchRun.isChecked != isChecked) {
+                    switchRun.isChecked = isChecked
+                }
             }
 
-            // 顯示網格開關（運行模式）
-            val switchGridToggleRunMode = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchGridToggleRunMode) // 獲取運行模式的網格開關
-
+            // Grid Toggle (Run Mode)
+            val switchGridToggleRunMode = findViewById<SwitchMaterial>(R.id.switchGridToggleRunMode) // 獲取運行模式的網格開關
+            switchGridToggleRunMode?.isChecked = isGridVisible // Set initial state
             // 設定運行模式網格開關的監聽器
             switchGridToggleRunMode?.setOnCheckedChangeListener { _, isChecked ->
+                isGridVisible = isChecked
                 backgroundGrid?.visibility = if (isChecked) View.VISIBLE else View.GONE // 根據開關狀態顯示或隱藏網格
                 window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                
+                // Sync Edit Mode Switch
+                val switchEdit = findViewById<SwitchMaterial>(R.id.switchGridToggle)
+                if (switchEdit != null && switchEdit.isChecked != isChecked) {
+                    switchEdit.isChecked = isChecked
+                }
             }
 
             // 深色模式開關
@@ -1101,6 +1160,8 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
         }
     }
 
+
+
     // v46: Helper to start MQTT Service with CONNECT action
     private fun startMqttConnection() {
         if (project == null) return
@@ -1121,6 +1182,8 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
 
     // 切換編輯/運行模式
     private fun toggleMode() {
+        isEditMode = !isEditMode
+        updateModeUI()
     }
 
     // 根據目前的 isEditMode 更新 UI 介面
@@ -1131,7 +1194,20 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
 
         if (isEditMode) { // 如果是編輯模式
              fabMode.setImageResource(android.R.drawable.ic_media_play) // 按鈕圖示改為「播放」
-             editorCanvas.background = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.bg_grid_pattern) // 顯示網格背景
+             // vFix: Remove hardcoded white background drawable, use GridPatternView instead
+             editorCanvas.background = null 
+             
+             // vFix: Ensure Grid matches state
+             backgroundGrid?.visibility = if (isGridVisible) View.VISIBLE else View.GONE
+             
+             // vFix: Hide Bottom Sheet initially in Edit Mode
+             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED // Or HIDDEN? User said "retract". Collapsed is peeking.
+             // If user wants "Cannot pull out", maybe HIDDEN is better?
+             // But "Click header to retract" implies it's visible.
+             // Let's stick to Collapsed (Header visible).
+             // Wait, "Component NOT dragged out -> List cannot be pulled".
+             // If Header is visible, they can click it.
+             // I added logic in Header Touch Listener to block expansion if no component selected.
 
              // 編輯模式下，解鎖側邊欄以便使用者拖曳組件
              drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START)
@@ -1146,7 +1222,7 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
 
              // 同步編輯模式的網格開關狀態
              val switchGridToggle = findViewById<SwitchMaterial>(R.id.switchGridToggle)
-             switchGridToggle?.isChecked = (backgroundGrid?.visibility == View.VISIBLE)
+             switchGridToggle?.isChecked = isGridVisible
 
              Toast.makeText(this, "Edit Mode", Toast.LENGTH_SHORT).show()
         } else { // 如果是運行模式
@@ -1165,7 +1241,7 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
 
              // 同步運行模式的網格開關狀態
              val switchGridToggleRunMode = findViewById<SwitchMaterial>(R.id.switchGridToggleRunMode)
-             switchGridToggleRunMode?.isChecked = (backgroundGrid?.visibility == View.VISIBLE)
+             switchGridToggleRunMode?.isChecked = isGridVisible
 
              containerLogs.visibility = View.VISIBLE
              containerProperties.visibility = View.GONE
@@ -1446,15 +1522,16 @@ class ProjectViewActivity : AppCompatActivity(), MqttRepository.MessageListener 
             val labelView = TextView(this).apply {
                 id = View.generateViewId() // 標籤也需要唯一的 ID
 
-                // Fix: Map tags to human readable names
+                // vFix: Map tags to human readable names
                 // v65: Append Index
                 val typeName = when (tag) {
-                    "THERMOMETER" -> "Thermometer"
+                    "THERMOMETER" -> "Level Indicator"
                     "BUTTON" -> "Button"
                     "SLIDER" -> "Slider"
                     "TEXT" -> "Text"
                     "IMAGE" -> "Image"
                     "LED" -> "LED"
+                    "CAMERA" -> "Camera"
                     else -> tag
                 }
                 text = "$typeName $index"

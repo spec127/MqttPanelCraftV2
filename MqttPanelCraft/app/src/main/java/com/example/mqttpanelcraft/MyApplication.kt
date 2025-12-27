@@ -15,6 +15,9 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        // vFix: Force Light Mode by default on start (User Request)
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO)
+
         // Init Data Layer
         com.example.mqttpanelcraft.data.ProjectRepository.initialize(this)
 
