@@ -17,11 +17,12 @@ import com.example.mqttpanelcraft.utils.CrashLogger
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import android.widget.AutoCompleteTextView
-import com.google.android.material.bottomsheet.BottomSheetDialog
+// Removed BottomSheet imports
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlinx.coroutines.*
+import android.view.animation.RotateAnimation
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -92,6 +93,8 @@ class DashboardActivity : AppCompatActivity() {
             val prefs = getSharedPreferences("AppSettings", MODE_PRIVATE)
             currentSortMode = prefs.getInt("sort_mode", 5)
             applySortMode(currentSortMode)
+            
+            setupSettingsUI() // v96: New Expandable UI
 
         } catch (e: Exception) {
             CrashLogger.logError(this, "Dashboard Init Failed", e)
@@ -113,58 +116,67 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun setupDrawer() {
+        val menu = binding.navigationView.menu
+        
+        // 1. Dark Mode Switch
+        val darkModeItem = menu.findItem(R.id.nav_dark_mode)
+        val switchDarkMode = darkModeItem.actionView?.findViewById<SwitchMaterial>(R.id.drawer_switch)
+        
+        val currentNightMode = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        switchDarkMode?.isChecked = currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        
+        switchDarkMode?.setOnCheckedChangeListener { _, isChecked ->
+            val mode = if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+            AppCompatDelegate.setDefaultNightMode(mode)
+            getSharedPreferences("AppSettings", MODE_PRIVATE).edit().putBoolean("dark_mode", isChecked).apply()
+            // Close drawer after short delay or keep open? Usually better to keep open for switches.
+        }
+
+        // 2. Ads Switch
+        val adsItem = menu.findItem(R.id.nav_ads)
+        val switchAds = adsItem.actionView?.findViewById<SwitchMaterial>(R.id.drawer_switch)
+        
+        switchAds?.isChecked = com.example.mqttpanelcraft.utils.AdManager.isAdsDisabled
+        switchAds?.setOnCheckedChangeListener { _, isChecked ->
+            com.example.mqttpanelcraft.utils.AdManager.setDisabled(isChecked, this)
+            com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, binding.bannerAdContainer)
+        }
+
         binding.navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_settings -> showSettingsBottomSheet()
                 R.id.nav_about -> Toast.makeText(this, "About MqttPanelCraft v1.0", Toast.LENGTH_SHORT).show()
-                // Language/Dark Mode removed from here as per v3 plan
+                // Switches are handled by their own listeners
             }
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
+            if (item.itemId == R.id.nav_about) {
+                 binding.drawerLayout.closeDrawer(GravityCompat.START)
+            }
             true
         }
     }
 
-    private fun showSettingsBottomSheet() {
-        val bottomSheetDialog = BottomSheetDialog(this)
-        bottomSheetDialog.setContentView(R.layout.bottom_sheet_settings)
-        
-        val switchDarkMode = bottomSheetDialog.findViewById<SwitchMaterial>(R.id.switchDarkMode)
-        val dropdownLanguage = bottomSheetDialog.findViewById<AutoCompleteTextView>(R.id.dropdownLanguage)
-        
-        // Setup Dark Mode Switch
-        val currentNightMode = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
-        switchDarkMode?.isChecked = currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        switchDarkMode?.setOnCheckedChangeListener { _, isChecked ->
-            val mode = if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-            AppCompatDelegate.setDefaultNightMode(mode)
-            
-            // Save Preference
-            val prefs = getSharedPreferences("AppSettings", MODE_PRIVATE)
-            prefs.edit().putBoolean("dark_mode", isChecked).apply()
+    private fun setupSettingsUI() {
+        // 1. Expand/Collapse Logic
+        val header = findViewById<View>(R.id.layoutSettingsHeader)
+        val content = findViewById<View>(R.id.layoutSettingsContent)
+        val arrow = findViewById<android.widget.ImageView>(R.id.ivSettingsArrow)
+        val tvTitle = findViewById<android.widget.TextView>(R.id.tvSettingsTitle)
+
+        updateSettingsTitle(tvTitle) // Set initial title
+
+        header.setOnClickListener {
+            if (content.visibility == View.VISIBLE) {
+                // Collapse
+                content.visibility = View.GONE
+                arrow.animate().rotation(270f).setDuration(200).start()
+            } else {
+                // Expand
+                content.visibility = View.VISIBLE
+                arrow.animate().rotation(90f).setDuration(200).start()
+            }
         }
 
-        // Setup Close Ads Switch
-        val switchCloseAds = bottomSheetDialog.findViewById<SwitchMaterial>(R.id.switchCloseAds)
-        switchCloseAds?.isChecked = com.example.mqttpanelcraft.utils.AdManager.isAdsDisabled
-        switchCloseAds?.setOnCheckedChangeListener { _, isChecked ->
-            com.example.mqttpanelcraft.utils.AdManager.setDisabled(isChecked, this)
-            // Reload Banner immediately to reflect change (hide or show)
-            com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, binding.bannerAdContainer)
-        }
-
-        // Setup Language Dropdown
-        val languages = listOf("English", "繁體中文")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, languages)
-        dropdownLanguage?.setAdapter(adapter)
-        
-        // Set current selection
-        val currentLang = if (resources.configuration.locales[0].language == "zh") "繁體中文" else "English"
-        dropdownLanguage?.setText(currentLang, false)
-        
-        // Setup Sort RadioGroup
-        val radioGroupSort = bottomSheetDialog.findViewById<android.widget.RadioGroup>(R.id.radioGroupSort)
-
-        // Initialize radio state
+        // 2. Sort Logic
+        val radioGroupSort = findViewById<android.widget.RadioGroup>(R.id.radioGroupSort)
         when (currentSortMode) {
             1 -> radioGroupSort?.check(R.id.rbSortNameAsc)
             2 -> radioGroupSort?.check(R.id.rbSortNameDesc)
@@ -184,19 +196,22 @@ class DashboardActivity : AppCompatActivity() {
             }
             applySortMode(newMode)
             loadProjects()
+            updateSettingsTitle(tvTitle) // Update title on change
         }
 
-        dropdownLanguage?.setOnItemClickListener { _, _, position, _ ->
-            val selected = languages[position]
-            if (selected != currentLang) {
-                val localeCode = if (selected == "繁體中文") "zh" else "en"
-                val regionCode = if (selected == "繁體中文") "TW" else "US"
-                setLocale(localeCode, regionCode)
-                bottomSheetDialog.dismiss()
-            }
+        // Dark Mode & Ads removed from here (moved to Drawer)
+    }
+
+    private fun updateSettingsTitle(tv: android.widget.TextView) {
+        val modeText = when(currentSortMode) {
+            1 -> "Name (A-Z)"
+            2 -> "Name (Z-A)"
+            3 -> "Date (Newest)"
+            4 -> "Date (Oldest)"
+            5 -> "Last Opened"
+            else -> "Unknown"
         }
-        
-        bottomSheetDialog.show()
+        tv.text = "Sort: $modeText / Settings"
     }
 
     private fun applySortMode(mode: Int) {
