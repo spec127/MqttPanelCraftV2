@@ -122,8 +122,17 @@ class SetupActivity : AppCompatActivity() {
         val project = ProjectRepository.getProjectById(id) ?: return
         originalProject = project
 
-        // Show Export
+        // Show Export (JSON)
         btnExport.visibility = android.view.View.VISIBLE
+
+        // Show Export (Arduino)
+        val btnExportArduino = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnExportArduino)
+        btnExportArduino.visibility = android.view.View.VISIBLE
+        btnExportArduino.setOnClickListener {
+             if(originalProject != null) {
+                 com.example.mqttpanelcraft.ui.ArduinoExportManager.showExportDialog(this, originalProject!!)
+             }
+        }
 
         etName.setText(project.name)
         etBroker.setText(project.broker)

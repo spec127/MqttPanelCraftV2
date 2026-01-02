@@ -161,7 +161,8 @@ class ProjectViewActivity : AppCompatActivity() {
                 viewModel.saveProject()
             },
             onComponentDeleted = { view ->
-                 viewModel.saveProject()
+                 viewModel.removeComponent(view.id)
+                 // viewModel.saveProject() // removeComponent calls saveProject internally
             },
             onCreateNewComponent = { tag, x, y ->
                 // Create View using Factory
@@ -367,7 +368,11 @@ class ProjectViewActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(android.R.drawable.ic_menu_sort_by_size)
-        toolbar.setNavigationOnClickListener { sidebarManager.showComponentsPanel() }
+        toolbar.setNavigationOnClickListener {
+            if (isEditMode) sidebarManager.showComponentsPanel()
+            else sidebarManager.showRunModePanel()
+            sidebarManager.openDrawer()
+        }
         
         findViewById<View>(R.id.btnSettings).setOnClickListener {
             val projectId = viewModel.project.value?.id
