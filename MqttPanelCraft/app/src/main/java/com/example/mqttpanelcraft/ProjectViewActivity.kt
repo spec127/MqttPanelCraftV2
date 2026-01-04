@@ -24,6 +24,8 @@ import com.example.mqttpanelcraft.ui.InterceptableFrameLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.slider.Slider
+import android.view.DragEvent
+import android.content.ClipData
 import java.util.Locale
 
 /**
@@ -104,14 +106,15 @@ class ProjectViewActivity : AppCompatActivity() {
         
         if (batchUpdates.isNotEmpty()) {
              viewModel.updateComponentsBatch(batchUpdates)
-             val msg = "Saving ${batchUpdates.size} components. Ex: ${batchUpdates[0].label} -> (${batchUpdates[0].x.toInt()}, ${batchUpdates[0].y.toInt()})"
-             android.widget.Toast.makeText(this, msg, android.widget.Toast.LENGTH_SHORT).show()
-             android.util.Log.d("ProjectView", "Sync: Batch saved components.")
+             val first = batchUpdates[0]
+             val msg = "Sync: ${batchUpdates.size} comps updated. Ex: ${first.label}[${first.id} -> (${first.x},${first.y})]"
+             com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectView", msg)
+             
+             // Keep Toast for UI feedback
+             val toastMsg = "Saving ${batchUpdates.size} components. Ex: ${first.label} -> (${first.x.toInt()}, ${first.y.toInt()})"
+             android.widget.Toast.makeText(this, toastMsg, android.widget.Toast.LENGTH_SHORT).show()
         } else {
-             // Optional: Toast even if no changes, to prove check ran? 
-             // User wants to know "When Saving". So only toast on save.
-             // But if user moved and NO save happens, they need to know "Why".
-             // android.widget.Toast.makeText(this, "No changes detected", android.widget.Toast.LENGTH_SHORT).show()
+             // com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectView", "Sync: No changes detected.")
         }
     }
 
@@ -342,8 +345,36 @@ class ProjectViewActivity : AppCompatActivity() {
                 componentBehaviorManager.attachBehavior(view, componentData)
             }
         )
-        // 設定 Canvas 拖曳監聽器 (僅在 Edit Mode 有效)
-        canvasManager.setupDragListener { isEditMode }
+        // Revert to Activity handling Drag (User Request: "Use old logic")
+        // canvasManager.setupDragListener { isEditMode }
+        
+        editorCanvas.setOnDragListener { v, event ->
+             if (!isEditMode) return@setOnDragListener false
+             when (event.action) {
+                 DragEvent.ACTION_DROP -> {
+                     handleCanvasDrop(event)
+                 }
+                DragEvent.ACTION_DRAG_LOCATION -> {
+                     // Removed to fix Lag: canvasManager.checkAlignment was too expensive calling JNI every frame
+                }
+                 DragEvent.ACTION_DRAG_ENDED -> {
+                      guideOverlay.clear()
+                      val localState = event.localState as? View
+                      if (!event.result) {
+                          // Restore if drop failed
+                          localState?.visibility = View.VISIBLE
+                          localState?.alpha = 1.0f
+                          val label = editorCanvas.findViewWithTag<View>("LABEL_FOR_${localState?.id}")
+                          label?.visibility = View.VISIBLE
+                      }
+                      dropDeleteZone.visibility = View.GONE
+                 }
+                 DragEvent.ACTION_DRAG_ENTERED -> {
+                     dropDeleteZone.visibility = View.VISIBLE
+                 }
+             }
+             true
+        }
 
         // 3. SidebarManager
         sidebarManager = SidebarManager(
@@ -373,6 +404,9 @@ class ProjectViewActivity : AppCompatActivity() {
                      val currentList = viewModel.components.value?.toMutableList()
                      val component = currentList?.find { it.id == id }
                      if (component != null) {
+                         // SNAPSHOT FOR UNDO
+                         viewModel.saveSnapshot()
+
                          component.label = name
                          component.width = params.width
                          component.height = params.height
@@ -489,15 +523,14 @@ class ProjectViewActivity : AppCompatActivity() {
             }
         }
         
-        com.example.mqttpanelcraft.data.ProjectRepository.saveStatus.observe(this) { status ->
-             if (status.startsWith("Disk Write Failed")) {
-                 android.widget.Toast.makeText(this, status, android.widget.Toast.LENGTH_LONG).show()
-             } else {
-                 // Success message - show briefly
-                 android.widget.Toast.makeText(this, status, android.widget.Toast.LENGTH_SHORT).show()
+        // Listen for Force Undo Refresh
+        viewModel.undoEvent.observe(this) {
+             val comps = viewModel.components.value
+             if (comps != null) {
+                 restoreComponents(comps)
+                 // Toast.makeText(this, "Undo Performed", Toast.LENGTH_SHORT).show()
              }
         }
-    }
     }
 
 
@@ -516,6 +549,9 @@ class ProjectViewActivity : AppCompatActivity() {
              findViewById<View>(R.id.containerLogs)?.visibility = View.GONE
              findViewById<View>(R.id.containerProperties)?.visibility = View.VISIBLE
              
+             // 顯示 Undo 按鈕
+             findViewById<View>(R.id.btnUndo)?.visibility = View.VISIBLE
+
              // 鎖定底部 Sheet，避免干擾編輯
              (bottomSheetBehavior as? LockableBottomSheetBehavior)?.isLocked = true
              bottomSheetBehavior.isHideable = false 
@@ -533,6 +569,9 @@ class ProjectViewActivity : AppCompatActivity() {
              findViewById<View>(R.id.containerLogs)?.visibility = View.VISIBLE
              findViewById<View>(R.id.containerProperties)?.visibility = View.GONE
              
+             // 隱藏 Undo 按鈕
+             findViewById<View>(R.id.btnUndo)?.visibility = View.GONE
+
              // 解鎖底部 Sheet
              (bottomSheetBehavior as? LockableBottomSheetBehavior)?.isLocked = false
              bottomSheetBehavior.isHideable = false 
@@ -572,7 +611,8 @@ class ProjectViewActivity : AppCompatActivity() {
         }
         
         // 設定頁面跳轉
-        findViewById<View>(R.id.btnSettings).setOnClickListener {
+        val btnSettings = findViewById<View>(R.id.btnSettings)
+        btnSettings.setOnClickListener {
             // 跳轉前先存檔，確保位置被記錄
             syncComponentsState()
             viewModel.saveProject()
@@ -583,6 +623,18 @@ class ProjectViewActivity : AppCompatActivity() {
                 intent.putExtra("PROJECT_ID", projectId)
                 startActivity(intent)
             }
+        }
+        // 長按設定按鈕顯示 Debug Log
+        btnSettings.setOnLongClickListener {
+            showDebugLogDialog()
+            true
+        }
+        
+        // Undo 按鈕
+        findViewById<View>(R.id.btnUndo).setOnClickListener {
+            com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectView", "Undo requested")
+            viewModel.undo()
+            Toast.makeText(this, "Undo Performed", Toast.LENGTH_SHORT).show()
         }
         
         // 格線開關控制
@@ -633,7 +685,7 @@ class ProjectViewActivity : AppCompatActivity() {
             }
             
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                scrim.alpha = slideOffset.coerceIn(0f, 1f)
+             scrim.alpha = slideOffset.coerceIn(0f, 1f)
             }
         })
 
@@ -653,19 +705,53 @@ class ProjectViewActivity : AppCompatActivity() {
         
     }
 
+    // override fun onCreateOptionsMenu ... REMOVED
+    // override fun onOptionsItemSelected ... REMOVED
+
+    private fun showDebugLogDialog() {
+        val logs = com.example.mqttpanelcraft.utils.DebugLogger.getLogs()
+        val scrollView = ScrollView(this)
+        val textView = TextView(this).apply {
+            text = logs
+            textSize = 10f
+            setPadding(16, 16, 16, 16)
+            setTextIsSelectable(true)
+        }
+        scrollView.addView(textView)
+        
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Debug Logs")
+            .setView(scrollView)
+            .setPositiveButton("Copy") { _, _ ->
+                val clipboard = getSystemService(android.content.ClipboardManager::class.java)
+                val clip = android.content.ClipData.newPlainText("Debug Logs", logs)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(this, "Logs copied to clipboard", Toast.LENGTH_SHORT).show()
+            }
+            .setNeutralButton("Clear") { _, _ ->
+                com.example.mqttpanelcraft.utils.DebugLogger.clear()
+            }
+            .setNegativeButton("Close", null)
+            .show()
+    }
+
     private fun toggleMode() {
         try {
             isEditMode = !isEditMode
             if (!isEditMode) {
                 // 觸發條件 2: 從編輯切換成使用時 -> 儲存
+                com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectView", "ToggleMode: Switching to Run. Triggering Save.")
                 Toast.makeText(this, "Mode Switch: Saving Project...", Toast.LENGTH_SHORT).show()
                 syncComponentsState()
                 viewModel.saveProject() 
+            } else {
+                com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectView", "ToggleMode: Switching to Edit.")
             }
             updateModeUI()
             setComponentsInteractive(!isEditMode)
         } catch (e: Exception) {
             e.printStackTrace()
+            com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectView", "Error toggleMode: ${e.message}")
             Toast.makeText(this, "Error toggling mode: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
@@ -710,11 +796,23 @@ class ProjectViewActivity : AppCompatActivity() {
             }
         }
         
+        
         // 委派拖曳行為給 DragDropManager
-        dragDropManager.attachDragBehavior(view) {
-             // 當開始拖曳時，顯示刪除區
-             dropDeleteZone.visibility = View.VISIBLE
-        }
+        dragDropManager.attachDragBehavior(view, 
+            onDragStart = {
+                 // 當開始拖曳時，顯示刪除區
+                 dropDeleteZone.visibility = View.VISIBLE
+                 // 重要：移動前先備份 (Snapshot)，才能 Undo
+                 viewModel.saveSnapshot()
+                 com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectView", "DragStart: Snapshot saved.")
+            },
+            onDragEnd = {
+                 // 拖曳結束 -> 儲存位置
+                 syncComponentsState()
+                 viewModel.saveProject()
+                 com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectView", "DragEnd: Force Saved on Move.")
+            }
+        )
     }
 
     // 優化：使用 Map 快取元件 View，加速 MQTT 訊息更新時的查找速度
@@ -763,5 +861,161 @@ class ProjectViewActivity : AppCompatActivity() {
     override fun onUserInteraction() {
         super.onUserInteraction()
         idleAdController.onUserInteraction()
+    }
+    // PORTER: Re-implemented logic from Backup/Old Code to handle Drag & Drop directly in Activity
+    private fun handleCanvasDrop(event: DragEvent) {
+        val x = event.x
+        val y = event.y
+        val localView = event.localState as? View
+        
+        // 1. Check Delete Zone (Simple Hit Test)
+        val locations = IntArray(2)
+        dropDeleteZone.getLocationOnScreen(locations)
+        val zoneRect = android.graphics.Rect(locations[0], locations[1], locations[0]+dropDeleteZone.width, locations[1]+dropDeleteZone.height)
+        val canvasLoc = IntArray(2)
+        editorCanvas.getLocationOnScreen(canvasLoc)
+        val screenX = x + canvasLoc[0]
+        val screenY = y + canvasLoc[1]
+        
+        if (zoneRect.contains(screenX.toInt(), screenY.toInt())) {
+            if (localView != null && localView.parent == editorCanvas) {
+                // Delete
+                viewModel.removeComponent(localView.id)
+                editorCanvas.removeView(localView)
+                val label = editorCanvas.findViewWithTag<View>("LABEL_FOR_${localView.id}")
+                if (label != null) editorCanvas.removeView(label)
+                com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectView", "Deleted component via global Drag Listener")
+            }
+            return
+        }
+
+        // 2. Handle Existing Component Move
+        if (localView != null && localView.parent == editorCanvas) {
+             // Logic from Backup + CanvasManager Helper
+             var finalX = x - (localView.width / 2)
+             var finalY = y - (localView.height / 2)
+             
+             // Snap using CanvasManager helper
+             val snapPos = canvasManager.getSnappedPosition(x, y, localView.width, localView.height, localView)
+             finalX = snapPos.x.toFloat()
+             finalY = snapPos.y.toFloat()
+             
+             // Bounds
+             finalX = finalX.coerceIn(0f, (editorCanvas.width - localView.width).toFloat())
+             finalY = finalY.coerceIn(0f, (editorCanvas.height - localView.height).toFloat())
+
+             // Update View UI
+             localView.x = finalX
+             localView.y = finalY
+             localView.visibility = View.VISIBLE
+             localView.alpha = 1.0f 
+             
+             // Update Label UI
+             val label = editorCanvas.findViewWithTag<View>("LABEL_FOR_${localView.id}")
+             label?.x = finalX
+             label?.y = finalY + localView.height + 4
+             label?.visibility = View.VISIBLE
+             
+             // 3. Persistence: Update ViewModel & Repository
+             // Attempt to find component in ViewModel
+             var comp = viewModel.components.value?.find { it.id == localView.id }
+             
+             // Fallback 1: Project LiveData Check
+             if (comp == null) {
+                 comp = viewModel.project.value?.components?.find { it.id == localView.id }
+             }
+             
+             // Fallback 2: Direct Repository Lookup (Fixes ViewModel sync issues)
+             if (comp == null) {
+                  val projId = intent.getStringExtra("PROJECT_ID")
+                  if (projId != null) {
+                      val repoProj = com.example.mqttpanelcraft.data.ProjectRepository.getProjectById(projId)
+                      comp = repoProj?.components?.find { it.id == localView.id }
+                  }
+             }
+
+             if (comp != null) {
+                 // SNAPSHOT FOR UNDO
+                 // Must be done BEFORE modifying the object (as it's a reference)
+                 viewModel.saveSnapshot()
+
+                 comp.x = finalX
+                 comp.y = finalY
+                 
+                 // Trigger Save (Async via Repository)
+                 viewModel.updateComponent(comp) 
+                 
+                 // Log success briefly
+                 // com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectView", "Saved Move: ${comp.label}")
+             } else {
+                 // Should be rare now
+                 Toast.makeText(this, "Error: Could not save position (Data Not Found)", Toast.LENGTH_SHORT).show()
+             }
+        } 
+        // 4. Handle New Component (Sidebar)
+        else if (event.clipData != null && event.clipData.itemCount > 0) {
+            val item = event.clipData.getItemAt(0)
+            val tag = item.text.toString()
+            createNewComponentLogic(tag, x, y)
+        }
+    }
+
+    // Extracted from initializeManagers for reuse
+    private fun createNewComponentLogic(tag: String, x: Float, y: Float) {
+         // 1. Calculate ID here to ensure View ID matches Data ID
+         val currentComps = viewModel.components.value ?: emptyList()
+         val maxId = currentComps.maxOfOrNull { it.id } ?: 100
+         val newId = maxId + 1
+
+         // 2. Factory Create
+         val view = com.example.mqttpanelcraft.ui.ComponentFactory.createComponentView(this, tag, isEditMode)
+         view.id = newId // Set View ID to match Data ID
+         
+         val (defW, defH) = com.example.mqttpanelcraft.ui.ComponentFactory.getDefaultSize(this, tag)
+         val params = FrameLayout.LayoutParams(defW, defH)
+         view.layoutParams = params
+         
+         // Snap
+         val snap = canvasManager.getSnappedPosition(x, y, defW, defH, null)
+         view.x = snap.x.toFloat()
+         view.y = snap.y.toFloat()
+         
+         editorCanvas.addView(view)
+         makeDraggable(view)
+
+         // Label Logic
+         val baseName = when(tag) {
+             "THERMOMETER" -> "Level Indicator"
+             "TEXT" -> "Label"
+             else -> tag.lowercase().replaceFirstChar { it.uppercase() }
+         }
+         val newName = "$baseName $newId"
+         
+         val label = TextView(this).apply {
+             text = newName
+             this.tag = "LABEL_FOR_${view.id}"
+             this.x = view.x
+             this.y = view.y + params.height + 4
+         }
+         editorCanvas.addView(label)
+         
+         componentViewCache[view.id] = view
+         
+         val componentData = com.example.mqttpanelcraft.model.ComponentData(
+             id = newId,
+             type = tag,
+             topicConfig = "${viewModel.project.value?.name ?: "project"}/$tag/$newId",
+             x = view.x,
+             y = view.y,
+             width = params.width,
+             height = params.height,
+             label = newName,
+             props = mutableMapOf()
+         )
+         
+         viewModel.addComponent(componentData)
+         componentBehaviorManager.attachBehavior(view, componentData)
+         
+         com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectView", "Created New: $newName ID:$newId")
     }
 }
