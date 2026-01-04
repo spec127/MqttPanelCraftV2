@@ -12,7 +12,7 @@ object ArduinoCodeGenerator {
         try {
             // 1. Load Templates
             val jsonStr = loadJSONFromAsset(context, "arduino_templates.json") ?: return "// Error: Template not found"
-            val templates = JSONObject(jsonStr)
+            val templates = JSONObject(jsonStr) // Clean JSON
             val base = templates.getJSONObject("base")
             val compTemplates = templates.getJSONObject("components")
             val mappings = templates.getJSONObject("mappings")
@@ -24,30 +24,41 @@ object ArduinoCodeGenerator {
             val sbLoop = StringBuilder(base.optString("loop_start", ""))
             val sbReceiver = StringBuilder(base.optString("receiver_head", ""))
 
+            // Mapping Table Builder
+            val sbMapping = StringBuilder()
+            sbMapping.append("/*\n [Auto-Generated Mapping Table]\n")
+            sbMapping.append(" Label | Type | Topic (Relative) | Variable\n")
+            sbMapping.append(" --------------------------------------------------\n")
+
             // 3. Iterate Components
-            // Track indexes per type (Spec v0.3: index starts at 1)
             val typeIndexes = mutableMapOf<String, Int>()
 
             project.components.forEach { comp ->
-                // Map App Component Tag to Spec Type Key
                 val templateKey = mappings.optString(comp.type)
                 if (templateKey.isNotEmpty() && compTemplates.has(templateKey)) {
                     val tmpl = compTemplates.getJSONObject(templateKey)
                     
-                    // Determine Spec Type and Index
                     val specType = tmpl.optString("type", "unknown")
                     val indexKey = tmpl.optString("index_key", specType)
                     
                     val idx = (typeIndexes[indexKey] ?: 0) + 1
                     typeIndexes[indexKey] = idx
 
-                    // Spec v0.3: Relative Topics (Appended to mqtt_topic base)
                     val relTopicBase = "$specType/$idx"
                     val relTopicSet = "$relTopicBase/set"
                     val relTopicVal = "$relTopicBase/val"
 
                     // --- Variable Declaration ---
                     var varDecl = tmpl.optString("var_decl", "")
+
+                    // Extract variable name for Mapping (e.g. btn_{{INDEX}})
+                    val varMatch = Regex("\\b\\w+_\\{\\{INDEX\\}\\}").find(varDecl)
+                    val varNameRaw = varMatch?.value ?: "unknown"
+                    val varNameFinal = varNameRaw.replace("{{INDEX}}", idx.toString())
+
+                    // Append to Mapping
+                    sbMapping.append(" ${comp.label} | ${comp.type} | $relTopicBase | $varNameFinal\n")
+
                     varDecl = varDecl.replace("{{INDEX}}", idx.toString())
                                      .replace("{{LABEL}}", comp.label)
                     if (varDecl.isNotEmpty()) sbGlobals.append(varDecl).append("\n")
@@ -61,6 +72,7 @@ object ArduinoCodeGenerator {
                     var loopLogic = tmpl.optString("loop_logic", "")
                     loopLogic = loopLogic.replace("{{INDEX}}", idx.toString())
                                          .replace("{{REL_TOPIC_VAL}}", relTopicVal)
+                                         .replace("{{TYPE_KEY}}", indexKey)
                     if (loopLogic.isNotEmpty()) sbLoop.append(loopLogic).append("\n")
                     
                     // --- Receiver Logic ---
@@ -68,15 +80,16 @@ object ArduinoCodeGenerator {
                     recvLogic = recvLogic.replace("{{INDEX}}", idx.toString())
                                          .replace("{{REL_TOPIC_SET}}", relTopicSet)
                                          .replace("{{REL_TOPIC_VAL}}", relTopicVal)
+                                         .replace("{{TYPE_KEY}}", indexKey)
                     if (recvLogic.isNotEmpty()) sbReceiver.append(recvLogic).append("\n")
                 }
             }
+            
+            sbMapping.append("*/\n\n")
 
             // 4. Assemble
             var header = base.optString("header", "")
             
-            // Inject Global Configs
-            // Spec: Topic = projectName/projectId (User doesn't input manually)
             val cleanProjName = project.name.replace(" ", "_")
             val baseTopic = "$cleanProjName/${project.id}"  
 
@@ -86,18 +99,19 @@ object ArduinoCodeGenerator {
 
             val fullCode = StringBuilder()
             fullCode.append(header)
+            fullCode.append(sbMapping) // Inject Mapping Table
             
             fullCode.append(sbGlobals).append("\n")
             
             fullCode.append(sbSetup)
-            fullCode.append(sbSetupMid) // Helper middleware (mqttpanel_begin)
-            fullCode.append(base.optString("setup_end", "")) // Close setup()
+            fullCode.append(sbSetupMid) 
+            fullCode.append(base.optString("setup_end", ""))
             
             fullCode.append(sbLoop)
-            fullCode.append(base.optString("loop_end", "")) // Close loop()
+            fullCode.append(base.optString("loop_end", ""))
             
             fullCode.append(sbReceiver)
-            fullCode.append(base.optString("receiver_tail", "")) // Close receiver()
+            fullCode.append(base.optString("receiver_tail", ""))
 
             return fullCode.toString()
 
