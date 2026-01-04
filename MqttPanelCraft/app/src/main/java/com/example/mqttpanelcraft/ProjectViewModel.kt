@@ -67,33 +67,84 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         ProjectRepository.updateProject(currentProj)
     }
 
-    fun addComponent(type: String, defaultTopic: String) {
+    // Undo Stack
+    private val undoStack = java.util.Stack<List<ComponentData>>()
+
+    val undoEvent = MutableLiveData<Long>()
+
+    fun undo() {
+        if (undoStack.isNotEmpty()) {
+            val previousState = undoStack.pop()
+            val proj = project.value ?: return
+            
+            proj.components.clear()
+            proj.components.addAll(previousState)
+            saveProject()
+            
+            // Trigger UI Refresh
+            undoEvent.value = System.currentTimeMillis()
+            
+            com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectVM", "Undo performed. Stack size: ${undoStack.size}")
+        } else {
+             com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectVM", "Undo failed: Stack empty")
+        }
+    }
+    
+    fun saveSnapshot() {
         val proj = project.value ?: return
+        // Deep copy of the list items to avoid reference issues
+        val snapshot = proj.components.map { it.copy() }
+        undoStack.push(snapshot)
+        if (undoStack.size > 20) undoStack.removeAt(0) // Limit stack
+        com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectVM", "Snapshot saved. Stack size: ${undoStack.size}")
+    }
+
+    fun addComponent(type: String, defaultTopic: String) {
+        saveSnapshot()
+        val proj = project.value ?: return
+        
+        // Fix ID Collision: Use Max ID + 1
+        val maxId = proj.components.maxOfOrNull { it.id } ?: 100
+        val newId = maxId + 1
+        
         val newComp = ComponentData(
-            id = (System.currentTimeMillis() % Int.MAX_VALUE).toInt(), 
+            id = newId, 
             type = type,
             topicConfig = defaultTopic,
             x = 100f,
             y = 100f, 
             width = if (type == "SWITCH") 200 else 300,
             height = if (type == "SWITCH") 100 else 150,
-            label = type,
+            label = "$type $newId", // Unique Label
             props = mutableMapOf()
         )
         proj.components.add(newComp)
-        saveProject() // Triggers Repository update -> LiveData update
+        saveProject() 
     }
 
     fun addComponent(component: ComponentData) {
+        saveSnapshot()
         val proj = project.value ?: return
-        proj.components.add(component)
+        // Ensure ID uniqueness logic for imported components?
+        // For Clone, we should regenerate ID.
+        // Assuming this is used for Clone/Import.
+        // If ID exists, gen new.
+        var finalComp = component
+        if (proj.components.any { it.id == component.id }) {
+             val maxId = proj.components.maxOfOrNull { it.id } ?: 100
+             finalComp = component.copy(id = maxId + 1)
+        }
+        
+        proj.components.add(finalComp)
         saveProject()
     }
 
     fun removeComponent(componentId: Int) {
+        saveSnapshot()
         val proj = project.value ?: return
         val removed = proj.components.removeIf { it.id == componentId }
         if (removed) {
+            com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectVM", "Removed component ID: $componentId")
             if (_selectedComponentId.value == componentId) {
                 _selectedComponentId.value = null
             }

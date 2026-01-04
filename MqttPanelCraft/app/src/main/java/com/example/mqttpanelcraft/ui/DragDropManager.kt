@@ -50,11 +50,11 @@ class DragDropManager(
         }
     }
 
-    fun attachDragBehavior(view: View, onDragStart: (View) -> Unit) {
+    fun attachDragBehavior(view: View, onDragStart: (View) -> Unit, onDragEnd: () -> Unit) {
         view.setOnLongClickListener { v ->
              if (!isEditModeProvider()) return@setOnLongClickListener false
              
-             // Trigger callback (e.g., to show Drop Zone)
+             // Trigger callback (Snapshot state before move)
              onDragStart(v)
              
              val dragData = ClipData("MOVE", arrayOf(android.content.ClipDescription.MIMETYPE_TEXT_PLAIN), ClipData.Item("MOVE"))
@@ -67,6 +67,16 @@ class DragDropManager(
         view.setOnDragListener { v, event ->
              if (event.action == DragEvent.ACTION_DRAG_ENDED) {
                  v.visibility = View.VISIBLE
+                 // Trigger callback (Save state after move)
+                 // ACTION_DRAG_ENDED is broadcast to all views. 
+                 // We only want to trigger save ONCE relative to the drag operation.
+                 // Ideally, the 'event.localState' is the view.
+                 // But event.localState might be null in DRAG_ENDED across apps, but fine here.
+                 // Check if 'v' is the one that was dragged?
+                 // event.localState IS the view we passed in startDragAndDrop
+                 if (event.localState == v) {
+                     onDragEnd()
+                 }
              }
              true
         }
