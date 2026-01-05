@@ -228,7 +228,7 @@ class CanvasManager(
         return null
     }
 
-    private fun checkAlignment(centerX: Float, centerY: Float, currentView: View) {
+    fun checkAlignment(centerX: Float, centerY: Float, currentView: View) {
          checkAlignmentBounds(centerX, centerY, currentView.width, currentView.height, currentView)
     }
     
@@ -272,7 +272,7 @@ class CanvasManager(
         }
     }
 
-    private fun checkDeleteZoneHover(screenX: Float, screenY: Float, view: View?) {
+    fun checkDeleteZoneHover(screenX: Float, screenY: Float, view: View?) {
         val locations = IntArray(2)
         dropDeleteZone.getLocationOnScreen(locations)
         val zoneRect = Rect(locations[0], locations[1], locations[0]+dropDeleteZone.width, locations[1]+dropDeleteZone.height)

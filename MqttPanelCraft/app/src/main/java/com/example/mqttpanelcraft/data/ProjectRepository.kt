@@ -7,30 +7,57 @@ import com.example.mqttpanelcraft.model.ComponentData
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import kotlinx.coroutines.launch
 
 object ProjectRepository {
-    private val projects = mutableListOf<Project>()
+    // Thread-Unsafe List guarded by @Synchronized
+    private val projects = ArrayList<Project>()
     private var file: File? = null
     private const val FILE_NAME = "projects.json"
+    
+    // Coroutine Scope for I/O - Kept for load but save is synced now
+    private val repoScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO + kotlinx.coroutines.Job())
+    
+    // LiveData for UI Observation
+    private val _projectsLiveData = androidx.lifecycle.MutableLiveData<List<Project>>()
+    val projectsLiveData: androidx.lifecycle.LiveData<List<Project>> = _projectsLiveData
 
+    private var isInitialized = false
+
+    @Synchronized
     fun initialize(context: Context) {
-        file = File(context.filesDir, "projects.json")
-        loadProjects()
+        file = File(context.filesDir, FILE_NAME)
+        com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Initialize. File: ${file?.absolutePath}")
+        if (!isInitialized) {
+            loadProjects()
+            isInitialized = true
+        } else {
+             com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Already initialized. Skipping load.")
+        }
     }
 
     private fun loadProjects() {
-        projects.clear()
         if (file == null || !file!!.exists()) {
-             // Defaults if empty
-            projects.add(Project("1", "Smart Home", "broker.emqx.io", 1883, "", "", "", ProjectType.HOME, false))
-            projects.add(Project("2", "Office Env", "test.mosquitto.org", 1883, "", "", "", ProjectType.FACTORY, false))
-            saveProjects()
-            return
+             com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "File does not exist or null. Creating defaults.")
+             synchronized(this) {
+                 if (projects.isEmpty()) {
+                    projects.add(Project("1", "Smart Home", "broker.emqx.io", 1883, "", "", "", ProjectType.HOME, false))
+                    projects.add(Project("2", "Office Env", "test.mosquitto.org", 1883, "", "", "", ProjectType.FACTORY, false))
+                 }
+                 saveProjects()
+                 updateLiveData()
+             }
+             return
         }
 
         try {
+            com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Reading from file...")
             val jsonStr = file!!.readText()
+            com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Read ${jsonStr.length} chars. Header: ${jsonStr.take(50)}...")
+            
             val jsonArray = JSONArray(jsonStr)
+            val newProjects = mutableListOf<Project>()
+            
             for (i in 0 until jsonArray.length()) {
                 val obj = jsonArray.getJSONObject(i)
                 val id = obj.getString("id")
@@ -48,7 +75,6 @@ object ProjectRepository {
 
                 val project = Project(id, name, broker, port, user, pass, client, type, false, mutableListOf(), customCode, createdAt, lastOpenedAt)
 
-                // Load Components
                 val compsArray = obj.optJSONArray("components")
                 if (compsArray != null) {
                     for (k in 0 until compsArray.length()) {
@@ -74,96 +100,139 @@ object ProjectRepository {
                         project.components.add(comp)
                     }
                 }
-
-                projects.add(project)
+                newProjects.add(project)
             }
+            
+            synchronized(this) {
+                projects.clear()
+                projects.addAll(newProjects)
+                updateLiveData()
+                com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Loaded ${projects.size} projects into memory.")
+                if (projects.isNotEmpty()) {
+                    val p1 = projects[0]
+                    com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "P1[${p1.name}] has ${p1.components.size} components. C1: ${if (p1.components.isNotEmpty()) "${p1.components[0].label}(${p1.components[0].x},${p1.components[0].y})" else "None"}")
+                }
+            }
+            
         } catch (e: Exception) {
             e.printStackTrace()
+            com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Error loading: ${e.message}")
         }
     }
 
     private fun saveProjects() {
-        if (file == null) return
-        try {
-            val jsonArray = JSONArray()
-            for (p in projects) {
-                val obj = JSONObject()
-                obj.put("id", p.id)
-                obj.put("name", p.name)
-                obj.put("broker", p.broker)
-                obj.put("port", p.port)
-                obj.put("username", p.username)
-                obj.put("password", p.password)
-                obj.put("clientId", p.clientId)
-                obj.put("type", p.type.name)
-                obj.put("customCode", p.customCode)
-                obj.put("createdAt", p.createdAt)
-                obj.put("lastOpenedAt", p.lastOpenedAt)
+        if (file == null) {
+            com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Save failed: File is null")
+            return
+        }
 
-                // Save Components
-                val compsArray = JSONArray()
-                for (c in p.components) {
-                    val cObj = JSONObject()
-                    cObj.put("id", c.id)
-                    cObj.put("type", c.type)
-                    cObj.put("x", c.x)
-                    cObj.put("y", c.y)
-                    cObj.put("width", c.width)
-                    cObj.put("height", c.height)
-                    cObj.put("label", c.label)
-                    cObj.put("topicConfig", c.topicConfig)
-                    val propsObj = JSONObject()
-                    for ((k, v) in c.props) {
-                        propsObj.put(k, v)
-                    }
-                    cObj.put("props", propsObj)
-                    compsArray.put(cObj)
+        repoScope.launch {
+            try {
+                // Create Snapshot in Sync Block
+                val projectsSnapshot = synchronized(this@ProjectRepository) {
+                    projects.toList()
                 }
-                obj.put("components", compsArray)
 
-                jsonArray.put(obj)
+                com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Saving ${projectsSnapshot.size} projects...")
+                
+                // Log snapshot state (First project only)
+                if (projectsSnapshot.isNotEmpty()) {
+                     val p1 = projectsSnapshot[0]
+                     com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Saving P1[${p1.name}]: ${p1.components.size} components. C1 Pos: ${if (p1.components.isNotEmpty()) "${p1.components[0].x},${p1.components[0].y}" else "N/A"}")
+                }
+    
+                val jsonArray = JSONArray()
+                
+                for (p in projectsSnapshot) {
+                    val obj = JSONObject()
+                    obj.put("id", p.id)
+                    obj.put("name", p.name)
+                    obj.put("broker", p.broker)
+                    obj.put("port", p.port)
+                    obj.put("username", p.username)
+                    obj.put("password", p.password)
+                    obj.put("clientId", p.clientId)
+                    obj.put("type", p.type.name)
+                    obj.put("customCode", p.customCode)
+                    obj.put("createdAt", p.createdAt)
+                    obj.put("lastOpenedAt", p.lastOpenedAt)
+    
+                    val compsArray = JSONArray()
+                    for (c in p.components) {
+                        val cObj = JSONObject()
+                        cObj.put("id", c.id)
+                        cObj.put("type", c.type)
+                        cObj.put("x", c.x)
+                        cObj.put("y", c.y)
+                        cObj.put("width", c.width)
+                        cObj.put("height", c.height)
+                        cObj.put("label", c.label)
+                        cObj.put("topicConfig", c.topicConfig)
+                        val propsObj = JSONObject()
+                        for ((k, v) in c.props) {
+                            propsObj.put(k, v)
+                        }
+                        cObj.put("props", propsObj)
+                        compsArray.put(cObj)
+                    }
+                    obj.put("components", compsArray)
+                    jsonArray.put(obj)
+                }
+                
+                // IO Operation
+                file!!.writeText(jsonArray.toString(2))
+                com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Saved successfully to ${file!!.absolutePath}. Size: ${file!!.length()} bytes.")
+            } catch (e: Exception) {
+                com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Error saving: ${e.message}")
+                android.util.Log.e("ProjectRepo", "Error saving projects", e)
             }
-            file!!.writeText(jsonArray.toString())
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
-        }
+    }
 
+    private fun updateLiveData() {
+        _projectsLiveData.postValue(projects.toList())
+    }
 
+    @Synchronized
     fun getAllProjects(): List<Project> {
         return projects.toList()
     }
     
+    @Synchronized
     fun getProjectById(id: String): Project? {
         return projects.find { it.id == id }
     }
 
+    @Synchronized
     fun addProject(project: Project) {
-        // Safety: Ensure ID is unique. If collision, auto-generate new ID.
         var finalProject = project
         if (getProjectById(project.id) != null) {
             val newId = generateId()
-            android.util.Log.w("Repo", "Duplicate ID detected [${project.id}]. Re-assigning to [$newId].")
             finalProject = project.copy(id = newId)
         }
         projects.add(finalProject)
+        updateLiveData()
         saveProjects()
     }
     
+    @Synchronized
     fun updateProject(updatedProject: Project) {
         val index = projects.indexOfFirst { it.id == updatedProject.id }
         if (index != -1) {
             projects[index] = updatedProject
+            updateLiveData()
             saveProjects()
         }
     }
     
+    @Synchronized
     fun deleteProject(id: String) {
-        projects.removeIf { it.id == id }
-        saveProjects()
+        val removed = projects.removeIf { it.id == id }
+        if (removed) {
+            updateLiveData()
+            saveProjects()
+        }
     }
-
-
 
     fun generateId(): String {
         val secureRandom = java.security.SecureRandom()
@@ -304,12 +373,14 @@ object ProjectRepository {
     fun swapProjects(fromIndex: Int, toIndex: Int) {
         if (fromIndex in projects.indices && toIndex in projects.indices) {
             java.util.Collections.swap(projects, fromIndex, toIndex)
+            updateLiveData()
             saveProjects()
         }
     }
 
     fun sortProjects(comparator: Comparator<Project>) {
         java.util.Collections.sort(projects, comparator)
+        updateLiveData()
         saveProjects()
     }
 }
