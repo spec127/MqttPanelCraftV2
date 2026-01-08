@@ -50,6 +50,17 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> = _errorMessage
 
+    private val _isGridVisible = MutableLiveData<Boolean>(true)
+    val isGridVisible: LiveData<Boolean> = _isGridVisible
+
+    fun toggleGrid() {
+        _isGridVisible.value = !(_isGridVisible.value ?: true)
+    }
+
+    fun setGridVisibility(visible: Boolean) {
+        _isGridVisible.value = visible
+    }
+
     fun loadProject(projectId: String) {
         _currentProjectId.value = projectId
     }
@@ -79,6 +90,9 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
             
             proj.components.clear()
             proj.components.addAll(previousState)
+            
+            // Force Observer Notification and Save
+            project.value = proj
             saveProject()
             
             // Trigger UI Refresh
@@ -99,25 +113,68 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectVM", "Snapshot saved. Stack size: ${undoStack.size}")
     }
 
+    // Helper to get Density
+    private val density: Float
+        get() = getApplication<Application>().resources.displayMetrics.density
+
+    // Grid Unit
+    private val GRID_UNIT_DP = 20
+
+    private fun getNextSmartLabel(type: String): String {
+        val proj = project.value ?: return "$type 1"
+        
+        // Find all used IDs for this Type (Labels starting with "Type ")
+        val usedIds = proj.components
+            .map { it.label }
+            .filter { it.startsWith("$type ") }
+            .mapNotNull { it.substringAfter("$type ").toIntOrNull() }
+            .sorted()
+            
+        // Find gap
+        var nextId = 1
+        for (id in usedIds) {
+            if (id == nextId) nextId++
+            else if (id > nextId) return "$type $nextId"
+        }
+        return "$type $nextId"
+    }
+
     fun addComponent(type: String, defaultTopic: String) {
         saveSnapshot()
         val proj = project.value ?: return
         
-        // Fix ID Collision: Use Max ID + 1
+        // Fix ID Collision: Use Max ID + 1 (System ID)
         val maxId = proj.components.maxOfOrNull { it.id } ?: 100
-        val newId = maxId + 1
+        val newSystemId = maxId + 1
         
+        // Smart Label (User Facing ID)
+        val newLabel = getNextSmartLabel(type)
+        
+        // Default Size (Grid Aligned)
+        // Match logic in ComponentFactory
+        // Unit = 20dp
+        val (wDp, hDp) = when(type) {
+            "SLIDER", "THERMOMETER", "TEXT" -> 160 to 100
+            "BUTTON", "CAMERA" -> 120 to 60
+            "LED" -> 80 to 80
+            else -> 100 to 100
+        }
+
         val newComp = ComponentData(
-            id = newId, 
+            id = newSystemId, 
             type = type,
             topicConfig = defaultTopic,
-            x = 100f,
+            x = 100f, // TODO: Smart placement? For now 100f is fine, ideally snap this too
             y = 100f, 
-            width = if (type == "SWITCH") 200 else 300,
-            height = if (type == "SWITCH") 100 else 150,
-            label = "$type $newId", // Unique Label
+            width = (wDp * density).toInt(),
+            height = (hDp * density).toInt(),
+            label = newLabel,
             props = mutableMapOf()
         )
+        // Ensure x,y are also snapped?
+        // 100f is 5 * 20 (if density=1). 
+        // Better to just let drag handle it, or pre-snap.
+        
         proj.components.add(newComp)
         saveProject() 
     }
@@ -125,11 +182,9 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
     fun addComponent(component: ComponentData) {
         saveSnapshot()
         val proj = project.value ?: return
-        // Ensure ID uniqueness logic for imported components?
-        // For Clone, we should regenerate ID.
-        // Assuming this is used for Clone/Import.
-        // If ID exists, gen new.
+        
         var finalComp = component
+        // Regen ID if exists
         if (proj.components.any { it.id == component.id }) {
              val maxId = proj.components.maxOfOrNull { it.id } ?: 100
              finalComp = component.copy(id = maxId + 1)
@@ -180,5 +235,12 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
             }
         }
         if (changed) saveProject()
+    }
+    companion object {
+        fun generateSmartId(components: List<ComponentData>, type: String): Int {
+            // Logic: Find max ID + 1 to ensure uniqueness based on integer IDs
+            val maxId = components.maxOfOrNull { it.id } ?: 100
+            return maxId + 1
+        }
     }
 }

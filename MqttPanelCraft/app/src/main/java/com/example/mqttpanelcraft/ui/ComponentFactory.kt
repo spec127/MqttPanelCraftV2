@@ -86,27 +86,52 @@ object ComponentFactory {
                 layoutParams = params
                 this.tag = "CLEAR_BTN"
                 visibility = if (isEditMode) View.VISIBLE else View.GONE
-                // Make sure this is ON TOP of the interceptor so it can be clicked even in edit mode
                 elevation = 10f 
             }
             container.addView(closeBtn)
+        }
+        
+        // RESIZE HANDLE (New)
+        // A small handle at bottom-right
+        if (isEditMode) {
+            val handle = View(context).apply {
+                this.tag = "RESIZE_HANDLE"
+                // 20dp handle size, but visual is smaller?
+                // Let's make it 24dp touch area, 12dp visual
+                // Actually, just a simple view for now.
+                layoutParams = FrameLayout.LayoutParams(40, 40).apply {
+                     gravity = Gravity.BOTTOM or Gravity.END
+                }
+                // Visual Indicator
+                background = android.graphics.drawable.ShapeDrawable(android.graphics.drawable.shapes.OvalShape()).apply {
+                    paint.color = android.graphics.Color.parseColor("#6200EE") // Primary Color
+                }
+                elevation = 20f
+            }
+            container.addView(handle)
         }
 
         return container
     }
     
     // Estimate default size for Drag Shadow / Snapping
+    // Estimate default size for Drag Shadow / Snapping
     fun getDefaultSize(context: Context, tag: String): Pair<Int, Int> {
         val density = context.resources.displayMetrics.density
-        val w = when(tag) {
-            "SLIDER", "THERMOMETER" -> 150 * density
-            "TEXT" -> 150 * density
-            "BUTTON", "CAMERA" -> 100 * density
-            "LED" -> 75 * density
-            else -> 100 * density
+        // Unit = 20dp
+        // 100dp = 5 units
+        // 160dp = 8 units
+        // 80dp = 4 units
+        
+        val wDp = when(tag) {
+            "SLIDER", "THERMOMETER", "TEXT" -> 160 
+            "BUTTON", "CAMERA" -> 120
+            "LED" -> 80
+            else -> 100
         }
-        val h = if (tag == "LED") 75 * density else 100 * density
-        return Pair(w.toInt(), h.toInt())
+        val hDp = if (tag == "LED") 80 else if (tag == "BUTTON") 60 else 100
+        
+        return Pair((wDp * density).toInt(), (hDp * density).toInt())
     }
 }
 

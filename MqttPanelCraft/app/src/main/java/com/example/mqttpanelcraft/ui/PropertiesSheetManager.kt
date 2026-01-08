@@ -17,6 +17,7 @@ import com.google.android.material.textfield.TextInputEditText
 
 class PropertiesSheetManager(
     private val propertyContainer: View, // Expecting the scrollview or container holding inputs
+    private val onExpandRequest: () -> Unit, // Callback to expand bottom sheet
     private val onPropertyUpdated: (viewId: Int, name: String, w: Int, h: Int, color: String, topicConfig: String) -> Unit
 ) {
 
@@ -99,20 +100,17 @@ class PropertiesSheetManager(
         // Ensure container is visible
         propertyContainer.visibility = View.VISIBLE
         
-        // Try to expand bottom sheet if parent is accessible
-        // We assume propertyContainer is inside the Bottom Sheet
-        // The structure is: BottomSheet (FrameLayout) -> LinearLayout -> ScrollView (propertyContainer)
-        // So we need to find the BottomSheet view to control behavior.
-        // Let's traverse up to find a view with BottomSheetBehavior
-        
+        // Find behavior and EXPAND
         var currentParent = propertyContainer.parent
-        var bottomSheetView: View? = null
         while (currentParent is View) {
             try {
                 val params = currentParent.layoutParams
                 if (params is androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
                     if (params.behavior is BottomSheetBehavior) {
-                        bottomSheetView = currentParent
+                        val behavior = params.behavior as BottomSheetBehavior
+                        behavior.isHideable = true // Allow user to drag it down to hide
+                        behavior.skipCollapsed = true // Skip collapsed state, go directly to Hidden
+                        behavior.state = BottomSheetBehavior.STATE_EXPANDED
                         break
                     }
                 }
@@ -120,15 +118,8 @@ class PropertiesSheetManager(
             currentParent = currentParent.parent
         }
         
-        if (bottomSheetView != null) {
-             val behavior = BottomSheetBehavior.from(bottomSheetView)
-             if (behavior is LockableBottomSheetBehavior) {
-                 behavior.isLocked = true // Lock it so it stays open/controlled
-             }
-             behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        } else {
-             android.util.Log.w("PropsManager", "Could not find BottomSheet parent behavior")
-        }
+        // Request expansion from callback as backup
+        onExpandRequest()
     }
 
     fun hide() {
@@ -140,7 +131,8 @@ class PropertiesSheetManager(
                 val params = currentParent.layoutParams
                 if (params is androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
                     if (params.behavior is BottomSheetBehavior) {
-                        (params.behavior as BottomSheetBehavior).state = BottomSheetBehavior.STATE_HIDDEN
+                        val behavior = params.behavior as BottomSheetBehavior
+                        behavior.state = BottomSheetBehavior.STATE_HIDDEN
                         break
                     }
                 }
@@ -148,6 +140,7 @@ class PropertiesSheetManager(
             currentParent = currentParent.parent
         }
     }
+
 
     private fun showColorPicker() {
         // Simple Color Picker Logic

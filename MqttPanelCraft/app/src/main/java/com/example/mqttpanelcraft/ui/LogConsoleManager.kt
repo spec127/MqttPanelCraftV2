@@ -15,6 +15,7 @@ class LogConsoleManager(
     private val rootView: View
 ) {
     private val logAdapter = LogAdapter()
+    private val fullLogs = StringBuilder()
     
     init {
         setupUI()
@@ -61,9 +62,14 @@ class LogConsoleManager(
     }
     
     fun addLog(message: String) {
+        fullLogs.append(message).append("\n")
         logAdapter.addLog(message)
         // Auto scroll?
         val rvLogs = rootView.findViewById<RecyclerView>(R.id.rvConsoleLogs)
         rvLogs?.smoothScrollToPosition(0)
+    }
+
+    fun getLogs(): String {
+        return fullLogs.toString()
     }
 }

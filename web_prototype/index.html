@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MqttPanelCraft - Web Prototype</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Paho MQTT Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Header / Toolbar -->
+    <header class="toolbar">
+        <div class="title">MqttPanelCraft <span class="badge">PROTOTYPE</span></div>
+        <div class="actions">
+            <button id="btnUndo" class="btn">↩ Undo</button>
+            <button id="btnToggleGrid" class="btn active">Grid: ON</button>
+            <button id="btnToggleMode" class="btn primary">Switch to RUN</button>
+            <button id="btnSettings" class="btn">Settings</button>
+            <button id="btnExport" class="btn">Export JSON</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar (Component Palette) -->
+        <aside id="sidebar" class="sidebar">
+            <h3>Components</h3>
+            <div class="palette">
+                <!-- Draggable Items -->
+                <div class="draggable-item" draggable="true" data-type="SWITCH">
+                    <div class="icon">🔌</div>
+                    <span>Switch</span>
+                </div>
+                <div class="draggable-item" draggable="true" data-type="BUTTON">
+                    <div class="icon">🔘</div>
+                    <span>Button</span>
+                </div>
+                <div class="draggable-item" draggable="true" data-type="TEXT">
+                    <div class="icon">📝</div>
+                    <span>Text/Label</span>
+                </div>
+                <div class="draggable-item" draggable="true" data-type="GAUGE">
+                    <div class="icon">🌡️</div>
+                    <span>Gauge</span>
+                </div>
+            </div>
+
+            <div id="connectionStatus" class="status-panel">
+                Status: <span id="mqttStatus" class="disconnected">Disconnected</span>
+            </div>
+        </aside>
+
+        <!-- Main Canvas -->
+        <main id="editorCanvas" class="canvas grid-bg">
+            <!-- Components will be dropped here -->
+            <div id="guideOverlay" class="guide-overlay">
+                <!-- Dynamic Alignment Lines -->
+                <div id="lineH" class="align-line horizontal hidden"></div>
+                <div id="lineV" class="align-line vertical hidden"></div>
+            </div>
+
+            <!-- Trash Bin Zone (Float at bottom) -->
+            <div id="trashBin" class="trash-bin hidden">
+                <div class="trash-icon">🗑️</div>
+            </div>
+        </main>
+
+        <!-- Properties Panel (Right Side) -->
+        <aside id="propertiesPanel" class="properties-panel hidden">
+            <h3>Properties</h3>
+            <div class="form-group">
+                <label>ID</label>
+                <input type="text" id="propId" disabled>
+            </div>
+            <div class="form-group">
+                <label>Label</label>
+                <input type="text" id="propLabel">
+            </div>
+            <div class="form-group">
+                <label>Topic</label>
+                <input type="text" id="propTopic">
+            </div>
+            <div class="form-group">
+                <label>Color</label>
+                <input type="color" id="propColor">
+            </div>
+            <div class="actions">
+                <button id="btnDeleteComp" class="btn danger">Delete</button>
+                <button id="btnCloseProps" class="btn">Close</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+
+</html>

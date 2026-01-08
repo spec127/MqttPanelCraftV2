@@ -49,6 +49,17 @@ class AlignmentOverlayView @JvmOverloads constructor(
         invalidate()
     }
 
+    fun drawLines(newLines: FloatArray) {
+        lines.clear()
+        // Convert flat array [x1, y1, x2, y2, x3, y3, ...] to list of arrays
+        for (i in newLines.indices step 4) {
+            if (i + 3 < newLines.size) {
+                 lines.add(floatArrayOf(newLines[i], newLines[i+1], newLines[i+2], newLines[i+3]))
+            }
+        }
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         
