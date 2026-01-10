@@ -8,7 +8,10 @@ import androidx.lifecycle.MutableLiveData
 import com.example.mqttpanelcraft.data.ProjectRepository
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.model.Project
-import java.util.UUID
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+
 
 class ProjectViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -19,6 +22,15 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
     
     // Reactive Project Data using MediatorLiveData to avoid Transformations dependency issues
     val project = androidx.lifecycle.MediatorLiveData<Project?>()
+    
+    // Manual Coroutine Scope as fallback
+    private val viewModelJob = kotlinx.coroutines.SupervisorJob()
+    private val uiScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main + viewModelJob)
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+    }
     
     // Components derived from Project
     val components = androidx.lifecycle.MediatorLiveData<List<ComponentData>>()
@@ -47,18 +59,30 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
     private val _selectedComponentId = MutableLiveData<Int?>(null)
     val selectedComponentId: LiveData<Int?> = _selectedComponentId
 
-    private val _errorMessage = MutableLiveData<String>()
-    val errorMessage: LiveData<String> = _errorMessage
+
+    
+    val canUndo = MutableLiveData<Boolean>(false)
 
     private val _isGridVisible = MutableLiveData<Boolean>(true)
     val isGridVisible: LiveData<Boolean> = _isGridVisible
 
+    private val _isGuidesVisible = MutableLiveData<Boolean>(true) // Guides (Alignment Lines)
+    val isGuidesVisible: LiveData<Boolean> = _isGuidesVisible
+
     fun toggleGrid() {
         _isGridVisible.value = !(_isGridVisible.value ?: true)
+    }
+    
+    fun toggleGuides() {
+        _isGuidesVisible.value = !(_isGuidesVisible.value ?: true)
     }
 
     fun setGridVisibility(visible: Boolean) {
         _isGridVisible.value = visible
+    }
+
+    fun setGuidesVisibility(visible: Boolean) {
+        _isGuidesVisible.value = visible
     }
 
     fun loadProject(projectId: String) {
@@ -99,6 +123,7 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
             undoEvent.value = System.currentTimeMillis()
             
             com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectVM", "Undo performed. Stack size: ${undoStack.size}")
+            canUndo.value = undoStack.isNotEmpty()
         } else {
              com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectVM", "Undo failed: Stack empty")
         }
@@ -110,6 +135,7 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         val snapshot = proj.components.map { it.copy() }
         undoStack.push(snapshot)
         if (undoStack.size > 20) undoStack.removeAt(0) // Limit stack
+        canUndo.value = undoStack.isNotEmpty()
         com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectVM", "Snapshot saved. Stack size: ${undoStack.size}")
     }
 
@@ -117,31 +143,45 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
     private val density: Float
         get() = getApplication<Application>().resources.displayMetrics.density
 
-    // Grid Unit
-    private val GRID_UNIT_DP = 20
+
 
     private fun getNextSmartLabel(type: String): String {
-        val proj = project.value ?: return "$type 1"
+        val proj = project.value ?: return "${type.lowercase()}1"
+        val prefix = type.lowercase()
         
-        // Find all used IDs for this Type (Labels starting with "Type ")
+        // Find all used IDs for this Type (Labels starting with "type")
         val usedIds = proj.components
             .map { it.label }
-            .filter { it.startsWith("$type ") }
-            .mapNotNull { it.substringAfter("$type ").toIntOrNull() }
+            .filter { it.startsWith(prefix, ignoreCase = true) }
+            .mapNotNull { 
+                // Remove prefix, try to parse integer
+                it.substring(prefix.length).toIntOrNull() 
+            }
             .sorted()
             
         // Find gap
         var nextId = 1
         for (id in usedIds) {
             if (id == nextId) nextId++
-            else if (id > nextId) return "$type $nextId"
+            else if (id > nextId) return "$prefix$nextId"
         }
-        return "$type $nextId"
+        return "$prefix$nextId"
     }
 
-    fun addComponent(type: String, defaultTopic: String) {
+    fun generateSmartTopic(type: String): String {
+        val proj = project.value ?: return "topic"
+        val newLabel = getNextSmartLabel(type)
+        
+        // Topic Generation: All Lowercase
+        val safeProjName = proj.name.lowercase().replace("/", "_").replace(" ", "_").replace("+", "")
+        val safeItemName = newLabel // newLabel is already lowercase and safe
+        // Topic Config: ProjectName/ProjectID/ItemName
+        return "$safeProjName/${proj.id}/$safeItemName"
+    }
+
+    fun addComponent(type: String, defaultTopic: String): Int {
         saveSnapshot()
-        val proj = project.value ?: return
+        val proj = project.value ?: return -1
         
         // Fix ID Collision: Use Max ID + 1 (System ID)
         val maxId = proj.components.maxOfOrNull { it.id } ?: 100
@@ -149,10 +189,11 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         
         // Smart Label (User Facing ID)
         val newLabel = getNextSmartLabel(type)
-        
+        val smartTopic = generateSmartTopic(type)
+
         // Default Size (Grid Aligned)
         // Match logic in ComponentFactory
-        // Unit = 20dp
+        // Unit = 10dp (Grid)
         val (wDp, hDp) = when(type) {
             "SLIDER", "THERMOMETER", "TEXT" -> 160 to 100
             "BUTTON", "CAMERA" -> 120 to 60
@@ -163,25 +204,23 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         val newComp = ComponentData(
             id = newSystemId, 
             type = type,
-            topicConfig = defaultTopic,
-            x = 100f, // TODO: Smart placement? For now 100f is fine, ideally snap this too
+            topicConfig = smartTopic,
+            x = 100f, 
             y = 100f, 
             width = (wDp * density).toInt(),
             height = (hDp * density).toInt(),
             label = newLabel,
             props = mutableMapOf()
         )
-        // Ensure x,y are also snapped?
-        // 100f is 5 * 20 (if density=1). 
-        // Better to just let drag handle it, or pre-snap.
         
         proj.components.add(newComp)
         saveProject() 
+        return newSystemId
     }
 
-    fun addComponent(component: ComponentData) {
+    fun addComponent(component: ComponentData): Int {
         saveSnapshot()
-        val proj = project.value ?: return
+        val proj = project.value ?: return -1
         
         var finalComp = component
         // Regen ID if exists
@@ -192,6 +231,7 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         
         proj.components.add(finalComp)
         saveProject()
+        return finalComp.id
     }
 
     fun removeComponent(componentId: Int) {
@@ -236,6 +276,81 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         }
         if (changed) saveProject()
     }
+    // === MQTT Logic ===
+    enum class MqttStatus { IDLE, CONNECTING, CONNECTED, FAILED }
+    val mqttStatus = MutableLiveData(MqttStatus.IDLE)
+    
+    private var connectionJob: kotlinx.coroutines.Job? = null
+    
+    fun initMqtt() {
+        if (connectionJob?.isActive == true) return
+        connectionJob = uiScope.launch {
+            val proj = project.value ?: return@launch
+            
+            // 1. Initial Attempt
+            mqttStatus.postValue(MqttStatus.CONNECTING)
+            fireConnect(proj)
+            if (waitForConn(2000)) {
+                startHeartbeat()
+                return@launch
+            }
+            
+            // 2. Retry Loop (6 times, 1s interval)
+            repeat(6) {
+                kotlinx.coroutines.delay(1000)
+                fireConnect(proj)
+                if (waitForConn(2000)) {
+                    startHeartbeat()
+                    return@launch
+                }
+            }
+            
+            // 3. Final Fail
+            mqttStatus.postValue(MqttStatus.FAILED)
+        }
+    }
+    
+    fun retryMqtt() {
+        connectionJob?.cancel()
+        connectionJob = null
+        initMqtt()
+    }
+
+    private suspend fun startHeartbeat() {
+        mqttStatus.postValue(MqttStatus.CONNECTED)
+        // delay() checks for cancellation automatically, so we can use while(true)
+        while (true) {
+             kotlinx.coroutines.delay(10000) // 10s Heartbeat
+             if (com.example.mqttpanelcraft.MqttRepository.connectionStatus.value != 1) {
+                 mqttStatus.postValue(MqttStatus.FAILED)
+                 break
+             }
+        }
+    }
+    
+    private fun fireConnect(proj: Project) {
+        val context = getApplication<Application>()
+        val intent = android.content.Intent(context, com.example.mqttpanelcraft.service.MqttService::class.java).apply {
+            action = "CONNECT"
+            putExtra("BROKER", proj.broker)
+            putExtra("PORT", proj.port)
+            putExtra("USER", proj.username)
+            putExtra("PASSWORD", proj.password)
+            putExtra("CLIENT_ID", proj.clientId)
+        }
+        context.startService(intent)
+    }
+    
+    private suspend fun waitForConn(timeoutMs: Long): Boolean {
+        // Poll MqttRepository.connectionStatus
+        val start = System.currentTimeMillis()
+        while (System.currentTimeMillis() - start < timeoutMs) {
+            if (com.example.mqttpanelcraft.MqttRepository.connectionStatus.value == 1) return true
+            kotlinx.coroutines.delay(200)
+        }
+        return false
+    }
+
     companion object {
         fun generateSmartId(components: List<ComponentData>, type: String): Int {
             // Logic: Find max ID + 1 to ensure uniqueness based on integer IDs

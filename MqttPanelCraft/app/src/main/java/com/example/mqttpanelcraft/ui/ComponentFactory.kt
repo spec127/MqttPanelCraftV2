@@ -93,23 +93,21 @@ object ComponentFactory {
         
         // RESIZE HANDLE (New)
         // A small handle at bottom-right
-        if (isEditMode) {
-            val handle = View(context).apply {
-                this.tag = "RESIZE_HANDLE"
-                // 20dp handle size, but visual is smaller?
-                // Let's make it 24dp touch area, 12dp visual
-                // Actually, just a simple view for now.
-                layoutParams = FrameLayout.LayoutParams(40, 40).apply {
-                     gravity = Gravity.BOTTOM or Gravity.END
-                }
-                // Visual Indicator
-                background = android.graphics.drawable.ShapeDrawable(android.graphics.drawable.shapes.OvalShape()).apply {
-                    paint.color = android.graphics.Color.parseColor("#6200EE") // Primary Color
-                }
-                elevation = 20f
+        // RESIZE HANDLE (New)
+        // Always add handle, ComponentRenderer manages visibility
+        val handle = View(context).apply {
+            this.tag = "RESIZE_HANDLE"
+            layoutParams = FrameLayout.LayoutParams(40, 40).apply {
+                 gravity = Gravity.BOTTOM or Gravity.END
             }
-            container.addView(handle)
+            // Visual Indicator
+            background = android.graphics.drawable.ShapeDrawable(android.graphics.drawable.shapes.OvalShape()).apply {
+                paint.color = android.graphics.Color.parseColor("#6200EE") // Primary Color
+            }
+            elevation = 20f
+            visibility = View.GONE // Default hidden
         }
+        container.addView(handle)
 
         return container
     }
@@ -118,10 +116,7 @@ object ComponentFactory {
     // Estimate default size for Drag Shadow / Snapping
     fun getDefaultSize(context: Context, tag: String): Pair<Int, Int> {
         val density = context.resources.displayMetrics.density
-        // Unit = 20dp
-        // 100dp = 5 units
-        // 160dp = 8 units
-        // 80dp = 4 units
+        // Unit = Constants.GRID_UNIT_DP (10dp)
         
         val wDp = when(tag) {
             "SLIDER", "THERMOMETER", "TEXT" -> 160 

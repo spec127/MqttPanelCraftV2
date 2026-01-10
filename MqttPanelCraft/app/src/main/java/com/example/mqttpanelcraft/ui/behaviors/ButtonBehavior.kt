@@ -21,7 +21,8 @@ class ButtonBehavior : IComponentBehavior {
             // For now, send "TOGGLE" or "ON"
             val topic = data.topicConfig
             if (topic.isNotEmpty()) {
-                sendMqtt(topic, "TOGGLE")
+                val payload = data.props["payload"] ?: "1"
+                sendMqtt(topic, payload)
             }
         }
     }

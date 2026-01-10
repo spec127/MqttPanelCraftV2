@@ -71,15 +71,31 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
         // 1. If Locked matches user request: Only DRAG from Header
         // If event is DOWN or MOVE, we check if it is in header.
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-            if (!isTouchInHeader(event)) {
-                return false
-            }
-            // If Locked (Edit Mode), we want to PREVENT Dragging entirely.
-            // We only want Click.
-            // So we return false here too, effectively disabling the Behavior's drag intervention.
-            // The click will still go to the Header View.
+            // Check if touch is in header
+            val inHeader = isTouchInHeader(event)
+            
             if (isLocked) {
-                return false
+                // If Locked: Only allow interaction if in Header
+                if (!inHeader) return false
+                // If in Header, we allow it (return super so Behavior handles drag)
+            } else {
+                // If Unlocked: Standard behavior (but we might want to restrict content drag per original design?
+                // The class doc says "Dragging is ONLY allowed from the Header View".
+                // So effectively, we always limit to header?
+                // User said "Cannot manual pull up". 
+                // If we always limit to header, that's fine.
+                // But let's stick to: Locked -> Header Only. Unlocked -> All.
+                // Or: This class is "Lockable".
+                // Let's implement: ALWAYS Header Only for Drag.
+                // Content scroll is handled by NestedScroll.
+                if (!inHeader) {
+                    // Start of touch not in header. 
+                    // Should we allow dragging from content? 
+                    // Standard BottomSheet allows dragging from content if content is not scrollable.
+                    // User complained "Cannot manual pull up".
+                    // Let's allow dragging from everywhere if NOT Locked.
+                    // And if Locked, only from Header.
+                }
             }
         }
 
@@ -91,27 +107,11 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
         child: V,
         event: MotionEvent
     ): Boolean {
-        // Same logic: If it's a drag attempt not on header, ignore.
-        
-        if (headerView == null && headerViewId != 0) {
-             headerView = parent.findViewById(headerViewId)
-        }
-
         if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-            if (isLocked) return false
-            if (!isTouchInHeader(event)) {
-                 return false // Don't handle touch on content
+            if (isLocked) {
+                if (!isTouchInHeader(event)) return false
             }
         }
-        
-        // If we are here, it's either in header OR it's a subsequent MOVE event
-        // that started in header.
-        // However, standard onTouchEvent handles the actual dragging.
-        // We only want to delegate to super if it started in header.
-        
-        // Tracking "started in header" is tricky across calls without state.
-        // IsLocked logic:
-        
         return super.onTouchEvent(parent, child, event)
     }
 
@@ -123,8 +123,7 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
         axes: Int,
         type: Int
     ): Boolean {
-        // Prevent generic nested scroll from moving the sheet
-        return false 
+        return super.onStartNestedScroll(coordinatorLayout, child, directTargetChild, target, axes, type)
     }
 
     override fun onNestedPreScroll(
@@ -136,6 +135,6 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
         consumed: IntArray,
         type: Int
     ) {
-         // Consume nothing, let content scroll, but don't move sheet
+         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
     }
 }

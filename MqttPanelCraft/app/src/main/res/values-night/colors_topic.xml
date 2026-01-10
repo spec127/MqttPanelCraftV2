@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_topic_input_color">#1E1E1E</color>
+    <color name="bg_topic_stroke_color">#555555</color>
+    <color name="topic_text_primary">#FFFFFF</color>
+    <color name="topic_text_secondary">#BBBBBB</color>
+</resources>

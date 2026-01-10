@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Display Actions"
-        android:textColor="@color/sidebar_section_header"
+        android:textColor="#666666"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"/>

@@ -9,45 +9,27 @@
         android:text="Properties" 
         android:textSize="18sp" 
         android:textStyle="bold" 
-        android:textColor="@color/sidebar_section_header"
+        android:textColor="?android:attr/textColorPrimary"
         android:layout_marginBottom="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
         
-    <!-- Name/Label REMOVED per user request -->
-    <!-- But we need a hidden field or similar if logic depends on it, but user said "Keep Size, Color, Topic". -->
-    <!-- Wait, "Name" is often the label on the component. removing it might make it impossible to rename. -->
-    <!-- User said: "keep size, color, topic, test topic". -->
-    <!-- I will hide Name effectively or put it at bottom if needed, but user instruction is explicit. -->
-    <!-- Actually, simpler to just start with Topic which is most important. -->
-    
-    <!-- Topic (Control - Writable now?) -->
-    <!-- Wait, user said "topic" and "test topic". -->
-    <!-- In previous code, 'topicConfig' was test topic? And 'tvPropTopic' was read-only? -->
-    <!-- Let's make Topic editable here. -->
-
     <!-- Topic Config (Main Topic) -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="MQTT Topic"
+        android:textColorHint="?android:attr/textColorHint"
+        app:boxStrokeColor="?attr/colorPrimary"
+        app:hintTextColor="?attr/colorPrimary"
         android:layout_marginBottom="8dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPropTopicConfig"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textColor="?android:attr/textColorPrimary"/>
     </com.google.android.material.textfield.TextInputLayout>
     
-    <!-- Test Topic / Payload? User said "test topic". Assuming they mean payload or a secondary topic? -->
-    <!-- The previous code had etPropTopicConfig labeled "Test Topic". -->
-    <!-- I will assume the main topic is key. Let's look at fields available. -->
-    <!-- We have etPropWidth, etPropHeight, etPropColor, etPropTopicConfig. -->
-    <!-- No separate 'Test Topic' was in the code before, `etPropTopicConfig` WAS the topic. -->
-    <!-- I will interpret user's "topic" as `etPropTopicConfig` and maybe they want a "Payload" field? -->
-    <!-- Or maybe "Topic" and "Test Message"? -->
-    
-    <!-- Let's stick to what we have but clean up. -->
-
     <!-- W/H Row -->
      <LinearLayout
         android:layout_width="match_parent"
@@ -60,38 +42,95 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:hint="Width (dp)"
+            android:textColorHint="?android:attr/textColorHint"
+            app:boxStrokeColor="?attr/colorPrimary"
+            app:hintTextColor="?attr/colorPrimary"
             android:layout_marginEnd="8dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPropWidth"
                 android:inputType="number"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorPrimary"/>
         </com.google.android.material.textfield.TextInputLayout>
         
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:hint="Height (dp)">
+            android:hint="Height (dp)"
+            android:textColorHint="?android:attr/textColorHint"
+            app:boxStrokeColor="?attr/colorPrimary"
+            app:hintTextColor="?attr/colorPrimary">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPropHeight"
                 android:inputType="number"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorPrimary"/>
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
     
-    <!-- Color -->
-    <com.google.android.material.textfield.TextInputLayout
+    <!-- Color Picker -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Color (Hex)"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:layout_marginBottom="8dp">
-        <com.google.android.material.textfield.TextInputEditText
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Color:"
+            android:textSize="16sp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:layout_marginEnd="12dp"/>
+            
+        <View
+            android:id="@+id/vPropColorPreview"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_color_preview"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginEnd="12dp"/>
+            
+        <!-- Hidden backing field for logic compatibility -->
+        <EditText
             android:id="@+id/etPropColor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="#RRGGBB"
+            android:visibility="gone"/>
+            
+         <TextView
+            android:id="@+id/tvColorHex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#FFFFFF"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="14sp"/>
+            
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        android:layout_marginVertical="8dp"/>
+        
+    <!-- Specific Properties Container -->
+    <LinearLayout
+        android:id="@+id/containerSpecificProps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp">
+        <!-- Dynamically inflated content goes here -->
+    </LinearLayout>
 
     <!-- Hidden Name Field just in case needed by logic -->
     <EditText

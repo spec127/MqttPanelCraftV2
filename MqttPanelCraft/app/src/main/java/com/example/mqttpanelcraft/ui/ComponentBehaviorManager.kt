@@ -18,6 +18,7 @@ class ComponentBehaviorManager(
     // Registry
     private val behaviors = mapOf<String, IComponentBehavior>(
         "BUTTON" to ButtonBehavior(),
+        "LED" to com.example.mqttpanelcraft.ui.behaviors.LedBehavior(),
         // "SWITCH" to SwitchBehavior(),
         // "GAUGE" to GaugeBehavior(),
         // ... Add new behaviors here

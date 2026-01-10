@@ -124,12 +124,17 @@ class ComponentRenderer(
              
              // Color Update
              data.props["color"]?.let { colorCode ->
-               // Note: Background color applies to content usually, not the container which has the border.
-               // Container has the border drawable. The content view (child 0) needs color.
                val content = view.getChildAt(0)
-               if (content != null && content.tag != "RESIZE_HANDLE") { // Simple check
+               if (content != null && content.tag != "RESIZE_HANDLE") {
                    try {
-                       content.setBackgroundColor(android.graphics.Color.parseColor(colorCode))
+                       val color = android.graphics.Color.parseColor(colorCode)
+                       val bg = content.background
+                       if (bg is android.graphics.drawable.GradientDrawable) {
+                           bg.mutate()
+                           bg.setColor(color) 
+                       } else {
+                           content.setBackgroundColor(color)
+                       }
                    } catch (_: Exception) {}
                }
             }

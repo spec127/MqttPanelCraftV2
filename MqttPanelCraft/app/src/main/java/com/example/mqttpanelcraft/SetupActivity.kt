@@ -549,40 +549,40 @@ class SetupActivity : AppCompatActivity() {
 
     private fun saveAndFinish(newProject: Project, targetProjectId: String) {
         if (projectId != null) {
+            // Edit Mode
             if (newProject.id != projectId) {
                 // ID Changed: Delete old, Add new
                 ProjectRepository.deleteProject(projectId!!)
                 ProjectRepository.addProject(newProject)
-
-                 // Return result to Caller
-                val resultIntent = android.content.Intent()
-                resultIntent.putExtra("NEW_ID", newProject.id)
-                setResult(RESULT_OK, resultIntent)
+                
+                // If ID changed, current Activity (PV) will be invalid.
+                // We should probably go back to List or restart PV with new ID.
+                // Safest: Restart PV
+                val intent = android.content.Intent(this, ProjectViewActivity::class.java)
+                intent.putExtra("PROJECT_ID", targetProjectId)
+                intent.flags = android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(intent)
+                finish()
             } else {
+                // Update
                 ProjectRepository.updateProject(newProject)
                 setResult(RESULT_OK)
+                finish() // Just return to the existing Activity
             }
         } else {
+            // Create Mode
             ProjectRepository.addProject(newProject)
             setResult(RESULT_OK)
-        }
 
-        // If we want to open project immediately (optional, but standard flow usually returns to dashboard)
-        // XML has "Save and Start" implies opening.
-        val returnToHome = intent.getBooleanExtra("RETURN_TO_HOME", false)
-
-        if (returnToHome) {
-             finish()
-        } else {
-             val targetActivity = if (newProject.type == ProjectType.WEBVIEW) {
+            val targetActivity = if (newProject.type == ProjectType.WEBVIEW) {
                  WebViewActivity::class.java
-             } else {
+            } else {
                  ProjectViewActivity::class.java
-             }
-             val intent = android.content.Intent(this, targetActivity)
-             intent.putExtra("PROJECT_ID", targetProjectId)
-             startActivity(intent)
-             finish()
+            }
+            val intent = android.content.Intent(this, targetActivity)
+            intent.putExtra("PROJECT_ID", targetProjectId)
+            startActivity(intent)
+            finish()
         }
     }
 

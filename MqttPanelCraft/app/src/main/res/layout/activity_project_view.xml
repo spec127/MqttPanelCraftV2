@@ -20,7 +20,14 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/Theme.Helloworld.PopupOverlay">
-
+            
+            <View
+                android:id="@+id/indicatorMqttStatus"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:background="@drawable/shape_circle_grey" />
+            
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -38,13 +45,6 @@
                     android:textStyle="bold"
                     android:layout_marginEnd="8dp"/>
 
-                <!-- Status Dot -->
-                <View
-                    android:id="@+id/viewStatusDot"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:background="@drawable/shape_circle_green"
-                    android:backgroundTint="@android:color/darker_gray"/>
             </LinearLayout>
 
         </androidx.appcompat.widget.Toolbar>
@@ -84,7 +84,7 @@
         android:id="@+id/btnUndo"
         android:layout_width="58dp"
         android:layout_height="58dp"
-        android:src="@android:drawable/ic_menu_revert" 
+        android:src="@drawable/ic_undo_white" 
         android:padding="13dp"
         app:tint="@android:color/white"
         android:background="?attr/selectableItemBackgroundBorderless"
@@ -117,21 +117,22 @@
                 <FrameLayout
                     android:id="@+id/editorCanvas"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:paddingBottom="50dp"
+                    android:clipToPadding="false"
+                    android:background="#121212">
                     
                     <!-- Background Pattern -->
                     <com.example.mqttpanelcraft.ui.GridPatternView
                         android:id="@+id/backgroundGrid"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:visibility="gone"/>
+                        android:layout_height="match_parent" />
                     
                     <!-- Guidelines Overlay -->
                      <com.example.mqttpanelcraft.ui.AlignmentOverlayView
                         android:id="@+id/guideOverlay"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:visibility="gone"/>
+                        android:layout_height="match_parent" />
 
                 </FrameLayout>
 
@@ -167,8 +168,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
                 android:background="@drawable/bg_bottom_sheet"
+                android:clickable="true"
+                android:focusable="true"
                 app:layout_behavior="com.example.mqttpanelcraft.ui.LockableBottomSheetBehavior"
-                app:behavior_peekHeight="30dp">
+                app:behavior_peekHeight="50dp">
                 
                 <!-- Wrapper for all content -->
                 <LinearLayout
@@ -182,15 +185,36 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:layout_width="match_parent"
-                        android:layout_height="30dp">
+                        android:layout_height="50dp">
                         
                         <ImageView
+                            android:id="@+id/ivHeaderHandle"
                             android:layout_width="40dp"
                             android:layout_height="4dp"
                             android:layout_gravity="center_horizontal"
                             android:layout_marginTop="8dp"
                             android:src="@drawable/ic_drag_handle" 
                             app:tint="#CCCCCC" />
+                            
+                        <TextView
+                            android:id="@+id/tvHeaderDelete"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="刪除"
+                            android:textColor="@android:color/white"
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:layout_gravity="center"
+                            android:visibility="gone"/>
+                            
+                         <ImageView
+                            android:id="@+id/ivHeaderTrash"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@android:drawable/ic_menu_delete"
+                            app:tint="@android:color/white"
+                            android:layout_gravity="center"
+                            android:visibility="gone"/>
                     </FrameLayout>
                     
                     <!-- Content Area (NOT part of header) -->
@@ -212,7 +236,7 @@
                             <TextView
                                 android:text="MQTT/System Logs"
                                 android:textStyle="bold"
-                                android:textColor="@color/sidebar_section_header"
+                                android:textColor="#666666"
                                 android:padding="8dp"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"/>
@@ -264,166 +288,212 @@
                             </LinearLayout>
                         </LinearLayout>
                      
-                        <!-- CONTAINER: Properties (Hidden by default) -->
-                        <ScrollView
+                        <!-- CONTAINER: Properties (Compact) -->
+                        <LinearLayout
                             android:id="@+id/containerProperties"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:visibility="gone"
-                            android:padding="16dp"
-                            android:clickable="true"
-                            android:focusable="true">
-                         
-                         <LinearLayout
-                             android:layout_width="match_parent"
-                             android:layout_height="wrap_content"
-                             android:orientation="vertical">
-                             
-                             <TextView 
-                                 android:text="Component Properties" 
-                                 android:textSize="18sp" 
-                                 android:textStyle="bold" 
-                                 android:textColor="@color/sidebar_section_header"
-                                 android:layout_marginBottom="16dp"
-                                 android:layout_width="wrap_content"
-                                 android:layout_height="wrap_content"/>
-                                 
-                             <!-- Name -->
-                             <com.google.android.material.textfield.TextInputLayout
-                                 android:layout_width="match_parent"
-                                 android:layout_height="wrap_content"
-                                 android:hint="Name / Label"
-                                 android:layout_marginBottom="8dp">
-                                 <com.google.android.material.textfield.TextInputEditText
-                                     android:id="@+id/etPropName"
-                                     android:layout_width="match_parent"
-                                     android:layout_height="wrap_content"/>
-                             </com.google.android.material.textfield.TextInputLayout>
-                             
-                             <!-- W/H Row -->
-                              <LinearLayout
-                                 android:layout_width="match_parent"
-                                 android:layout_height="wrap_content"
-                                 android:orientation="horizontal"
-                                 android:baselineAligned="false"
-                                 android:layout_marginBottom="8dp">
-                                  <com.google.android.material.textfield.TextInputLayout
-                                     android:layout_width="0dp"
-                                     android:layout_weight="1"
-                                     android:layout_height="wrap_content"
-                                     android:hint="Width (dp)"
-                                     android:layout_marginEnd="8dp">
-                                     <com.google.android.material.textfield.TextInputEditText
-                                         android:id="@+id/etPropWidth"
-                                         android:inputType="number"
-                                         android:layout_width="match_parent"
-                                         android:layout_height="wrap_content"/>
-                                 </com.google.android.material.textfield.TextInputLayout>
-                                 
-                                 <com.google.android.material.textfield.TextInputLayout
-                                     android:layout_width="0dp"
-                                     android:layout_weight="1"
-                                     android:layout_height="wrap_content"
-                                     android:hint="Height (dp)">
-                                     <com.google.android.material.textfield.TextInputEditText
-                                         android:id="@+id/etPropHeight"
-                                         android:inputType="number"
-                                         android:layout_width="match_parent"
-                                         android:layout_height="wrap_content"/>
-                                 </com.google.android.material.textfield.TextInputLayout>
-                             </LinearLayout>
-                             
-                             <!-- Color -->
-                             <com.google.android.material.textfield.TextInputLayout
-                                 android:layout_width="match_parent"
-                                 android:layout_height="wrap_content"
-                                 android:hint="Color (Hex #RRGGBB)"
-                                 android:layout_marginBottom="8dp">
-                                 <com.google.android.material.textfield.TextInputEditText
-                                     android:id="@+id/etPropColor"
-                                     android:layout_width="match_parent"
-                                     android:layout_height="wrap_content"/>
-                             </com.google.android.material.textfield.TextInputLayout>
+                            android:padding="8dp"
+                            android:orientation="vertical">
+                            
+                            <!-- Header -->
+                            <TextView 
+                                android:text="Properties" 
+                                android:textSize="14sp" 
+                                android:textStyle="bold" 
+                                android:textColor="#666666"
+                                android:layout_marginBottom="8dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                                
+                            <!-- Display Name -->
+                            <TextView
+                                android:text="Display Name"
+                                android:textSize="12sp"
+                                android:textColor="#666666"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                                
+                            <EditText
+                                android:id="@+id/etPropName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/shape_edit_text_bg"
+                                android:padding="8dp"
+                                android:layout_marginBottom="8dp"
+                                android:textSize="14sp"
+                                android:inputType="text"/>
 
-                             <!-- Test Topic (Simultaneous Sub) -->
-                             <com.google.android.material.textfield.TextInputLayout
-                                 android:layout_width="match_parent"
-                                 android:layout_height="wrap_content"
-                                 android:hint="Test Topic (Simultaneous Sub)"
-                                 android:layout_marginBottom="8dp">
-                                 <com.google.android.material.textfield.TextInputEditText
-                                     android:id="@+id/etPropTopicConfig"
-                                     android:layout_width="match_parent"
-                                     android:layout_height="wrap_content"/>
-                             </com.google.android.material.textfield.TextInputLayout>
-                             
+                                <!-- Row 1: Width / Height / Color -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="4dp">
+                                
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:hint="W"
+                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/etPropWidth"
+                                        android:inputType="number"
+                                        android:textSize="12sp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"/>
+                                </com.google.android.material.textfield.TextInputLayout>
+                                
+                                <Space android:layout_width="4dp" android:layout_height="wrap_content"/>
+                                
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:hint="H"
+                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+                                    <com.google.android.material.textfield.TextInputEditText
+                                        android:id="@+id/etPropHeight"
+                                        android:inputType="number"
+                                        android:textSize="12sp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"/>
+                                </com.google.android.material.textfield.TextInputLayout>
+                                
+                                <Space android:layout_width="4dp" android:layout_height="wrap_content"/>
+                                
+                                <!-- Color Preview -->
+                                <TextView
+                                    android:id="@+id/vPropColorPreview"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1.5"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
+                                    android:text="#FFFFFF"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#000000"
+                                    android:background="@drawable/bg_color_preview"
+                                    android:clickable="true"
+                                    android:focusable="true"/>
+                            </LinearLayout>
 
-                             <!-- Compression (Camera Only) -->
+                            <!-- Row 2: Composite Topic Editor -->
+                            <TextView
+                                android:text="Topic Name"
+                                android:textSize="12sp"
+                                android:textColor="#666666"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                                
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:background="@drawable/shape_edit_text_bg"
+                                android:padding="8dp"
+                                android:layout_marginBottom="4dp">
+                                
+                                <TextView
+                                    android:id="@+id/tvTopicPrefix"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="..."
+                                    android:textSize="14sp"
+                                    android:textColor="@color/topic_text_secondary"
+                                    android:maxLines="1"
+                                    android:ellipsize="start"
+                                    android:maxWidth="100dp"/>
+                                    
+                                <EditText
+                                    android:id="@+id/etTopicName"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:background="@null"
+                                    android:hint="NAME"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:inputType="textNoSuggestions|textVisiblePassword"
+                                    android:gravity="center"
+                                    android:textColor="@color/topic_text_primary"/>
+                                    
+                                <TextView
+                                    android:id="@+id/tvTopicSuffix"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="/val"
+                                    android:textSize="14sp"
+                                    android:textColor="@color/topic_text_secondary"/>
+                                    
+                                <ImageView
+                                    android:id="@+id/btnTopicCopy"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:padding="2dp"
+                                    android:src="@drawable/ic_copy"
+                                    app:tint="#666666"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:layout_marginStart="8dp"
+                                    android:contentDescription="Copy Topic"/>
+                                    
+                                <ImageView
+                                    android:id="@+id/btnTopicReset"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:padding="2dp"
+                                    android:src="@drawable/ic_sync"
+                                    app:tint="#666666"
+                                    android:background="?attr/selectableItemBackgroundBorderless"
+                                    android:layout_marginStart="8dp"
+                                    android:contentDescription="Reset Topic Name"/>
+                            </LinearLayout>
+                            
+                            <!-- Compression (Hidden usually) -->
                              <LinearLayout
                                  android:id="@+id/containerCompression"
                                  android:layout_width="match_parent"
                                  android:layout_height="wrap_content"
                                  android:orientation="vertical"
-                                 android:visibility="gone"
-                                 android:layout_marginBottom="8dp">
+                                 android:visibility="gone">
                                  <TextView
                                      android:layout_width="wrap_content"
                                      android:layout_height="wrap_content"
-                                     android:text="Image Quality (1-5)"
-                                     android:textColor="@color/sidebar_text_secondary"/>
+                                     android:text="Quality"
+                                     android:textSize="12sp"/>
                                  <com.google.android.material.slider.Slider
                                      android:id="@+id/sliderCompression"
                                      android:layout_width="match_parent"
                                      android:layout_height="wrap_content"
                                      android:valueFrom="1.0"
                                      android:valueTo="5.0"
-                                     android:stepSize="1.0"
-                                     android:value="3.0"/>
+                                     android:stepSize="1.0"/>
                              </LinearLayout>
-        
-                             <!-- Topic (Control - ReadOnly) -->
-                             <TextView
-                                 android:id="@+id/tvPropTopic"
-                                 android:layout_width="match_parent"
-                                 android:layout_height="wrap_content"
-                                 android:text="Topic: "
-                                 android:layout_marginBottom="8dp"
-                                 android:padding="8dp"
-                                 android:background="#EEE"
-                                 android:textColor="#333"
-                                 android:fontFamily="monospace"/>
+                             
 
 
-        
+                             <!-- Buttons -->
                              <Button
                                  android:id="@+id/btnSaveProps"
                                  android:layout_width="match_parent"
                                  android:layout_height="wrap_content"
-                                 android:text="Apply Changes"/>
+                                 android:text="Apply"
+                                 android:visibility="gone"/>
                              
-                             <LinearLayout
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:orientation="horizontal"
-                         android:layout_marginTop="8dp">
+                             <Button
+                                 android:id="@+id/btnClone"
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:text="Clone"
+                                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                 android:layout_marginTop="4dp"/>
 
-                         <Button
-                             android:id="@+id/btnClone"
-                             android:layout_width="0dp"
-                             android:layout_weight="1"
-                             android:layout_height="wrap_content"
-                             android:text="Clone"
-                             android:layout_marginEnd="8dp"
-                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
-
-                     </LinearLayout>
-                     
-                 </LinearLayout>
-                     </ScrollView>
-                     
-                   </FrameLayout>
-               </LinearLayout>
+                        </LinearLayout>
+                    </FrameLayout> 
+                </LinearLayout>
             </FrameLayout>
             
             <!-- Mode Toggle FAB -->
@@ -436,7 +506,7 @@
                 android:layout_margin="16dp" 
                 app:tint="@android:color/white"
                 app:srcCompat="@android:drawable/ic_media_play"/> 
-
+                
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <!-- LEFT SIDEBAR: Components (Drawer) -->
@@ -445,7 +515,7 @@
         android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/sidebar_background_color"
+        android:background="?attr/colorSurface"
         android:orientation="vertical">
         
          <!-- Edit Mode Content: Components -->
@@ -471,24 +541,23 @@
 
     </androidx.drawerlayout.widget.DrawerLayout>
 
-    <!-- Drop to Delete Zone (Moved to end for Z-Order) -->
+    <!-- Drop to Delete Zone (Overlay Bar) -->
     <FrameLayout
         android:id="@+id/dropDeleteZone"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/bg_delete_zone_circle"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_bottom_sheet"
+        android:backgroundTint="#FF4444"
         android:visibility="gone"
         android:elevation="20dp"
-        android:layout_gravity="center_horizontal|bottom">
-        <TextView
+        android:layout_gravity="bottom">
+        
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="✕"
-            android:textColor="#FFFFFF"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:src="@android:drawable/ic_menu_delete"
+            app:tint="#FFFFFF"/>
     </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

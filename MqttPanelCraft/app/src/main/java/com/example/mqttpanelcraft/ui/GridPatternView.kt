@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.example.mqttpanelcraft.R
+import com.example.mqttpanelcraft.Constants
 
 class GridPatternView @JvmOverloads constructor(
     context: Context,
@@ -19,8 +20,8 @@ class GridPatternView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
 
-    private val gridSize = 40f // dp (space between dots)
-    private val dotRadius = 6f // dp (radius of dots)
+    private val gridSize = Constants.GRID_UNIT_DP // dp (space between dots)
+    private val dotRadius = Constants.GRID_DOT_RADIUS_DP // dp (radius of dots)
     
     private var density = 1f
 
@@ -42,8 +43,8 @@ class GridPatternView @JvmOverloads constructor(
         val width = width.toFloat()
         val height = height.toFloat()
 
-        val startX = (width % spacing) / 2
-        val startY = (height % spacing) / 2
+        val startX = 0f
+        val startY = 0f
 
         var x = startX
         while (x < width) {
