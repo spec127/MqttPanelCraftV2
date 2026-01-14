@@ -1,12 +1,12 @@
 package com.example.mqttpanelcraft.utils
 
 import android.app.Activity
-import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
@@ -31,76 +31,76 @@ object AdManager {
 
     private var interstitialAd: InterstitialAd? = null
     private var rewardedAd: RewardedAd? = null
+    
+    // NOTE: isAdsDisabled property is removed. Use PremiumManager.isPremium(context) instead.
 
-    /**
-     * Legacy switch (d770477 already uses this).
-     * We keep it to avoid breaking existing logic.
-     */
-    var isAdsDisabled = false
-        private set
+    fun initialize(context: android.content.Context) {
+        val isPremium = PremiumManager.isPremium(context)
+        Log.d(TAG, "Initializing AdManager. Premium Status: $isPremium")
 
-    /**
-     * Single source of truth for "should we show ads".
-     * - Premium => always no ads
-     * - Otherwise follow legacy isAdsDisabled
-     */
-    private fun shouldDisableAds(context: Context): Boolean {
-        return PremiumManager.isPremium(context) || isAdsDisabled
-    }
-
-    fun initialize(context: Context) {
-        val prefs = context.getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
-        isAdsDisabled = prefs.getBoolean("ads_disabled", false)
-        Log.d(TAG, "Ads Disabled (legacy): $isAdsDisabled, Premium: ${PremiumManager.isPremium(context)}")
-
-        if (!shouldDisableAds(context)) {
-            MobileAds.initialize(context) { status ->
-                Log.d(TAG, "AdMob Initialized: ${status.adapterStatusMap}")
-            }
-        } else {
-            // If ads disabled, drop cached ads to avoid showing them later.
-            interstitialAd = null
-            rewardedAd = null
+        // Always initialize MobileAds. 
+        // Even if premium, we might need it initialized if user signs out or status changes dynamically.
+        MobileAds.initialize(context) { status ->
+            Log.d(TAG, "AdMob Initialized: ${status.adapterStatusMap}")
         }
     }
-
-    fun setDisabled(disabled: Boolean, context: Context) {
-        isAdsDisabled = disabled
-        context.getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
-            .edit().putBoolean("ads_disabled", disabled).apply()
-
-        if (!shouldDisableAds(context)) {
-            // Re-init if re-enabled and not premium
-            initialize(context)
-        } else {
-            // If disabled (or premium), clear loaded ads.
-            interstitialAd = null
-            rewardedAd = null
-        }
-    }
-
-    // Optional hook for PremiumManager (we keep it no-op-safe).
-    fun refreshAdState(context: Context) {
-        // For now, re-read prefs + decide whether to init.
-        // This is safe and won't touch canvas logic.
-        initialize(context)
+    
+    // Deprecated: Use PremiumManager directly if possible. keeping for easy refactor.
+    fun setDisabled(disabled: Boolean, context: android.content.Context) {
+        PremiumManager.setPremium(context, disabled)
     }
 
     // --- Banner Ads ---
 
-    fun loadBannerAd(activity: Activity, container: FrameLayout) {
-        if (shouldDisableAds(activity)) {
-            container.visibility = View.GONE
+    private fun getAdSize(activity: Activity): AdSize {
+        // Determine the screen width (less decorations) to use for the ad width.
+        val display = activity.windowManager.defaultDisplay
+        val outMetrics = android.util.DisplayMetrics()
+        display.getMetrics(outMetrics)
+
+        val density = outMetrics.density
+        
+        // Use full width of screen
+        var adWidthPixels = outMetrics.widthPixels.toFloat()
+        
+        // If you had margins, you'd subtract them here. 
+        // For now we use full width.
+        if (adWidthPixels == 0f) {
+            adWidthPixels = outMetrics.widthPixels.toFloat() // Fallback
+        }
+
+        val adWidth = (adWidthPixels / density).toInt()
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, adWidth)
+    }
+    
+    fun loadBannerAd(activity: Activity, container: FrameLayout, fab: View? = null) {
+        // Helper to clear and hide container
+        fun hideBanner() {
             container.removeAllViews()
+            container.visibility = View.GONE
+            // Reset FAB position if needed
+            fab?.animate()?.translationY(0f)?.setDuration(300)?.start()
+        }
+
+        // 1. Check Premium Status
+        if (PremiumManager.isPremium(activity)) {
+            Log.d(TAG, "Premium User: Hiding Banner Ad")
+            hideBanner()
             return
         }
 
+        // 2. Load Ad
         val adView = AdView(activity)
-        adView.setAdSize(AdSize.BANNER)
+        
+        // Use Adaptive Banner Size
+        val adSize = getAdSize(activity)
+        adView.setAdSize(adSize)
+        
         adView.adUnitId = BANNER_AD_ID
 
         // Create a wrapper for Ad + Close Button
         val wrapper = FrameLayout(activity)
+        // Reset layout params to wrap the adaptive height
         wrapper.layoutParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -113,56 +113,44 @@ object AdManager {
         ).apply {
             gravity = android.view.Gravity.CENTER
         }
-
+        
         wrapper.addView(adView, adParams)
-
-        // Close Button (user can hide banner temporarily)
-        val closeBtn = ImageButton(activity)
-        closeBtn.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
-        closeBtn.setBackgroundColor(android.graphics.Color.TRANSPARENT)
-        val btnParams = FrameLayout.LayoutParams(60, 60).apply {
-            gravity = android.view.Gravity.TOP or android.view.Gravity.END
-        }
-        closeBtn.setOnClickListener {
-            container.visibility = View.GONE
-            adView.destroy()
-        }
-
-        wrapper.addView(closeBtn, btnParams)
 
         container.removeAllViews()
         container.addView(wrapper)
 
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
-
+        
         adView.adListener = object : AdListener() {
             override fun onAdLoaded() {
-                // Premium could be toggled during loading; double check.
-                if (shouldDisableAds(activity)) {
-                    container.visibility = View.GONE
-                    container.removeAllViews()
-                    adView.destroy()
-                    return
-                }
-                container.visibility = View.VISIBLE
-            }
+                // Check again in case status changed
+               if (PremiumManager.isPremium(activity)) {
+                   hideBanner()
+                   return
+               }
 
+               container.visibility = View.VISIBLE
+               // Animate FAB up
+               val heightPx = adSize.getHeightInPixels(activity).toFloat()
+               fab?.animate()?.translationY(-heightPx)?.setDuration(300)?.start()
+            }
             override fun onAdFailedToLoad(error: LoadAdError) {
                 Log.e(TAG, "Banner failed to load: ${error.message}")
                 container.visibility = View.GONE
+                // Reset FAB position
+                fab?.animate()?.translationY(0f)?.setDuration(300)?.start()
             }
         }
     }
 
     // --- Interstitial Ads ---
 
-    fun loadInterstitial(context: Context) {
-        if (shouldDisableAds(context)) {
+    fun loadInterstitial(context: android.content.Context) {
+        if (PremiumManager.isPremium(context)) {
             interstitialAd = null
             return
         }
-
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(context, INTERSTITIAL_AD_ID, adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -172,20 +160,15 @@ object AdManager {
 
             override fun onAdLoaded(ad: InterstitialAd) {
                 Log.d(TAG, "Interstitial loaded")
-                // Premium could be toggled while loading; check again.
-                if (shouldDisableAds(context)) {
-                    interstitialAd = null
-                    return
-                }
                 interstitialAd = ad
             }
         })
     }
 
     fun showInterstitial(activity: Activity, onAdClosed: () -> Unit = {}) {
-        if (shouldDisableAds(activity)) {
-            onAdClosed()
-            return
+        if (PremiumManager.isPremium(activity)) {
+             onAdClosed()
+             return
         }
 
         if (interstitialAd != null) {
@@ -198,7 +181,7 @@ object AdManager {
                 }
 
                 override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                    Log.e(TAG, "Interstitial failed to show: ${adError.message}")
+                    Log.e(TAG, "Interstitial failed to show")
                     interstitialAd = null
                     onAdClosed()
                 }
@@ -213,12 +196,11 @@ object AdManager {
 
     // --- Rewarded Ads ---
 
-    fun loadRewarded(context: Context) {
-        if (shouldDisableAds(context)) {
+    fun loadRewarded(context: android.content.Context) {
+        if (PremiumManager.isPremium(context)) {
             rewardedAd = null
             return
         }
-
         val adRequest = AdRequest.Builder().build()
         RewardedAd.load(context, REWARDED_AD_ID, adRequest, object : RewardedAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -228,11 +210,6 @@ object AdManager {
 
             override fun onAdLoaded(ad: RewardedAd) {
                 Log.d(TAG, "Rewarded loaded")
-                // Premium could be toggled while loading; check again.
-                if (shouldDisableAds(context)) {
-                    rewardedAd = null
-                    return
-                }
                 rewardedAd = ad
             }
         })
@@ -243,12 +220,11 @@ object AdManager {
     }
 
     fun showRewarded(activity: Activity, onReward: () -> Unit, onClosed: () -> Unit) {
-        // Most conservative behavior:
-        // If Premium => treat as "no ad available" and just close.
-        // (If you want Premium to auto-reward, tell me and I’ll adjust.)
-        if (shouldDisableAds(activity)) {
-            onClosed()
-            return
+        if (PremiumManager.isPremium(activity)) {
+             // If premium, grant reward immediately without showing ad
+             onReward()
+             onClosed()
+             return
         }
 
         if (rewardedAd != null) {
@@ -265,13 +241,21 @@ object AdManager {
                 }
             }
             rewardedAd?.show(activity) { rewardItem ->
+                // User earned reward
                 Log.d(TAG, "User earned reward: ${rewardItem.amount} ${rewardItem.type}")
                 onReward()
             }
         } else {
             Log.d(TAG, "Rewarded ad not ready")
             loadRewarded(activity)
-            onClosed()
+            // Do NOT auto-reward. Just close.
+            onClosed() 
         }
+    }
+    
+    // Helper used by PremiumManager to refresh UI if needed
+    fun refreshAdState(context: android.content.Context) {
+         // Logic to refresh ads if visible could go here
+         // For now, next loadBannerAd call will handle it.
     }
 }

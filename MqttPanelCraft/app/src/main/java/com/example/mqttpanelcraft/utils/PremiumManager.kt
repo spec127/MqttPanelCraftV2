@@ -28,6 +28,6 @@ object PremiumManager {
         // Notify AdManager to update its state if necessary (e.g. hide existing banners)
         // Since AdManager logic will now pull from here, we might need a refresh method there 
         // if it caches anything or has visible views.
-        //AdManager.refreshAdState(context)
+        AdManager.refreshAdState(context)
     }
 }

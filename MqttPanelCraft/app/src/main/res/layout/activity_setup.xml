@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="16dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnImportJson"
@@ -51,7 +51,8 @@
                     android:layout_marginEnd="8dp"
                     android:text="Import JSON" 
                     android:textSize="14sp"
-                    android:textColor="@color/primary"/>
+                    android:textColor="@color/primary"
+                    android:contentDescription="Import Configuration"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnExportJson"
@@ -63,23 +64,9 @@
                     android:text="Export JSON" 
                     android:textSize="14sp"
                     android:textColor="@color/primary"
-                    android:visibility="gone"/>
+                    android:visibility="gone"
+                    android:contentDescription="Export Configuration"/>
             </LinearLayout>
-
-            <!-- Arduino Export Action -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnExportArduino"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="即刻導出 Arduino 程式碼 (Ino)" 
-                android:textSize="14sp"
-                android:textColor="@color/primary"
-                android:visibility="gone"
-                app:icon="@android:drawable/ic_menu_save"
-                app:iconTint="@color/primary"
-                app:iconGravity="textStart"/>
 
             <!-- Project ID -->
             <TextView
@@ -178,7 +165,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.7"
                     android:layout_marginEnd="8dp"
-                    android:hint="@string/hint_broker">
+                    android:hint="Broker Address">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etBroker"

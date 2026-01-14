@@ -54,7 +54,8 @@ class DashboardActivity : AppCompatActivity() {
                 val bars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
                 // Apply padding to the content container inside Drawer (CoordinatorLayout is usually first child)
                 val content = binding.drawerLayout.getChildAt(0)
-                content.setPadding(0, bars.top, 0, 0)
+                // Fix: Apply BOTTOM padding too so Banner Ad (gravity=bottom) isn't covered by Nav Bar
+                content.setPadding(0, bars.top, 0, bars.bottom)
 
                 // vFix: Light Status Bar for Dashboard
                 val isDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -88,7 +89,7 @@ class DashboardActivity : AppCompatActivity() {
 
             // Initialize Ads
             com.example.mqttpanelcraft.utils.AdManager.initialize(this)
-            com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, binding.bannerAdContainer)
+            // Deferred load in onResume to speed up start/restart
 
             // Load Persistent Sort Mode
             val prefs = getSharedPreferences("AppSettings", MODE_PRIVATE)
@@ -109,6 +110,11 @@ class DashboardActivity : AppCompatActivity() {
                 }
             }
 
+            // Restore Drawer State (keeps drawer open across theme recreations)
+            if (savedInstanceState?.getBoolean("DRAWER_OPEN") == true) {
+                binding.drawerLayout.openDrawer(GravityCompat.START)
+            }
+
         } catch (e: Exception) {
             CrashLogger.logError(this, "Dashboard Init Failed", e)
         }
@@ -116,8 +122,38 @@ class DashboardActivity : AppCompatActivity() {
     
     override fun onResume() {
         super.onResume()
-        // loadProjects() - Removed (Using LiveData)
+        // Refresh Banner Ad every time we return
+        // Defer Ad Load to allow UI to render first (speeds up Theme Switch)
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            if (!isFinishing && !isDestroyed) {
+                com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, binding.bannerAdContainer, binding.fabAddProject)
+            }
+        }, 100)
+        
+        
         startConnectionCheck()
+        updateUserBadge()
+    }
+
+    private fun updateUserBadge() {
+        // vUpdate: Premium Badge Logic
+        val headerView = binding.navigationView.getHeaderView(0)
+        val tvBadge = headerView.findViewById<android.widget.TextView>(R.id.tvPremiumBadge) ?: return
+        
+        if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
+            tvBadge.text = "Premium"
+            tvBadge.setTextColor(android.graphics.Color.parseColor("#FFD700"))
+            tvBadge.setBackgroundResource(R.drawable.bg_premium_badge)
+        } else {
+            tvBadge.text = "Free"
+            tvBadge.setTextColor(android.graphics.Color.parseColor("#BDBDBD"))
+            tvBadge.setBackgroundResource(R.drawable.bg_free_badge)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("DRAWER_OPEN", binding.drawerLayout.isDrawerOpen(GravityCompat.START))
     }
 
     private fun setupToolbar() {
@@ -140,21 +176,21 @@ class DashboardActivity : AppCompatActivity() {
 
         switchDarkMode?.setOnCheckedChangeListener { _, isChecked ->
             com.example.mqttpanelcraft.utils.ThemeManager.setTheme(this, isChecked)
-             // Close drawer after delay to allow animation
-             binding.drawerLayout.postDelayed({
-                 binding.drawerLayout.closeDrawer(GravityCompat.START)
-             }, 300)
         }
 
         // 2. Ads Switch
         val adsItem = menu.findItem(R.id.nav_ads)
         val switchAds = adsItem.actionView?.findViewById<SwitchMaterial>(R.id.drawer_switch)
 
-        switchAds?.isChecked = com.example.mqttpanelcraft.utils.AdManager.isAdsDisabled
+        switchAds?.isChecked = com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)
         switchAds?.setOnCheckedChangeListener { _, isChecked ->
-            com.example.mqttpanelcraft.utils.AdManager.setDisabled(isChecked, this)
-            com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, binding.bannerAdContainer)
+            com.example.mqttpanelcraft.utils.PremiumManager.setPremium(this, isChecked)
+            // Refresh banner immediately if possible
+            com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, binding.bannerAdContainer, binding.fabAddProject)
+            updateUserBadge()
         }
+
+        updateUserBadge() // Initial state
 
         binding.navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -286,8 +322,8 @@ class DashboardActivity : AppCompatActivity() {
                         .setMessage("Are you sure you want to delete '${project.name}'?")
                         .setPositiveButton("Delete") { _, _ ->
                             try {
+                                // Delete from repository; UI will refresh via projectsLiveData observer
                                 ProjectRepository.deleteProject(project.id)
-                                // LiveData will refresh UI automatically
                                 Toast.makeText(this, "Project deleted", Toast.LENGTH_SHORT).show()
                             } catch (e: Exception) {
                                 CrashLogger.logError(this, "Delete Failed", e)
@@ -296,6 +332,7 @@ class DashboardActivity : AppCompatActivity() {
                         .setNegativeButton("Cancel", null)
                         .show()
                 }
+
             }
         )
         binding.rvProjects.apply {
@@ -365,7 +402,10 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-             projectAdapter.updateData(updatedList)
+             // Re-verify existence to prevent ghosting (race condition with delete)
+             val validIds = ProjectRepository.getAllProjects().map { it.id }.toSet()
+             val validList = updatedList.filter { it.id in validIds }
+             projectAdapter.updateData(validList)
         }
     }
 

@@ -32,7 +32,9 @@ class SetupActivity : AppCompatActivity() {
     private var projectId: String? = null
     
     // UI Elements
+    private lateinit var tilName: com.google.android.material.textfield.TextInputLayout
     private lateinit var etName: TextInputEditText
+    private lateinit var tilBroker: com.google.android.material.textfield.TextInputLayout
     private lateinit var etBroker: TextInputEditText
     private lateinit var etPort: TextInputEditText
     private lateinit var etUser: TextInputEditText
@@ -125,17 +127,8 @@ class SetupActivity : AppCompatActivity() {
         val project = ProjectRepository.getProjectById(id) ?: return
         originalProject = project
 
-        // Show Export (JSON)
+        // Show Export
         btnExport.visibility = android.view.View.VISIBLE
-
-        // Show Export (Arduino)
-        val btnExportArduino = findViewById<com.google.android.material.button.MaterialButton>(R.id.btnExportArduino)
-        btnExportArduino.visibility = android.view.View.VISIBLE
-        btnExportArduino.setOnClickListener {
-             if(originalProject != null) {
-                 com.example.mqttpanelcraft.ui.ArduinoExportManager.showExportDialog(this, originalProject!!)
-             }
-        }
 
         etName.setText(project.name)
         etBroker.setText(project.broker)
@@ -175,8 +168,8 @@ class SetupActivity : AppCompatActivity() {
         }
 
 
-        findViewById<TextInputEditText>(R.id.etProjectName).setText(project.name)
-        findViewById<TextInputEditText>(R.id.etBroker).setText(project.broker)
+        // etName is already set above
+        // etBroker is already set above
         selectType(project.type)
         btnSave.text = "Update & Start"
         findViewById<MaterialButton>(R.id.btnSaveProject).text = "Update Project"
@@ -226,8 +219,12 @@ class SetupActivity : AppCompatActivity() {
     }
 
     private fun setupViews() {
+        tilName = findViewById(R.id.tilProjectName)
         etName = findViewById(R.id.etProjectName)
+        
+        tilBroker = findViewById(R.id.tilBroker)
         etBroker = findViewById(R.id.etBroker)
+        
         etPort = findViewById(R.id.etPort)
         etUser = findViewById(R.id.etUser)
         etPassword = findViewById(R.id.etPassword)
@@ -239,15 +236,12 @@ class SetupActivity : AppCompatActivity() {
 
         btnImport.setOnClickListener { showImportDialog() }
         btnExport.setOnClickListener { showExportDialog() }
-        val etName = findViewById<TextInputEditText>(R.id.etProjectName)
-        val etBroker = findViewById<TextInputEditText>(R.id.etBroker)
-        val btnTest = findViewById<MaterialButton>(R.id.btnTestConnection)
-        val btnSave = findViewById<MaterialButton>(R.id.btnSaveProject)
-
+        // shadowed var removals
+        
         cardHome = findViewById(R.id.cardHome)
         ivHome = findViewById(R.id.ivHome)
         tvHome = findViewById(R.id.tvHome)
-
+        // ... (lines 242-263 match original) ...
         cardFactory = findViewById(R.id.cardFactory)
         ivFactory = findViewById(R.id.ivFactory)
         tvFactory = findViewById(R.id.tvFactory)
@@ -270,8 +264,40 @@ class SetupActivity : AppCompatActivity() {
         btnSave.setOnClickListener {
             saveProject()
         }
-    }
 
+        // Real-time Validation on Focus Loss
+        etName.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                val name = etName.text.toString()
+                if (name.isBlank()) {
+                    tilName.error = getString(R.string.error_name_required)
+                    tilName.isErrorEnabled = true
+                } else if (!name.matches(Regex("^[A-Za-z0-9_]+$"))) {
+                    tilName.error = "Only letters, numbers, and underscores allowed"
+                    tilName.isErrorEnabled = true
+                } else if (ProjectRepository.isProjectNameTaken(name, projectId)) {
+                    tilName.error = "Project name already exists"
+                    tilName.isErrorEnabled = true
+                } else {
+                    tilName.isErrorEnabled = false
+                    tilName.error = null
+                }
+            }
+        }
+        
+        etBroker.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                 if (etBroker.text.toString().isBlank()) {
+                    tilBroker.error = getString(R.string.error_broker_required)
+                    tilBroker.isErrorEnabled = true
+                } else {
+                    tilBroker.isErrorEnabled = false
+                    tilBroker.error = null
+                }
+            }
+        }
+    }
+    
     private fun showImportDialog() {
         val context = this
         val builder = AlertDialog.Builder(context)
@@ -317,15 +343,6 @@ class SetupActivity : AppCompatActivity() {
                  newName += "_" + System.currentTimeMillis() % 1000
             }
             etName.setText(newName)
-
-            // Set Imported ID - DISABLED to prevent ID Collision/Duplication bugs
-            // Importing configuration should NOT change the Project's Identity (ID).
-            // if (imported.id.isNotEmpty()) {
-            //    val containerProjectId = findViewById<android.view.View>(R.id.containerProjectId)
-            //    val tvProjectId = findViewById<TextView>(R.id.tvProjectId)
-            //    containerProjectId.visibility = android.view.View.VISIBLE
-            //    tvProjectId.text = imported.id
-            // }
 
             etBroker.setText(imported.broker)
             etPort.setText(imported.port.toString())
@@ -393,8 +410,11 @@ class SetupActivity : AppCompatActivity() {
         val pass = etPassword.text.toString()
 
         if (broker.isBlank()) {
-            etBroker.error = "Required"
+            tilBroker.error = getString(R.string.error_broker_required)
+            tilBroker.isErrorEnabled = true
             return
+        } else {
+            tilBroker.isErrorEnabled = false
         }
 
         val port = portStr.toIntOrNull() ?: 1883
@@ -457,26 +477,34 @@ class SetupActivity : AppCompatActivity() {
         val pass = etPassword.text.toString()
 
         if (name.isBlank()) {
-            etName.error = getString(R.string.error_name_required)
+            tilName.error = getString(R.string.error_name_required)
+            tilName.isErrorEnabled = true
             return
         }
 
         // Regex Validation
         if (!name.matches(Regex("^[A-Za-z0-9_]+$"))) {
-            etName.error = "Only letters, numbers, and underscores allowed"
+            tilName.error = "Only letters, numbers, and underscores allowed"
+            tilName.isErrorEnabled = true
             return
         }
 
         // Duplicate Name Check
         if (ProjectRepository.isProjectNameTaken(name, projectId)) {
-            etName.error = "Project name already exists"
+            tilName.error = "Project name already exists"
+            tilName.isErrorEnabled = true
             return
         }
+        
+        tilName.isErrorEnabled = false
 
         if (broker.isBlank()) {
-            etBroker.error = getString(R.string.error_broker_required)
+            tilBroker.error = getString(R.string.error_broker_required)
+            tilBroker.isErrorEnabled = true
             return
         }
+        
+        tilBroker.isErrorEnabled = false
 
         val port = portStr.toIntOrNull() ?: 1883
 
@@ -491,6 +519,8 @@ class SetupActivity : AppCompatActivity() {
                  finalId = currentUiId
              }
         }
+        
+        // ...
 
         // Determine Components & Custom Code
         val finalComponents = pendingComponents
@@ -518,7 +548,7 @@ class SetupActivity : AppCompatActivity() {
         val targetProjectId = newProject.id
         var isRewardEarned = false
 
-        if (com.example.mqttpanelcraft.utils.AdManager.isAdsDisabled) {
+        if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
              // Skip Ads
              saveAndFinish(newProject, targetProjectId)
              return
@@ -549,40 +579,40 @@ class SetupActivity : AppCompatActivity() {
 
     private fun saveAndFinish(newProject: Project, targetProjectId: String) {
         if (projectId != null) {
-            // Edit Mode
             if (newProject.id != projectId) {
                 // ID Changed: Delete old, Add new
                 ProjectRepository.deleteProject(projectId!!)
                 ProjectRepository.addProject(newProject)
-                
-                // If ID changed, current Activity (PV) will be invalid.
-                // We should probably go back to List or restart PV with new ID.
-                // Safest: Restart PV
-                val intent = android.content.Intent(this, ProjectViewActivity::class.java)
-                intent.putExtra("PROJECT_ID", targetProjectId)
-                intent.flags = android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
-                startActivity(intent)
-                finish()
+
+                 // Return result to Caller
+                val resultIntent = android.content.Intent()
+                resultIntent.putExtra("NEW_ID", newProject.id)
+                setResult(RESULT_OK, resultIntent)
             } else {
-                // Update
                 ProjectRepository.updateProject(newProject)
                 setResult(RESULT_OK)
-                finish() // Just return to the existing Activity
             }
         } else {
-            // Create Mode
             ProjectRepository.addProject(newProject)
             setResult(RESULT_OK)
+        }
 
-            val targetActivity = if (newProject.type == ProjectType.WEBVIEW) {
+        // If we want to open project immediately (optional, but standard flow usually returns to dashboard)
+        // XML has "Save and Start" implies opening.
+        val returnToHome = intent.getBooleanExtra("RETURN_TO_HOME", false)
+
+        if (returnToHome) {
+             finish()
+        } else {
+             val targetActivity = if (newProject.type == ProjectType.WEBVIEW) {
                  WebViewActivity::class.java
-            } else {
+             } else {
                  ProjectViewActivity::class.java
-            }
-            val intent = android.content.Intent(this, targetActivity)
-            intent.putExtra("PROJECT_ID", targetProjectId)
-            startActivity(intent)
-            finish()
+             }
+             val intent = android.content.Intent(this, targetActivity)
+             intent.putExtra("PROJECT_ID", targetProjectId)
+             startActivity(intent)
+             finish()
         }
     }
 
