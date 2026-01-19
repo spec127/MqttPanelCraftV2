@@ -250,7 +250,7 @@
                                     android:text="MQTT/System Logs"
                                     android:textStyle="bold"
                                     android:textSize="18sp"
-                                    android:textColor="#333333"
+                                    android:textColor="@color/sidebar_text_primary"
                                     android:layout_width="0dp"
                                     android:layout_weight="1"
                                     android:layout_height="wrap_content"/>
@@ -263,7 +263,7 @@
                                     android:background="?attr/selectableItemBackgroundBorderless"
                                     android:clickable="true"
                                     android:focusable="true"
-                                    app:tint="#666666"
+                                    app:tint="@color/sidebar_icon_tint"
                                     android:padding="4dp"
                                     android:contentDescription="Clear Logs"/> 
                             </LinearLayout>
@@ -357,7 +357,7 @@
                                     android:text="Properties" 
                                     android:textSize="21sp" 
                                     android:textStyle="bold" 
-                                    android:textColor="#333333"
+                                    android:textColor="@color/sidebar_text_primary"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
                             </LinearLayout>
@@ -366,7 +366,7 @@
                             <TextView
                                 android:text="Display Name"
                                 android:textSize="12sp"
-                                android:textColor="#666666"
+                                android:textColor="@color/sidebar_text_secondary"
                                 android:layout_marginTop="12dp"
                                 android:paddingStart="24dp"
                                 android:paddingEnd="16dp"
@@ -442,7 +442,7 @@
                             <TextView
                                 android:text="Topic Name"
                                 android:textSize="12sp"
-                                android:textColor="#666666"
+                                android:textColor="@color/sidebar_text_secondary"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"/>
                                 
@@ -493,7 +493,7 @@
                                     android:layout_height="24dp"
                                     android:padding="2dp"
                                     android:src="@drawable/ic_copy"
-                                    app:tint="#666666"
+                                    app:tint="@color/sidebar_icon_tint"
                                     android:background="?attr/selectableItemBackgroundBorderless"
                                     android:layout_marginStart="8dp"
                                     android:contentDescription="Copy Topic"/>
@@ -504,7 +504,7 @@
                                     android:layout_height="24dp"
                                     android:padding="2dp"
                                     android:src="@drawable/ic_sync"
-                                    app:tint="#666666"
+                                    app:tint="@color/sidebar_icon_tint"
                                     android:background="?attr/selectableItemBackgroundBorderless"
                                     android:layout_marginStart="8dp"
                                     android:contentDescription="Reset Topic Name"/>

@@ -91,14 +91,21 @@ class ProjectViewActivity : AppCompatActivity() {
             viewModel.setGuidesVisibility(guidesVisible)
             
             // Status Bar Color
+            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+
             val isNightMode = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
             val wic = androidx.core.view.WindowInsetsControllerCompat(window, window.decorView)
             wic.isAppearanceLightStatusBars = !isNightMode
-            if (!isNightMode) {
-                 window.statusBarColor = android.graphics.Color.WHITE 
-            } else {
-                 window.statusBarColor = android.graphics.Color.BLACK
-            }
+            
+            // Force matches Dashboard Logic (Gray-White or Dark Background)
+            val bgColor = androidx.core.content.ContextCompat.getColor(this, R.color.background_color)
+            window.statusBarColor = bgColor
+            
+            // Fix: CoordinatorLayout & DrawerLayout default scrim color override
+            // CoordinatorLayout captures insets first
+            findViewById<androidx.coordinatorlayout.widget.CoordinatorLayout>(R.id.rootCoordinator)?.setStatusBarBackgroundColor(bgColor)
+            drawerLayout.setStatusBarBackgroundColor(bgColor)
             
             updateModeUI()
             
@@ -779,6 +786,12 @@ class ProjectViewActivity : AppCompatActivity() {
         if (::idleAdController.isInitialized) {
              idleAdController.start()
         }
+        
+        // Reload Project Data (In case updated via SetupActivity)
+        intent.getStringExtra("PROJECT_ID")?.let { id ->
+            viewModel.loadProject(id)
+        }
+        
         updateModeUI() // Ensure UI state is consistent
     }
 
