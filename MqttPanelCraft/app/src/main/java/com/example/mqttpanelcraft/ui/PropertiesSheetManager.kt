@@ -21,8 +21,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
-import com.example.mqttpanelcraft.ui.properties.ButtonPropertyBinder
-import com.example.mqttpanelcraft.ui.properties.IComponentPropertyBinder
+
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 class PropertiesSheetManager(
@@ -37,10 +36,8 @@ class PropertiesSheetManager(
     private var selectedViewId: Int = View.NO_ID
     private var currentData: ComponentData? = null
     
-    // Registry
-    private val binders = mapOf<String, IComponentPropertyBinder>(
-        "BUTTON" to ButtonPropertyBinder()
-    )
+    // Registry (Legacy binders removed)
+    // private val binders = mapOf<String, IComponentPropertyBinder>(...)
     
     // UI Elements
     private val etPropName: EditText? = propertyContainer.findViewById(R.id.etPropName)
@@ -143,7 +140,9 @@ class PropertiesSheetManager(
                 val hPx = (hDp * density).toInt()
                 
                 val name = etPropName?.text.toString()
-                val color = vPropColorPreview?.text.toString() ?: "#FFFFFF"
+                var color = vPropColorPreview?.text.toString()
+                if (color == "Default") color = ""
+
                 val topicConfig = getFullTopic()
                 
                 // Construct updated data
@@ -153,7 +152,17 @@ class PropertiesSheetManager(
                     height = hPx,
                     topicConfig = topicConfig
                 )
-                if (color.isNotEmpty()) updated.props["color"] = color
+                if (color.isNotEmpty() && color != "#FFFFFF") {
+                     updated.props["color"] = color
+                } else if (color == "#FFFFFF") {
+                     // Explicit white is allowed if user selected it? 
+                     // Or should we treat white as default?
+                     // If User explicitly picked White, let's save it.
+                     updated.props["color"] = color
+                } else {
+                     // Remove color prop if it was reset (Implement later if needed, for now just don't add)
+                     updated.props.remove("color")
+                }
                 
                 // Specific properties are updated via callback in Binder, but they might need to be merged?
                 // Actually binder updates `data.props` directly in my implementation of Binder?
@@ -195,38 +204,42 @@ class PropertiesSheetManager(
             
             // Specific Props Architecture
             containerSpecificProps?.removeAllViews()
-            binders[data.type]?.let { binder ->
+            
+            // PRIORITY 1: Definition Architecture
+            val def = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(data.type)
+            if (def != null && def.propertiesLayoutId != 0) {
                  val inflater = LayoutInflater.from(propertyContainer.context)
-                 val root = inflater.inflate(binder.getLayoutId(), containerSpecificProps, true)
-                 
-                 binder.bind(root, data) { key, value ->
-                     // Specific Property Updated
-                     currentData?.props?.put(key, value)
-                     saveCurrentProps() // Trigger full save
+                 val root = inflater.inflate(def.propertiesLayoutId, containerSpecificProps, true)
+                 def.bindPropertiesPanel(root, data) { key: String, value: String ->
+                      currentData?.props?.put(key, value)
+                      saveCurrentProps()
                  }
-            }
+            } 
+
+            // Legacy Fallback removed as files are deleted.
+            // Future components must implement IComponentDefinition.
             
             // ...
             etPropName?.setText(data.label)
             
             // Dimensions
             val density = propertyContainer.resources.displayMetrics.density
-            val wDp = kotlin.math.round(view.width / density).toInt()
-            val hDp = kotlin.math.round(view.height / density).toInt()
+            // Fix: Use data dimensions instead of View dimensions which might be 0 before layout
+            val wDp = kotlin.math.round(data.width / density).toInt()
+            val hDp = kotlin.math.round(data.height / density).toInt()
             etPropWidth?.setText(wDp.toString())
             etPropHeight?.setText(hDp.toString())
             
             // Color Logic (Try resolve background color)
-            var colorHex = "#FFFFFF"
+            var colorHex = "" // Default to empty (Transparent/Default)
+            
             // Prefer prop if set
             if (data.props.containsKey("color")) {
-                colorHex = data.props["color"] ?: "#FFFFFF"
-            } else if (view.background is android.graphics.drawable.ColorDrawable) {
-                val colorInt = (view.background as android.graphics.drawable.ColorDrawable).color
-                colorHex = String.format("#%08X", colorInt) // Use ARGB
+                colorHex = data.props["color"] ?: ""
             }
-
-            // etPropColor?.setText(colorHex)
+            
+            // If empty, we show "Default" in UI, but don't set text to #FFFFFF
+            // updateColorPreview handles empty string now
             updateColorPreview(colorHex)
             
             // Topic Parsing
@@ -261,23 +274,43 @@ class PropertiesSheetManager(
     
     private fun updateColorPreview(hex: String) {
         try {
+            if (hex.isEmpty() || hex == "Default") {
+                 vPropColorPreview?.text = "Default"
+                 vPropColorPreview?.setTextColor(Color.BLACK)
+                 vPropColorPreview?.setShadowLayer(0f, 0f, 0f, 0) // Clear shadow
+                 
+                 // Set preview to transparent grid or white with border
+                 val bg = vPropColorPreview?.background as? GradientDrawable ?: GradientDrawable()
+                 bg.setColor(Color.WHITE) 
+                 val density = propertyContainer.resources.displayMetrics.density
+                 bg.setStroke((1 * density).toInt(), Color.LTGRAY, (5 * density).toFloat(), (3 * density).toFloat()) // Dashed border
+                 bg.cornerRadius = (4 * density)
+                 vPropColorPreview?.background = bg
+                 return
+            }
+
             val color = Color.parseColor(hex)
             // Update View Background (keeping stroke)
             val bg = vPropColorPreview?.background as? GradientDrawable ?: GradientDrawable()
             bg.setColor(color)
             val density = propertyContainer.resources.displayMetrics.density
-            bg.setStroke((2 * density).toInt(), Color.parseColor("#808080"))
+            bg.setStroke((2 * density).toInt(), Color.parseColor("#808080")) // Solid border
             bg.cornerRadius = (4 * density)
             vPropColorPreview?.background = bg
             
             // Update Text
             vPropColorPreview?.text = hex
             
-            // Contrast Logic
-            val contrastColor = if ((Color.red(color)*0.299 + Color.green(color)*0.587 + Color.blue(color)*0.114) > 186) Color.BLACK else Color.WHITE
-            vPropColorPreview?.setTextColor(contrastColor)
+            // Contrast Logic (Luminance + Alpha)
+            // If Alpha < 180 (approx 70%), use Black text because background is transparent
+            val alpha = Color.alpha(color)
+            val luminescence = (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color))
             
-            // tvColorHex?.text = hex.uppercase()
+            val contrastColor = if (alpha < 180 || luminescence > 186) Color.BLACK else Color.WHITE
+            
+            vPropColorPreview?.setTextColor(contrastColor)
+            vPropColorPreview?.setShadowLayer(0f, 0f, 0f, 0) // Ensure no shadow
+            
         } catch(e: Exception) {}
     }
 
@@ -357,10 +390,21 @@ class PropertiesSheetManager(
         canvas.drawRect(0f, 0f, spectrumW.toFloat(), spectrumH.toFloat(), huePaint)
         
         // Draw Sat/Val Overlay
+        // X = Hue (Standard)
+        // Y = Saturation & Value Mixed?
+        // To allow White, we need a path from Color -> White.
+        // To allow Black, we need a path from Color -> Black.
+        // Standard HSV Square: X=Sat, Y=Val ( Hue on slider).
+        // Here X=Hue (Rainbow).
+        // If Y Top = White (Sat=0, Val=100)
+        // If Y Bottom = Black (Val=0)
+        // This means Center is Pure Color? 
+        // Let's try: Top=White, Middle=Transparent (shows Rainbow), Bottom=Black.
         val satValPaint = android.graphics.Paint()
         satValPaint.shader = LinearGradient(0f, 0f, 0f, spectrumH.toFloat(),
-            intArrayOf(Color.TRANSPARENT, Color.BLACK),
-            null, Shader.TileMode.CLAMP)
+            intArrayOf(Color.WHITE, Color.TRANSPARENT, Color.BLACK),
+            floatArrayOf(0f, 0.5f, 1f),
+            Shader.TileMode.CLAMP)
         canvas.drawRect(0f, 0f, spectrumW.toFloat(), spectrumH.toFloat(), satValPaint)
         
         val spectrumContainer = FrameLayout(context).apply {
