@@ -199,32 +199,9 @@ object AdManager {
             }
             interstitialAd?.show(activity)
         } else {
-            Log.d(TAG, "Interstitial not ready - Showing Placeholder Dialog")
+            Log.d(TAG, "Interstitial not ready - Proceeding silently")
             loadInterstitial(activity) // Try loading for next time
-            
-            // Show Fallback Dialog
-            androidx.appcompat.app.AlertDialog.Builder(activity)
-                .setTitle("Upgrade to Premium")
-                .setMessage("Support development and remove ads. Enjoy uninterrupted experience!")
-                .setPositiveButton("Go Premium!") { _, _ -> 
-                    // TODO: Navigate to Premium Purchase Page in logic
-                    onAdClosed() 
-                }
-                .setNegativeButton("Later") { _, _ -> 
-                    onAdClosed() 
-                }
-                .setOnDismissListener {
-                    // Safety net if dismissed via other means, though buttons handle it.
-                    // If buttons already called onAdClosed, this might call it again?
-                    // Typically harmless if onAdClosed is idempotent (ViewModel logic usually is).
-                    // But to be cleaner, we can remove onAdClosed from buttons and rely on this.
-                    // But buttons dismiss automatically.
-                    // Let's just trust buttons + back key behavior.
-                    // A simple boolean flag could prevent double call if strictly needed.
-                }
-                .setCancelable(true)
-                .setOnCancelListener { onAdClosed() } // Back key
-                .show()
+            onAdClosed()
         }
     }
 

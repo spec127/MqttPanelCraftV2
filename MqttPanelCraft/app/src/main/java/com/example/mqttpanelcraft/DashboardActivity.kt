@@ -116,11 +116,11 @@ class DashboardActivity : AppCompatActivity() {
         val tvBadge = headerView.findViewById<android.widget.TextView>(R.id.tvPremiumBadge) ?: return
         
         if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
-            tvBadge.text = "Premium"
+            tvBadge.text = getString(R.string.badge_premium)
             tvBadge.setTextColor(android.graphics.Color.parseColor("#FFD700"))
             tvBadge.setBackgroundResource(R.drawable.bg_premium_badge)
         } else {
-            tvBadge.text = "Free"
+            tvBadge.text = getString(R.string.badge_free)
             tvBadge.setTextColor(android.graphics.Color.parseColor("#BDBDBD"))
             tvBadge.setBackgroundResource(R.drawable.bg_free_badge)
         }
@@ -170,11 +170,9 @@ class DashboardActivity : AppCompatActivity() {
         binding.navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_about -> Toast.makeText(this, "About MqttPanelCraft v1.0", Toast.LENGTH_SHORT).show()
-                // Switches are handled by their own listeners
+                R.id.nav_language -> showLanguageDialog()
             }
-            if (item.itemId == R.id.nav_about) {
-                 binding.drawerLayout.closeDrawer(GravityCompat.START)
-            }
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
     }
@@ -228,14 +226,14 @@ class DashboardActivity : AppCompatActivity() {
 
     private fun updateSettingsTitle(tv: android.widget.TextView) {
         val modeText = when(currentSortMode) {
-            1 -> "Name (A-Z)"
-            2 -> "Name (Z-A)"
-            3 -> "Date (Newest)"
-            4 -> "Date (Oldest)"
-            5 -> "Last Opened"
+            1 -> getString(R.string.sort_name_asc)
+            2 -> getString(R.string.sort_name_desc)
+            3 -> getString(R.string.sort_date_new)
+            4 -> getString(R.string.sort_date_old)
+            5 -> getString(R.string.sort_last_opened)
             else -> "Unknown"
         }
-        tv.text = "Sort: $modeText / Settings"
+        tv.text = "${getString(R.string.label_sort_by)}: $modeText / Settings"
     }
 
     private fun applySortMode(mode: Int) {
@@ -252,17 +250,24 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    private fun setLocale(languageCode: String, countryCode: String) {
-        val locale = Locale(languageCode, countryCode)
-        Locale.setDefault(locale)
-        val config = resources.configuration
-        config.setLocale(locale)
-        createConfigurationContext(config)
-        resources.updateConfiguration(config, resources.displayMetrics)
+    // --- Language Handling ---
+    private fun showLanguageDialog() {
+        val languages = arrayOf("English", "繁體中文")
+        val currentLang = com.example.mqttpanelcraft.utils.LocaleManager.getLanguageCode(this)
+        val checkedItem = if (currentLang == "zh") 1 else 0
 
-        // Restart Activity
-        finish()
-        startActivity(intent)
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.dialog_language_title))
+            .setSingleChoiceItems(languages, checkedItem) { dialog, which ->
+                val selectedCode = if (which == 1) "zh" else "en"
+                if (selectedCode != currentLang) {
+                    com.example.mqttpanelcraft.utils.LocaleManager.setLocale(this, selectedCode)
+                    recreate() // Restart Activity
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(getString(R.string.btn_cancel), null)
+            .show()
     }
 
     private fun setupRecyclerView() {
@@ -293,18 +298,18 @@ class DashboardActivity : AppCompatActivity() {
                     startActivity(intent)
                 } else if (action == "DELETE") {
                     AlertDialog.Builder(this)
-                        .setTitle("Delete Project")
-                        .setMessage("Are you sure you want to delete '${project.name}'?")
-                        .setPositiveButton("Delete") { _, _ ->
+                        .setTitle(getString(R.string.dialog_delete_title))
+                        .setMessage(getString(R.string.dialog_delete_message, project.name))
+                        .setPositiveButton(getString(R.string.btn_delete)) { _, _ ->
                             try {
                                 // Delete from repository; UI will refresh via projectsLiveData observer
                                 ProjectRepository.deleteProject(project.id)
-                                Toast.makeText(this, "Project deleted", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, getString(R.string.msg_component_deleted), Toast.LENGTH_SHORT).show()
                             } catch (e: Exception) {
                                 CrashLogger.logError(this, "Delete Failed", e)
                             }
                         }
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(getString(R.string.btn_cancel), null)
                         .show()
                 }
 

@@ -245,7 +245,7 @@ class PropertiesSheetManager(
         isBinding = false
     }
 
-    fun showProperties(view: View, data: ComponentData) {
+    fun showProperties(view: View, data: ComponentData, autoExpand: Boolean = true) {
         selectedViewId = view.id
         currentData = data
         lastViewId = view.id
@@ -340,8 +340,11 @@ class PropertiesSheetManager(
         }
         
         propertyContainer.visibility = View.VISIBLE
-        forceExpandBottomSheet()
-        onExpandRequest()
+        
+        if (autoExpand) {
+            forceExpandBottomSheet()
+            onExpandRequest()
+        }
     }
     
     private fun updateColorPreview(hex: String) {

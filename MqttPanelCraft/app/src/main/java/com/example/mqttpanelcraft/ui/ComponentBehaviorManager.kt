@@ -10,8 +10,6 @@ import com.example.mqttpanelcraft.model.ComponentData
  * Strategy Pattern: Delegates logic to IComponentBehavior implementations.
  */
 class ComponentBehaviorManager(
-    private val context: Context,
-    private val projectIdProvider: () -> String?,
     private val sendMqtt: (topic: String, payload: String) -> Unit
 ) {
     // Registry (Legacy behaviors removed)

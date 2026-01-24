@@ -41,8 +41,8 @@ object ProjectRepository {
              com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "File does not exist or null. Creating defaults.")
              synchronized(this) {
                  if (projects.isEmpty()) {
-                    projects.add(Project("1", "Smart Home", "broker.emqx.io", 1883, "", "", "", ProjectType.HOME, false))
-                    projects.add(Project("2", "Office Env", "test.mosquitto.org", 1883, "", "", "", ProjectType.FACTORY, false))
+                    projects.add(Project("1", "Smart Home", "broker.emqx.io", 1883, "", "", "", ProjectType.HOME, false, orientation = "SENSOR"))
+                    projects.add(Project("2", "Office Env", "test.mosquitto.org", 1883, "", "", "", ProjectType.FACTORY, false, orientation = "SENSOR"))
                  }
                  saveProjects()
                  updateLiveData()
@@ -70,10 +70,11 @@ object ProjectRepository {
                 val typeStr = obj.optString("type", "HOME")
                 val type = try { ProjectType.valueOf(typeStr) } catch (e: Exception) { ProjectType.HOME }
                 val customCode = obj.optString("customCode", "")
+                val orientation = obj.optString("orientation", "SENSOR")
                 val createdAt = obj.optLong("createdAt", System.currentTimeMillis())
                 val lastOpenedAt = obj.optLong("lastOpenedAt", System.currentTimeMillis())
 
-                val project = Project(id, name, broker, port, user, pass, client, type, false, mutableListOf(), customCode, createdAt, lastOpenedAt)
+                val project = Project(id, name, broker, port, user, pass, client, type, false, mutableListOf(), customCode, orientation, createdAt, lastOpenedAt)
 
                 val compsArray = obj.optJSONArray("components")
                 if (compsArray != null) {
@@ -154,6 +155,7 @@ object ProjectRepository {
                     obj.put("clientId", p.clientId)
                     obj.put("type", p.type.name)
                     obj.put("customCode", p.customCode)
+                    obj.put("orientation", p.orientation)
                     obj.put("createdAt", p.createdAt)
                     obj.put("lastOpenedAt", p.lastOpenedAt)
     
@@ -240,8 +242,8 @@ object ProjectRepository {
         var newId: String
         do {
             newId = (1..10)
-                .map { charPool[secureRandom.nextInt(charPool.length)] }
-                .joinToString("")
+            .map { charPool[secureRandom.nextInt(charPool.length)] }
+            .joinToString("")
         } while (getProjectById(newId) != null)
         return newId
     }
@@ -275,6 +277,7 @@ object ProjectRepository {
             // pObj.put("password", project.password)
             pObj.put("type", project.type.name)
             pObj.put("customCode", project.customCode)
+            pObj.put("orientation", project.orientation)
             pObj.put("createdAt", project.createdAt)
             pObj.put("lastOpenedAt", project.lastOpenedAt)
 
@@ -325,6 +328,7 @@ object ProjectRepository {
             val typeStr = pObj.optString("type", "HOME")
             val type = try { ProjectType.valueOf(typeStr) } catch (e: Exception) { ProjectType.HOME }
             val customCode = pObj.optString("customCode", "")
+            val orientation = pObj.optString("orientation", "SENSOR")
 
             val project = Project(
                 id = id,
@@ -335,6 +339,7 @@ object ProjectRepository {
                 password = "",
                 type = type,
                 customCode = customCode,
+                orientation = orientation,
                 createdAt = pObj.optLong("createdAt", System.currentTimeMillis()),
                 lastOpenedAt = pObj.optLong("lastOpenedAt", System.currentTimeMillis())
             )

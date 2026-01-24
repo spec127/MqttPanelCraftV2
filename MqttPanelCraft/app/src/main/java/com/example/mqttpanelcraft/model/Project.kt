@@ -12,6 +12,7 @@ data class Project(
     val isConnected: Boolean = false,
     val components: MutableList<ComponentData> = mutableListOf(),
     val customCode: String = "",
+    val orientation: String = "SENSOR",
     val createdAt: Long = System.currentTimeMillis(),
     var lastOpenedAt: Long = System.currentTimeMillis()
 )

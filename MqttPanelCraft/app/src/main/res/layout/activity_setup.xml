@@ -249,7 +249,7 @@
                 android:layout_marginTop="16dp"
                 android:orientation="horizontal">
 
-                <!-- Home Card -->
+                <!-- IOT Card (Formerly Home) -->
                 <LinearLayout
                     android:id="@+id/cardHome"
                     android:layout_width="0dp"
@@ -265,7 +265,7 @@
                         android:id="@+id/ivHome"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@drawable/ic_home"
+                        android:src="@drawable/ic_panel_mode"
                         app:tint="@color/primary"
                         android:contentDescription="@string/theme_home"/>
 
@@ -279,9 +279,9 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Factory Card -->
+                <!-- Webview Card (Moved from bottom) -->
                 <LinearLayout
-                    android:id="@+id/cardFactory"
+                    android:id="@+id/cardWebview"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -292,53 +292,63 @@
                     android:padding="16dp">
 
                     <ImageView
-                        android:id="@+id/ivFactory"
+                        android:id="@+id/ivWebview"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@drawable/ic_factory"
+                        android:src="@drawable/ic_globe"
                         app:tint="#757575"
-                        android:contentDescription="@string/theme_factory"/>
+                        android:contentDescription="Webview"/>
 
                     <TextView
-                        android:id="@+id/tvFactory"
+                        android:id="@+id/tvWebview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="@string/theme_factory"
+                        android:text="Webview"
                         android:textColor="#757575"
                         android:textStyle="bold" />
                 </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Advanced (WebView) Card -->
-            <LinearLayout
-                android:id="@+id/cardWebview"
+            <!-- Screen Orientation -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Orientation"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/rgOrientation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_card_unselected"
-                android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:layout_marginTop="8dp">
 
-                <ImageView
-                    android:id="@+id/ivWebview"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_webview"
-                    app:tint="#757575"
-                    android:contentDescription="Advanced Webview"/>
-
-                <TextView
-                    android:id="@+id/tvWebview"
+                <RadioButton
+                    android:id="@+id/rbSensor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="Advanced (Webview)"
-                    android:textColor="#757575"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                    android:text="Sensor/Auto"
+                    android:layout_weight="1"/>
+                
+                <RadioButton
+                    android:id="@+id/rbPortrait"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Portrait"
+                    android:layout_weight="1"/>
+                
+                <RadioButton
+                    android:id="@+id/rbLandscape"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Landscape"
+                    android:layout_weight="1"/>
+            </RadioGroup>
 
             <!-- Save Button -->
             <com.google.android.material.button.MaterialButton

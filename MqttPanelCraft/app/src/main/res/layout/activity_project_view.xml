@@ -189,10 +189,10 @@
                         
                         <ImageView
                             android:id="@+id/ivHeaderHandle"
-                            android:layout_width="40dp"
-                            android:layout_height="4dp"
+                            android:layout_width="80dp"
+                            android:layout_height="6dp"
                             android:layout_gravity="center_horizontal"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="12dp"
                             android:src="@drawable/ic_drag_handle" 
                             app:tint="#CCCCCC" />
                             
@@ -250,12 +250,12 @@
                                     android:text="MQTT/System Logs"
                                     android:textStyle="bold"
                                     android:textSize="21sp"
-                                    android:textColor="#333333"
+                                    android:textColor="?android:attr/textColorPrimary"
                                     android:layout_width="0dp"
                                     android:layout_weight="1"
                                     android:layout_height="wrap_content"/>
                                     
-                                <ImageView
+                                    <ImageView
                                     android:id="@+id/btnLogClear"
                                     android:layout_width="32dp"
                                     android:layout_height="32dp"
@@ -263,7 +263,7 @@
                                     android:background="?attr/selectableItemBackgroundBorderless"
                                     android:clickable="true"
                                     android:focusable="true"
-                                    app:tint="#666666"
+                                    app:tint="?android:attr/textColorPrimary"
                                     android:padding="4dp"
                                     android:contentDescription="Clear Logs"/> 
                             </LinearLayout>
@@ -357,7 +357,7 @@
                                     android:text="Properties" 
                                     android:textSize="21sp" 
                                     android:textStyle="bold" 
-                                    android:textColor="#333333"
+                                    android:textColor="?android:attr/textColorPrimary"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
                             </LinearLayout>

@@ -60,10 +60,6 @@ class SetupActivity : AppCompatActivity() {
     private lateinit var ivHome: ImageView
     private lateinit var tvHome: TextView
 
-    private lateinit var cardFactory: LinearLayout
-    private lateinit var ivFactory: ImageView
-    private lateinit var tvFactory: TextView
-
     private lateinit var cardWebview: LinearLayout
     private lateinit var ivWebview: ImageView
     private lateinit var tvWebview: TextView
@@ -175,6 +171,10 @@ class SetupActivity : AppCompatActivity() {
         // etName is already set above
         // etBroker is already set above
         selectType(project.type)
+        
+        // Load Orientation
+        setOrientationUI(project.orientation)
+        
         btnSave.text = "Update & Start"
         findViewById<MaterialButton>(R.id.btnSaveProject).text = "Update Project"
         supportActionBar?.title = "Edit Project"
@@ -238,6 +238,9 @@ class SetupActivity : AppCompatActivity() {
         btnImport = findViewById(R.id.btnImportJson)
         btnExport = findViewById(R.id.btnExportJson)
 
+        // Orientation Init (Default Sensor)
+        setOrientationUI("SENSOR")
+
         btnImport.setOnClickListener { showImportDialog() }
         btnExport.setOnClickListener { showExportDialog() }
         // shadowed var removals
@@ -246,17 +249,12 @@ class SetupActivity : AppCompatActivity() {
         ivHome = findViewById(R.id.ivHome)
         tvHome = findViewById(R.id.tvHome)
         // ... (lines 242-263 match original) ...
-        cardFactory = findViewById(R.id.cardFactory)
-        ivFactory = findViewById(R.id.ivFactory)
-        tvFactory = findViewById(R.id.tvFactory)
-
         cardWebview = findViewById(R.id.cardWebview)
         ivWebview = findViewById(R.id.ivWebview)
         tvWebview = findViewById(R.id.tvWebview)
 
         // Theme Selection
         cardHome.setOnClickListener { selectType(ProjectType.HOME) }
-        cardFactory.setOnClickListener { selectType(ProjectType.FACTORY) }
         cardWebview.setOnClickListener { selectType(ProjectType.WEBVIEW) }
 
         // Test Connection (Mock)
@@ -301,6 +299,17 @@ class SetupActivity : AppCompatActivity() {
             }
         }
     }
+    
+    // ... (Lines 296-528 Omitted for brevity, assume unchanged logic between) ...
+
+    /** 
+     * Need to target saveProject construction of Project object. 
+     * Since REPLACE tool requires contiguous block, I will replace the Project construction part specifically.
+     * Wait, I need a larger chunk or targeted replacement. 
+     * Let's look at line 529 area.
+     */
+     
+
     
     private fun showImportDialog() {
         val context = this
@@ -534,6 +543,8 @@ class SetupActivity : AppCompatActivity() {
         val finalCustomCode = pendingCustomCode
             ?: originalProject?.customCode
             ?: ""
+            
+        val finalOrientation = getSelectedOrientation()
 
         val newProject = Project(
             id = finalId,
@@ -545,7 +556,8 @@ class SetupActivity : AppCompatActivity() {
             type = selectedType,
             isConnected = false,
             components = finalComponents,
-            customCode = finalCustomCode
+            customCode = finalCustomCode,
+            orientation = finalOrientation
         )
 
         // Unified Flow: Always Show Rewarded (unless disabled)
@@ -613,6 +625,26 @@ class SetupActivity : AppCompatActivity() {
              com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
         }
     }
+    
+    // Helper to get Orientation String
+    private fun getSelectedOrientation(): String {
+        val rg = findViewById<android.widget.RadioGroup>(R.id.rgOrientation)
+        return when (rg.checkedRadioButtonId) {
+            R.id.rbPortrait -> "PORTRAIT"
+            R.id.rbLandscape -> "LANDSCAPE"
+            else -> "SENSOR"
+        }
+    }
+    
+    // Helper to set UI
+    private fun setOrientationUI(value: String) {
+        val rg = findViewById<android.widget.RadioGroup>(R.id.rgOrientation)
+        when (value) {
+            "PORTRAIT" -> rg.check(R.id.rbPortrait)
+            "LANDSCAPE" -> rg.check(R.id.rbLandscape)
+            else -> rg.check(R.id.rbSensor)
+        }
+    }
 
     private fun saveAndFinish(newProject: Project, targetProjectId: String) {
         if (projectId != null) {
@@ -667,10 +699,6 @@ class SetupActivity : AppCompatActivity() {
         ivHome.setColorFilter(greyColor)
         tvHome.setTextColor(greyColor)
 
-        cardFactory.setBackgroundResource(R.drawable.bg_card_unselected)
-        ivFactory.setColorFilter(greyColor)
-        tvFactory.setTextColor(greyColor)
-
         cardWebview.setBackgroundResource(R.drawable.bg_card_unselected)
         ivWebview.setColorFilter(greyColor)
         tvWebview.setTextColor(greyColor)
@@ -682,17 +710,12 @@ class SetupActivity : AppCompatActivity() {
                 ivHome.setColorFilter(primaryColor)
                 tvHome.setTextColor(primaryColor)
             }
-            ProjectType.FACTORY -> {
-                cardFactory.setBackgroundResource(R.drawable.bg_card_selected)
-                ivFactory.setColorFilter(primaryColor)
-                tvFactory.setTextColor(primaryColor)
-            }
             ProjectType.WEBVIEW -> {
                 cardWebview.setBackgroundResource(R.drawable.bg_card_selected)
                 ivWebview.setColorFilter(primaryColor)
                 tvWebview.setTextColor(primaryColor)
             }
-            else -> {} // Handle OTHER if needed
+            else -> {} // Handle OTHER or Legacy FACTORY (No UI)
         }
     }
 

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MqttPanelCraft</string>
+    <string name="nav_header_title">我的專案</string>
+    <string name="nav_header_subtitle">user@example.com</string>
+
+    <!-- Drawer Menu -->
+    <string name="action_about">關於</string>
+    <string name="action_dark_mode">深色模式</string>
+    <string name="action_ads">廣告</string>
+    <string name="action_language">語言 (Language)</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">我的專案</string>
+    <string name="settings_title">排序 / 設定</string>
+    <string name="label_sort_by">排序方式</string>
+    <string name="sort_name_asc">名稱 (A-Z)</string>
+    <string name="sort_name_desc">名稱 (Z-A)</string>
+    <string name="sort_date_new">日期 (最新)</string>
+    <string name="sort_date_old">日期 (最舊)</string>
+    <string name="sort_last_opened">最後開啟</string>
+    <string name="empty_state_message">尚無專案</string>
+    <string name="badge_premium">進階版</string>
+    <string name="badge_free">免費版</string>
+    
+    <!-- Setup Activity -->
+    <string name="title_project_setup">專案設定</string>
+    <string name="label_project_name">專案名稱</string>
+    <string name="hint_project_name">我的智慧家庭</string>
+    <string name="label_mqtt_broker">MQTT Broker</string>
+    <string name="hint_broker">wss://broker.emqx.io:8083</string>
+    <string name="label_theme">主題 / 類型</string>
+    <string name="btn_test_connection">測試連線</string>
+    <string name="btn_save_start">儲存並開始</string>
+    <string name="theme_home">面板 (Panel)</string>
+    <string name="theme_factory">工廠模式</string>
+    <string name="theme_webview">進階 (Webview)</string>
+    <string name="error_name_required">請輸入名稱</string>
+    <string name="error_broker_required">請輸入 Broker URL</string>
+
+    <!-- Project View Activity -->
+    <string name="title_project_editor">專案編輯器</string>
+    <string name="sidebar_components">元件</string>
+    <string name="category_display">顯示</string>
+    <string name="component_text">文字數值</string>
+    <string name="component_gauge">儀表板</string>
+    <string name="sidebar_properties">屬性</string>
+    <string name="prop_helper">選擇元件以編輯</string>
+    <string name="prop_topic">MQTT 主題</string>
+    <string name="prop_label">標籤</string>
+    <string name="console_title">MQTT 控制台</string>
+    <string name="hint_topic">主題</string>
+    <string name="hint_payload">訊息內容</string>
+    <string name="btn_send">發送</string>
+    
+    <!-- Messages -->
+    <string name="msg_logs_copied">日誌已複製</string>
+    <string name="msg_init_error">初始化錯誤: %s</string>
+    <string name="msg_component_deleted">元件已刪除</string>
+    <string name="msg_network_error">網路錯誤</string>
+    <string name="msg_mqtt_failed">連線失敗，請檢查 Broker 設定</string>
+    <string name="msg_mqtt_retry">重試連線中...</string>
+    <string name="msg_mqtt_connected">已連線</string>
+    <string name="msg_select_component">請先選擇一個元件</string>
+    <string name="msg_add_component">請先新增元件</string>
+    
+    <!-- Dialogs -->
+    <string name="dialog_language_title">選擇語言</string>
+    <string name="dialog_delete_title">刪除專案</string>
+    <string name="dialog_delete_message">確定要刪除 \'%s\' 嗎？</string>
+    <string name="btn_delete">刪除</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_close">關閉</string>
+    <string name="btn_copy">複製</string>
+
+    <!-- Sidebar Run Mode -->
+    <string name="lock_portrait">鎖定直向</string>
+    <string name="lock_landscape">鎖定橫向</string>
+</resources>

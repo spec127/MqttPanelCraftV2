@@ -13,7 +13,11 @@
         app:actionLayout="@layout/item_drawer_switch"
         xmlns:app="http://schemas.android.com/apk/res-auto"/>
     <item
+        android:id="@+id/nav_language"
+        android:icon="@drawable/ic_globe" 
+        android:title="@string/action_language" />
+    <item
         android:id="@+id/nav_about"
         android:icon="@drawable/ic_google"
-        android:title="About" />
+        android:title="@string/action_about" />
 </menu>

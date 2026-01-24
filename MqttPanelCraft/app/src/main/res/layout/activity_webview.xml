@@ -45,6 +45,17 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/shape_circle_green" />
 
+                <!-- Info Icon -->
+                <ImageView
+                    android:id="@+id/btnInfo"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_toStartOf="@id/btnSettings"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="16dp"
+                    android:src="@android:drawable/ic_dialog_info"
+                    app:tint="@android:color/white" />
+
                 <!-- Settings Icon -->
                 <ImageView
                     android:id="@+id/btnSettings"

@@ -58,4 +58,8 @@ class MyApplication : Application() {
         // android.os.Process.killProcess(android.os.Process.myPid())
         exitProcess(1)
     }
+
+    override fun attachBaseContext(base: android.content.Context) {
+        super.attachBaseContext(com.example.mqttpanelcraft.utils.LocaleManager.onAttach(base))
+    }
 }

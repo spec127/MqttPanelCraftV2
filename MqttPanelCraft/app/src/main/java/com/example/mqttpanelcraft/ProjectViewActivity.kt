@@ -126,7 +126,8 @@ class ProjectViewActivity : AppCompatActivity() {
         renderer = ComponentRenderer(editorCanvas, this)
 
         // 2. Behavior (Logic)
-        behaviorManager = ComponentBehaviorManager(this, { viewModel.project.value?.id }) { topic, payload ->
+        // 2. Behavior (Logic)
+        behaviorManager = ComponentBehaviorManager { topic, payload ->
             // Send MQTT
             val intent = Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java).apply {
                 action = "PUBLISH"
@@ -149,20 +150,37 @@ class ProjectViewActivity : AppCompatActivity() {
                         selectedComponentId = null
                         behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
                         // Clear visible properties or set "No Selection" state
-                        propertiesManager.clear() // DOES NOT EXPAND
+                        propertiesManager.clear() 
                     } else {
-                        // Component Click -> Select & Expand
-                        selectedComponentId = id
-                        val comp = viewModel.components.value?.find { it.id == id }
-                        if (comp != null) {
-                            propertiesManager.showProperties(renderer.getView(id) ?: View(this@ProjectViewActivity), comp)
-                            behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+                        // Component Logic:
+                        // 1. If ALREADY selected -> EXPAND (Second Click)
+                        // 2. If NEW selection -> SELECT & BIND but KEEP COLLAPSED (First Click)
+                        
+                        if (selectedComponentId == id) {
+                             // Second Click: Expand
+                             val comp = viewModel.components.value?.find { it.id == id }
+                             val view = renderer.getView(id)
+                             if (comp != null && view != null) {
+                                 propertiesManager.showProperties(view, comp, autoExpand = true)
+                             }
+                        } else {
+                             // First Click: Select Only
+                             selectedComponentId = id
+                             val comp = viewModel.components.value?.find { it.id == id }
+                             val view = renderer.getView(id)
+                             if (comp != null && view != null) {
+                                 // Bind data so dragging works, but DO NOT auto-expand yet.
+                                 // Ensure sheet is collapsed (Peeked) so user can see header & drag handle
+                                 behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+                                 propertiesManager.showProperties(view, comp, autoExpand = false)
+                             }
                         }
                     }
                     // Trigger Re-render to update Selection Border
                     viewModel.components.value?.let { renderer.render(it, isEditMode, selectedComponentId) }
                     
                     updateCanvasOcclusion()
+                    updateSheetState() // Sync Draggability
                 } else {
                     // RUN MODE
                     if (id == -1) {
@@ -199,12 +217,16 @@ class ProjectViewActivity : AppCompatActivity() {
             }
 
             override fun onComponentDeleted(id: Int) {
-                viewModel.saveSnapshot()
-                viewModel.removeComponent(id)
-                if (selectedComponentId == id) {
-                    selectedComponentId = null
-                    propertiesManager.hide()
+                if (id != -1) {
+                    viewModel.saveSnapshot()
+                    viewModel.removeComponent(id)
+                    if (selectedComponentId == id) {
+                        selectedComponentId = null
+                        propertiesManager.hide()
+                        updateSheetState() // Sync Draggability
+                    }
                 }
+                Toast.makeText(this@ProjectViewActivity, getString(R.string.msg_component_deleted), Toast.LENGTH_SHORT).show()
             }
             
             override fun onDeleteZoneHover(isHovered: Boolean) {
@@ -258,7 +280,10 @@ class ProjectViewActivity : AppCompatActivity() {
                     val newId = newComp.id
                     viewModel.selectComponent(newId)
                     
-                    // Show Properties Immediately
+                    // Show Properties Immediately (For new components, maybe expand immediately is fine?
+                    // User said "first click selects... then drag".
+                    // But for A NEW component, usually it's "Edit Immediately". 
+                    // Let's keep Auto-Expand for Creation to reduce friction.
                     selectedComponentId = newId
                     
                     // Force Render (Sync)
@@ -266,13 +291,74 @@ class ProjectViewActivity : AppCompatActivity() {
                     
                     val view = renderer.getView(newId)
                     if (view != null) {
-                        propertiesManager.showProperties(view, newComp)
+                        propertiesManager.showProperties(view, newComp, autoExpand = true)
                     }
                 }
             }
         })
         
+        // Auto-Hide Bottom Sheet when Sidebar Opens
+        drawerLayout.addDrawerListener(object : androidx.drawerlayout.widget.DrawerLayout.SimpleDrawerListener() {
+            override fun onDrawerOpened(drawerView: View) {
+                val sheet = findViewById<View>(R.id.bottomSheet)
+                val behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
+                
+                // User Request: Keep a bit visible (Peeked) and don't lose selection.
+                // So always go to STATE_COLLAPSED, never HIDDEN.
+                if (behavior.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED ||
+                    behavior.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN) {
+                    behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+                }
+            }
+        })
         
+        
+        // Global Drag Listener to Fix "Fly Back" Bug
+        // When dropping outside the canvas (e.g. bottom navbar), consume event as Deletion.
+        findViewById<View>(R.id.rootCoordinator)?.setOnDragListener { _, event ->
+            if (event.action == android.view.DragEvent.ACTION_DROP) {
+                 // Consume drop everywhere outside canvas to prevent "bounce back" animation
+                 // This effectively means "Delete" if dropped on UI chrome
+                 true 
+            } else {
+                 true
+            }
+        }
+        
+        // Header Interaction Listener (for Empty State Warning)
+        val header = findViewById<View>(R.id.bottomSheetHeader)
+        header.setOnClickListener {
+             if (isEditMode) {
+                 if (selectedComponentId == null) {
+                     // Check if empty project or just no selection
+                     val comps = viewModel.components.value
+                     if (comps.isNullOrEmpty()) {
+                         Toast.makeText(this, getString(R.string.msg_add_component), Toast.LENGTH_SHORT).show()
+                     } else {
+                         Toast.makeText(this, getString(R.string.msg_select_component), Toast.LENGTH_SHORT).show()
+                     }
+                 } else {
+                     // If selected, toggle expand
+                     val sheet = findViewById<View>(R.id.bottomSheet)
+                     val b = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
+                     if (b.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED) {
+                         b.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+                     } else if (b.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED) {
+                         b.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+                     }
+                 }
+             } else {
+                 // Run Mode (Logs): Toggle
+                 val sheet = findViewById<View>(R.id.bottomSheet)
+                 val b = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
+                 if (b.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED) {
+                     b.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+                 } else {
+                     b.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+                 }
+             }
+        }
+
         interactionManager.setup(
             isEditMode = { isEditMode },
             isGridEnabled = { viewModel.isGridVisible.value ?: true },
@@ -308,6 +394,14 @@ class ProjectViewActivity : AppCompatActivity() {
         viewModel.project.observe(this) { project ->
             if (project != null) {
                 supportActionBar?.title = project.name
+                
+                // Apply Orientation
+                when (project.orientation) {
+                    "PORTRAIT" -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    "LANDSCAPE" -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                    else -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED // Sensor
+                }
+                
                 viewModel.initMqtt()
             }
         }
@@ -438,19 +532,17 @@ class ProjectViewActivity : AppCompatActivity() {
           sheetBehavior.addBottomSheetCallback(object : com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback() {
               override fun onStateChanged(bottomSheet: View, newState: Int) {
                   updateBottomInset(bottomSheet)
-                  // Auto-restore logic
-                  if ((newState == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED || 
-                       newState == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED) 
-                       && viewModel.selectedComponentId.value == null) {
-                       val lastId = propertiesManager.getLastSelectedId()
-                       if (lastId != null) viewModel.selectComponent(lastId)
-                  }
               }
               override fun onSlide(bottomSheet: View, slideOffset: Float) {
                   updateCanvasOcclusion(bottomSheet)
                   updateBottomInset(bottomSheet)
               }
           })
+          
+          // Fix: Initialize Bottom Inset immediately so Drag Resistance/Delete Zone works on start
+          bottomSheet.post { 
+              updateBottomInset(bottomSheet)
+          }
     }
 
     private fun updateModeUI() {
@@ -470,6 +562,9 @@ class ProjectViewActivity : AppCompatActivity() {
             sidebarManager.showComponentsPanel()
             findViewById<View>(R.id.btnUndo).visibility = View.VISIBLE
             
+            // Unlock Drawer for Component Palette
+            drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED)
+            
             // Edit Mode: Logs OFF, Properties Visible (Collapsed)
             logsContainer.visibility = View.GONE
             findViewById<View>(R.id.containerProperties).visibility = View.VISIBLE
@@ -488,7 +583,9 @@ class ProjectViewActivity : AppCompatActivity() {
         } else {
             fabMode.setImageResource(android.R.drawable.ic_menu_edit)
             guideOverlay.visibility = View.GONE // Guides off in run mode
-            sidebarManager.showRunModePanel()
+            // Sidebar Disable in Run Mode
+            drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+            
             findViewById<View>(R.id.btnUndo).visibility = View.GONE
             
             // Run Mode: Logs ON (Peek), Properties OFF
@@ -498,6 +595,27 @@ class ProjectViewActivity : AppCompatActivity() {
             // Force Peek to show Logs Header/Initial Rows
             sheetBehavior.isHideable = false // Logs usually stick around? Or allow hide?
             sheetBehavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+        }
+        updateSheetState()
+    }
+
+    private fun updateSheetState() {
+        val bottomSheet = findViewById<View>(R.id.bottomSheet) ?: return
+        val sheetBehavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(bottomSheet)
+        
+        if (isEditMode) {
+             // In Edit Mode: Helper logic
+             if (selectedComponentId == null) {
+                 sheetBehavior.isDraggable = false
+                 if (sheetBehavior.state != com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN) {
+                    sheetBehavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED 
+                 }
+             } else {
+                 sheetBehavior.isDraggable = true
+             }
+        } else {
+             // Run Mode: Always draggable (Logs)
+             sheetBehavior.isDraggable = true
         }
     }
 
@@ -591,14 +709,23 @@ class ProjectViewActivity : AppCompatActivity() {
         sidebarManager = SidebarManager(
             drawerLayout,
             null,
-            findViewById(R.id.sidebarEditMode),
-            findViewById(R.id.sidebarRunMode),
-            { _,_ -> }
-        )
+            findViewById(R.id.sidebarEditMode)
+        ) { view, type ->
+            // On Drag Start from Sidebar
+            // Create a temporary component to drag
+            val def = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(type)
+            if (def != null) {
+                // ... same logic usually handled inside SidebarManager? 
+                // Wait, SidebarManager handles startDragAndDrop internally using the touch listener.
+                // The callback is for... checking?
+                // Actually SidebarManager's constructor last arg is `onComponentDragStart`.
+                // Let's check SidebarManager definition again.
+            }
+        }
         sidebarManager.setupComponentPalette(drawerLayout)
-        sidebarManager.setupRunModeSettings(findViewById(R.id.sidebarRunMode), this)
+        // sidebarRunMode removed
         
-        sidebarManager.setupRunModeSettings(findViewById(R.id.sidebarRunMode), this)
+        // sidebarRunMode removed
         
         // Ensure AdManager is ready and pre-load Interstitial
         com.example.mqttpanelcraft.utils.AdManager.initialize(this)

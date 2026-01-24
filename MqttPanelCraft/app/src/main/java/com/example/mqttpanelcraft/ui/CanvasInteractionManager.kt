@@ -98,7 +98,8 @@ class CanvasInteractionManager(
                     if (y > limitY) {
                          // Dropped in Delete Zone - Cancel Creation
                          callbacks.onDeleteZoneHover(false)
-                         // Do NOTHING (Deletion)
+                         // Trigger "Deleted" feedback even for new components
+                         callbacks.onComponentDeleted(-1) 
                     } else if (event.clipData != null && event.clipData.itemCount > 0) {
                         val type = event.clipData.getItemAt(0).text.toString()
                         callbacks.onNewComponent(type, event.x, event.y)

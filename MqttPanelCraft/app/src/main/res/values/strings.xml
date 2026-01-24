@@ -1,8 +1,27 @@
 <resources>
     <string name="app_name">MqttPanelCraft</string>
-    <string name="nav_header_title">My IoT App</string>
+    <string name="nav_header_title">My Projects</string>
     <string name="nav_header_subtitle">user@example.com</string>
 
+    <!-- Drawer Menu -->
+    <string name="action_about">About</string>
+    <string name="action_dark_mode">Dark Mode</string>
+    <string name="action_ads">Ads</string>
+    <string name="action_language">Language</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">My Projects</string>
+    <string name="settings_title">Sort / Settings</string>
+    <string name="label_sort_by">Sort By</string>
+    <string name="sort_name_asc">Name (A-Z)</string>
+    <string name="sort_name_desc">Name (Z-A)</string>
+    <string name="sort_date_new">Date (Newest)</string>
+    <string name="sort_date_old">Date (Oldest)</string>
+    <string name="sort_last_opened">Last Opened</string>
+    <string name="empty_state_message">No projects yet</string>
+    <string name="badge_premium">Premium</string>
+    <string name="badge_free">Free</string>
+    
     <!-- Setup Activity -->
     <string name="title_project_setup">Project Setup</string>
     <string name="label_project_name">Project Name</string>
@@ -12,8 +31,9 @@
     <string name="label_theme">Theme / Type</string>
     <string name="btn_test_connection">Test</string>
     <string name="btn_save_start">Save and Start</string>
-    <string name="theme_home">Home</string>
+    <string name="theme_home">Panel</string>
     <string name="theme_factory">Factory</string>
+    <string name="theme_webview">Advanced (Webview)</string>
     <string name="error_name_required">Name is required</string>
     <string name="error_broker_required">Broker URL is required</string>
 
@@ -31,4 +51,28 @@
     <string name="hint_topic">Topic</string>
     <string name="hint_payload">Payload</string>
     <string name="btn_send">SEND</string>
+    
+    <!-- Messages -->
+    <string name="msg_logs_copied">Logs Copied</string>
+    <string name="msg_init_error">Init Error: %s</string>
+    <string name="msg_component_deleted">Component Deleted</string>
+    <string name="msg_network_error">Network Error</string>
+    <string name="msg_mqtt_failed">Connection Failed, Check Broker</string>
+    <string name="msg_mqtt_retry">Retrying Connection...</string>
+    <string name="msg_mqtt_connected">Connected</string>
+    <string name="msg_select_component">Please select a component first</string>
+    <string name="msg_add_component">Please add a component first</string>
+    
+    <!-- Dialogs -->
+    <string name="dialog_language_title">Select Language</string>
+    <string name="dialog_delete_title">Delete Project</string>
+    <string name="dialog_delete_message">Are you sure you want to delete \'%s\'?</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_close">Close</string>
+    <string name="btn_copy">Copy</string>
+
+    <!-- Sidebar Run Mode -->
+    <string name="lock_portrait">Lock Portrait</string>
+    <string name="lock_landscape">Lock Landscape</string>
 </resources>

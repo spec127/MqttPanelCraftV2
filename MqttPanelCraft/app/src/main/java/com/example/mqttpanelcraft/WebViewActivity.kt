@@ -148,6 +148,45 @@ class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
                  startActivity(intent)
              }
         }
+        
+        // Info Button: AI Assistance Prompt
+        findViewById<android.view.View>(R.id.btnInfo).setOnClickListener {
+             val promptText = """
+                 **Role**: Expert Web Developer for Embedded Android WebView (MQTT).
+                 
+                 **Goal**: Create a Single-File Dashboard (HTML + CSS + JS) based on my requirements.
+                 
+                 **1. Code Format**:
+                 - Single HTML file (Internal CSS/JS).
+                 - Responsive Design (Mobile First).
+                 - No external build steps (Vanilla JS preferred).
+                 
+                 **2. MQTT API (Injected Object 'window.mqtt')**:
+                 - `mqtt.publish('topic', 'payload')`: Send message.
+                 - `mqtt.subscribe('topic')`: Subscribe to topic.
+                 - `function mqttOnMessage(topic, payload)`: Define this global function to handle incoming messages.
+                 
+                 **3. MQTT Topic Convention**:
+                 - You MUST prefix all topics with: `${project?.name ?: "Project"}/${projectId ?: "ID"}/`
+                 - Example: `${project?.name ?: "Project"}/${projectId ?: "ID"}/your/custom/topic`
+                 
+                 **4. Prohibitions**:
+                 - Do NOT use module imports or 'include'.
+                 - Do NOT assume a backend server exists (Client-side only).
+             """.trimIndent()
+             
+             val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+             builder.setTitle("AI Assistant Prompt")
+             builder.setMessage(promptText)
+             builder.setPositiveButton("Copy") { _, _ ->
+                 val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                 val clip = android.content.ClipData.newPlainText("AI Prompt", promptText)
+                 clipboard.setPrimaryClip(clip)
+                 Toast.makeText(this, "Prompt Copied!", Toast.LENGTH_SHORT).show()
+             }
+             builder.setNegativeButton("Close", null)
+             builder.show()
+        }
 
         // Register Listener
         MqttRepository.registerListener(this)
@@ -157,6 +196,12 @@ class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
         MqttRepository.connectionStatus.observe(this) { status ->
             updateStatusIndicator(status)
         }
+        
+        // Initialize Idle Ad Controller
+        idleAdController = com.example.mqttpanelcraft.ui.IdleAdController(this) {
+             // Ad Closed Callback (Resume if needed, but WebView keeps running)
+        }
+        idleAdController.start()
     }
 
     private fun updateStatusIndicator(status: Int) {
@@ -186,6 +231,30 @@ class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
     override fun onDestroy() {
         super.onDestroy()
         MqttRepository.unregisterListener(this)
+    }
+
+    // Idle Ads
+    private lateinit var idleAdController: com.example.mqttpanelcraft.ui.IdleAdController
+
+    override fun onResume() {
+        super.onResume()
+        if (::idleAdController.isInitialized) {
+            idleAdController.start()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (::idleAdController.isInitialized) {
+            idleAdController.stop()
+        }
+    }
+    
+    override fun dispatchTouchEvent(ev: android.view.MotionEvent?): Boolean {
+        if (::idleAdController.isInitialized) {
+            idleAdController.onUserInteraction()
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     // JS Interface

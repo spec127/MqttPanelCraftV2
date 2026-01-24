@@ -28,16 +28,7 @@
         android:id="@+id/switchLockLandscape"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Lock Landscape (Left)"
-        android:checked="false"
-        android:textSize="14sp"
-        android:layout_marginBottom="12dp" />
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switchLockLandscapeReverse"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lock Landscape (Right)"
+        android:text="Lock Landscape"
         android:checked="false"
         android:textSize="14sp"
         android:layout_marginBottom="12dp" />
