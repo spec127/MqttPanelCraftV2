@@ -556,11 +556,20 @@ class ProjectViewActivity : AppCompatActivity() {
             sheetBehavior.isLocked = isEditMode
         }
 
+        // Toggle Toolbar Navigation Icon (Hamburger)
         if (isEditMode) {
             fabMode.setImageResource(android.R.drawable.ic_media_play)
             guideOverlay.visibility = View.VISIBLE
             sidebarManager.showComponentsPanel()
             findViewById<View>(R.id.btnUndo).visibility = View.VISIBLE
+            
+            // Show Sidebar Toggle
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_add_bold) // White bold add icon
+            // Fix: Restore Navigation Listener for Drawer (because Run Mode overrides it)
+            findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar).setNavigationOnClickListener {
+                sidebarManager.openDrawer()
+            }
             
             // Unlock Drawer for Component Palette
             drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED)
@@ -576,15 +585,25 @@ class ProjectViewActivity : AppCompatActivity() {
             // But if we toggle, we might want to keep state.
             // state = STATE_HIDDEN ?? 
             // Let's keep existing logic but allow Hide.
-             if (sheetBehavior.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN) {
-                 sheetBehavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
-             }
+            if (sheetBehavior.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN) {
+                sheetBehavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+            }
             
         } else {
             fabMode.setImageResource(android.R.drawable.ic_menu_edit)
             guideOverlay.visibility = View.GONE // Guides off in run mode
             // Sidebar Disable in Run Mode
             drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+            
+            // Run Mode: Show Back Button to Exit
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
+            
+            // Restore functionality: Clicking back exits the activity (or Run Mode?)
+            // Usually in Run Mode inside a Project, "Back" would go back to Dashboard.
+            findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar).setNavigationOnClickListener {
+                onBackPressed()
+            }
             
             findViewById<View>(R.id.btnUndo).visibility = View.GONE
             
@@ -723,6 +742,12 @@ class ProjectViewActivity : AppCompatActivity() {
             }
         }
         sidebarManager.setupComponentPalette(drawerLayout)
+        
+        // Exit App Button Logic
+        findViewById<android.view.View>(R.id.btnExitApp)?.setOnClickListener {
+             finishAffinity() // Close all activities and exit app
+        }
+        
         // sidebarRunMode removed
         
         // sidebarRunMode removed

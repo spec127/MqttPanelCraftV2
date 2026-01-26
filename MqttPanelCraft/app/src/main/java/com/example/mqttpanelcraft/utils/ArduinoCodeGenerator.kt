@@ -9,6 +9,10 @@ import java.io.InputStreamReader
 object ArduinoCodeGenerator {
 
     fun generate(context: Context, project: Project): String {
+        if (project.type == com.example.mqttpanelcraft.model.ProjectType.WEBVIEW) {
+            return generateForWebView(context, project)
+        }
+        
         try {
             // 1. Load Templates
             val jsonStr = loadJSONFromAsset(context, "arduino_templates.json") ?: return "// Error: Template not found"
@@ -121,6 +125,159 @@ object ArduinoCodeGenerator {
         }
     }
 
+    private fun generateForWebView(context: Context, project: Project): String {
+        try {
+             // 1. Load Base Templates
+            val jsonStr = loadJSONFromAsset(context, "arduino_templates.json") ?: return "// Error: Template not found"
+            val templates = JSONObject(jsonStr)
+            val base = templates.getJSONObject("base")
+
+            // FIX: If customCode is empty (e.g. user never saved), fallback to Default Template
+            var htmlContent = project.customCode
+            var usedFallback = false
+            if (htmlContent.isEmpty()) {
+                 htmlContent = HtmlTemplates.generateDefaultHtml(project)
+                 usedFallback = true
+            }
+            
+            // 2. Scan HTML for Topics (Smart Handling)
+            // Strategy:
+            // A. Find "const VAR_NAME = TOPIC_BASE + '/relative/path';"
+            // B. Find "mqtt.subscribe(VAR_NAME)" OR "mqtt.subscribe('LITERAL')" (App Input -> Arduino Output)
+            // C. Find "mqtt.publish(VAR_NAME)" OR "mqtt.publish('LITERAL')" (App Output -> Arduino Input)
+            
+            val topicVarMap = mutableMapOf<String, String>()
+            
+            // Refined Regex to be more robust:
+            // Matches: const/let/var VAR = VAR + "STRING"
+            val varDefRegex = Regex("(?:const|let|var)\\s+(\\w+)\\s*=\\s*\\w+\\s*\\+\\s*['\"]([^'\"]+)['\"]")
+            
+            varDefRegex.findAll(htmlContent).forEach { match ->
+                topicVarMap[match.groupValues[1]] = match.groupValues[2]
+            }
+
+            // Regex for Subscribe & Publish
+            val subRegex = Regex("mqtt\\.subscribe\\s*\\(\\s*([^)]+)\\s*\\)")
+            val pubRegex = Regex("mqtt\\.publish\\s*\\(\\s*([^,)]+)")  // Capture first arg (topic)
+            
+            val appSubs = mutableSetOf<String>() // Arduino should PUBLISH (Output)
+            val appPubs = mutableSetOf<String>() // Arduino should SUBSCRIBE (Input)
+
+            val rawMatchesSub = mutableListOf<String>()
+            val rawMatchesPub = mutableListOf<String>()
+            
+            // Process App Subs
+            subRegex.findAll(htmlContent).forEach { match ->
+                val arg = match.groupValues[1].trim()
+                rawMatchesSub.add(arg)
+                val resolved = resolveTopic(arg, topicVarMap)
+                if (resolved.isNotEmpty()) appSubs.add(resolved)
+            }
+
+            // Process App Pubs
+            pubRegex.findAll(htmlContent).forEach { match ->
+                val arg = match.groupValues[1].trim()
+                rawMatchesPub.add(arg)
+                val resolved = resolveTopic(arg, topicVarMap)
+                if (resolved.isNotEmpty()) appPubs.add(resolved)
+            }
+
+            val sb = StringBuilder()
+            
+            // Header
+            var header = base.optString("header", "")
+            val cleanProjName = project.name.replace(" ", "_")
+            val baseTopic = "$cleanProjName/${project.id}" 
+            
+            header = header.replace("{{BROKER}}", project.broker)
+                           .replace("{{PORT}}", project.port.toString())
+                           .replace("{{BASE_TOPIC}}", baseTopic)
+            
+            sb.append(header)
+            sb.append("\n/* [WebView Analysis]\n")
+            sb.append("   Source: ${if (usedFallback) "Default Template (Project code was empty)" else "Custom Code"}\n")
+            sb.append("   Found Variables: ${topicVarMap.keys.joinToString(", ")}\n")
+            sb.append("   App Publishes (Arduino Subscribes): ${appPubs.joinToString(", ")}\n")
+            sb.append("   App Subscribes (Arduino Publishes): ${appSubs.joinToString(", ")}\n")
+            sb.append("*/\n\n")
+
+            // Global Vars (Stub)
+            sb.append(base.optString("globals", "")).append("\n")
+            
+            // Setup
+            var setupStart = base.optString("setup_start", "")
+            sb.append(setupStart)
+            
+            // Subscribe Calls (Derived from App PLUBS)
+            if (appPubs.isEmpty()) {
+                sb.append("  // INFO: No 'mqtt.publish' detected in App code.\n")
+                sb.append("  // If the App sends commands, ensure it uses mqtt.publish('topic', ...)\n")
+            }
+
+            appPubs.forEach { relPath ->
+                // If it starts with / it is relative to base.
+                if (relPath.startsWith("/")) {
+                     sb.append("  client.subscribe((String(baseTopic) + \"$relPath\").c_str());\n")
+                } else {
+                     sb.append("  client.subscribe((String(baseTopic) + \"/$relPath\").c_str());\n")
+                }
+            }
+            sb.append(base.optString("setup_mid", ""))
+            sb.append(base.optString("setup_end", ""))
+
+            // Loop
+            sb.append(base.optString("loop_start", ""))
+            
+            // Generate Loop Logic (Derived from App SUBS -> Arduino PUBLISH)
+            if (appSubs.isEmpty()) {
+                 sb.append("  // INFO: No 'mqtt.subscribe' detected in App code.\n")
+            } else {
+                 sb.append("  // --- Examples: Sending Data to App ---\n")
+                 appSubs.forEach { relPath ->
+                     val suffix = if(relPath.startsWith("/")) relPath else "/$relPath"
+                     sb.append("  // To send to '$suffix':\n")
+                     sb.append("  // client.publish((String(baseTopic) + \"$suffix\").c_str(), \"Hello App\");\n")
+                 }
+                 sb.append("  // -------------------------------------\n")
+            }
+            
+            sb.append(base.optString("loop_end", ""))
+            
+            // Receiver
+            sb.append(base.optString("receiver_head", ""))
+            
+            // Receiver Logic (Derived from App PUBS)
+            appPubs.forEach { relPath ->
+                val suffix = if(relPath.startsWith("/")) relPath else "/$relPath"
+                
+                sb.append("  // Match: BASE + $suffix\n")
+                sb.append("  if (String(topic).endsWith(\"$suffix\")) {\n")
+                sb.append("      Serial.print(\"[$suffix] \"); Serial.println((char*)payload);\n")
+                sb.append("      // TODO: Act on command (e.g. if payload is 'ON')...\n")
+                sb.append("  }\n")
+            }
+            
+            sb.append(base.optString("receiver_tail", ""))
+            
+            return sb.toString()
+            
+        } catch (e: Exception) {
+            return "// Error generating WebView code: ${e.message}"
+        }
+    }
+
+    private fun resolveTopic(arg: String, varMap: Map<String, String>): String {
+        // Check if it's a known variable
+        if (varMap.containsKey(arg)) {
+            return varMap[arg]!!
+        } 
+        // Check if it's a literal string
+        if (arg.startsWith("'") || arg.startsWith("\"")) {
+            return arg.trim('\'', '"')
+        }
+        return ""
+    }
+
     private fun loadJSONFromAsset(context: Context, fileName: String): String? {
         return try {
             val stream = context.assets.open(fileName)
@@ -139,3 +296,4 @@ object ArduinoCodeGenerator {
         }
     }
 }
+

@@ -42,83 +42,152 @@ class SidebarManager(
         return drawerLayout?.isDrawerOpen(GravityCompat.START) == true
     }
 
-    // Setup listeners for component palette items (to be implemented fully)
     fun setupComponentPalette(rootView: View) {
-        val categories = listOf(
-            R.id.cardText to "TEXT",
-            R.id.cardImage to "IMAGE",
-            R.id.cardButton to "BUTTON",
-            R.id.cardSlider to "SLIDER",
-            R.id.cardLed to "LED",
-            R.id.cardThermometer to "THERMOMETER",
-            R.id.cardCamera to "CAMERA"
-        )
-        
+        val container = rootView.findViewById<android.widget.LinearLayout>(R.id.cardsContainer) ?: return
+        container.removeAllViews()
+
+        val registry = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry
+        val allDefs = registry.getAllTypes().mapNotNull { registry.get(it) }
+
+        // Define Group Order
+        val groupOrder = listOf("DISPLAY", "CONTROL", "SENSOR")
+        val grouped = allDefs.groupBy { it.group }
+
+        val inflater = android.view.LayoutInflater.from(rootView.context)
+        val density = rootView.resources.displayMetrics.density
+        fun dpToPx(dp: Int): Int = (dp * density).toInt()
+
+        // Shared Touch Listener
         val touchListener = View.OnTouchListener { view, event ->
-             if (event.action == android.view.MotionEvent.ACTION_DOWN) {
-                 val tag = view.tag as? String ?: return@OnTouchListener false
-                 
-                 val item = android.content.ClipData.Item(tag)
-                 val dragData = android.content.ClipData(tag, arrayOf(android.content.ClipDescription.MIMETYPE_TEXT_PLAIN), item)
-                 
-                 // Generate "Real" Preview View for Shadow
-                 val checkContext = view.context
-                 
-                 // Registry only
-                 val def = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(tag)
-                 val (w, h) = if (def != null) {
-                      val density = checkContext.resources.displayMetrics.density
-                      Pair((def.defaultSize.width * density).toInt(), (def.defaultSize.height * density).toInt())
-                 } else {
-                      Pair(300, 300)
-                 }
+            if (event.action == android.view.MotionEvent.ACTION_DOWN) {
+                val tag = view.tag as? String ?: return@OnTouchListener false
 
-                 // Create temp preview for shadow
-                 val previewView = def?.createView(checkContext, true) ?: View(checkContext)
-                 
-                 // FIX: Apply default styles (Shape, Color, etc.) via onUpdateView
-                 if (def != null) {
-                     val dummyData = com.example.mqttpanelcraft.model.ComponentData(
-                         id = -1,
-                         type = tag,
-                         x = 0f,
-                         y = 0f,
-                         width = w,
-                         height = h,
-                         label = def.labelPrefix,
-                         topicConfig = "",
-                         props = mutableMapOf()
-                     )
-                     def.onUpdateView(previewView, dummyData)
-                 }
+                val item = android.content.ClipData.Item(tag)
+                val dragData = android.content.ClipData(tag, arrayOf(android.content.ClipDescription.MIMETYPE_TEXT_PLAIN), item)
 
-                 val widthSpec = View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY)
-                 val heightSpec = View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY)
-                 previewView.measure(widthSpec, heightSpec)
-                 previewView.layout(0, 0, w, h)
-                 
-                 val shadow = object : View.DragShadowBuilder(previewView) {
-                     override fun onProvideShadowMetrics(outShadowSize: android.graphics.Point, outShadowTouchPoint: android.graphics.Point) {
-                         outShadowSize.set(previewView.measuredWidth, previewView.measuredHeight)
-                         outShadowTouchPoint.set(previewView.measuredWidth / 2, previewView.measuredHeight / 2)
-                     }
-                     override fun onDrawShadow(canvas: android.graphics.Canvas) {
-                         previewView.draw(canvas)
-                     }
-                 }
+                // Generate "Real" Preview View for Shadow
+                val checkContext = view.context
 
-                 view.startDragAndDrop(dragData, shadow, null, 0)
-                 closeDrawer()
-                 return@OnTouchListener true
-             }
-             false
+                // Registry only
+                val def = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(tag)
+                val (w, h) = if (def != null) {
+                    val d = checkContext.resources.displayMetrics.density
+                    Pair((def.defaultSize.width * d).toInt(), (def.defaultSize.height * d).toInt())
+                } else {
+                    Pair(300, 300)
+                }
+
+                // Create temp preview for shadow
+                val previewView = def?.createView(checkContext, true) ?: View(checkContext)
+
+                // FIX: Apply default styles (Shape, Color, etc.) via onUpdateView
+                if (def != null) {
+                    val dummyData = com.example.mqttpanelcraft.model.ComponentData(
+                        id = -1,
+                        type = tag,
+                        x = 0f,
+                        y = 0f,
+                        width = w,
+                        height = h,
+                        label = def.labelPrefix,
+                        topicConfig = "",
+                        props = mutableMapOf()
+                    )
+                    def.onUpdateView(previewView, dummyData)
+                }
+
+                val widthSpec = View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY)
+                val heightSpec = View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY)
+                previewView.measure(widthSpec, heightSpec)
+                previewView.layout(0, 0, w, h)
+
+                val shadow = object : View.DragShadowBuilder(previewView) {
+                    override fun onProvideShadowMetrics(outShadowSize: android.graphics.Point, outShadowTouchPoint: android.graphics.Point) {
+                        outShadowSize.set(previewView.measuredWidth, previewView.measuredHeight)
+                        outShadowTouchPoint.set(previewView.measuredWidth / 2, previewView.measuredHeight / 2)
+                    }
+
+                    override fun onDrawShadow(canvas: android.graphics.Canvas) {
+                        previewView.draw(canvas)
+                    }
+                }
+
+                view.startDragAndDrop(dragData, shadow, null, 0)
+                closeDrawer()
+                return@OnTouchListener true
+            }
+            false
         }
 
-        val cards = categories.mapNotNull { (id, tag) ->
-            val card = rootView.findViewById<View>(id)
-            card?.tag = tag
-            card?.setOnTouchListener(touchListener)
-            if (card != null) card to tag else null
+        // Search List for filtering
+        val searchList = mutableListOf<Pair<View, String>>()
+
+        groupOrder.forEach { groupName ->
+            val defsInGroup = grouped[groupName] ?: return@forEach
+
+            // Add Header
+            val header = android.widget.TextView(rootView.context).apply {
+                text = groupName.lowercase().replaceFirstChar { it.uppercase() } // "Display"
+                textSize = 16f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+
+                val typedValue = android.util.TypedValue()
+                context.theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
+                setTextColor(typedValue.data)
+
+                val params = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(0, 0, 0, dpToPx(8))
+                layoutParams = params
+            }
+            container.addView(header)
+
+            // Chunk by 2
+            defsInGroup.chunked(2).forEach { rowDefs ->
+                val rowCtx = rootView.context
+                val row = android.widget.LinearLayout(rowCtx).apply {
+                    orientation = android.widget.LinearLayout.HORIZONTAL
+                    val params = android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    params.setMargins(0, 0, 0, dpToPx(16))
+                    layoutParams = params
+                }
+
+                rowDefs.forEach { def ->
+                    val card = inflater.inflate(R.layout.item_sidebar_component, row, false)
+                    // Set Icon
+                    val img = card.findViewById<android.widget.ImageView>(R.id.imgIcon)
+                    img.setImageResource(def.iconResId)
+
+                    // Set Label
+                    val tv = card.findViewById<android.widget.TextView>(R.id.tvLabel)
+
+                    // Special Case for Thermometer -> Level Indicator (User preference)
+                    tv.text = if (def.type == "THERMOMETER") "Level Indicator" else def.type.lowercase().replaceFirstChar { it.uppercase() }
+
+                    card.tag = def.type
+                    card.setOnTouchListener(touchListener)
+
+                    row.addView(card)
+                    searchList.add(card to def.type)
+                }
+
+                // Filler if only 1 to prevent stretching
+                if (rowDefs.size == 1) {
+                    val filler = android.view.View(rowCtx)
+                    val params = android.widget.LinearLayout.LayoutParams(0, 1)
+                    params.weight = 1f
+                    params.setMargins(dpToPx(4), 0, dpToPx(4), 0)
+                    filler.layoutParams = params
+                    row.addView(filler)
+                }
+
+                container.addView(row)
+            }
         }
 
         // Search Logic
@@ -127,23 +196,23 @@ class SidebarManager(
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s.toString().trim().lowercase()
-                cards.forEach { (view, tag) ->
-                    // Search by Tag (e.g. "BUTTON") or visible name guessing
-                    // Mapping specific search aliases could be better, but Tag is close enought usually.
-                    // THERMOMETER -> "Level Indicator" in XML. 
-                    val searchable = when(tag) {
-                         "THERMOMETER" -> "level indicator thermometer"
-                         else -> tag.lowercase()
+                searchList.forEach { (view, tag) ->
+                    val searchable = when (tag) {
+                        "THERMOMETER" -> "level indicator thermometer"
+                        else -> tag.lowercase()
                     }
+
+                    // For now, we simply toggle visibility.
+                    // Note: Hiding individual cards in a row might break alignment if we don't handle the row.
+                    // Simpler approach: If query is not empty, check if match.
                     
                     if (query.isEmpty() || searchable.contains(query)) {
                         view.visibility = View.VISIBLE
-                        // Restore layout params if needed? (weight might be affected if we use GONE)
-                        // If we use GONE, the other item in row expands.
-                        // If we use INVISIBLE, space is kept.
-                        // User likely wants GONE to filter list.
+                        // We might need to handle the parent row visibility if all children are hidden?
+                        // This simplistic search hides the CARD but keeps the empty space in the LinearLayout row.
+                        // It's acceptable for now as a "simple search". 
                     } else {
-                        view.visibility = View.GONE
+                        view.visibility = View.INVISIBLE // Use INVISIBLE to keep layout structure stable
                     }
                 }
             }

@@ -97,6 +97,10 @@ class DashboardActivity : AppCompatActivity() {
     
     override fun onResume() {
         super.onResume()
+        
+        // Re-apply sort mode to ensure "Last Opened" updates or other changes are reflected in order
+        applySortMode(currentSortMode)
+        
         // Refresh Banner Ad every time we return
         // Defer Ad Load to allow UI to render first (speeds up Theme Switch)
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
@@ -169,7 +173,9 @@ class DashboardActivity : AppCompatActivity() {
 
         binding.navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_about -> Toast.makeText(this, "About MqttPanelCraft v1.0", Toast.LENGTH_SHORT).show()
+                R.id.nav_about -> {
+                    startActivity(Intent(this, AboutActivity::class.java))
+                }
                 R.id.nav_language -> showLanguageDialog()
             }
             binding.drawerLayout.closeDrawer(GravityCompat.START)

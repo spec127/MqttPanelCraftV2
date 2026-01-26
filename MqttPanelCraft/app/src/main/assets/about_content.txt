@@ -1,0 +1,56 @@
+MqttPanelCraft
+Version {VERSION_NAME}
+Copyright © 2026
+
+Privacy & Legal
+
+Privacy Policy: {PRIVACY_POLICY_LINK}
+Contact: {SUPPORT_EMAIL}
+
+Trademarks:
+All trademarks, logos, and brand names are the property of their respective owners. This app is not affiliated with, sponsored, or endorsed by Google or the Eclipse Foundation.
+
+Third-Party Services
+
+This app integrates the following third-party service(s):
+
+Google Mobile Ads SDK (AdMob)
+
+Purpose: Ads / Monetization
+
+Terms & Policies: Your use of the Google Mobile Ads SDK is governed by Google’s applicable terms and policies.
+
+Open Source Notices
+
+This app includes open-source components. We provide the following notices to comply with their license requirements.
+If you believe any attribution is missing or incorrect, please contact us at {SUPPORT_EMAIL}.
+
+1) AndroidX Libraries (Core, AppCompat, Lifecycle)
+
+License: Apache License 2.0
+
+Source: Android Open Source Project / AndroidX
+
+2) Material Components for Android
+
+License: Apache License 2.0
+
+Source: Material Components for Android
+
+3) Kotlin Coroutines
+
+License: Apache License 2.0
+
+Source: kotlinx.coroutines
+
+4) Eclipse Paho MQTT Client (MQTTv3)
+
+License: Eclipse Public License 2.0 (EPL-2.0) and Eclipse Distribution License 1.0 (EDL-1.0)
+
+Source: Eclipse Paho Java Client (MQTT)
+
+License Texts
+
+Full license texts are available in the app under “Open Source Licenses”.
+
+(Recommended) The license list and texts are generated and displayed using Google’s OSS Licenses tooling to include applicable third-party license metadata.

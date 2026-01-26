@@ -75,14 +75,43 @@ class SetupActivity : AppCompatActivity() {
         setupToolbar()
         setupViews()
         
+        // Initialize Views for ID
+        val tilProjectId = findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.tilProjectId)
+        val etProjectId = findViewById<TextInputEditText>(R.id.etProjectId)
+
+        // Global ID Generation Logic (Refresh Button)
+        tilProjectId.setEndIconOnClickListener {
+            // Confirmation only needed if editing existing project to prevent breaking links
+            if (projectId != null) {
+                AlertDialog.Builder(this)
+                    .setTitle("Change Project ID")
+                    .setMessage("Warning: Changing the ID will treat this as a new entry. Are you sure?")
+                    .setPositiveButton("Generate New ID") { _, _ ->
+                         etProjectId.setText(ProjectRepository.generateId())
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            } else {
+                // Create Mode: Just generate
+                etProjectId.setText(ProjectRepository.generateId())
+            }
+        }
+        
+        // Copy ID
+        etProjectId.setOnClickListener {
+            val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            val clip = android.content.ClipData.newPlainText("Project ID", etProjectId.text.toString())
+            clipboard.setPrimaryClip(clip)
+            android.widget.Toast.makeText(this, "ID Copied", android.widget.Toast.LENGTH_SHORT).show()
+        }
+
         // Check for Edit Mode
         projectId = intent.getStringExtra("PROJECT_ID")
         if (projectId != null) {
             setupEditMode(projectId!!)
         } else {
-             // Create Mode: Import is visible, Export is gone (default in XML)
-             // Create Mode Default: Label is Project Name (User Req 1)
-             findViewById<android.widget.TextView>(R.id.tvProjectIdLabel).text = "Project Name"
+             // Create Mode: Generate initial random ID
+             etProjectId.setText(ProjectRepository.generateId())
         }
 
         setupWindowInsets()
@@ -127,8 +156,9 @@ class SetupActivity : AppCompatActivity() {
         val project = ProjectRepository.getProjectById(id) ?: return
         originalProject = project
 
-        // Show Export
+        // Show Export & Arduino Code
         btnExport.visibility = android.view.View.VISIBLE
+        findViewById<android.view.View>(R.id.btnExportArduino).visibility = android.view.View.VISIBLE
 
         etName.setText(project.name)
         etBroker.setText(project.broker)
@@ -136,37 +166,9 @@ class SetupActivity : AppCompatActivity() {
         etUser.setText(project.username)
         etPassword.setText(project.password)
 
-        // v2: Show Project ID + Change Button
-        val containerProjectId = findViewById<android.view.View>(R.id.containerProjectId)
-        val tvProjectId = findViewById<TextView>(R.id.tvProjectId)
-        val btnChangeId = findViewById<MaterialButton>(R.id.btnChangeId)
-
-        containerProjectId.visibility = android.view.View.VISIBLE
-        tvProjectId.text = id
-
-        btnChangeId.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle("Change Project ID")
-                .setMessage("Warning: Changing the ID will treat this as a new entry. Are you sure?")
-                .setPositiveButton("Generate New ID") { _, _ ->
-                     val newId = ProjectRepository.generateId()
-                     tvProjectId.text = newId
-                }
-                .setNegativeButton("Cancel", null)
-                .show()
-        }
-
-        // Edit Mode: Label is Project ID (User Req 1)
-        findViewById<android.widget.TextView>(R.id.tvProjectIdLabel).text = "Project ID"
-
-        // v38: Copy ID to Clipboard
-        tvProjectId.setOnClickListener {
-            val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText("Project ID", tvProjectId.text.toString())
-            clipboard.setPrimaryClip(clip)
-            android.widget.Toast.makeText(this, "ID Copied", android.widget.Toast.LENGTH_SHORT).show()
-        }
-
+        // Set ID (Listeners already set in onCreate)
+        val etProjectId = findViewById<TextInputEditText>(R.id.etProjectId)
+        etProjectId.setText(id)
 
         // etName is already set above
         // etBroker is already set above
@@ -183,10 +185,14 @@ class SetupActivity : AppCompatActivity() {
     private fun setupToolbar() {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back) // Need this icon, or use standard back
-        // For now use default if arrow back not custom created, or create one.
-        // Standard Android usually has one if displayHomeAsUp is true.
-        // If not creating specific drawable, system default works.
+        
+        // Fix: Tint Back Arrow for Dark Mode
+        val backArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back)?.mutate()
+        val isDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val color = if (isDark) Color.WHITE else Color.BLACK
+        backArrow?.setTint(color)
+        
+        supportActionBar?.setHomeAsUpIndicator(backArrow) 
     }
     
     override fun onSupportNavigateUp(): Boolean {
@@ -243,6 +249,30 @@ class SetupActivity : AppCompatActivity() {
 
         btnImport.setOnClickListener { showImportDialog() }
         btnExport.setOnClickListener { showExportDialog() }
+        
+        findViewById<android.view.View>(R.id.btnExportArduino).setOnClickListener {
+            // Generate temporary project object for valid state
+            val tempProject = originalProject ?: run {
+                 // Warn if new project not saved? Or try to construct on fly?
+                 // Constructing on fly is better UX.
+                 val name = etName.text.toString().ifBlank { "Untitled" }
+                 val broker = etBroker.text.toString().ifBlank { "broker" }
+                 
+                 Project(
+                    id = projectId ?: "temp_id",
+                    name = name,
+                    broker = broker,
+                    port = etPort.text.toString().toIntOrNull() ?: 1883,
+                    username = etUser.text.toString(),
+                    password = etPassword.text.toString(),
+                    type = selectedType,
+                    components = pendingComponents ?: mutableListOf(),
+                    customCode = pendingCustomCode ?: ""
+                 )
+            }
+            com.example.mqttpanelcraft.ui.ArduinoExportManager.showExportDialog(this, tempProject)
+        }
+        
         // shadowed var removals
         
         cardHome = findViewById(R.id.cardHome)
@@ -526,9 +556,9 @@ class SetupActivity : AppCompatActivity() {
 
         // Check if ID was changed in UI (Only in Edit Mode)
         if (projectId != null) {
-             val tvProjectId = findViewById<TextView>(R.id.tvProjectId)
-             val currentUiId = tvProjectId.text.toString()
-             if (currentUiId != projectId) {
+             val etProjectId = findViewById<TextInputEditText>(R.id.etProjectId)
+             val currentUiId = etProjectId.text.toString()
+             if (currentUiId.isNotEmpty() && currentUiId != projectId) {
                  finalId = currentUiId
              }
         }

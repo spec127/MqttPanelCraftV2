@@ -26,7 +26,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bannerAdContainer"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/btnSaveProject"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
         <LinearLayout
@@ -35,143 +36,124 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- Import/Export Actions -->
+            <!-- Row 1: Import / Export -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="12dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnImportJson"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="6dp"
                     android:text="Import JSON" 
                     android:textSize="14sp"
                     android:textColor="@color/primary"
-                    android:contentDescription="Import Configuration"/>
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnExportJson"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="6dp"
                     android:text="Export JSON" 
                     android:textSize="14sp"
                     android:textColor="@color/primary"
                     android:visibility="gone"
-                    android:contentDescription="Export Configuration"/>
-            </LinearLayout>
-
-            <!-- Project ID -->
-            <TextView
-                android:id="@+id/tvProjectIdLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Project ID"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <!-- Project ID (Read Only + Regenerate) -->
-            <LinearLayout
-                android:id="@+id/containerProjectId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                tools:visibility="visible"
-                android:gravity="bottom"
-                android:layout_marginBottom="16dp">
-                
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <!-- Removed Small Label -->
-                    
-                    <TextView
-                        android:id="@+id/tvProjectId"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="ID: abc1234567"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:fontFamily="monospace"
-                        android:background="@drawable/bg_card_unselected"
-                        android:padding="12dp"
-                        android:ellipsize="end"
-                        android:maxLines="1"/>
-                </LinearLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnChangeId"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Change" 
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    app:strokeColor="#757575"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"/>
             </LinearLayout>
 
+            <!-- Row 2: Arduino Code (Edit Mode Only) -->
+             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnExportArduino"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="16dp"
+                android:text="Export Arduino Code" 
+                android:textSize="14sp"
+                android:textColor="@color/primary"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+            <!-- Project ID (Input Box Style - Always Visible) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilProjectId"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Project ID"
+                android:layout_marginBottom="16dp"
+                android:visibility="visible"
+                app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_refresh"
+                app:endIconContentDescription="Generate New ID">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etProjectId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:cursorVisible="false"
+                    android:text="abc12345"
+                    android:textSize="16sp"
+                    android:paddingVertical="16dp"
+                    android:fontFamily="monospace"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Row 3: Name -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilProjectName"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="@string/hint_project_name">
+                android:hint="@string/hint_project_name"
+                android:layout_marginBottom="12dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etProjectName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName" />
+                    android:inputType="textPersonName"
+                    android:textSize="16sp"
+                    android:paddingVertical="16dp"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Broker -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/label_mqtt_broker"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <!-- Broker & Port Row -->
+            <!-- Row 4: Broker & Port -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilBroker"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.7"
+                    android:layout_weight="0.75"
                     android:layout_marginEnd="8dp"
-                    android:hint="Broker Address">
+                    android:hint="Broker">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etBroker"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textUri" />
+                        android:inputType="textUri"
+                        android:textSize="16sp"
+                        android:paddingVertical="16dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
                 
                 <com.google.android.material.textfield.TextInputLayout
@@ -179,7 +161,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.3"
+                    android:layout_weight="0.25"
                     android:hint="Port">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -187,69 +169,68 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="1883"
-                        android:inputType="number" />
+                        android:inputType="number"
+                        android:textSize="16sp"
+                        android:paddingVertical="16dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
             
-            <!-- Username -->
+            <!-- Row 5: User (Stacked) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilUser"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="Username (Optional)">
+                android:layout_marginBottom="12dp"
+                android:hint="User">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etUser"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:textSize="16sp"
+                    android:paddingVertical="16dp"/>
             </com.google.android.material.textfield.TextInputLayout>
-            
-            <!-- Password -->
+        
+            <!-- Row 6: Password (Stacked) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilPassword"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="Password (Optional)">
+                android:layout_marginBottom="16dp"
+                android:hint="Password">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPassword" />
+                    android:inputType="textPassword"
+                    android:textSize="16sp"
+                    android:paddingVertical="16dp"/>
             </com.google.android.material.textfield.TextInputLayout>
-            
-            <!-- Test Connection Button -->
+
+            <!-- Test Connection (Compact) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnTestConnection"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_height="48dp"
                 android:text="@string/btn_test_connection"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:layout_marginBottom="24dp"/>
 
-            <!-- Theme Selector -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/label_theme"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
+            <!-- Theme Cards (Larger) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
 
-                <!-- IOT Card (Formerly Home) -->
+                <!-- IOT Panel -->
                 <LinearLayout
                     android:id="@+id/cardHome"
                     android:layout_width="0dp"
@@ -258,13 +239,13 @@
                     android:layout_marginEnd="8dp"
                     android:background="@drawable/bg_card_selected"
                     android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:orientation="horizontal"
+                    android:padding="24dp"> <!-- Increased padding -->
 
                     <ImageView
                         android:id="@+id/ivHome"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:src="@drawable/ic_panel_mode"
                         app:tint="@color/primary"
                         android:contentDescription="@string/theme_home"/>
@@ -273,13 +254,14 @@
                         android:id="@+id/tvHome"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="12dp"
                         android:text="@string/theme_home"
                         android:textColor="@color/primary"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Webview Card (Moved from bottom) -->
+                <!-- Webview -->
                 <LinearLayout
                     android:id="@+id/cardWebview"
                     android:layout_width="0dp"
@@ -288,13 +270,13 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/bg_card_unselected"
                     android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:orientation="horizontal"
+                    android:padding="24dp">
 
                     <ImageView
                         android:id="@+id/ivWebview"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:src="@drawable/ic_globe"
                         app:tint="#757575"
                         android:contentDescription="Webview"/>
@@ -303,67 +285,67 @@
                         android:id="@+id/tvWebview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="12dp"
                         android:text="Webview"
                         android:textColor="#757575"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Screen Orientation -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Orientation"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
+            <!-- Orientation -->
             <RadioGroup
                 android:id="@+id/rgOrientation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="8dp">
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="24dp">
 
                 <RadioButton
                     android:id="@+id/rbSensor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sensor/Auto"
-                    android:layout_weight="1"/>
+                    android:text="Auto"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="16dp"/>
                 
                 <RadioButton
                     android:id="@+id/rbPortrait"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Portrait"
-                    android:layout_weight="1"/>
+                    android:textSize="14sp"
+                    android:layout_marginEnd="16dp"/>
                 
                 <RadioButton
                     android:id="@+id/rbLandscape"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Landscape"
-                    android:layout_weight="1"/>
+                    android:textSize="14sp"/>
             </RadioGroup>
-
-            <!-- Save Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSaveProject"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:backgroundTint="@color/primary"
-                android:paddingVertical="12dp"
-                android:text="@string/btn_save_start"
-                android:textSize="18sp" />
 
         </LinearLayout>
 
     </ScrollView>
+
+    <!-- Save Button (Docked at Bottom) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSaveProject"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/primary"
+        android:text="@string/btn_save_start"
+        android:textSize="16sp"
+        app:cornerRadius="28dp"
+        app:layout_constraintBottom_toTopOf="@+id/bannerAdContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <FrameLayout
         android:id="@+id/bannerAdContainer"

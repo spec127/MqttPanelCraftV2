@@ -16,6 +16,8 @@ object ThermometerDefinition : IComponentDefinition {
     override val type = "THERMOMETER"
     override val defaultSize = Size(160, 100)
     override val labelPrefix = "temp"
+    override val iconResId = android.R.drawable.ic_menu_info_details
+    override val group = "SENSOR"
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode)

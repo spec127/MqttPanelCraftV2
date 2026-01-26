@@ -40,10 +40,10 @@ object ProjectRepository {
         if (file == null || !file!!.exists()) {
              com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "File does not exist or null. Creating defaults.")
              synchronized(this) {
-                 if (projects.isEmpty()) {
-                    projects.add(Project("1", "Smart Home", "broker.emqx.io", 1883, "", "", "", ProjectType.HOME, false, orientation = "SENSOR"))
-                    projects.add(Project("2", "Office Env", "test.mosquitto.org", 1883, "", "", "", ProjectType.FACTORY, false, orientation = "SENSOR"))
-                 }
+                if (projects.isEmpty()) {
+                    // Do not create default sample projects.
+                    // User wants a clean slate for tutorials.
+                }
                  saveProjects()
                  updateLiveData()
              }

@@ -15,6 +15,8 @@ object LedDefinition : IComponentDefinition {
     override val type = "LED"
     override val defaultSize = Size(80, 80) // Specific Default
     override val labelPrefix = "led"
+    override val iconResId = android.R.drawable.star_on
+    override val group = "SENSOR"
 
     // Appearance
     override fun createView(context: Context, isEditMode: Boolean): View {

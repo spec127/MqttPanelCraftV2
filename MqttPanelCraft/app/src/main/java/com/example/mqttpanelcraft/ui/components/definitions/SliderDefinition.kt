@@ -15,6 +15,8 @@ object SliderDefinition : IComponentDefinition {
     override val type = "SLIDER"
     override val defaultSize = Size(160, 100)
     override val labelPrefix = "slider"
+    override val iconResId = android.R.drawable.ic_menu_preferences
+    override val group = "CONTROL"
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode)

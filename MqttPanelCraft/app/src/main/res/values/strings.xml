@@ -8,6 +8,7 @@
     <string name="action_dark_mode">Dark Mode</string>
     <string name="action_ads">Ads</string>
     <string name="action_language">Language</string>
+    <string name="title_open_source_licenses">Open Source Licenses</string>
 
     <!-- Dashboard -->
     <string name="dashboard_title">My Projects</string>

@@ -14,6 +14,8 @@ object ImageDefinition : IComponentDefinition {
     override val type = "IMAGE"
     override val defaultSize = Size(100, 100)
     override val labelPrefix = "img"
+    override val iconResId = android.R.drawable.ic_menu_gallery
+    override val group = "DISPLAY"
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode)

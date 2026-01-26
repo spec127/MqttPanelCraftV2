@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.spec127.mqttpanelcraft"
+        applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -50,8 +50,4 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
-    implementation("com.google.android.gms:play-services-ads:23.0.0")
 }

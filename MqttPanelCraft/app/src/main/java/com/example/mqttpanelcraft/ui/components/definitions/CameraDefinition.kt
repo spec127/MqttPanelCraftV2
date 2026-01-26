@@ -15,6 +15,8 @@ object CameraDefinition : IComponentDefinition {
     override val type = "CAMERA"
     override val defaultSize = Size(120, 100) // Default H was 100
     override val labelPrefix = "cam"
+    override val iconResId = android.R.drawable.ic_menu_camera
+    override val group = "CONTROL"
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode)

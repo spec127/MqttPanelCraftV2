@@ -15,6 +15,8 @@ object TextDefinition : IComponentDefinition {
     override val type = "TEXT"
     override val defaultSize = Size(160, 100)
     override val labelPrefix = "txt"
+    override val iconResId = android.R.drawable.ic_menu_sort_by_size // 'Abc' equivalent
+    override val group = "DISPLAY"
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode)

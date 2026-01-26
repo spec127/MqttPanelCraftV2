@@ -26,8 +26,33 @@ object PremiumManager {
         prefs.edit().putBoolean(KEY_PREMIUM_STATUS, isPremium).apply()
         
         // Notify AdManager to update its state if necessary (e.g. hide existing banners)
-        // Since AdManager logic will now pull from here, we might need a refresh method there 
-        // if it caches anything or has visible views.
         AdManager.refreshAdState(context)
+    }
+
+    /**
+     * Shows a dialog to simulate Premium purchase.
+     */
+    fun showPremiumDialog(context: Context, callback: (Boolean) -> Unit) {
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle("Upgrade to Premium")
+            .setMessage("Unlock advanced features like File Import and remove all ads!\n\n(Simulation: Click 'Buy' to enable)")
+            .setPositiveButton("Buy ($1.99)") { _, _ ->
+                setPremium(context, true)
+                android.widget.Toast.makeText(context, "Premium Unlocked!", android.widget.Toast.LENGTH_SHORT).show()
+                callback(true)
+            }
+            .setNegativeButton("Cancel") { _, _ ->
+                callback(false)
+            }
+            .setNeutralButton("Restore") { _, _ ->
+                 // Simulation: Check if already true? Or just re-enable
+                 if (isPremium(context)) {
+                     android.widget.Toast.makeText(context, "Already Premium", android.widget.Toast.LENGTH_SHORT).show()
+                     callback(true)
+                 } else {
+                     android.widget.Toast.makeText(context, "No purchase found", android.widget.Toast.LENGTH_SHORT).show()
+                 }
+            }
+            .show()
     }
 }

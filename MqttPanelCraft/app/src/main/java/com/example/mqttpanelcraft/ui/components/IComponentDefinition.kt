@@ -15,6 +15,10 @@ interface IComponentDefinition {
     val type: String
     val defaultSize: Size // Ensure unify 100x100 if needed
     val labelPrefix: String // e.g. "button"
+    
+    // 1.5 Sidebar Presentation
+    val iconResId: Int // e.g. R.drawable.ic_button
+    val group: String // e.g. "CONTROL", "DISPLAY", "SENSOR"
 
     // 2. Appearance (Factory)
     fun createView(context: Context, isEditMode: Boolean): View

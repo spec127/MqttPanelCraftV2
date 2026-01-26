@@ -29,27 +29,23 @@ class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
         // Ensure Data Init
         ProjectRepository.initialize(applicationContext)
         
-        // Apply Global Theme
-        com.example.mqttpanelcraft.utils.ThemeManager.applyTheme(this)
-        
         setContentView(R.layout.activity_webview)
         
-        // Fix: Status Bar Spacing & Color
-        val root = findViewById<android.view.View>(R.id.rootCoordinator)
-        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
-            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
+        // Root Coordinator
+        // Note: We do NOT add manual padding here, unlike before. 
+        // CoordinatorLayout manages insets (or stays behind status bar) naturally.
+        
         val windowInsetsController = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
-        val isDarkTheme = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        windowInsetsController.isAppearanceLightStatusBars = !isDarkTheme
+        val isNightMode = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        windowInsetsController.isAppearanceLightStatusBars = !isNightMode
         
         // Toolbar Setup
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white) // Ensure you have this or use default
+        toolbar.setNavigationOnClickListener { finish() }
         
         val tvTitle = findViewById<android.widget.TextView>(R.id.tvToolbarTitle)
         
@@ -62,9 +58,20 @@ class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
         projectId = intent.getStringExtra("PROJECT_ID")
         
         if (projectId != null) {
-            project = ProjectRepository.getProjectById(projectId!!)
-            tvTitle.text = project?.name ?: "Web Project"
+            // Initial Load
+            loadProjectConfig()
         }
+        
+        // Status Bar Color and Flags
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+
+        // Get Background Color (Handles Dark/Light mode via Resource System)
+        val bgColor = androidx.core.content.ContextCompat.getColor(this, R.color.background_color)
+        window.statusBarColor = bgColor
+        
+        // Also set on CoordinatorLayout (Crucial for Scrim)
+        findViewById<androidx.coordinatorlayout.widget.CoordinatorLayout>(R.id.rootCoordinator)?.setStatusBarBackgroundColor(bgColor)
         
         // MQTT Service Integration
         // Ensure Service is Connected using Project Defaults
@@ -100,10 +107,21 @@ class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
         webView.addJavascriptInterface(MQTTInterface(), "mqtt")
 
         // Load Code: Priority: ProjectRepository (JSON) -> Template
-        val initialCode = if (!project?.customCode.isNullOrEmpty()) {
+        // Fix: Check if customCode accidentally contains Kotlin source (starts with 'package')
+        val initialCode = if (!project?.customCode.isNullOrEmpty() && !project!!.customCode.trim().startsWith("package")) {
             project!!.customCode
         } else {
             HtmlTemplates.generateDefaultHtml(project)
+        }
+        
+        // Fix: Editor Style for Dark Mode (Black BG, White Text)
+        if (isNightMode) {
+            codeEditor.setBackgroundColor(android.graphics.Color.BLACK)
+            codeEditor.setTextColor(android.graphics.Color.WHITE)
+            containerCode.setBackgroundColor(android.graphics.Color.BLACK)
+            window.statusBarColor = android.graphics.Color.BLACK // Optional override for editor focus
+        } else {
+             // Light Mode defaults
         }
         
         codeEditor.setText(initialCode)
@@ -124,6 +142,7 @@ class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
                  imm.hideSoftInputFromWindow(codeEditor.windowToken, 0)
                  
                  val code = codeEditor.text.toString()
+
                  
                  // Save to ProjectRepository (Persistence in JSON)
                  if (project != null) {
@@ -147,6 +166,17 @@ class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
                  intent.putExtra("PROJECT_ID", projectId)
                  startActivity(intent)
              }
+        }
+        
+        // Upload Button (Premium)
+        findViewById<android.view.View>(R.id.btnUpload).setOnClickListener {
+            if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
+                filePickerLauncher.launch("*/*")
+            } else {
+                com.example.mqttpanelcraft.utils.PremiumManager.showPremiumDialog(this) { success ->
+                    if (success) filePickerLauncher.launch("*/*")
+                }
+            }
         }
         
         // Info Button: AI Assistance Prompt
@@ -173,6 +203,11 @@ class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
                  **4. Prohibitions**:
                  - Do NOT use module imports or 'include'.
                  - Do NOT assume a backend server exists (Client-side only).
+
+                 **5. Load File Feature**:
+                 - Click the 'Cloud Upload' icon in the toolbar.
+                 - Selected file is passed to JS function: `receiveFile(name, type, dataBase64)`.
+                 - Ensure you implement `receiveFile` in your JS to handle it.
              """.trimIndent()
              
              val builder = androidx.appcompat.app.AlertDialog.Builder(this)
@@ -241,6 +276,29 @@ class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
         if (::idleAdController.isInitialized) {
             idleAdController.start()
         }
+        // Reload Project Config (e.g. Orientation changes from Settings)
+        if (projectId != null) {
+            loadProjectConfig()
+        }
+    }
+
+    private fun loadProjectConfig() {
+        val currentProject = ProjectRepository.getProjectById(projectId!!)
+        if (currentProject != null) {
+            project = currentProject
+            findViewById<android.widget.TextView>(R.id.tvToolbarTitle).text = currentProject.name
+            
+            // Apply Orientation
+            val targetOrientation = when (currentProject.orientation) {
+                "PORTRAIT" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                "LANDSCAPE" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                else -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            }
+            
+            if (requestedOrientation != targetOrientation) {
+                requestedOrientation = targetOrientation
+            }
+        }
     }
 
     override fun onPause() {
@@ -256,6 +314,39 @@ class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
         }
         return super.dispatchTouchEvent(ev)
     }
+
+    // --- File Picker & Premium Logic ---
+    private val filePickerLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            try {
+                // Get Filename
+                var displayName = "unknown_file"
+                contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                        if (nameIndex != -1) displayName = cursor.getString(nameIndex)
+                    }
+                }
+
+                contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val bytes = inputStream.readBytes()
+                    val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+                    val mimeType = contentResolver.getType(uri) ?: "application/octet-stream"
+                    
+                    // Inject JS: receiveFile(name, type, data)
+                    // Sanitize name for JS string
+                    val safeName = displayName.replace("'", "\\'")
+                    webView.evaluateJavascript("if(window.receiveFile) receiveFile('$safeName', '$mimeType', 'data:$mimeType;base64,$base64')", null)
+                    Toast.makeText(this, "File Loaded: $displayName", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this, "Load Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // Removed onCreateOptionsMenu and onOptionsItemSelected as Menu is depleted.
 
     // JS Interface
     inner class MQTTInterface {
