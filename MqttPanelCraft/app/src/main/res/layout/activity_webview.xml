@@ -49,19 +49,19 @@
                 <!-- Upload Icon -->
                 <ImageView
                     android:id="@+id/btnUpload"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_toStartOf="@id/btnInfo"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="16dp"
-                    android:src="@android:drawable/ic_menu_upload"
+                    android:src="@drawable/ic_folder_open_custom"
                     app:tint="@android:color/white" />
 
                 <!-- Info Icon -->
                 <ImageView
                     android:id="@+id/btnInfo"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_toStartOf="@id/btnSettings"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="16dp"
@@ -71,12 +71,12 @@
                 <!-- Settings Icon -->
                 <ImageView
                     android:id="@+id/btnSettings"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="16dp"
-                    android:src="@android:drawable/ic_menu_preferences"
+                    android:src="@drawable/ic_settings_custom"
                     app:tint="@android:color/white" />
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>

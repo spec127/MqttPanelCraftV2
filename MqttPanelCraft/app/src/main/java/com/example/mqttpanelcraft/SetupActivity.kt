@@ -30,7 +30,7 @@ import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 
-class SetupActivity : AppCompatActivity() {
+class SetupActivity : BaseActivity() {
 
     private var selectedType: ProjectType = ProjectType.HOME
     private var projectId: String? = null
@@ -148,7 +148,7 @@ class SetupActivity : AppCompatActivity() {
 
             WindowInsetsCompat.CONSUMED
         }
-        com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, findViewById(R.id.bannerAdContainer))
+        // com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, findViewById(R.id.bannerAdContainer))
         com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
     }
 

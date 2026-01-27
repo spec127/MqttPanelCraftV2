@@ -24,7 +24,8 @@ import java.util.Locale
 import kotlinx.coroutines.*
 import android.view.animation.RotateAnimation
 
-class DashboardActivity : AppCompatActivity() {
+
+class DashboardActivity : BaseActivity() {
 
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var projectAdapter: ProjectAdapter
@@ -258,17 +259,32 @@ class DashboardActivity : AppCompatActivity() {
 
     // --- Language Handling ---
     private fun showLanguageDialog() {
-        val languages = arrayOf("English", "繁體中文")
-        val currentLang = com.example.mqttpanelcraft.utils.LocaleManager.getLanguageCode(this)
-        val checkedItem = if (currentLang == "zh") 1 else 0
+        // Options: System Default, English, Traditional Chinese
+        val languages = arrayOf(
+            getString(R.string.lang_system_default), // Need to add this string resource
+            "English", 
+            "繁體中文"
+        )
+        val codes = arrayOf(
+            com.example.mqttpanelcraft.utils.LocaleManager.CODE_AUTO,
+            com.example.mqttpanelcraft.utils.LocaleManager.CODE_EN,
+            com.example.mqttpanelcraft.utils.LocaleManager.CODE_ZH
+        )
+
+        val currentCode = com.example.mqttpanelcraft.utils.LocaleManager.getLanguageCode(this)
+        var checkedItem = codes.indexOf(currentCode)
+        if (checkedItem == -1) checkedItem = 0 // Default to Auto if unknown
 
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.dialog_language_title))
             .setSingleChoiceItems(languages, checkedItem) { dialog, which ->
-                val selectedCode = if (which == 1) "zh" else "en"
-                if (selectedCode != currentLang) {
+                val selectedCode = codes[which]
+                if (selectedCode != currentCode) {
                     com.example.mqttpanelcraft.utils.LocaleManager.setLocale(this, selectedCode)
-                    recreate() // Restart Activity
+                    // Full App Restart
+                    val intent = Intent(this, DashboardActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
                 }
                 dialog.dismiss()
             }

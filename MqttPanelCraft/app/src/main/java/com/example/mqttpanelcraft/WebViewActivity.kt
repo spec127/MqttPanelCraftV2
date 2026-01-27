@@ -15,7 +15,7 @@ import com.example.mqttpanelcraft.service.MqttService
 import com.example.mqttpanelcraft.utils.HtmlTemplates
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class WebViewActivity : AppCompatActivity(), MqttRepository.MessageListener {
+class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
 
     private lateinit var webView: WebView
     private lateinit var codeEditor: EditText

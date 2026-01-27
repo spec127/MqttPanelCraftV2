@@ -19,7 +19,7 @@ import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import java.util.Locale
 
-class ProjectViewActivity : AppCompatActivity() {
+class ProjectViewActivity : BaseActivity() {
 
     // ViewModel
     private lateinit var viewModel: ProjectViewModel
@@ -140,6 +140,29 @@ class ProjectViewActivity : AppCompatActivity() {
         // 3. Interaction (Input)
         val peekHeightPx = (50 * resources.displayMetrics.density).toInt()
         interactionManager = CanvasInteractionManager(editorCanvas, guideOverlay, peekHeightPx, object : CanvasInteractionManager.InteractionCallbacks {
+            override fun onComponentSelected(id: Int) {
+                if (isEditMode) {
+                     if (selectedComponentId != id) {
+                         selectedComponentId = id
+                         val comp = viewModel.components.value?.find { it.id == id }
+                         val view = renderer.getView(id)
+                         if (comp != null && view != null) {
+                             // Selection Only: Bind Properties but force collapse
+                             val sheet = findViewById<View>(R.id.bottomSheet)
+                             val behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
+                             behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+                             propertiesManager.showProperties(view, comp, autoExpand = false)
+                         }
+                         // Render Selection Border
+                         viewModel.components.value?.let { renderer.render(it, isEditMode, selectedComponentId) }
+                         updateSheetState()
+                         
+                         // Legacy Occlusion Update (Translation)
+                         editorCanvas.post { updateCanvasOcclusion() }
+                      }
+                }
+            }
+
             override fun onComponentClicked(id: Int) {
                 if (isEditMode) {
                     val sheet = findViewById<View>(R.id.bottomSheet)
@@ -154,7 +177,7 @@ class ProjectViewActivity : AppCompatActivity() {
                     } else {
                         // Component Logic:
                         // 1. If ALREADY selected -> EXPAND (Second Click)
-                        // 2. If NEW selection -> SELECT & BIND but KEEP COLLAPSED (First Click)
+                        // 2. If NEW selection -> SELECT (First Click)
                         
                         if (selectedComponentId == id) {
                              // Second Click: Expand
@@ -164,16 +187,8 @@ class ProjectViewActivity : AppCompatActivity() {
                                  propertiesManager.showProperties(view, comp, autoExpand = true)
                              }
                         } else {
-                             // First Click: Select Only
-                             selectedComponentId = id
-                             val comp = viewModel.components.value?.find { it.id == id }
-                             val view = renderer.getView(id)
-                             if (comp != null && view != null) {
-                                 // Bind data so dragging works, but DO NOT auto-expand yet.
-                                 // Ensure sheet is collapsed (Peeked) so user can see header & drag handle
-                                 behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
-                                 propertiesManager.showProperties(view, comp, autoExpand = false)
-                             }
+                             // First Click: Select Only 
+                             onComponentSelected(id)
                         }
                     }
                     // Trigger Re-render to update Selection Border
@@ -181,17 +196,8 @@ class ProjectViewActivity : AppCompatActivity() {
                     
                     updateCanvasOcclusion()
                     updateSheetState() // Sync Draggability
-                } else {
-                    // RUN MODE
-                    if (id == -1) {
-                         // Background Click -> Collapse Log Console (if expanded)
-                         val sheet = findViewById<View>(R.id.bottomSheet)
-                         val behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
-                         if (behavior.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED) {
-                             behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
-                         }
-                    }
-                } 
+                }
+                // RUN MODE: Background clicks ignored (Prevents auto-collapse)
             }
 
             override fun onComponentMoved(id: Int, newX: Float, newY: Float) {
@@ -389,6 +395,18 @@ class ProjectViewActivity : AppCompatActivity() {
                     behaviorManager.attachBehavior(view, comp)
                 }
             }
+
+            // Auto-Resize Canvas for Scrolling
+            // FrameLayout with setX/Y children doesn't auto-size. We must force it.
+            if (components.isNotEmpty()) {
+                val maxY = components.maxOf { it.y + it.height }
+                editorCanvas.tag = maxY // Store for occlusion logic
+                // Post to ensure BottomSheet layout is complete before calculating occlusion
+                editorCanvas.post { updateCanvasOcclusion() }
+            } else {
+                editorCanvas.tag = 0f
+                editorCanvas.post { updateCanvasOcclusion() }
+            }
         }
         
         viewModel.project.observe(this) { project ->
@@ -558,6 +576,9 @@ class ProjectViewActivity : AppCompatActivity() {
 
         // Toggle Toolbar Navigation Icon (Hamburger)
         if (isEditMode) {
+            // Restore Touch Listener for Drag/Drop
+            editorCanvas.setOnTouchListener { _, event -> interactionManager.handleTouch(event) }
+
             fabMode.setImageResource(android.R.drawable.ic_media_play)
             guideOverlay.visibility = View.VISIBLE
             sidebarManager.showComponentsPanel()
@@ -590,6 +611,9 @@ class ProjectViewActivity : AppCompatActivity() {
             }
             
         } else {
+            // Run Mode: Remove Touch Listener to allow NestedScrollView to handle scrolling fully
+            editorCanvas.setOnTouchListener(null)
+
             fabMode.setImageResource(android.R.drawable.ic_menu_edit)
             guideOverlay.visibility = View.GONE // Guides off in run mode
             // Sidebar Disable in Run Mode
@@ -827,37 +851,68 @@ class ProjectViewActivity : AppCompatActivity() {
 
     private fun updateCanvasOcclusion(bottomSheet: View? = null) {
         val sheet = bottomSheet ?: findViewById(R.id.bottomSheet) ?: return
-        val canvas = findViewById<View>(R.id.editorCanvas) ?: return
         
-        val selectedId = selectedComponentId
-        if (selectedId == null) {
-            canvas.translationY = 0f
-            return
+        if (isEditMode) {
+            // LEGACY LOGIC: Shift Canvas Y to keep selected component visible
+            // This logic pushes the entire canvas up using translationY
+            val canvas = findViewById<View>(R.id.editorCanvas) ?: return
+            val selectedId = selectedComponentId
+            
+            if (selectedId == null) {
+                canvas.translationY = 0f
+                return
+            }
+            
+            val compView = renderer.getView(selectedId)
+            if (compView == null) {
+                 canvas.translationY = 0f
+                 return
+            }
+    
+            val compLoc = IntArray(2)
+            compView.getLocationOnScreen(compLoc) 
+            val currentCompBottom = compLoc[1] + compView.height
+            
+            val sheetLoc = IntArray(2)
+            sheet.getLocationOnScreen(sheetLoc)
+            val sheetTop = sheetLoc[1]
+            
+            val margin = (50 * resources.displayMetrics.density)
+            
+            val currentTrans = canvas.translationY
+            // Calculate where the component WOULD be without translation
+            val rawBottom = currentCompBottom - currentTrans
+            
+            // We want (rawBottom + newTrans) < (sheetTop - margin)
+            // newTrans < sheetTop - margin - rawBottom
+            var targetTrans = (sheetTop - margin - rawBottom)
+            
+            // Only translate UP (negative), never down positive (don't detach from top)
+            if (targetTrans > 0f) targetTrans = 0f
+            
+            canvas.translationY = targetTrans
+            
+        } else {
+            // RUN MODE LOGIC: Resize Canvas Height to enable Scrolling
+            // Ensure no residual translation
+            editorCanvas.translationY = 0f
+            
+            val density = resources.displayMetrics.density
+            val sheetLoc = IntArray(2)
+            sheet.getLocationOnScreen(sheetLoc)
+            val sheetTop = sheetLoc[1]
+            val screenHeight = resources.displayMetrics.heightPixels
+            val visibleSheetHeight = (screenHeight - sheetTop).coerceAtLeast(0)
+    
+            // MaxY stored in Tag from ViewModel observer
+            val maxY = (editorCanvas.tag as? Float) ?: 0f
+            val requiredHeight = (maxY + visibleSheetHeight + (20 * density)).toInt()
+            
+            if (editorCanvas.minimumHeight != requiredHeight) {
+                editorCanvas.minimumHeight = requiredHeight
+                editorCanvas.requestLayout()
+            }
         }
-        
-        val compView = renderer.getView(selectedId)
-        if (compView == null) {
-             canvas.translationY = 0f
-             return
-        }
-
-        val compLoc = IntArray(2)
-        compView.getLocationOnScreen(compLoc) 
-        val currentCompBottom = compLoc[1] + compView.height
-        
-        val sheetLoc = IntArray(2)
-        sheet.getLocationOnScreen(sheetLoc)
-        val sheetTop = sheetLoc[1]
-        
-        val margin = (50 * resources.displayMetrics.density)
-        
-        val currentTrans = canvas.translationY
-        val rawBottom = currentCompBottom - currentTrans
-        
-        var targetTrans = (sheetTop - margin - rawBottom)
-        if (targetTrans > 0f) targetTrans = 0f
-        
-        canvas.translationY = targetTrans
     }
 
     private fun updateBottomInset(bottomSheet: View) {
@@ -877,6 +932,60 @@ class ProjectViewActivity : AppCompatActivity() {
         // Inset is the amount of canvas covered by the sheet
         val overlap = (canvasBottom - sheetTop).coerceAtLeast(0)
         interactionManager.updateBottomInset(overlap)
+    }
+
+    private fun ensureComponentVisible(componentId: Int) {
+        val view = renderer.getView(componentId) ?: return
+        val scrollView = findViewById<androidx.core.widget.NestedScrollView>(R.id.editorScrollView)
+        val sheet = findViewById<View>(R.id.bottomSheet)
+        if (scrollView == null || sheet == null) return
+
+        val compLoc = IntArray(2)
+        view.getLocationOnScreen(compLoc)
+        val compBottomScreen = compLoc[1] + view.height
+        
+        val sheetLoc = IntArray(2)
+        sheet.getLocationOnScreen(sheetLoc)
+        val sheetTopScreen = sheetLoc[1]
+        
+        val density = resources.displayMetrics.density
+        // Goal: Component Bottom must be at least 50dp above Sheet Top
+        val safetyMargin = (50 * density).toInt()
+        val visibleLimit = sheetTopScreen - safetyMargin
+        
+        if (compBottomScreen > visibleLimit) {
+            val diff = compBottomScreen - visibleLimit
+            
+            // Check if we can scroll
+            val currentScrollY = scrollView.scrollY
+            // Max scroll is Child Height - Scroll View Height (View port)
+            // Note: editorCanvas.height already includes any minimumHeight override
+            val maxScrollY = editorCanvas.height - scrollView.height
+            val targetScrollY = currentScrollY + diff
+            
+            // If we need to scroll MORE than currently possible
+            if (targetScrollY > maxScrollY) {
+                // Extend Canvas to allow scrolling
+                // We add the 'diff' to the current height essentially
+                // But precisely: We need new maxScrollY >= targetScrollY
+                // newHeight - scrollView.height >= targetScrollY
+                // newHeight >= targetScrollY + scrollView.height
+                
+                val requiredHeight = targetScrollY + scrollView.height
+                
+                if (editorCanvas.minimumHeight < requiredHeight) {
+                    editorCanvas.minimumHeight = requiredHeight
+                    editorCanvas.requestLayout()
+                }
+                
+                // Allow layout to settle before scrolling
+                scrollView.post {
+                    scrollView.smoothScrollBy(0, diff)
+                }
+            } else {
+                scrollView.smoothScrollBy(0, diff)
+            }
+        }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

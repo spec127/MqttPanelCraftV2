@@ -9,6 +9,7 @@
     <string name="action_dark_mode">深色模式</string>
     <string name="action_ads">廣告</string>
     <string name="action_language">語言 (Language)</string>
+    <string name="lang_system_default">系統預設</string>
 
     <!-- Dashboard -->
     <string name="dashboard_title">我的專案</string>

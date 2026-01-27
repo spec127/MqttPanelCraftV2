@@ -8,6 +8,7 @@
     <string name="action_dark_mode">Dark Mode</string>
     <string name="action_ads">Ads</string>
     <string name="action_language">Language</string>
+    <string name="lang_system_default">System Default</string>
     <string name="title_open_source_licenses">Open Source Licenses</string>
 
     <!-- Dashboard -->

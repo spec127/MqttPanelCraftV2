@@ -15,6 +15,7 @@ class CanvasInteractionManager(
 
     interface InteractionCallbacks {
         fun onComponentClicked(id: Int)
+        fun onComponentSelected(id: Int)
         fun onComponentMoved(id: Int, newX: Float, newY: Float)
         fun onComponentResized(id: Int, newW: Int, newH: Int)
         fun onComponentResizing(id: Int, newW: Int, newH: Int)
@@ -49,6 +50,7 @@ class CanvasInteractionManager(
     private var initW = 0
     private var initH = 0
     private var isDragDetected = false
+    private var hasTriggeredDragSelection = false
 
     private var isGridSnapEnabled: () -> Boolean = { true }
     private var isEditMode: () -> Boolean = { false }
@@ -111,7 +113,7 @@ class CanvasInteractionManager(
         }
     }
 
-    private fun handleTouch(event: MotionEvent): Boolean {
+    fun handleTouch(event: MotionEvent): Boolean {
         val x = event.x
         val y = event.y
         val rawX = event.rawX
@@ -122,6 +124,7 @@ class CanvasInteractionManager(
                 downX = rawX
                 downY = rawY
                 isDragDetected = false
+                hasTriggeredDragSelection = false
                 
                 // Only allow Drag/Resize in Edit Mode
                 if (isEditMode()) {
@@ -158,6 +161,11 @@ class CanvasInteractionManager(
                 val dy = rawY - downY
                 if (!isDragDetected && (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD)) {
                     isDragDetected = true
+                    // NEW: Trigger selection immediately on drag start
+                    if (!hasTriggeredDragSelection && activeView != null) {
+                        callbacks.onComponentSelected(activeView!!.id)
+                        hasTriggeredDragSelection = true
+                    }
                 }
 
                 if (currentMode == Mode.DRAGGING && activeView != null) {

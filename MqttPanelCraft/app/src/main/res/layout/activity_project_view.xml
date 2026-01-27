@@ -51,51 +51,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Draggable Trash Bin REMOVED -->
-
-    <!-- Settings Wrench (Overlay - replacing Custom Gear) -->
-    <ImageView
-        android:id="@+id/btnSettings"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:src="@android:drawable/ic_menu_preferences"
-        android:padding="13dp"
-        app:tint="@android:color/white"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_gravity="top|end"
-        android:layout_marginEnd="0dp"
-        android:elevation="10dp"
-        android:visibility="visible" />
-
-    <ImageView
-        android:id="@+id/btnGrid"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:src="@drawable/ic_grid_on" 
-        android:padding="13dp"
-        app:tint="@android:color/white"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_gravity="top|end"
-        android:layout_marginEnd="58dp"
-        android:elevation="10dp"
-        android:visibility="visible" />
-
-    <ImageView
-        android:id="@+id/btnUndo"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:src="@drawable/ic_undo_white" 
-        android:padding="13dp"
-        app:tint="@android:color/white"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_gravity="top|end"
-        android:layout_marginEnd="116dp"
-        android:elevation="10dp"
-        android:visibility="visible" />
-        
-    <!-- Drop to Delete Zone (Overlay) -->
-
-
     <!-- DrawerLayout (Below AppBar) -->
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawerLayout"
@@ -114,27 +69,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <FrameLayout
-                    android:id="@+id/editorCanvas"
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/editorScrollView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingBottom="50dp"
-                    android:clipToPadding="false"
-                    android:background="@color/canvas_background">
-                    
-                    <!-- Background Pattern -->
-                    <com.example.mqttpanelcraft.ui.GridPatternView
-                        android:id="@+id/backgroundGrid"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-                    
-                    <!-- Guidelines Overlay -->
-                     <com.example.mqttpanelcraft.ui.AlignmentOverlayView
-                        android:id="@+id/guideOverlay"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                    android:fillViewport="true">
 
-                </FrameLayout>
+                    <FrameLayout
+                        android:id="@+id/editorCanvas"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingBottom="50dp"
+                        android:clipToPadding="false"
+                        android:background="@color/canvas_background">
+                        
+                        <!-- Background Pattern -->
+                        <com.example.mqttpanelcraft.ui.GridPatternView
+                            android:id="@+id/backgroundGrid"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+                        
+                        <!-- Guidelines Overlay -->
+                         <com.example.mqttpanelcraft.ui.AlignmentOverlayView
+                            android:id="@+id/guideOverlay"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </FrameLayout>
+                </androidx.core.widget.NestedScrollView>
 
             </FrameLayout>
 
@@ -763,6 +725,46 @@
     </LinearLayout>
 
     </androidx.drawerlayout.widget.DrawerLayout>
+
+    <!-- Settings Wrench (Overlay - replacing Custom Gear) -->
+    <ImageView
+        android:id="@+id/btnSettings"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:src="@drawable/ic_settings_custom"
+        android:padding="13dp"
+        app:tint="@android:color/white"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="0dp"
+        android:elevation="10dp"
+        android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/btnGrid"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:src="@drawable/ic_grid_on" 
+        android:padding="13dp"
+        app:tint="@android:color/white"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="58dp"
+        android:elevation="10dp"
+        android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/btnUndo"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:src="@drawable/ic_undo_white" 
+        android:padding="13dp"
+        app:tint="@android:color/white"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="116dp"
+        android:elevation="10dp"
+        android:visibility="visible" />
 
     <!-- Drop to Delete Zone (Overlay Bar) -->
     <FrameLayout
