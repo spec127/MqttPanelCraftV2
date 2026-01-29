@@ -111,7 +111,8 @@ class PropertiesSheetManager(
         
         vPropColorPreview?.setOnClickListener {
             val currentColor = vPropColorPreview?.text.toString()
-            val initialColor = if (currentColor == "Default") "#FFFFFFFF" else currentColor
+            val defaultStr = propertyContainer.context.getString(R.string.properties_label_default)
+            val initialColor = if (currentColor == defaultStr || currentColor == "Default") "#FFFFFFFF" else currentColor
             
             ColorPickerDialog(
                 context = propertyContainer.context,
@@ -154,14 +155,6 @@ class PropertiesSheetManager(
         etPropWidth?.setText(wDp.toString())
         etPropHeight?.setText(hDp.toString())
         isBinding = false
-        
-        // Don't auto-save dimensions during drag, it might cause loops or jitter.
-        // Wait, User wanted "Real-time dimension updates". 
-        // If Model updates Activity, Activity calls this.
-        // If this assumes "User Typed", it triggers save. But `isBinding` prevents loop.
-        // But if user drags handle, Activity updates View.
-        // Activity also updates VM.
-        // So this is for synchronization only.
     }
 
     private fun saveCurrentProps() {
@@ -177,7 +170,9 @@ class PropertiesSheetManager(
                 
                 val name = etPropName?.text.toString()
                 var color = vPropColorPreview?.text.toString()
-                if (color == "Default") color = ""
+                
+                val defaultStr = propertyContainer.context.getString(R.string.properties_label_default)
+                if (color == defaultStr || color == "Default") color = ""
 
                 val topicConfig = getFullTopic()
                 
@@ -191,12 +186,8 @@ class PropertiesSheetManager(
                 if (color.isNotEmpty() && color != "#FFFFFF") {
                      updated.props["color"] = color
                 } else if (color == "#FFFFFF") {
-                     // Explicit white is allowed if user selected it? 
-                     // Or should we treat white as default?
-                     // If User explicitly picked White, let's save it.
                      updated.props["color"] = color
                 } else {
-                     // Remove color prop if it was reset (Implement later if needed, for now just don't add)
                      updated.props.remove("color")
                 }
                 
@@ -215,11 +206,6 @@ class PropertiesSheetManager(
                     }
                 }
                 
-                // Specific properties are updated via callback in Binder, but they might need to be merged?
-                // Actually binder updates `data.props` directly in my implementation of Binder?
-                // ButtonPropertyBinder calls `onUpdate(key, value)`.
-                // WE need to handle that callback.
-                
                 onPropertyUpdated(updated)
             } catch (e: Exception) {
             }
@@ -235,7 +221,7 @@ class PropertiesSheetManager(
         etPropHeight?.setText("")
         etPropHeight?.setText("")
         // etPropColor?.setText("")
-        vPropColorPreview?.text = "#FFFFFF"
+        vPropColorPreview?.text = "#FFFFFF" // Reset to White/Default visualization, will be overridden
         // tvColorHex?.text = ""
         vPropColorPreview?.background = null
         etTopicName?.setText("")
@@ -269,15 +255,10 @@ class PropertiesSheetManager(
                  }
             } 
 
-            // Legacy Fallback removed as files are deleted.
-            // Future components must implement IComponentDefinition.
-            
-            // ...
             etPropName?.setText(data.label)
             
             // Dimensions
             val density = propertyContainer.resources.displayMetrics.density
-            // Fix: Use data dimensions instead of View dimensions which might be 0 before layout
             val wDp = kotlin.math.round(data.width / density).toInt()
             val hDp = kotlin.math.round(data.height / density).toInt()
             etPropWidth?.setText(wDp.toString())
@@ -310,24 +291,21 @@ class PropertiesSheetManager(
             }
 
             
-            // If empty, we show "Default" in UI, but don't set text to #FFFFFF
-            // updateColorPreview handles empty string now
+            // If empty, we show "Default" in UI
             updateColorPreview(colorHex)
             
             // Topic Parsing
             val topicConfig = data.topicConfig
             val parts = topicConfig.split("/")
             
-            // Standard Format: ProjectName/ProjectId/Rest...
             if (parts.size >= 2) {
                  val prefixStr = "${parts[0]}/${parts[1]}/"
                  val nameStr = if (parts.size > 2) parts.drop(2).joinToString("/") else ""
                  
                  tvTopicPrefix?.text = prefixStr
                  etTopicName?.setText(nameStr)
-                 tvTopicSuffix?.text = "" // No suffix logic anymore
+                 tvTopicSuffix?.text = "" 
             } else {
-                // Fallback for non-standard topics
                 tvTopicPrefix?.text = ""
                 etTopicName?.setText(topicConfig)
                 tvTopicSuffix?.text = ""
@@ -349,12 +327,12 @@ class PropertiesSheetManager(
     
     private fun updateColorPreview(hex: String) {
         try {
-            if (hex.isEmpty() || hex == "Default") {
-                 vPropColorPreview?.text = "Default"
+            val defaultStr = propertyContainer.context.getString(R.string.properties_label_default)
+            if (hex.isEmpty() || hex == "Default" || hex == defaultStr) {
+                 vPropColorPreview?.text = defaultStr
                  vPropColorPreview?.setTextColor(Color.BLACK)
-                 vPropColorPreview?.setShadowLayer(0f, 0f, 0f, 0) // Clear shadow
+                 vPropColorPreview?.setShadowLayer(0f, 0f, 0f, 0)
                  
-                 // Set preview to transparent grid or white with border
                  val bg = vPropColorPreview?.background as? GradientDrawable ?: GradientDrawable()
                  bg.setColor(Color.WHITE) 
                  val density = propertyContainer.resources.displayMetrics.density
@@ -365,7 +343,7 @@ class PropertiesSheetManager(
             }
 
             val color = Color.parseColor(hex)
-            // Update View Background (keeping stroke)
+            // Update View Background
             val bg = vPropColorPreview?.background as? GradientDrawable ?: GradientDrawable()
             bg.setColor(color)
             val density = propertyContainer.resources.displayMetrics.density
@@ -376,8 +354,7 @@ class PropertiesSheetManager(
             // Update Text
             vPropColorPreview?.text = hex
             
-            // Contrast Logic (Luminance + Alpha)
-            // If Alpha < 180 (approx 70%), use Black text because background is transparent
+            // Contrast Logic
             val alpha = Color.alpha(color)
             val luminescence = (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color))
             
@@ -391,17 +368,13 @@ class PropertiesSheetManager(
 
     fun hide() {
         propertyContainer.visibility = View.GONE
-        // Helper to find BS and hide it
         findBottomSheetBehavior()?.state = BottomSheetBehavior.STATE_HIDDEN
         currentData = null
-        // Note: We keep lastComponentData for restore logic
     }
     
     fun getLastSelectedId(): Int? = if (lastComponentData != null && lastViewId != View.NO_ID) lastViewId else null
     
     fun restoreLastState(): Boolean {
-        // We prefer external restoration via ViewModel, so this might be redundant if used with Activity logic,
-        // but keeping it for manual internal restore if needed.
         if (lastComponentData != null && lastViewId != View.NO_ID) {
             val view = propertyContainer.rootView.findViewById<View>(lastViewId)
             if (view != null) {
@@ -436,15 +409,12 @@ class PropertiesSheetManager(
         return null
     }
 
-    // === Color Picker 已移至 ColorPickerDialog.kt ===
-    
     private fun updateIconPreview(iconKey: String?) {
         if (iconKey.isNullOrEmpty()) {
             ivPropIconPreview?.setImageDrawable(null)
             ivPropIconPreview?.tag = null
             btnClearIcon?.visibility = View.GONE
         } else {
-            // Map keys to drawables (Simple map for now)
             val resId = getDrawableIdFromKey(iconKey)
             ivPropIconPreview?.setImageResource(resId)
             ivPropIconPreview?.tag = iconKey
@@ -459,18 +429,18 @@ class PropertiesSheetManager(
             "send" -> android.R.drawable.ic_menu_send
             "edit" -> android.R.drawable.ic_menu_edit
             "info" -> android.R.drawable.ic_dialog_info
-            "mic" -> android.R.drawable.btn_star // Placeholder for mic
+            "mic" -> android.R.drawable.btn_star 
             else -> android.R.drawable.ic_menu_help
         }
     }
     
     private fun showIconSelector(anchor: View) {
         val popup = android.widget.PopupMenu(propertyContainer.context, anchor)
-        popup.menu.add("Plus").setOnMenuItemClickListener { updateIconPreview("plus"); saveCurrentProps(); true }
-        popup.menu.add("Delete").setOnMenuItemClickListener { updateIconPreview("delete"); saveCurrentProps(); true }
-        popup.menu.add("Send").setOnMenuItemClickListener { updateIconPreview("send"); saveCurrentProps(); true }
-        popup.menu.add("Edit").setOnMenuItemClickListener { updateIconPreview("edit"); saveCurrentProps(); true }
-        popup.menu.add("Info").setOnMenuItemClickListener { updateIconPreview("info"); saveCurrentProps(); true }
+        popup.menu.add(0, 1, 0, R.string.icon_desc_plus).setOnMenuItemClickListener { updateIconPreview("plus"); saveCurrentProps(); true }
+        popup.menu.add(0, 2, 0, R.string.icon_desc_delete).setOnMenuItemClickListener { updateIconPreview("delete"); saveCurrentProps(); true }
+        popup.menu.add(0, 3, 0, R.string.icon_desc_send).setOnMenuItemClickListener { updateIconPreview("send"); saveCurrentProps(); true }
+        popup.menu.add(0, 4, 0, R.string.icon_desc_edit).setOnMenuItemClickListener { updateIconPreview("edit"); saveCurrentProps(); true }
+        popup.menu.add(0, 5, 0, R.string.icon_desc_info).setOnMenuItemClickListener { updateIconPreview("info"); saveCurrentProps(); true }
         popup.show()
     }
 }

@@ -1,80 +1,169 @@
 <resources>
     <string name="app_name">MqttPanelCraft</string>
-    <string name="nav_header_title">My Projects</string>
-    <string name="nav_header_subtitle">user@example.com</string>
+    <string name="mqttpanelcraft">MqttPanelCraft</string>
+    <string name="app_logo">App Logo</string>
+    <string name="nav_header_app_title">My Projects</string>
+    <string name="nav_header_email_placeholder">user@example.com</string>
+
+    <!-- Version & About -->
+    <string name="about">About</string>
+    <string name="version_format">Version %1$s (Build %2$s)</string>
+    <string name="version_unknown">Version Unknown</string>
+    <string name="title_privacy_policy">Privacy Policy</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="error_privacy_load">Error loading privacy policy.</string>
+    <string name="open_source_licenses">Open Source Licenses</string>
+    <string name="title_open_source_licenses">Open Source Licenses</string>
+    <string name="contact_support">Contact Support</string>
+    <string name="msg_feature_disabled">Feature temporarily disabled</string>
 
     <!-- Drawer Menu -->
-    <string name="action_about">About</string>
-    <string name="action_dark_mode">Dark Mode</string>
-    <string name="action_ads">Ads</string>
-    <string name="action_language">Language</string>
+    <string name="drawer_item_about">About</string>
+    <string name="drawer_item_dark_mode">Dark Mode</string>
+    <string name="drawer_item_disable_ads">Disable Ads</string>
+    <string name="drawer_item_ads">Ads</string>
+    <string name="drawer_item_language">Language</string>
     <string name="lang_system_default">System Default</string>
-    <string name="title_open_source_licenses">Open Source Licenses</string>
+    <string name="dashboard_btn_exit">Exit App</string>
+    <string name="action_edit">Edit</string>
 
     <!-- Dashboard -->
-    <string name="dashboard_title">My Projects</string>
-    <string name="settings_title">Sort / Settings</string>
-    <string name="label_sort_by">Sort By</string>
-    <string name="sort_name_asc">Name (A-Z)</string>
-    <string name="sort_name_desc">Name (Z-A)</string>
-    <string name="sort_date_new">Date (Newest)</string>
-    <string name="sort_date_old">Date (Oldest)</string>
-    <string name="sort_last_opened">Last Opened</string>
-    <string name="empty_state_message">No projects yet</string>
-    <string name="badge_premium">Premium</string>
-    <string name="badge_free">Free</string>
+    <string name="dashboard_toolbar_title">My Projects</string>
+    <string name="dashboard_settings_title">Sort / Settings</string>
+    <!-- Dupes removed -->
+    <string name="dashboard_sort_label">Sort By</string>
+    <string name="dashboard_sort_name_asc">Name (A-Z)</string>
+    <string name="dashboard_sort_name_desc">Name (Z-A)</string>
+    <string name="dashboard_sort_date_new">Date (Newest)</string>
+    <string name="dashboard_sort_date_old">Date (Oldest)</string>
+    <string name="dashboard_sort_last_opened">Last Opened</string>
+    <string name="dashboard_empty_state_msg">No projects yet</string>
+    <string name="dashboard_badge_premium">Premium</string>
+    <string name="dashboard_badge_free">Free</string>
     
     <!-- Setup Activity -->
-    <string name="title_project_setup">Project Setup</string>
-    <string name="label_project_name">Project Name</string>
-    <string name="hint_project_name">My Smart Home</string>
-    <string name="label_mqtt_broker">MQTT Broker</string>
-    <string name="hint_broker">wss://broker.emqx.io:8083</string>
-    <string name="label_theme">Theme / Type</string>
-    <string name="btn_test_connection">Test</string>
-    <string name="btn_save_start">Save and Start</string>
-    <string name="theme_home">Panel</string>
-    <string name="theme_factory">Factory</string>
-    <string name="theme_webview">Advanced (Webview)</string>
-    <string name="error_name_required">Name is required</string>
-    <string name="error_broker_required">Broker URL is required</string>
+    <!-- Setup Activity -->
+    <string name="setup_title_create">Project Setup</string>
+    <string name="setup_title_edit">Edit Project</string>
+    <string name="setup_label_name">Project Name</string>
+    <string name="setup_hint_name">My Smart Home</string>
+    <string name="setup_label_broker">MQTT Broker</string>
+    <string name="setup_label_port">Port</string>
+    <string name="setup_hint_broker_url">wss://broker.emqx.io:8083</string>
+    <string name="setup_label_theme">Theme / Type</string>
+    <string name="setup_btn_test">Test</string>
+    <string name="setup_btn_save_start">Save and Start</string>
+    <string name="setup_btn_update_start">Update &amp; Start</string>
+    <string name="setup_btn_update_only">Update Project</string>
+    <string name="setup_theme_panel">Panel</string>
+    <string name="setup_theme_factory">Factory</string>
+    <string name="setup_theme_webview">Webview</string>
+    <string name="setup_desc_panel">Standard Mode. Intuitively build your dashboard by dragging and dropping components.</string>
+    <string name="setup_desc_webview">Advanced Mode. Design fully custom interfaces using HTML, CSS, and JavaScript.</string>
+    <string name="setup_error_name_required">Name is required</string>
+    <string name="setup_error_broker_required">Broker URL is required</string>
+    <string name="setup_error_only_letters">Only letters, numbers, and underscores allowed</string>
+    <string name="setup_error_name_exists">Project name already exists</string>
 
     <!-- Project View Activity -->
-    <string name="title_project_editor">Project Editor</string>
-    <string name="sidebar_components">Components</string>
-    <string name="category_display">Display</string>
-    <string name="component_text">Text Value</string>
-    <string name="component_gauge">Gauge</string>
-    <string name="sidebar_properties">Properties</string>
-    <string name="prop_helper">Select a component to edit</string>
-    <string name="prop_topic">MQTT Topic</string>
-    <string name="prop_label">Label</string>
-    <string name="console_title">MQTT Console</string>
-    <string name="hint_topic">Topic</string>
-    <string name="hint_payload">Payload</string>
-    <string name="btn_send">SEND</string>
+    <string name="project_view_title">Project Editor</string>
+    <string name="project_sidebar_title_components">Components</string>
+    <string name="project_sidebar_category_display">Display</string>
+    <string name="project_component_text">Text Value</string>
+    <string name="project_component_gauge">Gauge</string>
+    <string name="project_sidebar_title_properties">Properties</string>
+    <string name="project_prop_helper">Select a component to edit</string>
+    <string name="project_prop_topic">MQTT Topic</string>
+    <string name="project_prop_label">Label</string>
+    <string name="project_console_title">MQTT/System Logs</string>
+    <string name="project_hint_topic">Topic</string>
+    <string name="project_hint_payload">Payload</string>
+    <string name="project_btn_send">SEND</string>
+    <string name="project_lock_portrait">Lock Portrait</string>
+    <string name="project_lock_landscape">Lock Landscape</string>
+    <string name="project_hint_topic_target">Topic (Target)</string>
+    <string name="project_label_message">Message</string>
+    <string name="project_btn_send_console">Send</string>
+    <string name="project_prop_display_name">Display Name</string>
     
-    <!-- Messages -->
-    <string name="msg_logs_copied">Logs Copied</string>
-    <string name="msg_init_error">Init Error: %s</string>
-    <string name="msg_component_deleted">Component Deleted</string>
-    <string name="msg_network_error">Network Error</string>
+    <!-- Messages & Toasts -->
+    <string name="project_msg_logs_copied">Logs Copied</string>
+    <string name="project_msg_init_error">Init Error: %s</string>
+    <string name="project_msg_component_deleted">Component Deleted</string>
+    <string name="common_msg_network_error">Network Error</string>
     <string name="msg_mqtt_failed">Connection Failed, Check Broker</string>
     <string name="msg_mqtt_retry">Retrying Connection...</string>
     <string name="msg_mqtt_connected">Connected</string>
-    <string name="msg_select_component">Please select a component first</string>
-    <string name="msg_add_component">Please add a component first</string>
+    <string name="project_msg_select_component">Please select a component first</string>
+    <string name="project_msg_add_component">Please add a component first</string>
+    <string name="project_msg_id_copied">ID Copied</string>
+    <string name="project_msg_components_loaded">Loaded %d components!</string>
+    <string name="dashboard_msg_project_deleted">Project Deleted</string>
+    <string name="dashboard_msg_opening_project">Opening %s...</string>
+    <string name="project_msg_file_saved">Saved to file!</string>
+    <string name="project_msg_file_save_failed">Save Failed: %s</string>
+    <string name="project_msg_file_read_failed">Read Failed: %s</string>
+    <string name="common_msg_copied_clipboard">Copied to Clipboard</string>
     
     <!-- Dialogs -->
     <string name="dialog_language_title">Select Language</string>
     <string name="dialog_delete_title">Delete Project</string>
     <string name="dialog_delete_message">Are you sure you want to delete \'%s\'?</string>
-    <string name="btn_delete">Delete</string>
-    <string name="btn_cancel">Cancel</string>
-    <string name="btn_close">Close</string>
-    <string name="btn_copy">Copy</string>
+    <string name="dialog_change_id_title">Change Project ID</string>
+    <string name="dialog_change_id_msg">Warning: Changing the ID will treat this as a new entry. Are you sure?</string>
+    <string name="dialog_import_title">Import Configuration Payload</string>
+    <string name="dialog_export_title">Export Configuration</string>
+    
+    <!-- Common Buttons & Hints -->
+    <string name="common_btn_delete">Delete</string>
+    <string name="common_btn_cancel">Cancel</string>
+    <string name="common_btn_close">Close</string>
+    <string name="common_btn_copy">Copy</string>
+    <string name="common_btn_gen_id">Generate New ID</string>
+    <string name="hint_paste_json">Paste JSON here...</string>
+    <string name="common_btn_load_text">Load Text</string>
+    <string name="common_btn_load_file">Load File</string>
+    <string name="common_btn_save">Save File</string>
+    <string name="arduino_code_export">Export Arduino Code</string>
+    <!-- close removed, use common_btn_close -->
+    <string name="copy_code">Copy Code</string>
+    <string name="btn_copy_topic_only">Copy Topic</string>
 
-    <!-- Sidebar Run Mode -->
-    <string name="lock_portrait">Lock Portrait</string>
-    <string name="lock_landscape">Lock Landscape</string>
+    <!-- Properties Sidebar -->
+    <!-- Properties Sidebar -->
+    <string name="properties_label_topic">Topic</string>
+    <string name="properties_btn_clone">Clone</string>
+    <string name="properties_label_color">Color</string>
+    <string name="properties_btn_apply">Apply</string>
+    <string name="properties_title">Properties</string>
+    <string name="properties_label_height">H</string>
+    <string name="properties_label_width">W</string>
+    <string name="properties_label_default">Default</string>
+    <string name="properties_label_button_text">Button Text</string>
+    <string name="properties_btn_select_icon">Select Icon</string>
+    <string name="properties_btn_no_icon">No Icon</string>
+    <string name="project_msg_topic_copied">Topic Copied</string>
+    <string name="icon_desc_plus">Plus</string>
+    <string name="icon_desc_delete">Delete</string>
+    <string name="icon_desc_send">Send</string>
+    <string name="icon_desc_edit">Edit</string>
+    <string name="icon_desc_info">Info</string>
+    <string name="import_json">Import JSON</string>
+    <string name="export_json">Export JSON</string>
+    <string name="project_id">Project ID</string>
+    <string name="webview">Webview</string>
+    <string name="auto">Auto</string>
+    <string name="portrait">Portrait</string>
+    <string name="landscape">Landscape</string>
+    <string name="user">User</string>
+    <string name="password">Password</string>
+    
+    <string name="project_hint_search">Search...</string>
+    <string name="project_btn_exit_app">Exit App</string>
+    <string name="project_cat_control">Control</string>
+    <string name="project_cat_sensor">Sensor</string>
+    <string name="project_msg_mqtt_failed">Connection failed. Check Broker settings and tap indicator to retry.</string>
+    <string name="project_msg_mqtt_retrying">Retrying connection...</string>
+    <string name="project_dialog_title_debug_logs">Debug Logs</string>
+    <string name="project_log_mqtt_status">MQTT Status: %1$s</string>
 </resources>

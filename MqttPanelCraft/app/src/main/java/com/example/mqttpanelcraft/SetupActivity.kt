@@ -84,12 +84,12 @@ class SetupActivity : BaseActivity() {
             // Confirmation only needed if editing existing project to prevent breaking links
             if (projectId != null) {
                 AlertDialog.Builder(this)
-                    .setTitle("Change Project ID")
-                    .setMessage("Warning: Changing the ID will treat this as a new entry. Are you sure?")
-                    .setPositiveButton("Generate New ID") { _, _ ->
+                    .setTitle(getString(R.string.dialog_change_id_title))
+                    .setMessage(getString(R.string.dialog_change_id_msg))
+                    .setPositiveButton(getString(R.string.common_btn_gen_id)) { _, _ ->
                          etProjectId.setText(ProjectRepository.generateId())
                     }
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(getString(R.string.common_btn_cancel), null)
                     .show()
             } else {
                 // Create Mode: Just generate
@@ -100,9 +100,9 @@ class SetupActivity : BaseActivity() {
         // Copy ID
         etProjectId.setOnClickListener {
             val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText("Project ID", etProjectId.text.toString())
+            val clip = android.content.ClipData.newPlainText(getString(R.string.project_id), etProjectId.text.toString())
             clipboard.setPrimaryClip(clip)
-            android.widget.Toast.makeText(this, "ID Copied", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(this, getString(R.string.project_msg_id_copied), android.widget.Toast.LENGTH_SHORT).show()
         }
 
         // Check for Edit Mode
@@ -177,9 +177,9 @@ class SetupActivity : BaseActivity() {
         // Load Orientation
         setOrientationUI(project.orientation)
         
-        btnSave.text = "Update & Start"
-        findViewById<MaterialButton>(R.id.btnSaveProject).text = "Update Project"
-        supportActionBar?.title = "Edit Project"
+        btnSave.text = getString(R.string.setup_btn_update_start)
+        findViewById<MaterialButton>(R.id.btnSaveProject).text = getString(R.string.setup_btn_update_only)
+        supportActionBar?.title = getString(R.string.setup_title_edit)
     }
 
     private fun setupToolbar() {
@@ -206,10 +206,10 @@ class SetupActivity : BaseActivity() {
                 contentResolver.openOutputStream(uri)?.use { outputStream ->
                     outputStream.write(pendingExportJson!!.toByteArray())
                 }
-                android.widget.Toast.makeText(this, "Saved to file!", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(this, getString(R.string.project_msg_file_saved), android.widget.Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 e.printStackTrace()
-                android.widget.Toast.makeText(this, "Save Failed: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(this, getString(R.string.project_msg_file_save_failed, e.message), android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -223,7 +223,7 @@ class SetupActivity : BaseActivity() {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                android.widget.Toast.makeText(this, "Read Failed: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(this, getString(R.string.project_msg_file_read_failed, e.message), android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -302,13 +302,13 @@ class SetupActivity : BaseActivity() {
             if (!hasFocus) {
                 val name = etName.text.toString()
                 if (name.isBlank()) {
-                    tilName.error = getString(R.string.error_name_required)
+                    tilName.error = getString(R.string.setup_error_name_required)
                     tilName.isErrorEnabled = true
                 } else if (!name.matches(Regex("^[A-Za-z0-9_]+$"))) {
-                    tilName.error = "Only letters, numbers, and underscores allowed"
+                    tilName.error = getString(R.string.setup_error_only_letters)
                     tilName.isErrorEnabled = true
                 } else if (ProjectRepository.isProjectNameTaken(name, projectId)) {
-                    tilName.error = "Project name already exists"
+                    tilName.error = getString(R.string.setup_error_name_exists)
                     tilName.isErrorEnabled = true
                 } else {
                     tilName.isErrorEnabled = false
@@ -320,7 +320,7 @@ class SetupActivity : BaseActivity() {
         etBroker.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                  if (etBroker.text.toString().isBlank()) {
-                    tilBroker.error = getString(R.string.error_broker_required)
+                    tilBroker.error = getString(R.string.setup_error_broker_required)
                     tilBroker.isErrorEnabled = true
                 } else {
                     tilBroker.isErrorEnabled = false
@@ -344,10 +344,10 @@ class SetupActivity : BaseActivity() {
     private fun showImportDialog() {
         val context = this
         val builder = AlertDialog.Builder(context)
-        builder.setTitle("Import Configuration Payload")
+        builder.setTitle(getString(R.string.dialog_import_title))
 
         val input = android.widget.EditText(context)
-        input.hint = "Paste JSON here..."
+        input.hint = getString(R.string.hint_paste_json)
         input.isSingleLine = false
         input.minLines = 10
         input.gravity = android.view.Gravity.TOP or android.view.Gravity.START
@@ -356,19 +356,19 @@ class SetupActivity : BaseActivity() {
 
         builder.setView(input)
 
-        builder.setPositiveButton("Load Text") { _, _ ->
+        builder.setPositiveButton(getString(R.string.common_btn_load_text)) { _, _ ->
             val json = input.text.toString()
             if (json.isNotBlank()) {
                 processImportedJson(json)
             }
         }
 
-        builder.setNeutralButton("Load File") { _, _ ->
+        builder.setNeutralButton(getString(R.string.common_btn_load_file)) { _, _ ->
              // MIME types: json, text, or any
              openJsonLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
         }
 
-        builder.setNegativeButton("Cancel", null)
+        builder.setNegativeButton(getString(R.string.common_btn_cancel), null)
 
         val dialog = builder.create()
         // Fix: Set input mode on the dialog's window, not via view
@@ -404,7 +404,7 @@ class SetupActivity : BaseActivity() {
 
             pendingCustomCode = imported.customCode
 
-            android.widget.Toast.makeText(this, "Loaded ${imported.components.size} components!", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(this, getString(R.string.project_msg_components_loaded, imported.components.size), android.widget.Toast.LENGTH_SHORT).show()
         } else {
              android.widget.Toast.makeText(this, "Invalid JSON", android.widget.Toast.LENGTH_SHORT).show()
         }
@@ -416,7 +416,7 @@ class SetupActivity : BaseActivity() {
         val json = ProjectRepository.exportProjectToJson(originalProject!!)
         val context = this
         val builder = AlertDialog.Builder(context)
-        builder.setTitle("Export Configuration")
+        builder.setTitle(getString(R.string.dialog_export_title))
 
         val input = android.widget.EditText(context)
         input.setText(json)
@@ -430,19 +430,19 @@ class SetupActivity : BaseActivity() {
 
         builder.setView(input)
 
-        builder.setPositiveButton("Copy") { _, _ ->
+        builder.setPositiveButton(getString(R.string.common_btn_copy)) { _, _ ->
              val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
              val clip = android.content.ClipData.newPlainText("Config JSON", json)
              clipboard.setPrimaryClip(clip)
-             android.widget.Toast.makeText(context, "Copied to Clipboard", android.widget.Toast.LENGTH_SHORT).show()
+              android.widget.Toast.makeText(context, getString(R.string.common_msg_copied_clipboard), android.widget.Toast.LENGTH_SHORT).show()
         }
 
-        builder.setNeutralButton("Save File") { _, _ ->
+        builder.setNeutralButton(getString(R.string.common_btn_save)) { _, _ ->
              pendingExportJson = json
              saveJsonLauncher.launch("${originalProject?.name ?: "config"}.json")
         }
 
-        builder.setNegativeButton("Close", null)
+        builder.setNegativeButton(getString(R.string.common_btn_close), null)
         builder.show()
     }
 
@@ -453,7 +453,7 @@ class SetupActivity : BaseActivity() {
         val pass = etPassword.text.toString()
 
         if (broker.isBlank()) {
-            tilBroker.error = getString(R.string.error_broker_required)
+            tilBroker.error = getString(R.string.setup_error_broker_required)
             tilBroker.isErrorEnabled = true
             return
         } else {
@@ -520,21 +520,21 @@ class SetupActivity : BaseActivity() {
         val pass = etPassword.text.toString()
 
         if (name.isBlank()) {
-            tilName.error = getString(R.string.error_name_required)
+            tilName.error = getString(R.string.setup_error_name_required)
             tilName.isErrorEnabled = true
             return
         }
 
         // Regex Validation
         if (!name.matches(Regex("^[A-Za-z0-9_]+$"))) {
-            tilName.error = "Only letters, numbers, and underscores allowed"
+            tilName.error = getString(R.string.setup_error_only_letters)
             tilName.isErrorEnabled = true
             return
         }
 
         // Duplicate Name Check
         if (ProjectRepository.isProjectNameTaken(name, projectId)) {
-            tilName.error = "Project name already exists"
+            tilName.error = getString(R.string.setup_error_name_exists)
             tilName.isErrorEnabled = true
             return
         }
@@ -542,7 +542,7 @@ class SetupActivity : BaseActivity() {
         tilName.isErrorEnabled = false
 
         if (broker.isBlank()) {
-            tilBroker.error = getString(R.string.error_broker_required)
+            tilBroker.error = getString(R.string.setup_error_broker_required)
             tilBroker.isErrorEnabled = true
             return
         }
@@ -734,16 +734,20 @@ class SetupActivity : BaseActivity() {
         tvWebview.setTextColor(greyColor)
 
         // 2. Highlight selected
+        val tvDesc = findViewById<TextView>(R.id.tvThemeDescription)
+        
         when (type) {
             ProjectType.HOME -> {
                 cardHome.setBackgroundResource(R.drawable.bg_card_selected)
                 ivHome.setColorFilter(primaryColor)
                 tvHome.setTextColor(primaryColor)
+                tvDesc.text = getString(R.string.setup_desc_panel)
             }
             ProjectType.WEBVIEW -> {
                 cardWebview.setBackgroundResource(R.drawable.bg_card_selected)
                 ivWebview.setColorFilter(primaryColor)
                 tvWebview.setTextColor(primaryColor)
+                tvDesc.text = getString(R.string.setup_desc_webview)
             }
             else -> {} // Handle OTHER or Legacy FACTORY (No UI)
         }

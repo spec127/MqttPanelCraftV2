@@ -4,12 +4,12 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
         android:background="@color/background_color">
 
         <com.google.android.material.appbar.AppBarLayout
@@ -51,7 +51,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Sort / Settings"
+                android:text="@string/dashboard_settings_title"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorOnSurface"/>
@@ -80,7 +80,7 @@
             <TextView
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:text="Sort By"
+                 android:text="@string/dashboard_sort_label"
                  android:textSize="14sp"
                  android:textColor="#757575"
                  android:layout_marginBottom="8dp"/>
@@ -92,11 +92,11 @@
                 android:orientation="vertical"
                 android:layout_marginBottom="16dp">
                 
-                <RadioButton android:id="@+id/rbSortNameAsc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Name (A-Z)"/>
-                <RadioButton android:id="@+id/rbSortNameDesc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Name (Z-A)"/>
-                <RadioButton android:id="@+id/rbSortDateNew" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Date (Newest)"/>
-                <RadioButton android:id="@+id/rbSortDateOld" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Date (Oldest)"/>
-                <RadioButton android:id="@+id/rbSortLastOpened" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Last Opened"/>
+                <RadioButton android:id="@+id/rbSortNameAsc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/dashboard_sort_name_asc"/>
+                <RadioButton android:id="@+id/rbSortNameDesc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/dashboard_sort_name_desc"/>
+                <RadioButton android:id="@+id/rbSortDateNew" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/dashboard_sort_date_new"/>
+                <RadioButton android:id="@+id/rbSortDateOld" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/dashboard_sort_date_old"/>
+                <RadioButton android:id="@+id/rbSortLastOpened" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/dashboard_sort_last_opened"/>
             </RadioGroup>
 
 
@@ -131,7 +131,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="No projects yet"
+                android:text="@string/dashboard_empty_state_msg"
                 android:textColor="#BDBDBD"
                 android:textSize="18sp" />
         </LinearLayout>
@@ -157,12 +157,49 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navigationView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/drawerContainer"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:headerLayout="@layout/nav_header"
-        app:menu="@menu/activity_main_drawer" />
+        android:orientation="vertical"
+        android:background="@color/drawer_background"> 
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigationView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:headerLayout="@layout/nav_header"
+            app:menu="@menu/activity_main_drawer" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="32dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnExitApp"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="@string/dashboard_btn_exit"
+                android:textSize="14sp"
+                android:textColor="@color/drawer_btn_text"
+                app:icon="@drawable/ic_close_white"
+                app:iconTint="@color/drawer_btn_icon_tint"
+                app:cornerRadius="28dp"
+                app:backgroundTint="@color/drawer_btn_bg"/>
+        </FrameLayout>
+
+    </LinearLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>

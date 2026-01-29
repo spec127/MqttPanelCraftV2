@@ -84,12 +84,10 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // Settings -> BottomSheet
+        // Settings -> BottomSheet (Removed)
+        btnSettings.visibility = View.GONE
         btnSettings.setOnClickListener {
-            try {
-                showSettingsBottomSheet()
-            } catch (e: Exception) {
-                CrashLogger.logError(this, "Settings Open Failed", e)
-            }
+            // No-op
         }
     }
 
@@ -122,48 +120,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun showSettingsBottomSheet() {
-        val bottomSheetDialog = BottomSheetDialog(this)
-        bottomSheetDialog.setContentView(R.layout.bottom_sheet_settings)
-        
-        val switchDarkMode = bottomSheetDialog.findViewById<SwitchMaterial>(R.id.switchDarkMode)
-        val dropdownLanguage = bottomSheetDialog.findViewById<AutoCompleteTextView>(R.id.dropdownLanguage)
-        
-        // vFix: Hide Sort Option in Login
-        val tvSortLabel = bottomSheetDialog.findViewById<TextView>(R.id.tvSortLabel)
-        val radioGroupSort = bottomSheetDialog.findViewById<android.widget.RadioGroup>(R.id.radioGroupSort)
-        tvSortLabel?.visibility = View.GONE
-        radioGroupSort?.visibility = View.GONE
-        
-        // Setup Dark Mode Switch
-        val currentNightMode = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
-        switchDarkMode?.isChecked = currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        switchDarkMode?.setOnCheckedChangeListener { _, isChecked ->
-            val mode = if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-            AppCompatDelegate.setDefaultNightMode(mode)
-        }
-
-        // Setup Language Dropdown
-        val languages = listOf("English", "繁體中文")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, languages)
-        dropdownLanguage?.setAdapter(adapter)
-        
-        // Set current selection
-        val currentLang = if (resources.configuration.locales[0].language == "zh") "繁體中文" else "English"
-        dropdownLanguage?.setText(currentLang, false)
-        
-        dropdownLanguage?.setOnItemClickListener { _, _, position, _ ->
-            val selected = languages[position]
-            if (selected != currentLang) {
-                val localeCode = if (selected == "繁體中文") "zh" else "en"
-                val regionCode = if (selected == "繁體中文") "TW" else "US"
-                setLocale(localeCode, regionCode)
-                bottomSheetDialog.dismiss()
-            }
-        }
-        
-        bottomSheetDialog.show()
-    }
+    // showSettingsBottomSheet removed
     
     private fun setLocale(languageCode: String, countryCode: String) {
         val locale = Locale(languageCode, countryCode)

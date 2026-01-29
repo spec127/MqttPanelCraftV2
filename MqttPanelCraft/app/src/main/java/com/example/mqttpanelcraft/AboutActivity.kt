@@ -43,10 +43,10 @@ class AboutActivity : BaseActivity() {
             } else {
                 pInfo.versionCode.toLong()
             }
-            tvVersion.text = "Version $version (Build $build)"
+            tvVersion.text = getString(R.string.version_format, version, build.toString())
         } catch (e: Exception) {
             e.printStackTrace()
-            tvVersion.text = "Version Unknown"
+            tvVersion.text = getString(R.string.version_unknown)
         }
 
         findViewById<Button>(R.id.btnPrivacy).setOnClickListener {
@@ -71,7 +71,7 @@ class AboutActivity : BaseActivity() {
         
         findViewById<Button>(R.id.btnOssLicenses).setOnClickListener {
             // Feature disabled as dependencies were reverted
-            android.widget.Toast.makeText(this, "Feature temporarily disabled", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(this, getString(R.string.msg_feature_disabled), android.widget.Toast.LENGTH_SHORT).show()
             // startActivity(Intent(this, com.google.android.gms.oss.licenses.OssLicensesMenuActivity::class.java))
         }
 
@@ -85,13 +85,13 @@ class AboutActivity : BaseActivity() {
         val privacyText = try {
             assets.open("privacy_policy.txt").bufferedReader().use { it.readText() }
         } catch (e: Exception) {
-            "Error loading privacy policy."
+            getString(R.string.error_privacy_load)
         }
         
         androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Privacy Policy")
+            .setTitle(getString(R.string.title_privacy_policy))
             .setMessage(privacyText)
-            .setPositiveButton("Close", null)
+            .setPositiveButton(getString(R.string.common_btn_close), null)
             .show()
     }
 

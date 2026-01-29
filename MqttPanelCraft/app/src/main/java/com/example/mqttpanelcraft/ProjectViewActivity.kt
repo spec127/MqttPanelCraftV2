@@ -117,7 +117,7 @@ class ProjectViewActivity : BaseActivity() {
 
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Init Error: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.project_msg_init_error, e.message), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -232,7 +232,7 @@ class ProjectViewActivity : BaseActivity() {
                         updateSheetState() // Sync Draggability
                     }
                 }
-                Toast.makeText(this@ProjectViewActivity, getString(R.string.msg_component_deleted), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ProjectViewActivity, getString(R.string.project_msg_component_deleted), Toast.LENGTH_SHORT).show()
             }
             
             override fun onDeleteZoneHover(isHovered: Boolean) {
@@ -339,9 +339,9 @@ class ProjectViewActivity : BaseActivity() {
                      // Check if empty project or just no selection
                      val comps = viewModel.components.value
                      if (comps.isNullOrEmpty()) {
-                         Toast.makeText(this, getString(R.string.msg_add_component), Toast.LENGTH_SHORT).show()
+                         Toast.makeText(this, getString(R.string.project_msg_add_component), Toast.LENGTH_SHORT).show()
                      } else {
-                         Toast.makeText(this, getString(R.string.msg_select_component), Toast.LENGTH_SHORT).show()
+                         Toast.makeText(this, getString(R.string.project_msg_select_component), Toast.LENGTH_SHORT).show()
                      }
                  } else {
                      // If selected, toggle expand
@@ -432,7 +432,7 @@ class ProjectViewActivity : BaseActivity() {
                  ProjectViewModel.MqttStatus.CONNECTED -> android.graphics.Color.GREEN
                  ProjectViewModel.MqttStatus.FAILED -> {
                      if (light.tag != "FAILED_SHOWN") {
-                          Toast.makeText(this, "無法連線，請確認Broker設定後點擊燈號重試", Toast.LENGTH_LONG).show()
+                          Toast.makeText(this, getString(R.string.project_msg_mqtt_failed), Toast.LENGTH_LONG).show()
                           light.tag = "FAILED_SHOWN" // Simple debit
                      }
                      android.graphics.Color.RED
@@ -446,11 +446,11 @@ class ProjectViewActivity : BaseActivity() {
              bg?.setColor(color)
              
              // Log Status (User Request)
-             viewModel.addLog("MQTT Status: $status")
+             viewModel.addLog(getString(R.string.project_log_mqtt_status, status))
              
              light.setOnClickListener {
                  if (status == ProjectViewModel.MqttStatus.FAILED) {
-                     Toast.makeText(this, "重試連線中...", Toast.LENGTH_SHORT).show()
+                     Toast.makeText(this, getString(R.string.project_msg_mqtt_retrying), Toast.LENGTH_SHORT).show()
                      viewModel.retryMqtt()
                  } else {
                      Toast.makeText(this, "Status: ${status}", Toast.LENGTH_SHORT).show()
@@ -506,15 +506,15 @@ class ProjectViewActivity : BaseActivity() {
          // Long Press Settings for Logs
          btnSettings.setOnLongClickListener {
              AlertDialog.Builder(this)
-                 .setTitle("Debug Logs")
+                 .setTitle(getString(R.string.project_dialog_title_debug_logs))
                  .setMessage(logConsoleManager.getLogs())
-                 .setPositiveButton("Copy") { _, _ ->
+                 .setPositiveButton(getString(R.string.common_btn_copy)) { _, _ ->
                      val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                      val clip = android.content.ClipData.newPlainText("MqttLogs", logConsoleManager.getLogs())
                      clipboard.setPrimaryClip(clip)
-                     Toast.makeText(this, "Logs Copied", Toast.LENGTH_SHORT).show()
+                     Toast.makeText(this, getString(R.string.project_msg_logs_copied), Toast.LENGTH_SHORT).show()
                  }
-                 .setNegativeButton("Close", null)
+                 .setNegativeButton(getString(R.string.common_btn_close), null)
                  .show()
              true
          }

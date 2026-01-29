@@ -127,7 +127,13 @@ class SidebarManager(
 
             // Add Header
             val header = android.widget.TextView(rootView.context).apply {
-                text = groupName.lowercase().replaceFirstChar { it.uppercase() } // "Display"
+                val headerText = when(groupName) {
+                    "DISPLAY" -> context.getString(R.string.project_sidebar_category_display)
+                    "CONTROL" -> context.getString(R.string.project_cat_control)
+                    "SENSOR" -> context.getString(R.string.project_cat_sensor)
+                    else -> groupName.lowercase().replaceFirstChar { it.uppercase() }
+                }
+                text = headerText
                 textSize = 16f
                 setTypeface(null, android.graphics.Typeface.BOLD)
 

@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorSurface"
-            app:title="About"
+            app:title="@string/about"
             app:titleTextColor="?attr/colorOnSurface"
             app:navigationIcon="@drawable/ic_arrow_back"
             app:navigationIconTint="?attr/colorOnSurface"/>
@@ -38,30 +38,30 @@
 
             <!-- App Logo & Version -->
             <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:src="@drawable/ic_launcher_foreground"
                 android:background="@drawable/ic_launcher_background"
                 app:tint="@color/primary" 
-                android:contentDescription="App Logo"/>
+                android:contentDescription="@string/app_logo"/>
             
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="MqttPanelCraft"
-                android:textSize="20sp"
+                android:text="@string/mqttpanelcraft"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorOnBackground"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="4dp"/>
 
             <TextView
                 android:id="@+id/tvVersion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Version 1.0 (Build 1)"
-                android:textSize="14sp"
+                android:text="@string/version_format"
+                android:textSize="12sp"
                 android:textColor="?android:attr/textColorSecondary"
-                android:layout_marginBottom="24dp"/>
+                android:layout_marginBottom="12dp"/>
 
             <!-- Action Buttons -->
             <LinearLayout
@@ -69,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="8dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPrivacy"
@@ -77,10 +77,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Privacy Policy"
+                    android:text="@string/privacy_policy"
                     android:layout_marginEnd="4dp"
                     app:backgroundTint="@color/purple_500"
-                    android:textColor="@android:color/white"/>
+                    android:textColor="@android:color/white"
+                    android:lines="1"
+                    android:ellipsize="end"/>
                 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnOssLicenses"
@@ -88,20 +90,24 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Open Source Licenses"
+                    android:text="@string/open_source_licenses"
                     android:layout_marginStart="4dp"
                     app:backgroundTint="@color/purple_500"
-                    android:textColor="@android:color/white"/>
+                    android:textColor="@android:color/white"
+                    android:lines="1"
+                    android:ellipsize="end"/>
             </LinearLayout>
             
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnContact"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Contact Support"
+                android:text="@string/contact_support"
                 android:textColor="@color/purple_500"
-                android:layout_marginBottom="24dp"/>
+                app:strokeColor="@color/purple_500"
+                app:strokeWidth="1dp"
+                android:layout_marginBottom="16dp"/>
 
             <View
                 android:layout_width="match_parent"

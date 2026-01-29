@@ -40,6 +40,9 @@ class DashboardActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
+            // Enable Edge-to-Edge
+            androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+            
             binding = ActivityDashboardBinding.inflate(layoutInflater)
             setContentView(binding.root)
 
@@ -53,9 +56,18 @@ class DashboardActivity : BaseActivity() {
             // Setup Window Insets (Status Bar / Nav Bar) handled by fitsSystemWindows and Themes
             // removed manual setOnApplyWindowInsetsListener logic
             
-            // Fix: Explicitly set DrawerLayout status bar color to match background
-            // DrawerLayout with fitsSystemWindows="true" defaults to colorPrimaryDark (Purple) otherwise.
-            binding.drawerLayout.setStatusBarBackgroundColor(androidx.core.content.ContextCompat.getColor(this, R.color.background_color))
+            // Fix: Explicitly set DrawerLayout status bar color to Transparent to let drawer background show through
+            binding.drawerLayout.setStatusBarBackgroundColor(android.graphics.Color.TRANSPARENT)
+            window.statusBarColor = android.graphics.Color.TRANSPARENT
+            window.navigationBarColor = android.graphics.Color.TRANSPARENT
+
+            // Adjust Drawer Width to 2/5 of Screen
+            val drawerContainer = findViewById<android.view.View>(R.id.drawerContainer)
+            drawerContainer?.post {
+                val params = drawerContainer.layoutParams
+                params.width = (resources.displayMetrics.widthPixels * 0.675).toInt() // Reduced by 10% (0.75 * 0.9)
+                drawerContainer.layoutParams = params
+            }
 
             // Initialize Data
             ProjectRepository.initialize(this)
@@ -121,11 +133,11 @@ class DashboardActivity : BaseActivity() {
         val tvBadge = headerView.findViewById<android.widget.TextView>(R.id.tvPremiumBadge) ?: return
         
         if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
-            tvBadge.text = getString(R.string.badge_premium)
+            tvBadge.text = getString(R.string.dashboard_badge_premium)
             tvBadge.setTextColor(android.graphics.Color.parseColor("#FFD700"))
             tvBadge.setBackgroundResource(R.drawable.bg_premium_badge)
         } else {
-            tvBadge.text = getString(R.string.badge_free)
+            tvBadge.text = getString(R.string.dashboard_badge_free)
             tvBadge.setTextColor(android.graphics.Color.parseColor("#BDBDBD"))
             tvBadge.setBackgroundResource(R.drawable.bg_free_badge)
         }
@@ -182,6 +194,14 @@ class DashboardActivity : BaseActivity() {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
+
+        // Footer Exit Button Logic
+        val btnExit = binding.drawerLayout.findViewById<android.view.View>(R.id.btnExitApp)
+        // Note: The ID btnExitApp is inside the drawer layout hierarchy directly now (inside the LinearLayout wrapper)
+        // findViewById looks recursively, so it should find it.
+        btnExit?.setOnClickListener {
+             finishAffinity()
+        }
     }
 
     private fun setupSettingsUI() {
@@ -233,14 +253,14 @@ class DashboardActivity : BaseActivity() {
 
     private fun updateSettingsTitle(tv: android.widget.TextView) {
         val modeText = when(currentSortMode) {
-            1 -> getString(R.string.sort_name_asc)
-            2 -> getString(R.string.sort_name_desc)
-            3 -> getString(R.string.sort_date_new)
-            4 -> getString(R.string.sort_date_old)
-            5 -> getString(R.string.sort_last_opened)
-            else -> "Unknown"
+            1 -> getString(R.string.dashboard_sort_name_asc)
+            2 -> getString(R.string.dashboard_sort_name_desc)
+            3 -> getString(R.string.dashboard_sort_date_new)
+            4 -> getString(R.string.dashboard_sort_date_old)
+            5 -> getString(R.string.dashboard_sort_last_opened)
+            else -> getString(R.string.dashboard_sort_last_opened)
         }
-        tv.text = "${getString(R.string.label_sort_by)}: $modeText / Settings"
+        tv.text = "${getString(R.string.dashboard_sort_label)}: $modeText"
     }
 
     private fun applySortMode(mode: Int) {
@@ -261,7 +281,7 @@ class DashboardActivity : BaseActivity() {
     private fun showLanguageDialog() {
         // Options: System Default, English, Traditional Chinese
         val languages = arrayOf(
-            getString(R.string.lang_system_default), // Need to add this string resource
+            getString(R.string.lang_system_default),
             "English", 
             "繁體中文"
         )
@@ -288,7 +308,7 @@ class DashboardActivity : BaseActivity() {
                 }
                 dialog.dismiss()
             }
-            .setNegativeButton(getString(R.string.btn_cancel), null)
+            .setNegativeButton(getString(R.string.common_btn_cancel), null)
             .show()
     }
 
@@ -306,7 +326,7 @@ class DashboardActivity : BaseActivity() {
                      startActivity(intent)
                 } else {
                      // On Item Click -> Open Project View
-                     Toast.makeText(this, "Opening ${project.name}...", Toast.LENGTH_SHORT).show()
+                     Toast.makeText(this, getString(R.string.dashboard_msg_opening_project, project.name), Toast.LENGTH_SHORT).show()
                      val intent = Intent(this, ProjectViewActivity::class.java)
                      intent.putExtra("PROJECT_ID", project.id)
                      startActivity(intent)
@@ -322,16 +342,16 @@ class DashboardActivity : BaseActivity() {
                     AlertDialog.Builder(this)
                         .setTitle(getString(R.string.dialog_delete_title))
                         .setMessage(getString(R.string.dialog_delete_message, project.name))
-                        .setPositiveButton(getString(R.string.btn_delete)) { _, _ ->
+                        .setPositiveButton(getString(R.string.common_btn_delete)) { _, _ ->
                             try {
                                 // Delete from repository; UI will refresh via projectsLiveData observer
                                 ProjectRepository.deleteProject(project.id)
-                                Toast.makeText(this, getString(R.string.msg_component_deleted), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, getString(R.string.dashboard_msg_project_deleted), Toast.LENGTH_SHORT).show()
                             } catch (e: Exception) {
                                 CrashLogger.logError(this, "Delete Failed", e)
                             }
                         }
-                        .setNegativeButton(getString(R.string.btn_cancel), null)
+                        .setNegativeButton(getString(R.string.common_btn_cancel), null)
                         .show()
                 }
 

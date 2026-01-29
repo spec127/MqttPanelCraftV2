@@ -53,12 +53,12 @@ class ProjectAdapter(
         // Handle menu click
         holder.ivMenu.setOnClickListener { view ->
             val popup = PopupMenu(view.context, view)
-            popup.menu.add("Edit")
-            popup.menu.add("Delete")
+            popup.menu.add(0, 1, 0, R.string.action_edit)
+            popup.menu.add(0, 2, 0, R.string.common_btn_delete)
             popup.setOnMenuItemClickListener { item ->
-                when (item.title) {
-                    "Edit" -> onMenuClick(project, "EDIT")
-                    "Delete" -> onMenuClick(project, "DELETE")
+                when (item.itemId) {
+                    1 -> onMenuClick(project, "EDIT")
+                    2 -> onMenuClick(project, "DELETE")
                 }
                 true
             }

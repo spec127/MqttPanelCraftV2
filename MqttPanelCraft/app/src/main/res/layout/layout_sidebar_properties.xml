@@ -9,7 +9,7 @@
     android:orientation="vertical">
     
     <TextView 
-        android:text="Properties" 
+        android:text="@string/properties_title"
         android:textSize="18sp" 
         android:textStyle="bold" 
         android:textColor="?android:attr/textColorPrimary"
@@ -21,7 +21,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="MQTT Topic"
+        android:hint="@string/properties_label_topic"
         android:textColorHint="?android:attr/textColorHint"
         app:boxStrokeColor="?attr/colorPrimary"
         app:hintTextColor="?attr/colorPrimary"
@@ -44,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:hint="Width (dp)"
+            android:hint="@string/properties_label_width"
             android:textColorHint="?android:attr/textColorHint"
             app:boxStrokeColor="?attr/colorPrimary"
             app:hintTextColor="?attr/colorPrimary"
@@ -61,7 +61,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:hint="Height (dp)"
+            android:hint="@string/properties_label_height"
             android:textColorHint="?android:attr/textColorHint"
             app:boxStrokeColor="?attr/colorPrimary"
             app:hintTextColor="?attr/colorPrimary">
@@ -88,7 +88,7 @@
         android:id="@+id/btnClone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="複製元件"
+        android:text="@string/properties_btn_clone"
         android:layout_marginBottom="8dp"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
     
@@ -103,7 +103,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="顏色："
+            android:text="@string/properties_label_color"
             android:textSize="16sp"
             android:textColor="?android:attr/textColorPrimary"
             android:layout_marginEnd="12dp"/>
@@ -113,7 +113,7 @@
             android:layout_width="60dp"
             android:layout_height="40dp"
             android:gravity="center"
-            android:text="Default"
+            android:text="@string/properties_label_default"
             android:textSize="11sp"
             android:background="@drawable/bg_color_preview"
             android:clickable="true"
@@ -161,6 +161,6 @@
         android:id="@+id/btnSaveProps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Apply"/>
+        android:text="@string/properties_btn_apply"/>
         
 </LinearLayout>

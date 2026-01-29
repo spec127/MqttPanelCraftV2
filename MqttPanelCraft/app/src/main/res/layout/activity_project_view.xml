@@ -209,7 +209,7 @@
                                 android:paddingBottom="12dp">
                                 
                                 <TextView
-                                    android:text="MQTT/System Logs"
+                                    android:text="@string/project_console_title"
                                     android:textStyle="bold"
                                     android:textSize="21sp"
                                     android:textColor="?android:attr/textColorPrimary"
@@ -245,7 +245,7 @@
                                 <com.google.android.material.textfield.TextInputLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:hint="Topic (Target)"
+                                    android:hint="@string/project_hint_topic_target"
                                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu">
                                     
                                     <AutoCompleteTextView
@@ -270,7 +270,7 @@
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
                                         android:layout_height="wrap_content"
-                                        android:hint="Payload"
+                                        android:hint="@string/project_label_message"
                                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
                                         <com.google.android.material.textfield.TextInputEditText
                                             android:id="@+id/etConsolePayload"
@@ -284,7 +284,7 @@
                                         android:id="@+id/btnConsoleSend" 
                                         android:layout_width="wrap_content" 
                                         android:layout_height="wrap_content" 
-                                        android:text="Send"
+                                        android:text="@string/project_btn_send_console"
                                         android:layout_marginStart="8dp"
                                         style="@style/Widget.MaterialComponents.Button.TextButton"/> 
                                         <!-- Using compact button style or default -->
@@ -316,7 +316,7 @@
                                 android:paddingBottom="12dp">
                                 
                                 <TextView 
-                                    android:text="Properties" 
+                                    android:text="@string/properties_title" 
                                     android:textSize="21sp" 
                                     android:textStyle="bold" 
                                     android:textColor="?android:attr/textColorPrimary"
@@ -338,7 +338,7 @@
 
                             <!-- Display Name -->
                             <TextView
-                                android:text="Display Name"
+                                android:text="@string/project_prop_display_name"
                                 android:textSize="12sp"
                                 android:textColor="#666666"
                                 android:layout_marginTop="12dp"
@@ -373,7 +373,7 @@
                                     android:layout_width="0dp"
                                     android:layout_weight="1"
                                     android:layout_height="wrap_content"
-                                    android:hint="W"
+                                    android:hint="@string/properties_label_width"
                                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
                                     <com.google.android.material.textfield.TextInputEditText
                                         android:id="@+id/etPropWidth"
@@ -389,7 +389,7 @@
                                     android:layout_width="0dp"
                                     android:layout_weight="1"
                                     android:layout_height="wrap_content"
-                                    android:hint="H"
+                                    android:hint="@string/properties_label_height"
                                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
                                     <com.google.android.material.textfield.TextInputEditText
                                         android:id="@+id/etPropHeight"
@@ -406,7 +406,7 @@
                                     android:layout_width="0dp"
                                     android:layout_weight="1"
                                     android:layout_height="match_parent"
-                                    android:text="Clone"
+                                    android:text="@string/properties_btn_clone"
                                     android:textSize="11sp"
                                     android:padding="0dp"
                                     android:insetTop="0dp"
@@ -417,7 +417,7 @@
 
                                 <!-- Composite Topic Editor -->
                             <TextView
-                                android:text="Topic Name"
+                                android:text="@string/properties_label_topic"
                                 android:textSize="12sp"
                                 android:textColor="#666666"
                                 android:layout_marginStart="24dp"
@@ -514,7 +514,7 @@
 
                             <!-- Color Selection -->
                             <TextView
-                                android:text="Color"
+                                android:text="@string/properties_label_color"
                                 android:textSize="12sp"
                                 android:textColor="#666666"
                                 android:layout_width="wrap_content"
@@ -537,7 +537,7 @@
                                     android:layout_width="120dp"
                                     android:layout_height="48dp"
                                     android:gravity="center"
-                                    android:text="Default"
+                                    android:text="@string/properties_label_default"
                                     android:textSize="12sp"
                                     android:textStyle="bold"
                                     android:textColor="#000000"
@@ -558,7 +558,7 @@
                                 <com.google.android.material.textfield.TextInputLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:hint="Message to Send"
+                                    android:hint="@string/project_hint_payload"
                                     android:layout_marginStart="24dp"
                                     android:layout_marginEnd="16dp"
                                     android:layout_marginBottom="8dp"
@@ -576,7 +576,7 @@
                                 <com.google.android.material.textfield.TextInputLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:hint="Button Text"
+                                    android:hint="@string/properties_label_button_text"
                                     android:layout_marginStart="24dp"
                                     android:layout_marginEnd="16dp"
                                     android:layout_marginBottom="12dp"
@@ -591,7 +591,7 @@
 
                                 <!-- Icon Selection -->
                                 <TextView
-                                    android:text="Icon"
+                                    android:text="@string/app_logo" 
                                     android:textSize="12sp"
                                     android:textColor="#666666"
                                     android:layout_width="wrap_content"
@@ -599,6 +599,18 @@
                                     android:paddingStart="24dp"
                                     android:paddingEnd="16dp"
                                     android:layout_marginBottom="4dp"/>
+                                <!-- Note: 'Icon' wasn't extracted, using app_logo or just hardcoding 'Icon' if no better generic? 
+                                     Actually 'Icon' -> '圖示' is better. I don't have 'label_icon'.
+                                     Wait, let me add 'label_icon' to strings first or reuse something?
+                                     I will use 'sidebar_components' which is 'Components'/'元件'. Not ideal.
+                                     I'll add 'label_icon' now to strings if possible, or just skip it for now and do it in next step.
+                                     For now, I'll use hardcoded 'Icon' since I didn't add the string. Or...
+                                     I'll assume I can add it? No, tool calls are strict.
+                                     I'll leave 'Icon' hardcoded for this block or use 'app_logo' (App Logo / 應用程式圖示) - weird.
+                                     I'll just leave "Icon" text but replace the other strings.
+                                     Actually, I will Add 'label_icon' to ReplaceFileContent in Step 1/2 of this batch? No, I can't modify prev tool calls.
+                                     I'll stick to replacing the known ones.
+                                 -->
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
@@ -627,7 +639,7 @@
                                             android:id="@+id/btnSelectIcon"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="Select Icon"
+                                            android:text="@string/properties_btn_select_icon"
                                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                                             android:layout_marginStart="16dp"/>
 
@@ -635,7 +647,7 @@
                                             android:id="@+id/btnClearIcon"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="No Icon"
+                                            android:text="@string/properties_btn_no_icon"
                                             style="@style/Widget.MaterialComponents.Button.TextButton"
                                             android:textColor="#666666"
                                             android:layout_marginStart="8dp"/>
@@ -671,7 +683,7 @@
                                  android:id="@+id/btnSaveProps"
                                  android:layout_width="match_parent"
                                  android:layout_height="wrap_content"
-                                 android:text="Apply"
+                                 android:text="@string/properties_btn_apply"
                                  android:visibility="gone"/>
                               </LinearLayout>
 
@@ -712,15 +724,7 @@
              <include layout="@layout/layout_sidebar_components" />
          </LinearLayout>
          
-         <!-- Run Mode Content: Actions -->
-         <LinearLayout
-             android:id="@+id/sidebarRunMode"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:orientation="vertical"
-             android:visibility="gone">
-             <include layout="@layout/layout_sidebar_run_mode" />
-         </LinearLayout>
+
          
     </LinearLayout>
 

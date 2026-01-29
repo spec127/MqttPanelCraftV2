@@ -21,4 +21,11 @@
     <color name="sidebar_section_header">#666666</color>
     <color name="grid_dot_color">#E0E0E0</color>
     <color name="canvas_background">#FFFFFF</color>
+    
+    <!-- Drawer Semantic Colors -->
+    <color name="drawer_background">#FAFAFA</color>
+    <color name="drawer_btn_bg">#EEEEEE</color>
+    <color name="drawer_btn_text">#212121</color>
+    <color name="drawer_btn_icon_tint">#212121</color>
+    <!-- nav_header colors removed as we use drawable-night strategy now -->
 </resources>

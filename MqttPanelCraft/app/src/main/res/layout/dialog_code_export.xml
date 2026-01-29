@@ -7,7 +7,7 @@
     android:background="@android:color/white">
 
     <TextView
-        android:text="Arduino Code Export"
+        android:text="@string/arduino_code_export"
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"
@@ -42,15 +42,25 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Close"
+            android:text="@string/common_btn_close"
             style="@style/Widget.MaterialComponents.Button.TextButton"/>
             
+        <Button
+            android:id="@+id/btnSaveFile"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/common_btn_save"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"/>
+
         <Button
             android:id="@+id/btnCopy"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Copy Code"/>
+            android:text="@string/copy_code"/>
     </LinearLayout>
 
 </LinearLayout>

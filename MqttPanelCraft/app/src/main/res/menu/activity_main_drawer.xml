@@ -3,21 +3,21 @@
     <item
         android:id="@+id/nav_dark_mode"
         android:icon="@drawable/ic_theme" 
-        android:title="Dark Mode"
+        android:title="@string/drawer_item_dark_mode"
         app:actionLayout="@layout/item_drawer_switch"
         xmlns:app="http://schemas.android.com/apk/res-auto"/>
     <item
         android:id="@+id/nav_ads"
         android:icon="@drawable/ic_ads_off"
-        android:title="Disable Ads"
+        android:title="@string/drawer_item_disable_ads"
         app:actionLayout="@layout/item_drawer_switch"
         xmlns:app="http://schemas.android.com/apk/res-auto"/>
     <item
         android:id="@+id/nav_language"
         android:icon="@drawable/ic_globe" 
-        android:title="@string/action_language" />
+        android:title="@string/drawer_item_language" />
     <item
         android:id="@+id/nav_about"
         android:icon="@drawable/ic_google"
-        android:title="@string/action_about" />
+        android:title="@string/drawer_item_about" />
 </menu>
