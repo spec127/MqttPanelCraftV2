@@ -150,6 +150,7 @@ class SetupActivity : BaseActivity() {
         }
         // com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, findViewById(R.id.bannerAdContainer))
         com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
+        com.example.mqttpanelcraft.utils.AdManager.loadInterstitial(this)
     }
 
     private fun setupEditMode(id: String) {
@@ -187,7 +188,7 @@ class SetupActivity : BaseActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         
         // Fix: Tint Back Arrow for Dark Mode
-        val backArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back)?.mutate()
+        val backArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_thick)?.mutate()
         val isDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
         val color = if (isDark) Color.WHITE else Color.BLACK
         backArrow?.setTint(color)
@@ -248,13 +249,20 @@ class SetupActivity : BaseActivity() {
         setOrientationUI("SENSOR")
 
         btnImport.setOnClickListener { showImportDialog() }
-        btnExport.setOnClickListener { showExportDialog() }
+        
+        btnExport.setOnClickListener { 
+             if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
+                 showExportDialog()
+             } else {
+                 com.example.mqttpanelcraft.utils.AdManager.showInterstitial(this) {
+                     showExportDialog()
+                 }
+             }
+        }
         
         findViewById<android.view.View>(R.id.btnExportArduino).setOnClickListener {
             // Generate temporary project object for valid state
             val tempProject = originalProject ?: run {
-                 // Warn if new project not saved? Or try to construct on fly?
-                 // Constructing on fly is better UX.
                  val name = etName.text.toString().ifBlank { "Untitled" }
                  val broker = etBroker.text.toString().ifBlank { "broker" }
                  
@@ -270,7 +278,30 @@ class SetupActivity : BaseActivity() {
                     customCode = pendingCustomCode ?: ""
                  )
             }
-            com.example.mqttpanelcraft.ui.ArduinoExportManager.showExportDialog(this, tempProject)
+            
+            if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
+                 com.example.mqttpanelcraft.ui.ArduinoExportManager.showExportDialog(this, tempProject)
+            } else {
+                 // Check if Ad is Ready
+                 if (com.example.mqttpanelcraft.utils.AdManager.isRewardedReady()) {
+                     var isRewardEarned = false
+                     com.example.mqttpanelcraft.utils.AdManager.showRewarded(this,
+                        onReward = {
+                            isRewardEarned = true
+                        },
+                        onClosed = {
+                            if (isRewardEarned) {
+                                com.example.mqttpanelcraft.ui.ArduinoExportManager.showExportDialog(this, tempProject)
+                            } else {
+                                android.widget.Toast.makeText(this, getString(R.string.msg_limit_reached).replace("Project Limit Reached", "必須完整觀看廣告才能匯出"), android.widget.Toast.LENGTH_LONG).show() // Or custom string
+                            }
+                        }
+                     )
+                 } else {
+                     android.widget.Toast.makeText(this, "廣告載入中...請稍後再試", android.widget.Toast.LENGTH_SHORT).show()
+                     com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
+                 }
+            }
         }
         
         // shadowed var removals

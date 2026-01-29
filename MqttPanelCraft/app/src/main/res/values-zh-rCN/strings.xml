@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MqttPanelCraft</string>
+    <string name="mqttpanelcraft">MqttPanelCraft</string>
+    <string name="app_logo">应用程序图标</string>
+    <string name="nav_header_app_title">我的项目</string>
+    <string name="nav_header_email_placeholder">user@example.com</string>
+
+    <!-- Version & About -->
+    <string name="about">关于</string>
+    <string name="version_format">Version %1$s (Build %2$s)</string>
+    <string name="version_unknown">版本未知</string>
+    <string name="title_privacy_policy">隐私政策</string>
+    <string name="privacy_policy">隐私政策</string>
+    <string name="error_privacy_load">加载隐私政策时发生错误。</string>
+    <string name="open_source_licenses">开源许可</string>
+    <string name="title_open_source_licenses">开源许可</string>
+    <string name="contact_support">联系我们</string>
+    <string name="msg_feature_disabled">功能暂时禁用</string>
+
+    <!-- Drawer Menu -->
+    <string name="drawer_item_about">关于</string>
+    <string name="drawer_item_dark_mode">深色模式</string>
+    <string name="drawer_item_disable_ads">移除广告</string>
+    <string name="drawer_item_ads">广告</string>
+    <string name="drawer_item_language">语言 (Language)</string>
+    <string name="lang_system_default">系统默认</string>
+    <string name="dashboard_btn_exit">退出应用</string>
+    <string name="action_edit">编辑</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_toolbar_title">我的项目</string>
+    <string name="dashboard_settings_title">排序 / 设置</string>
+    <!-- Dupes removed -->
+    <string name="dashboard_sort_label">排序方式</string>
+    <string name="dashboard_sort_name_asc">名称 (A-Z)</string>
+    <string name="dashboard_sort_name_desc">名称 (Z-A)</string>
+    <string name="dashboard_sort_date_new">日期 (最新)</string>
+    <string name="dashboard_sort_date_old">日期 (最旧)</string>
+    <string name="dashboard_sort_last_opened">上次打开</string>
+    <string name="dashboard_empty_state_msg">尚无项目</string>
+    <!-- Badges kept English as requested -->
+    <string name="dashboard_badge_premium">Premium</string>
+    <string name="dashboard_badge_free">Free</string>
+    
+    <!-- Setup Activity -->
+    <!-- Setup Activity -->
+    <string name="setup_title_create">项目设置</string>
+    <string name="setup_title_edit">编辑项目</string>
+    <string name="setup_label_name">项目名称</string>
+    <string name="setup_hint_name">项目名称</string>
+    <string name="setup_label_broker">MQTT Broker</string>
+    <string name="setup_label_port">端口</string>
+    <string name="setup_hint_broker_url">wss://broker.emqx.io:8083</string>
+    <string name="setup_label_theme">主题 / 类型</string>
+    <string name="setup_btn_test">测试连接</string>
+    <string name="setup_btn_save_start">保存并开始</string>
+    <string name="setup_btn_update_start">更新并开始</string>
+    <string name="setup_btn_update_only">更新项目</string>
+    <string name="setup_theme_panel">Panel</string>
+    <string name="setup_theme_factory">工厂模式</string>
+    <string name="setup_theme_webview">Webview</string>
+    <string name="setup_desc_panel">标准模式：通过拖拽组件，直观地布置您的控制画面。</string>
+    <string name="setup_desc_webview">高级模式：使用 HTML 与 JavaScript 打造完全定制的界面。</string>
+    <string name="setup_error_name_required">请输入名称</string>
+    <string name="setup_error_broker_required">请输入 Broker URL</string>
+    <string name="setup_error_only_letters">仅允许字母、数字和下划线</string>
+    <string name="setup_error_name_exists">项目名称已存在</string>
+
+    <!-- Project View Activity -->
+    <string name="project_view_title">项目编辑器</string>
+    <string name="project_sidebar_title_components">组件</string>
+    <string name="project_sidebar_category_display">显示</string>
+    <string name="project_component_text">文本数值</string>
+    <string name="project_component_gauge">仪表盘</string>
+    <string name="project_sidebar_title_properties">属性</string>
+    <string name="project_prop_helper">选择组件以编辑</string>
+    <string name="project_prop_topic">MQTT 主题</string>
+    <string name="project_prop_label">标签</string>
+    <string name="project_console_title">MQTT/系统日志</string>
+    <string name="project_hint_topic">主题</string>
+    <string name="project_hint_payload">消息内容</string>
+    <string name="project_btn_send">发送</string>
+    <string name="project_lock_portrait">锁定竖屏</string>
+    <string name="project_lock_landscape">锁定横屏</string>
+    <string name="project_hint_topic_target">Topic (目标)</string>
+    <string name="project_label_message">消息内容</string>
+    <string name="project_btn_send_console">发送</string>
+    <string name="project_prop_display_name">显示名称</string>
+    
+    <!-- Messages & Toasts -->
+    <string name="project_msg_logs_copied">日志已复制</string>
+    <string name="project_msg_init_error">初始化错误: %s</string>
+    <string name="project_msg_component_deleted">组件已删除</string>
+    <string name="common_msg_network_error">网络错误</string>
+    <string name="msg_mqtt_failed">连接失败，请检查 Broker 设置</string>
+    <string name="msg_mqtt_retry">重试连接中...</string>
+    <string name="msg_mqtt_connected">已连接</string>
+    <string name="project_msg_select_component">请先选择一个组件</string>
+    <string name="project_msg_add_component">请先新增一个组件</string>
+    <string name="project_msg_id_copied">ID 已复制</string>
+    <string name="project_msg_components_loaded">已加载 %d 个组件！</string>
+    <string name="project_msg_file_saved">已保存至文件！</string>
+    <string name="project_msg_file_save_failed">保存失败: %s</string>
+    <string name="project_msg_file_read_failed">读取失败: %s</string>
+    <string name="dashboard_msg_project_deleted">项目已删除</string>
+    <string name="dashboard_msg_opening_project">打开 %s 中...</string>
+    <string name="common_msg_copied_clipboard">已复制到剪贴板</string>
+    
+    <!-- Dialogs -->
+    <string name="dialog_language_title">选择语言</string>
+    <string name="dialog_delete_title">删除项目</string>
+    <string name="dialog_delete_message">确定要删除 \'%s\' 吗？</string>
+    <string name="dialog_change_id_title">更改项目 ID</string>
+    <string name="dialog_change_id_msg">警告：更改 ID 将被视为新项目。您确定吗？</string>
+    <string name="dialog_import_title">导入配置内容</string>
+    <string name="dialog_export_title">导出配置</string>
+    
+    <!-- Common Buttons & Hints -->
+    <string name="common_btn_delete">删除</string>
+    <string name="common_btn_cancel">取消</string>
+    <string name="common_btn_close">关闭</string>
+    <string name="common_btn_copy">复制</string>
+    <string name="common_btn_gen_id">生成新 ID</string>
+    <string name="hint_paste_json">在此粘贴 JSON...</string>
+    <string name="common_btn_load_text">加载文本</string>
+    <string name="common_btn_load_file">加载文件</string>
+    <string name="common_btn_save">保存文件</string>
+    <string name="arduino_code_export">导出 Arduino Code</string>
+    <!-- close removed -->
+    <string name="copy_code">复制代码</string>
+    <string name="btn_copy_topic_only">复制 Topic</string>
+
+    <!-- Properties Sidebar -->
+    <!-- Properties Sidebar -->
+    <string name="properties_label_topic">Topic</string>
+    <string name="properties_label_width">宽</string>
+    <string name="properties_label_height">高</string>
+    <string name="properties_btn_clone">复制</string>
+    <string name="properties_label_color">颜色</string>
+    <string name="properties_btn_apply">应用</string>
+    <string name="properties_title">属性</string>
+    <string name="properties_label_default">默认</string>
+    <string name="properties_label_button_text">按钮文字</string>
+    <string name="properties_btn_select_icon">选择图标</string>
+    <string name="properties_btn_no_icon">无图标</string>
+    <string name="project_msg_topic_copied">主题已复制</string>
+    <string name="icon_desc_plus">新增 (Plus)</string>
+    <string name="icon_desc_delete">删除 (Delete)</string>
+    <string name="icon_desc_send">发送 (Send)</string>
+    <string name="icon_desc_edit">编辑 (Edit)</string>
+    <string name="icon_desc_info">信息 (Info)</string>
+    <string name="import_json">导入 JSON</string>
+    <string name="export_json">导出 JSON</string>
+    <string name="project_id">项目 ID</string>
+    <string name="webview">Webview (高级)</string>
+    <string name="auto">自动</string>
+    <string name="portrait">锁定竖屏</string>
+    <string name="landscape">锁定横屏</string>
+    <string name="user">用户名</string>
+    <string name="password">密码</string>
+    
+    <string name="project_hint_search">搜索...</string>
+    <string name="project_btn_exit_app">退出 App</string>
+    <string name="project_cat_control">控制</string>
+    <string name="project_cat_sensor">传感器</string>
+    <string name="project_msg_mqtt_failed">无法连接，请确认Broker设置后点击灯号重试</string>
+    <string name="project_msg_mqtt_retrying">重试连接中...</string>
+    <string name="project_dialog_title_debug_logs">调试日志</string>
+    <string name="project_log_mqtt_status">MQTT 状态: %1$s</string>
+    <string name="msg_limit_reached">免费版限制只能创建 3 个项目。</string>
+    <string name="title_limit_reached">达到上限</string>
+    <string name="dialog_btn_upgrade">升级高级版</string>
+</resources>

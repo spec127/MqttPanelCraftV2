@@ -20,6 +20,7 @@ object LocaleManager {
     const val CODE_AUTO = "auto"
     const val CODE_EN = "en"
     const val CODE_ZH = "zh"
+    const val CODE_CN = "zh-CN"
 
     /**
      * Set the language and save to preferences.
@@ -77,6 +78,7 @@ object LocaleManager {
     private fun getLocaleForCode(code: String): Locale {
         return when (code) {
             CODE_ZH -> Locale.TRADITIONAL_CHINESE
+            CODE_CN -> Locale.SIMPLIFIED_CHINESE
             CODE_EN -> Locale.ENGLISH
             CODE_AUTO -> getSystemLocale()
             else -> Locale.ENGLISH // Fallback

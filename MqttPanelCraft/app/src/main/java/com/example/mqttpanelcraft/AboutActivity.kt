@@ -58,7 +58,7 @@ class AboutActivity : BaseActivity() {
             // ... (keep existing email logic if needed, but for brevity I'll keep it as is if I don't touch it)
              val intent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:") 
-                putExtra(Intent.EXTRA_EMAIL, arrayOf("support@example.com")) // Placeholder
+                putExtra(Intent.EXTRA_EMAIL, arrayOf("niceboat919@gmail.com"))
                 putExtra(Intent.EXTRA_SUBJECT, "MqttPanelCraft Support")
             }
             if (intent.resolveActivity(packageManager) != null) {

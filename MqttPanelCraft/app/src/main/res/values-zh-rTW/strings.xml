@@ -15,7 +15,7 @@
     <string name="error_privacy_load">載入隱私權政策時發生錯誤。</string>
     <string name="open_source_licenses">開放原始碼授權</string>
     <string name="title_open_source_licenses">開放原始碼授權</string>
-    <string name="contact_support">聯絡客服</string>
+    <string name="contact_support">聯絡我們</string>
     <string name="msg_feature_disabled">功能暫時停用</string>
 
     <!-- Drawer Menu -->
@@ -168,4 +168,7 @@
     <string name="project_msg_mqtt_retrying">重試連線中...</string>
     <string name="project_dialog_title_debug_logs">除錯日誌</string>
     <string name="project_log_mqtt_status">MQTT 狀態: %1$s</string>
+    <string name="msg_limit_reached">免費版限制只能建立 3 個專案。</string>
+    <string name="title_limit_reached">達到上限</string>
+    <string name="dialog_btn_upgrade">升級高級版</string>
 </resources>

@@ -318,6 +318,7 @@ class PropertiesSheetManager(
         }
         
         propertyContainer.visibility = View.VISIBLE
+        propertyContainer.findViewById<View>(R.id.svPropertiesContent)?.visibility = View.VISIBLE
         
         if (autoExpand) {
             forceExpandBottomSheet()
@@ -370,6 +371,17 @@ class PropertiesSheetManager(
         propertyContainer.visibility = View.GONE
         findBottomSheetBehavior()?.state = BottomSheetBehavior.STATE_HIDDEN
         currentData = null
+    }
+
+    fun showTitleOnly() {
+        propertyContainer.visibility = View.VISIBLE
+        val content = propertyContainer.findViewById<View>(R.id.svPropertiesContent)
+        content?.visibility = View.INVISIBLE // Or GONE? INVISIBLE keeps layout height maybe? GONE is safer for visual cleaniness.
+        // If GONE, the header is the only thing left.
+        content?.visibility = View.GONE
+        
+        // Also ensure Behavior is Collapsed/Locked handled by Caller?
+        // Caller checks selectedComponentId.
     }
     
     fun getLastSelectedId(): Int? = if (lastComponentData != null && lastViewId != View.NO_ID) lastViewId else null

@@ -49,6 +49,12 @@ License: Eclipse Public License 2.0 (EPL-2.0) and Eclipse Distribution License 1
 
 Source: Eclipse Paho Java Client (MQTT)
 
+5) PubSubClient (Arduino)
+
+License: MIT License
+
+Source: Nick O'Leary (https://github.com/knolleary/pubsubclient)
+
 License Texts
 
 Full license texts are available in the app under “Open Source Licenses”.

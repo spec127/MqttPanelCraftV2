@@ -1,0 +1,5 @@
+<resources>
+    <string name="msg_limit_reached">Free version is limited to 3 projects. Please upgrade to Premium.</string>
+    <string name="title_limit_reached">Limit Reached</string>
+    <string name="btn_upgrade">Upgrade</string>
+</resources>

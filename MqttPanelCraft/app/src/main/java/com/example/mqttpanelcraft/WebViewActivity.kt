@@ -44,7 +44,9 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white) // Ensure you have this or use default
+        val backArrow = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_thick)?.mutate()
+        backArrow?.setTint(android.graphics.Color.WHITE)
+        supportActionBar?.setHomeAsUpIndicator(backArrow) // Ensure you have this or use default
         toolbar.setNavigationOnClickListener { finish() }
         
         val tvTitle = findViewById<android.widget.TextView>(R.id.tvToolbarTitle)
@@ -233,6 +235,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         }
         
         // Initialize Idle Ad Controller
+        com.example.mqttpanelcraft.utils.AdManager.loadInterstitial(this)
         idleAdController = com.example.mqttpanelcraft.ui.IdleAdController(this) {
              // Ad Closed Callback (Resume if needed, but WebView keeps running)
         }

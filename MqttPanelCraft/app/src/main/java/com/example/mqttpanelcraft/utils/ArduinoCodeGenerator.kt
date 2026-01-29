@@ -208,19 +208,15 @@ object ArduinoCodeGenerator {
             var setupStart = base.optString("setup_start", "")
             sb.append(setupStart)
             
-            // Subscribe Calls (Derived from App PLUBS)
+            // Setup (Subscribe)
             if (appPubs.isEmpty()) {
                 sb.append("  // INFO: No 'mqtt.publish' detected in App code.\n")
                 sb.append("  // If the App sends commands, ensure it uses mqtt.publish('topic', ...)\n")
             }
 
             appPubs.forEach { relPath ->
-                // If it starts with / it is relative to base.
-                if (relPath.startsWith("/")) {
-                     sb.append("  client.subscribe((String(baseTopic) + \"$relPath\").c_str());\n")
-                } else {
-                     sb.append("  client.subscribe((String(baseTopic) + \"/$relPath\").c_str());\n")
-                }
+                val cleanPath = relPath.removePrefix("/")
+                sb.append("  mqttpanel_sub(String(mqtt_topic_head) + \"$cleanPath\");\n")
             }
             sb.append(base.optString("setup_mid", ""))
             sb.append(base.optString("setup_end", ""))
@@ -233,11 +229,11 @@ object ArduinoCodeGenerator {
                  sb.append("  // INFO: No 'mqtt.subscribe' detected in App code.\n")
             } else {
                  sb.append("  // --- Examples: Sending Data to App ---\n")
-                 appSubs.forEach { relPath ->
-                     val suffix = if(relPath.startsWith("/")) relPath else "/$relPath"
-                     sb.append("  // To send to '$suffix':\n")
-                     sb.append("  // client.publish((String(baseTopic) + \"$suffix\").c_str(), \"Hello App\");\n")
-                 }
+                  appSubs.forEach { relPath ->
+                      val cleanPath = relPath.removePrefix("/")
+                      sb.append("  // To send to '$cleanPath':\n")
+                      sb.append("  // mqttpanel_pub(String(mqtt_topic_head) + \"$cleanPath\", \"Hello App\");\n")
+                  }
                  sb.append("  // -------------------------------------\n")
             }
             
@@ -248,12 +244,12 @@ object ArduinoCodeGenerator {
             
             // Receiver Logic (Derived from App PUBS)
             appPubs.forEach { relPath ->
-                val suffix = if(relPath.startsWith("/")) relPath else "/$relPath"
+                val cleanPath = relPath.removePrefix("/")
                 
-                sb.append("  // Match: BASE + $suffix\n")
-                sb.append("  if (String(topic).endsWith(\"$suffix\")) {\n")
-                sb.append("      Serial.print(\"[$suffix] \"); Serial.println((char*)payload);\n")
-                sb.append("      // TODO: Act on command (e.g. if payload is 'ON')...\n")
+                sb.append("  // Match: BASE + /$cleanPath\n")
+                sb.append("  if (topic == String(mqtt_topic_head) + \"$cleanPath\") {\n")
+                sb.append("      Serial.print(\"[$cleanPath] \"); Serial.println(msg);\n")
+                sb.append("      // TODO: Act on command (e.g. if msg is 'ON')...\n")
                 sb.append("  }\n")
             }
             
@@ -267,14 +263,26 @@ object ArduinoCodeGenerator {
     }
 
     private fun resolveTopic(arg: String, varMap: Map<String, String>): String {
-        // Check if it's a known variable
-        if (varMap.containsKey(arg)) {
-            return varMap[arg]!!
-        } 
-        // Check if it's a literal string
-        if (arg.startsWith("'") || arg.startsWith("\"")) {
-            return arg.trim('\'', '"')
+        val trimmed = arg.trim()
+        
+        // 1. Check if it's a known variable
+        if (varMap.containsKey(trimmed)) {
+            return varMap[trimmed]!!
         }
+        
+        // 2. Check if it's a literal string
+        if (trimmed.startsWith("'") || trimmed.startsWith("\"")) {
+            return trimmed.trim('\'', '"')
+        }
+        
+        // 3. Check for Concatenation Pattern: PREFIX + 'string'
+        // Regex: Any identifier + plus + quoted string
+        val concatRegex = Regex("\\w+\\s*\\+\\s*['\"]([^'\"]+)['\"]")
+        val match = concatRegex.find(trimmed)
+        if (match != null) {
+            return match.groupValues[1]
+        }
+        
         return ""
     }
 

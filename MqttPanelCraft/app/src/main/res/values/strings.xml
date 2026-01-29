@@ -14,7 +14,7 @@
     <string name="error_privacy_load">Error loading privacy policy.</string>
     <string name="open_source_licenses">Open Source Licenses</string>
     <string name="title_open_source_licenses">Open Source Licenses</string>
-    <string name="contact_support">Contact Support</string>
+    <string name="contact_support">Contact us</string>
     <string name="msg_feature_disabled">Feature temporarily disabled</string>
 
     <!-- Drawer Menu -->
@@ -166,4 +166,7 @@
     <string name="project_msg_mqtt_retrying">Retrying connection...</string>
     <string name="project_dialog_title_debug_logs">Debug Logs</string>
     <string name="project_log_mqtt_status">MQTT Status: %1$s</string>
+    <string name="msg_limit_reached">Free version is limited to 3 projects.</string>
+    <string name="title_limit_reached">Limit Reached</string>
+    <string name="dialog_btn_upgrade">Upgrade</string>
 </resources>

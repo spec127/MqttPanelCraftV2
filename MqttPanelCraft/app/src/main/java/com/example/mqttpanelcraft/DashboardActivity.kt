@@ -283,12 +283,14 @@ class DashboardActivity : BaseActivity() {
         val languages = arrayOf(
             getString(R.string.lang_system_default),
             "English", 
-            "繁體中文"
+            "繁體中文",
+            "简体中文"
         )
         val codes = arrayOf(
             com.example.mqttpanelcraft.utils.LocaleManager.CODE_AUTO,
             com.example.mqttpanelcraft.utils.LocaleManager.CODE_EN,
-            com.example.mqttpanelcraft.utils.LocaleManager.CODE_ZH
+            com.example.mqttpanelcraft.utils.LocaleManager.CODE_ZH,
+            com.example.mqttpanelcraft.utils.LocaleManager.CODE_CN
         )
 
         val currentCode = com.example.mqttpanelcraft.utils.LocaleManager.getLanguageCode(this)
@@ -385,6 +387,24 @@ class DashboardActivity : BaseActivity() {
 
     private fun setupFab() {
         binding.fabAddProject.setOnClickListener {
+            if (!com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this) && 
+                ProjectRepository.getAllProjects().size >= 3) {
+                
+                AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.title_limit_reached))
+                    .setMessage(getString(R.string.msg_limit_reached))
+                    .setPositiveButton(getString(R.string.dialog_btn_upgrade)) { _, _ ->
+                         com.example.mqttpanelcraft.utils.PremiumManager.showPremiumDialog(this) { success ->
+                             if (success) {
+                                  // Retry? Or just let them click FAB again.
+                                  updateUserBadge()
+                             }
+                         }
+                    }
+                    .setNegativeButton(getString(R.string.common_btn_cancel), null)
+                    .show()
+                return@setOnClickListener
+            }
             val intent = Intent(this, SetupActivity::class.java)
             startActivity(intent)
         }

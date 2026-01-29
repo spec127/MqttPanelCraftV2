@@ -173,7 +173,7 @@ class ProjectViewActivity : BaseActivity() {
                         selectedComponentId = null
                         behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
                         // Clear visible properties or set "No Selection" state
-                        propertiesManager.clear() 
+                        propertiesManager.showTitleOnly() 
                     } else {
                         // Component Logic:
                         // 1. If ALREADY selected -> EXPAND (Second Click)
@@ -228,7 +228,7 @@ class ProjectViewActivity : BaseActivity() {
                     viewModel.removeComponent(id)
                     if (selectedComponentId == id) {
                         selectedComponentId = null
-                        propertiesManager.hide()
+                        propertiesManager.showTitleOnly()
                         updateSheetState() // Sync Draggability
                     }
                 }
@@ -503,21 +503,7 @@ class ProjectViewActivity : BaseActivity() {
              startActivity(intent)
          }
          
-         // Long Press Settings for Logs
-         btnSettings.setOnLongClickListener {
-             AlertDialog.Builder(this)
-                 .setTitle(getString(R.string.project_dialog_title_debug_logs))
-                 .setMessage(logConsoleManager.getLogs())
-                 .setPositiveButton(getString(R.string.common_btn_copy)) { _, _ ->
-                     val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                     val clip = android.content.ClipData.newPlainText("MqttLogs", logConsoleManager.getLogs())
-                     clipboard.setPrimaryClip(clip)
-                     Toast.makeText(this, getString(R.string.project_msg_logs_copied), Toast.LENGTH_SHORT).show()
-                 }
-                 .setNegativeButton(getString(R.string.common_btn_close), null)
-                 .show()
-             true
-         }
+
 
          // Undo Button
          findViewById<View>(R.id.btnUndo).setOnClickListener {
@@ -621,7 +607,9 @@ class ProjectViewActivity : BaseActivity() {
             
             // Run Mode: Show Back Button to Exit
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
+            val backArrow = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_thick)?.mutate()
+            backArrow?.setTint(android.graphics.Color.WHITE)
+            supportActionBar?.setHomeAsUpIndicator(backArrow)
             
             // Restore functionality: Clicking back exits the activity (or Run Mode?)
             // Usually in Run Mode inside a Project, "Back" would go back to Dashboard.
