@@ -31,9 +31,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Component"
-            android:textSize="10sp"
-            android:layout_marginTop="2dp"
-            android:textColor="?android:attr/textColorSecondary"/>
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:textColor="?android:attr/textColorPrimary"/>
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

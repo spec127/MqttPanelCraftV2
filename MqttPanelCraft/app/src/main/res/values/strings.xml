@@ -70,6 +70,7 @@
     <string name="project_sidebar_title_components">Components</string>
     <string name="project_sidebar_category_display">Display</string>
     <string name="project_component_text">Text Value</string>
+    <string name="project_component_switch">Switch</string>
     <string name="project_component_gauge">Gauge</string>
     <string name="project_sidebar_title_properties">Properties</string>
     <string name="project_prop_helper">Select a component to edit</string>
@@ -169,4 +170,19 @@
     <string name="msg_limit_reached">Free version is limited to 3 projects.</string>
     <string name="title_limit_reached">Limit Reached</string>
     <string name="dialog_btn_upgrade">Upgrade</string>
+    <!-- Component Labels (Sidebar) -->
+    <string name="component_label_button">Button</string>
+    <string name="component_label_switch">Switch</string>
+    <string name="component_label_slider">Slider</string>
+    <string name="component_label_input">Input Box</string>
+    <string name="component_label_camera">Camera</string>
+    
+    <string name="component_label_led">LED</string>
+    <string name="component_label_thermometer">Thermometer</string>
+    <string name="component_label_level">Level Indicator</string>
+    
+    <string name="component_label_text">Text Display</string>
+    <string name="component_label_image">Image</string>
+    <string name="component_label_chart">Chart</string>
+
 </resources>

@@ -21,7 +21,7 @@ object ButtonDefinition : IComponentDefinition {
     override val defaultSize = Size(120, 60)
     override val labelPrefix = "btn"
     override val iconResId = android.R.drawable.ic_media_play
-    override val group = "CONTROL"
+        override val group = "CONTROL"
 
     // 2. Factory (Appearance)
     override fun createView(context: Context, isEditMode: Boolean): View {

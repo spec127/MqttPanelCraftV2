@@ -10,12 +10,16 @@ object ComponentDefinitionRegistry {
     init {
         // We will register them here
         register(ButtonDefinition)
+        register(com.example.mqttpanelcraft.ui.components.definitions.SwitchDefinition)
         register(com.example.mqttpanelcraft.ui.components.definitions.LedDefinition)
         register(com.example.mqttpanelcraft.ui.components.definitions.TextDefinition)
         register(com.example.mqttpanelcraft.ui.components.definitions.SliderDefinition)
         register(com.example.mqttpanelcraft.ui.components.definitions.ImageDefinition)
         register(com.example.mqttpanelcraft.ui.components.definitions.CameraDefinition)
         register(com.example.mqttpanelcraft.ui.components.definitions.ThermometerDefinition)
+        register(com.example.mqttpanelcraft.ui.components.definitions.TextInputDefinition)
+        register(com.example.mqttpanelcraft.ui.components.definitions.LevelIndicatorDefinition)
+        register(com.example.mqttpanelcraft.ui.components.definitions.LineChartDefinition)
     }
 
     fun register(def: IComponentDefinition) {

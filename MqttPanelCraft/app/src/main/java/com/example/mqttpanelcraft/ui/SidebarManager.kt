@@ -125,7 +125,7 @@ class SidebarManager(
         groupOrder.forEach { groupName ->
             val defsInGroup = grouped[groupName] ?: return@forEach
 
-            // Add Header
+            // 1. Header
             val header = android.widget.TextView(rootView.context).apply {
                 val headerText = when(groupName) {
                     "DISPLAY" -> context.getString(R.string.project_sidebar_category_display)
@@ -134,9 +134,8 @@ class SidebarManager(
                     else -> groupName.lowercase().replaceFirstChar { it.uppercase() }
                 }
                 text = headerText
-                textSize = 16f
-                setTypeface(null, android.graphics.Typeface.BOLD)
-
+                textSize = 18f // Bigger
+                setTypeface(null, android.graphics.Typeface.BOLD) // Bolder
                 val typedValue = android.util.TypedValue()
                 context.theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
                 setTextColor(typedValue.data)
@@ -145,55 +144,116 @@ class SidebarManager(
                     android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
                     android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
                 )
-                params.setMargins(0, 0, 0, dpToPx(8))
+                params.setMargins(0,dpToPx(16), 0, dpToPx(8)) // More space top
                 layoutParams = params
             }
             container.addView(header)
 
-            // Chunk by 2
-            defsInGroup.chunked(2).forEach { rowDefs ->
-                val rowCtx = rootView.context
-                val row = android.widget.LinearLayout(rowCtx).apply {
-                    orientation = android.widget.LinearLayout.HORIZONTAL
-                    val params = android.widget.LinearLayout.LayoutParams(
-                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                    )
-                    params.setMargins(0, 0, 0, dpToPx(16))
-                    layoutParams = params
-                }
+            // 2. Grid Container
+            val grid = android.widget.GridLayout(rootView.context).apply {
+                columnCount = 2
+                alignmentMode = android.widget.GridLayout.ALIGN_BOUNDS
+                layoutParams = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            }
+            container.addView(grid)
 
-                rowDefs.forEach { def ->
-                    val card = inflater.inflate(R.layout.item_sidebar_component, row, false)
+            // 3. Render Items Logic
+            fun renderGrid(isExpanded: Boolean) {
+                grid.removeAllViews()
+                
+                val visibleItems = if (isExpanded) defsInGroup else defsInGroup.take(3)
+                val showMoreButton = !isExpanded && defsInGroup.size > 3 // Show "More" if truncated
+                val showLessButton = isExpanded && defsInGroup.size > 3  // Optional: "Less" button? User didn't ask, but good UX.
+                // User said "4th is dots". Implies toggle.
+                
+                // Add Items
+                visibleItems.forEach { def ->
+                    val card = inflater.inflate(R.layout.item_sidebar_component, grid, false)
                     // Set Icon
                     val img = card.findViewById<android.widget.ImageView>(R.id.imgIcon)
                     img.setImageResource(def.iconResId)
-
                     // Set Label
                     val tv = card.findViewById<android.widget.TextView>(R.id.tvLabel)
+                    // Translation lookup logic required here or inside Definition?
+                    // Currently Definition returns hardcoded type string sometimes.
+                    // Ideally use string resources map.
+                    val labelResName = "component_label_${def.type.lowercase()}"
+                    val labelId = rootView.resources.getIdentifier(labelResName, "string", rootView.context.packageName)
+                    if (labelId != 0) {
+                        tv.text = rootView.context.getString(labelId)
+                    } else {
+                        tv.text = def.type.lowercase().replaceFirstChar { it.uppercase() }
+                    }
 
-                    // Special Case for Thermometer -> Level Indicator (User preference)
-                    tv.text = if (def.type == "THERMOMETER") "Level Indicator" else def.type.lowercase().replaceFirstChar { it.uppercase() }
-
+                    // Card Layout Params for Grid
+                    val params = android.widget.GridLayout.LayoutParams().apply {
+                        width = 0 
+                        height = android.widget.GridLayout.LayoutParams.WRAP_CONTENT
+                        columnSpec = android.widget.GridLayout.spec(android.widget.GridLayout.UNDEFINED, 1f)
+                        setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4))
+                    }
+                    card.layoutParams = params
+                    
                     card.tag = def.type
-                    card.setOnTouchListener(touchListener)
-
-                    row.addView(card)
+                    card.setOnTouchListener(touchListener) // Drag
+                    
+                    grid.addView(card)
                     searchList.add(card to def.type)
                 }
-
-                // Filler if only 1 to prevent stretching
-                if (rowDefs.size == 1) {
-                    val filler = android.view.View(rowCtx)
-                    val params = android.widget.LinearLayout.LayoutParams(0, 1)
-                    params.weight = 1f
-                    params.setMargins(dpToPx(4), 0, dpToPx(4), 0)
-                    filler.layoutParams = params
-                    row.addView(filler)
+                
+                // Add "More" Button if needed
+                if (showMoreButton) {
+                     val moreCard = inflater.inflate(R.layout.item_sidebar_component, grid, false)
+                     val img = moreCard.findViewById<android.widget.ImageView>(R.id.imgIcon)
+                     img.setImageResource(android.R.drawable.ic_menu_more) // Dots
+                     val tv = moreCard.findViewById<android.widget.TextView>(R.id.tvLabel)
+                     tv.text = "More" // TODO: Translate
+                     
+                     val params = android.widget.GridLayout.LayoutParams().apply {
+                        width = 0
+                        height = android.widget.GridLayout.LayoutParams.WRAP_CONTENT
+                        columnSpec = android.widget.GridLayout.spec(android.widget.GridLayout.UNDEFINED, 1f)
+                        setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4))
+                    }
+                    moreCard.layoutParams = params
+                    
+                    moreCard.setOnClickListener {
+                        renderGrid(true) // Expand
+                    }
+                    grid.addView(moreCard)
+                } else if (showLessButton) {
+                    // Optional: Add Collapse button at the end?
+                    // User didn't ask explicitly. collapsing via "re-clicking dots" isn't possible if dots are gone.
+                    // Let's add "Less" or "Collapse" button at the end of expanded list.
+                    val lessCard = inflater.inflate(R.layout.item_sidebar_component, grid, false)
+                     val img = lessCard.findViewById<android.widget.ImageView>(R.id.imgIcon)
+                     img.setImageResource(android.R.drawable.arrow_up_float) 
+                     val tv = lessCard.findViewById<android.widget.TextView>(R.id.tvLabel)
+                     tv.text = "Collapse" 
+                     
+                     val params = android.widget.GridLayout.LayoutParams().apply {
+                        width = 0
+                        height = android.widget.GridLayout.LayoutParams.WRAP_CONTENT
+                        columnSpec = android.widget.GridLayout.spec(android.widget.GridLayout.UNDEFINED, 1f)
+                        setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4))
+                    }
+                    lessCard.layoutParams = params
+                    
+                    lessCard.setOnClickListener {
+                        renderGrid(false) // Collapse
+                    }
+                    grid.addView(lessCard)
                 }
-
-                container.addView(row)
+                
+                // Padding for even grid cells if odd count?
+                // GridLayout handles it with weights.
             }
+            
+            // Initial render
+            renderGrid(false) // Collapsed by default
         }
 
         // Search Logic

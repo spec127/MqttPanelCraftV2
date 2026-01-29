@@ -607,6 +607,35 @@ class SetupActivity : BaseActivity() {
             
         val finalOrientation = getSelectedOrientation()
 
+        // Update Component Topics if ID changed
+        // Smart Topic Sync 3.0: Split & Match ID
+        if (originalProject != null) {
+             val oldId = originalProject?.id ?: ""
+             if (oldId.isNotEmpty()) {
+                 val newSafeName = name.lowercase().replace("/", "_").replace(" ", "_").replace("+", "")
+                 val newSafeId = finalId
+                 var updatedCount = 0
+                 
+                 finalComponents.forEach { component ->
+                     val parts = component.topicConfig.split("/")
+                     // Expecting format: Name/ID/Item...
+                     if (parts.size >= 3) {
+                         // Check if middle part is the Old ID (Case Insensitive)
+                         if (parts[1].equals(oldId, ignoreCase = true)) {
+                             val suffix = parts.drop(2).joinToString("/")
+                             component.topicConfig = "$newSafeName/$newSafeId/$suffix"
+                             updatedCount++
+                         }
+                     }
+                 }
+                 if (updatedCount > 0) {
+                     android.widget.Toast.makeText(this, "Updated $updatedCount component topics", android.widget.Toast.LENGTH_SHORT).show()
+                 }
+             }
+        }
+
+
+
         val newProject = Project(
             id = finalId,
             name = name,

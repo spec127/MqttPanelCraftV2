@@ -450,11 +450,15 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="..."
-                                    android:textSize="14sp"
+                                    android:textSize="16sp"
                                     android:textColor="@color/topic_text_secondary"
                                     android:maxLines="1"
                                     android:ellipsize="start"
-                                    android:maxWidth="100dp"/>
+                                    app:autoSizeTextType="uniform"
+                                    app:autoSizeMinTextSize="10sp"
+                                    app:autoSizeMaxTextSize="16sp"
+                                    app:autoSizeStepGranularity="1sp"
+                                    android:maxWidth="180dp"/>
                                     
                                 <EditText
                                     android:id="@+id/etTopicName"
@@ -463,7 +467,7 @@
                                     android:layout_height="wrap_content"
                                     android:background="@null"
                                     android:hint="NAME"
-                                    android:textSize="14sp"
+                                    android:textSize="16sp"
                                     android:textStyle="bold"
                                     android:inputType="textNoSuggestions|textVisiblePassword"
                                     android:gravity="center"
@@ -474,7 +478,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="/val"
-                                    android:textSize="14sp"
+                                    android:textSize="16sp"
                                     android:textColor="@color/topic_text_secondary"/>
                                     
                                 <ImageView

@@ -89,7 +89,27 @@ class PropertiesSheetManager(
         etPropWidth?.addTextChangedListener(textWatcher)
         etPropHeight?.addTextChangedListener(textWatcher)
         // etPropColor is hidden, driven by Popup
-        etTopicName?.addTextChangedListener(textWatcher)
+        etTopicName?.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Auto-shrink text
+                val len = s?.length ?: 0
+                val newSize = when {
+                    len > 25 -> 10f
+                    len > 20 -> 12f
+                    len > 15 -> 14f
+                    else -> 16f
+                }
+                etTopicName.textSize = newSize // Note: In code logic, setTextSize calls might be needed for SP if property defaults to SP or PX? 
+                // TextView.setTextSize(unit, size) defaults to SP in java, but property accessor .textSize returns PX and sets... what?
+                // Kotlin property .textSize usually maps to getTextSize (px) and setTextSize(size) -> SP default.
+                // Let's use explicit method to be safe: etTopicName.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, newSize)
+                etTopicName.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, newSize)
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {
+                 if (!isBinding) saveCurrentProps()
+            }
+        })
         
         btnSaveProps?.visibility = View.GONE
         
