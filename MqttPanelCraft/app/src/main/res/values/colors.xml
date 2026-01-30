@@ -7,6 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="primary_dark_blue">#FF0D47A1</color>
     <color name="primary">#1976D2</color>
     <color name="background_color">#F0F2F5</color>
     <color name="surface_color">#FFFFFF</color>
@@ -19,13 +20,22 @@
     <color name="sidebar_icon_tint">#666666</color>
     <color name="sidebar_component_stroke">#999999</color>
     <color name="sidebar_section_header">#666666</color>
+    
+    <!-- New Colors for Redesign -->
+    <color name="sidebar_header_background">#E1BEE7</color> <!-- Lighter Purple to match Toolbar -->
+    <color name="sidebar_header_text">#4A148C</color> <!-- Dark Purple -->
+    
     <color name="grid_dot_color">#E0E0E0</color>
     <color name="canvas_background">#FFFFFF</color>
+    
+    <!-- Toolbar Colors -->
+    <color name="toolbar_bg">#a573bc</color>
+    <color name="toolbar_text">#FFFFFF</color>
+    <color name="toolbar_border">#00000000</color> <!-- Transparent or unused -->
     
     <!-- Drawer Semantic Colors -->
     <color name="drawer_background">#FAFAFA</color>
     <color name="drawer_btn_bg">#EEEEEE</color>
     <color name="drawer_btn_text">#212121</color>
     <color name="drawer_btn_icon_tint">#212121</color>
-    <!-- nav_header colors removed as we use drawable-night strategy now -->
 </resources>

@@ -99,10 +99,10 @@ class ProjectViewActivity : BaseActivity() {
 
             val isNightMode = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
             val wic = androidx.core.view.WindowInsetsControllerCompat(window, window.decorView)
-            wic.isAppearanceLightStatusBars = !isNightMode
+            wic.isAppearanceLightStatusBars = false // Always White Icons for Purple/Dark Toolbar
             
             // Force matches Dashboard Logic (Gray-White or Dark Background)
-            val bgColor = androidx.core.content.ContextCompat.getColor(this, R.color.background_color)
+            val bgColor = androidx.core.content.ContextCompat.getColor(this, R.color.toolbar_bg)
             window.statusBarColor = bgColor
             
             // Fix: CoordinatorLayout & DrawerLayout default scrim color override

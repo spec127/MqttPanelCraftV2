@@ -12,13 +12,16 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:elevation="0dp"
+        android:stateListAnimator="@null"
         android:theme="@style/Theme.Helloworld.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/toolbar_bg"
+            app:elevation="0dp"
             app:popupTheme="@style/Theme.Helloworld.PopupOverlay">
             
             <View
@@ -40,7 +43,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/toolbar_text"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_marginEnd="8dp"/>
@@ -48,7 +51,7 @@
             </LinearLayout>
 
         </androidx.appcompat.widget.Toolbar>
-
+        
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- DrawerLayout (Below AppBar) -->
@@ -714,7 +717,7 @@
         <!-- LEFT SIDEBAR: Components (Drawer) -->
     <LinearLayout
         android:id="@+id/sidebarContainer"
-        android:layout_width="320dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="?attr/colorSurface"
@@ -742,7 +745,7 @@
         android:layout_height="58dp"
         android:src="@drawable/ic_settings_custom"
         android:padding="13dp"
-        app:tint="@android:color/white"
+        app:tint="@color/toolbar_text"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:layout_gravity="top|end"
         android:layout_marginEnd="0dp"
@@ -755,7 +758,7 @@
         android:layout_height="58dp"
         android:src="@drawable/ic_grid_on" 
         android:padding="13dp"
-        app:tint="@android:color/white"
+        app:tint="@color/toolbar_text"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:layout_gravity="top|end"
         android:layout_marginEnd="58dp"

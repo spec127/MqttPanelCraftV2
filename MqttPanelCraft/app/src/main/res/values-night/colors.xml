@@ -21,6 +21,10 @@
     <color name="sidebar_section_header">#FFFFFF</color>
     <color name="grid_dot_color">#25FFFFFF</color>
     <color name="canvas_background">#121212</color>
+    
+    <!-- Toolbar Colors (Dark) -->
+    <color name="toolbar_bg">#a573bc</color> 
+    <color name="toolbar_text">#FFFFFF</color>
 
     <!-- Drawer Semantic Colors (Dark) -->
     <color name="drawer_background">#1E1E1E</color>

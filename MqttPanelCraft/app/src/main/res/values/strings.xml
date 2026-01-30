@@ -34,8 +34,8 @@
     <string name="dashboard_sort_label">Sort By</string>
     <string name="dashboard_sort_name_asc">Name (A-Z)</string>
     <string name="dashboard_sort_name_desc">Name (Z-A)</string>
-    <string name="dashboard_sort_date_new">Date (Newest)</string>
-    <string name="dashboard_sort_date_old">Date (Oldest)</string>
+    <string name="dashboard_sort_date_new">Creation Date (Newest)</string>
+    <string name="dashboard_sort_date_old">Creation Date (Oldest)</string>
     <string name="dashboard_sort_last_opened">Last Opened</string>
     <string name="dashboard_empty_state_msg">No projects yet</string>
     <string name="dashboard_badge_premium">Premium</string>
@@ -68,7 +68,7 @@
     <!-- Project View Activity -->
     <string name="project_view_title">Project Editor</string>
     <string name="project_sidebar_title_components">Components</string>
-    <string name="project_sidebar_category_display">Display</string>
+    <string name="project_sidebar_category_display">Media Components</string>
     <string name="project_component_text">Text Value</string>
     <string name="project_component_switch">Switch</string>
     <string name="project_component_gauge">Gauge</string>
@@ -161,8 +161,8 @@
     
     <string name="project_hint_search">Search...</string>
     <string name="project_btn_exit_app">Exit App</string>
-    <string name="project_cat_control">Control</string>
-    <string name="project_cat_sensor">Sensor</string>
+    <string name="project_cat_control">Operation Components</string>
+    <string name="project_cat_sensor">Status Components</string>
     <string name="project_msg_mqtt_failed">Connection failed. Check Broker settings and tap indicator to retry.</string>
     <string name="project_msg_mqtt_retrying">Retrying connection...</string>
     <string name="project_dialog_title_debug_logs">Debug Logs</string>
@@ -184,5 +184,7 @@
     <string name="component_label_text">Text Display</string>
     <string name="component_label_image">Image</string>
     <string name="component_label_chart">Chart</string>
+    <string name="project_sidebar_btn_more">More</string>
+    <string name="project_sidebar_btn_collapse">Collapse</string>
 
 </resources>

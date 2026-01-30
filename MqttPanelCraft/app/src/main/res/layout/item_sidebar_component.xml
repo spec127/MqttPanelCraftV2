@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardComponent"
     android:layout_width="0dp"
-    android:layout_height="80dp"
+    android:layout_height="105dp"
     android:layout_weight="1"
     android:layout_margin="4dp"
     app:cardCornerRadius="8dp"
@@ -21,8 +21,8 @@
 
         <ImageView
             android:id="@+id/imgIcon"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:src="@android:drawable/ic_menu_help"
             app:tint="?android:attr/textColorPrimary"/>
 
@@ -32,7 +32,6 @@
             android:layout_height="wrap_content"
             android:text="Component"
             android:textSize="13sp"
-            android:textStyle="bold"
             android:layout_marginTop="4dp"
             android:textColor="?android:attr/textColorPrimary"/>
     </LinearLayout>

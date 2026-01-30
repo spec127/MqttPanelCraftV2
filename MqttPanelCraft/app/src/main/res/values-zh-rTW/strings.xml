@@ -35,8 +35,8 @@
     <string name="dashboard_sort_label">排序方式</string>
     <string name="dashboard_sort_name_asc">名稱 (A-Z)</string>
     <string name="dashboard_sort_name_desc">名稱 (Z-A)</string>
-    <string name="dashboard_sort_date_new">日期 (最新)</string>
-    <string name="dashboard_sort_date_old">日期 (最舊)</string>
+    <string name="dashboard_sort_date_new">建立日期 (最新)</string>
+    <string name="dashboard_sort_date_old">建立日期 (最舊)</string>
     <string name="dashboard_sort_last_opened">上次開啟</string>
     <string name="dashboard_empty_state_msg">尚無專案</string>
     <!-- Badges kept English as requested -->
@@ -70,7 +70,7 @@
     <!-- Project View Activity -->
     <string name="project_view_title">專案編輯器</string>
     <string name="project_sidebar_title_components">元件</string>
-    <string name="project_sidebar_category_display">顯示</string>
+    <string name="project_sidebar_category_display">媒體元件</string>
     <string name="project_component_text">文字數值</string>
     <string name="project_component_gauge">儀表板</string>
     <string name="project_sidebar_title_properties">屬性</string>
@@ -162,8 +162,8 @@
     
     <string name="project_hint_search">搜尋...</string>
     <string name="project_btn_exit_app">退出 App</string>
-    <string name="project_cat_control">控制</string>
-    <string name="project_cat_sensor">傳感器</string>
+    <string name="project_cat_control">操作元件</string>
+    <string name="project_cat_sensor">狀態元件</string>
     <string name="project_msg_mqtt_failed">無法連線，請確認Broker設定後點擊燈號重試</string>
     <string name="project_msg_mqtt_retrying">重試連線中...</string>
     <string name="project_dialog_title_debug_logs">除錯日誌</string>
@@ -171,4 +171,21 @@
     <string name="msg_limit_reached">免費版限制只能建立 3 個專案。</string>
     <string name="title_limit_reached">達到上限</string>
     <string name="dialog_btn_upgrade">升級高級版</string>
+    <!-- Component Labels (Sidebar) -->
+    <string name="component_label_button">按鈕</string>
+    <string name="component_label_switch">開關</string>
+    <string name="component_label_slider">滑桿</string>
+    <string name="component_label_input">輸入框</string>
+    <string name="component_label_camera">相機</string>
+    
+    <string name="component_label_led">LED 燈</string>
+    <string name="component_label_thermometer">溫度計</string>
+    <string name="component_label_level">水平指示</string>
+    
+    <string name="component_label_text">文字顯示</string>
+    <string name="component_label_image">圖片</string>
+    <string name="component_label_chart">圖表</string>
+    <string name="project_sidebar_btn_more">顯示更多</string>
+    <string name="project_sidebar_btn_collapse">收合</string>
+
 </resources>
