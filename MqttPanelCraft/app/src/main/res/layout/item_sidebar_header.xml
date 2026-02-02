@@ -1,30 +1,43 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:background="@color/sidebar_header_background"
-    android:padding="8dp"
+    android:background="@android:color/transparent"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="8dp"
     android:clickable="true"
     android:focusable="true">
 
     <ImageView
-        android:id="@+id/ivArrow"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_expand_less_circle" 
-        android:rotation="180" 
+        android:id="@+id/ivCategoryIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@android:drawable/ic_menu_preferences"
         android:layout_marginEnd="8dp"
         android:tint="@color/sidebar_header_text"/>
 
     <TextView
         android:id="@+id/tvHeaderTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Category"
-        android:textSize="14sp"
+        android:layout_weight="1"
+        android:text="CATEGORY"
+        android:textSize="16sp"
         android:textStyle="bold"
+        android:textAllCaps="true"
+        android:letterSpacing="0.1"
         android:textColor="@color/sidebar_header_text"/>
+
+    <ImageView
+        android:id="@+id/ivArrow"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_expand_less_circle" 
+        android:rotation="180" 
+        android:tint="@color/sidebar_header_text"
+        android:alpha="0.5"/>
 
 </LinearLayout>

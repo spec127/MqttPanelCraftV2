@@ -95,10 +95,10 @@ class PropertiesSheetManager(
                 // Auto-shrink text
                 val len = s?.length ?: 0
                 val newSize = when {
-                    len > 25 -> 10f
-                    len > 20 -> 12f
-                    len > 15 -> 14f
-                    else -> 16f
+                    len > 25 -> 12f
+                    len > 20 -> 14f
+                    len > 15 -> 16f
+                    else -> 18f
                 }
                 etTopicName.textSize = newSize // Note: In code logic, setTextSize calls might be needed for SP if property defaults to SP or PX? 
                 // TextView.setTextSize(unit, size) defaults to SP in java, but property accessor .textSize returns PX and sets... what?
@@ -322,7 +322,14 @@ class PropertiesSheetManager(
                  val prefixStr = "${parts[0]}/${parts[1]}/"
                  val nameStr = if (parts.size > 2) parts.drop(2).joinToString("/") else ""
                  
-                 tvTopicPrefix?.text = prefixStr
+                 // Truncate Prefix if too long (User Request: Max 16 chars, else "...xyz")
+                 val displayPrefix = if (prefixStr.length > 16) {
+                     "..." + prefixStr.takeLast(13)
+                 } else {
+                     prefixStr
+                 }
+                 
+                 tvTopicPrefix?.text = displayPrefix
                  etTopicName?.setText(nameStr)
                  tvTopicSuffix?.text = "" 
             } else {
@@ -358,7 +365,7 @@ class PropertiesSheetManager(
                  bg.setColor(Color.WHITE) 
                  val density = propertyContainer.resources.displayMetrics.density
                  bg.setStroke((1 * density).toInt(), Color.LTGRAY, (5 * density).toFloat(), (3 * density).toFloat()) // Dashed border
-                 bg.cornerRadius = (4 * density)
+                 bg.cornerRadius = (12 * density)
                  vPropColorPreview?.background = bg
                  return
             }
@@ -369,7 +376,7 @@ class PropertiesSheetManager(
             bg.setColor(color)
             val density = propertyContainer.resources.displayMetrics.density
             bg.setStroke((2 * density).toInt(), Color.parseColor("#808080")) // Solid border
-            bg.cornerRadius = (4 * density)
+            bg.cornerRadius = (12 * density)
             vPropColorPreview?.background = bg
             
             // Update Text

@@ -9,8 +9,8 @@
         android:id="@+id/textTimestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="10sp"
-        android:textColor="#AAAAAA"
+        android:textSize="11sp"
+        android:textColor="@color/prop_text_secondary"
         android:text="12:00:00"/>
 
     <TextView
@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp"
-        android:textColor="@color/sidebar_text_primary"
+        android:textColor="@color/prop_text_primary"
         android:text="Log Content"/>
 
 </LinearLayout>

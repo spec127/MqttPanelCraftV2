@@ -134,7 +134,7 @@ class DashboardActivity : BaseActivity() {
         
         if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
             tvBadge.text = getString(R.string.dashboard_badge_premium)
-            tvBadge.setTextColor(android.graphics.Color.parseColor("#FFD700"))
+            tvBadge.setTextColor(android.graphics.Color.parseColor("#FFD700")) // Gold Text
             tvBadge.setBackgroundResource(R.drawable.bg_premium_badge)
         } else {
             tvBadge.text = getString(R.string.dashboard_badge_free)
@@ -153,6 +153,15 @@ class DashboardActivity : BaseActivity() {
         // Enable hamburger icon click
         binding.toolbar.setNavigationOnClickListener {
              binding.drawerLayout.openDrawer(GravityCompat.START)
+        }
+        
+        // vFix: Handle Edge-to-Edge Insets
+        // Pad the AppBarLayout so the Toolbar content is below the status bar, 
+        // but the AppBarLayout background (Gradient) fills the status bar.
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.appBarLayout) { v, insets ->
+            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            v.setPadding(v.paddingLeft, systemBars.top, v.paddingRight, v.paddingBottom)
+            insets
         }
     }
 

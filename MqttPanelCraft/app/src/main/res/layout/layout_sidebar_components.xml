@@ -12,9 +12,9 @@
     <!-- Search Bar -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="32dp"
         app:cardCornerRadius="8dp"
-        app:cardElevation="8dp"
+        app:cardElevation="4dp"
         app:strokeWidth="1dp"
         app:strokeColor="?android:attr/textColorSecondary"
         android:layout_marginBottom="8dp">
@@ -22,13 +22,17 @@
         <EditText
             android:id="@+id/etSearchComponents"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
             android:background="@null"
             android:hint="@string/project_hint_search"
             android:textColorHint="?android:attr/textColorHint"
             android:textColor="?android:attr/textColorPrimary"
-            android:padding="8dp"
-            android:textSize="14sp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:textSize="13sp"
             android:drawableEnd="@android:drawable/ic_menu_close_clear_cancel"
             android:drawableTint="?android:attr/textColorPrimary"/>
     </com.google.android.material.card.MaterialCardView>

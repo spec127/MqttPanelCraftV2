@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true">
+        <layer-list>
+            <!-- Shadow/Outer Ring -->
+            <item>
+                <shape android:shape="oval">
+                    <stroke android:width="2dp" android:color="@color/setup_radio_ring" />
+                    <size android:width="20dp" android:height="20dp" />
+                </shape>
+            </item>
+            <!-- Inner Color with Gradient for 3D effect -->
+            <item android:bottom="3dp" android:left="3dp" android:right="3dp" android:top="3dp">
+                <shape android:shape="oval">
+                    <solid android:color="@color/setup_accent_color"/>
+                    <gradient
+                        android:type="radial"
+                        android:gradientRadius="10dp"
+                        android:startColor="#40FFFFFF"
+                        android:centerColor="#00FFFFFF"
+                        android:endColor="#20000000" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <stroke android:width="2dp" android:color="@color/setup_radio_ring" />
+                    <size android:width="20dp" android:height="20dp" />
+                    <solid android:color="#00000000"/>
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>

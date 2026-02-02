@@ -36,7 +36,10 @@ class ProjectAdapter(
         val project = projects[position]
         holder.tvProjectName.text = project.name
         holder.tvBrokerUrl.text = project.broker
-        holder.chipType.text = project.type.name
+        holder.chipType.text = when(project.type.name) {
+            "HOME" -> "PANEL"
+            else -> project.type.name
+        }
 
         // Status Dot Color
         val statusDrawable = if (project.isConnected) {

@@ -4,8 +4,8 @@
     android:id="@+id/rootCoordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
-    android:fitsSystemWindows="true"
+    android:background="@drawable/bg_canvas_gradient"
+    android:fitsSystemWindows="false"
     tools:context=".ProjectViewActivity">
 
     <!-- AppBar (Z-Order: Top) -->
@@ -14,43 +14,52 @@
         android:layout_height="wrap_content"
         app:elevation="0dp"
         android:stateListAnimator="@null"
+        android:background="@android:color/transparent"
+        android:fitsSystemWindows="true"
         android:theme="@style/Theme.Helloworld.AppBarOverlay">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/toolbar_bg"
-            app:elevation="0dp"
-            app:popupTheme="@style/Theme.Helloworld.PopupOverlay">
-            
-            <View
-                android:id="@+id/indicatorMqttStatus"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center"
-                android:background="@drawable/shape_circle_grey" />
-            
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                app:elevation="0dp"
+                app:contentInsetStart="0dp"
+                app:contentInsetStartWithNavigation="0dp"
+                app:popupTheme="@style/Theme.Helloworld.PopupOverlay"/>
+
+            <!-- Overlay for centered elements -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
                 android:gravity="center_vertical"
-                android:layout_gravity="center">
+                android:paddingStart="56dp"
+                android:paddingEnd="56dp">
+
+                <View
+                    android:id="@+id/indicatorMqttStatus"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/shape_circle_grey" />
 
                 <TextView
                     android:id="@+id/tvToolbarTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_toStartOf="@id/indicatorMqttStatus"
+                    android:layout_marginEnd="12dp"
+                    android:layout_centerVertical="true"
                     android:text=""
                     android:textColor="@color/toolbar_text"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginEnd="8dp"/>
-
-            </LinearLayout>
-
-        </androidx.appcompat.widget.Toolbar>
+                    android:textStyle="bold"/>
+            </RelativeLayout>
+        </FrameLayout>
         
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -82,9 +91,9 @@
                         android:id="@+id/editorCanvas"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:paddingBottom="50dp"
+                        android:paddingBottom="100dp"
                         android:clipToPadding="false"
-                        android:background="@color/canvas_background">
+                        android:background="@drawable/bg_canvas_border">
                         
                         <!-- Background Pattern -->
                         <com.example.mqttpanelcraft.ui.GridPatternView
@@ -136,7 +145,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 app:layout_behavior="com.example.mqttpanelcraft.ui.LockableBottomSheetBehavior"
-                app:behavior_peekHeight="85dp">
+                app:behavior_peekHeight="100dp">
                 
                 <!-- Wrapper for all content -->
                 <LinearLayout
@@ -215,7 +224,7 @@
                                     android:text="@string/project_console_title"
                                     android:textStyle="bold"
                                     android:textSize="21sp"
-                                    android:textColor="?android:attr/textColorPrimary"
+                                    android:textColor="@color/toolbar_text"
                                     android:layout_width="0dp"
                                     android:layout_weight="1"
                                     android:layout_height="wrap_content"/>
@@ -228,7 +237,7 @@
                                     android:background="?attr/selectableItemBackgroundBorderless"
                                     android:clickable="true"
                                     android:focusable="true"
-                                    app:tint="?android:attr/textColorPrimary"
+                                    app:tint="@color/prop_text_secondary"
                                     android:padding="4dp"
                                     android:contentDescription="Clear Logs"/> 
                             </LinearLayout>
@@ -237,60 +246,62 @@
                                 android:id="@+id/rvConsoleLogs"
                                 android:layout_width="match_parent"
                                 android:layout_height="0dp"
-                                android:layout_weight="1"/>
+                                android:layout_weight="1"
+                                android:scrollbars="vertical"
+                                android:layout_marginBottom="8dp"/>
                                 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical">
+                                android:orientation="vertical"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp">
                                 
                                 <!-- Row 1: Topic Selector (Publish Target) -->
-                                <com.google.android.material.textfield.TextInputLayout
+                                <AutoCompleteTextView
+                                    android:id="@+id/etConsoleTopic"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="40dp"
                                     android:hint="@string/project_hint_topic_target"
-                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu">
-                                    
-                                    <AutoCompleteTextView
-                                        android:id="@+id/etConsoleTopic"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:textSize="14sp"
-                                        android:inputType="textNoSuggestions"
-                                        android:padding="8dp"/>
-                                </com.google.android.material.textfield.TextInputLayout>
-
-                                <Space android:layout_width="match_parent" android:layout_height="4dp"/>
+                                    android:background="@drawable/bg_input_dense_purple"
+                                    android:textSize="13sp"
+                                    android:inputType="textNoSuggestions"
+                                    android:textColor="@color/primary"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="12dp"
+                                    android:layout_marginBottom="8dp"/>
 
                                 <!-- Row 2: Payload + Send -->
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="horizontal"
-                                    android:gravity="center_vertical">
+                                    android:gravity="center_vertical"
+                                    android:layout_marginBottom="16dp">
                                     
-                                    <com.google.android.material.textfield.TextInputLayout
+                                    <EditText
+                                        android:id="@+id/etConsolePayload"
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
-                                        android:layout_height="wrap_content"
+                                        android:layout_height="40dp"
                                         android:hint="@string/project_label_message"
-                                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-                                        <com.google.android.material.textfield.TextInputEditText
-                                            android:id="@+id/etConsolePayload"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:textSize="14sp"
-                                            android:padding="8dp"/>
-                                    </com.google.android.material.textfield.TextInputLayout>
+                                        android:background="@drawable/bg_input_dense_purple"
+                                        android:textSize="13sp"
+                                        android:inputType="text"
+                                        android:textColor="@color/toolbar_text"
+                                        android:paddingStart="12dp"
+                                        android:paddingEnd="12dp"/>
 
                                     <Button 
                                         android:id="@+id/btnConsoleSend" 
                                         android:layout_width="wrap_content" 
                                         android:layout_height="wrap_content" 
                                         android:text="@string/project_btn_send_console"
+                                        android:textSize="16sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/toolbar_text"
                                         android:layout_marginStart="8dp"
                                         style="@style/Widget.MaterialComponents.Button.TextButton"/> 
-                                        <!-- Using compact button style or default -->
                                 </LinearLayout>
                             </LinearLayout>
                         </LinearLayout>
@@ -316,13 +327,13 @@
                                 android:paddingStart="24dp"
                                 android:paddingEnd="16dp"
                                 android:paddingTop="12dp"
-                                android:paddingBottom="12dp">
+                                android:paddingBottom="28dp">
                                 
                                 <TextView 
                                     android:text="@string/properties_title" 
                                     android:textSize="21sp" 
                                     android:textStyle="bold" 
-                                    android:textColor="?android:attr/textColorPrimary"
+                                    android:textColor="@color/toolbar_text"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
                             </LinearLayout>
@@ -338,362 +349,299 @@
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:orientation="vertical">
-
-                            <!-- Display Name -->
-                            <TextView
-                                android:text="@string/project_prop_display_name"
-                                android:textSize="12sp"
-                                android:textColor="#666666"
-                                android:layout_marginTop="12dp"
-                                android:paddingStart="24dp"
-                                android:paddingEnd="16dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
-                                
-                            <EditText
-                                android:id="@+id/etPropName"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/shape_edit_text_bg"
-                                android:padding="8dp"
-                                android:layout_marginBottom="8dp"
-                                android:layout_marginStart="24dp"
-                                android:layout_marginEnd="16dp"
-                                android:textSize="14sp"
-                                android:inputType="text"/>
-
-                                <!-- Row: Width / Height / Clone Button -->
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical"
-                                android:layout_marginStart="24dp"
-                                android:layout_marginEnd="16dp"
-                                android:layout_marginBottom="4dp">
-                                
-                                <com.google.android.material.textfield.TextInputLayout
-                                    android:layout_width="0dp"
-                                    android:layout_weight="1"
-                                    android:layout_height="wrap_content"
-                                    android:hint="@string/properties_label_width"
-                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-                                    <com.google.android.material.textfield.TextInputEditText
-                                        android:id="@+id/etPropWidth"
-                                        android:inputType="number"
-                                        android:textSize="12sp"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"/>
-                                </com.google.android.material.textfield.TextInputLayout>
-                                
-                                <Space android:layout_width="4dp" android:layout_height="wrap_content"/>
-                                
-                                <com.google.android.material.textfield.TextInputLayout
-                                    android:layout_width="0dp"
-                                    android:layout_weight="1"
-                                    android:layout_height="wrap_content"
-                                    android:hint="@string/properties_label_height"
-                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-                                    <com.google.android.material.textfield.TextInputEditText
-                                        android:id="@+id/etPropHeight"
-                                        android:inputType="number"
-                                        android:textSize="12sp"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"/>
-                                </com.google.android.material.textfield.TextInputLayout>
-                                
-                                <Space android:layout_width="4dp" android:layout_height="wrap_content"/>
-                                
-                                <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/btnClone"
-                                    android:layout_width="0dp"
-                                    android:layout_weight="1"
-                                    android:layout_height="match_parent"
-                                    android:text="@string/properties_btn_clone"
-                                    android:textSize="11sp"
-                                    android:padding="0dp"
-                                    android:insetTop="0dp"
-                                    android:insetBottom="0dp"
-                                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                                    android:layout_marginTop="4dp"/>
-                            </LinearLayout>
-
-                                <!-- Composite Topic Editor -->
-                            <TextView
-                                android:text="@string/properties_label_topic"
-                                android:textSize="12sp"
-                                android:textColor="#666666"
-                                android:layout_marginStart="24dp"
-                                android:layout_marginEnd="16dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
-
-                            <LinearLayout
-                                android:textSize="12sp"
-                                android:textColor="#666666"
-                                android:layout_marginStart="24dp"
-                                android:layout_marginEnd="16dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
-                                
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical"
-                                android:background="@drawable/shape_edit_text_bg"
-                                android:padding="8dp"
-                                android:layout_marginStart="24dp"
-                                android:layout_marginEnd="16dp"
-                                android:layout_marginBottom="4dp">
-                                
-                                <TextView
-                                    android:id="@+id/tvTopicPrefix"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="..."
-                                    android:textSize="16sp"
-                                    android:textColor="@color/topic_text_secondary"
-                                    android:maxLines="1"
-                                    android:ellipsize="start"
-                                    app:autoSizeTextType="uniform"
-                                    app:autoSizeMinTextSize="10sp"
-                                    app:autoSizeMaxTextSize="16sp"
-                                    app:autoSizeStepGranularity="1sp"
-                                    android:maxWidth="180dp"/>
-                                    
-                                <EditText
-                                    android:id="@+id/etTopicName"
-                                    android:layout_width="0dp"
-                                    android:layout_weight="1"
-                                    android:layout_height="wrap_content"
-                                    android:background="@null"
-                                    android:hint="NAME"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold"
-                                    android:inputType="textNoSuggestions|textVisiblePassword"
-                                    android:gravity="center"
-                                    android:textColor="@color/topic_text_primary"/>
-                                    
-                                <TextView
-                                    android:id="@+id/tvTopicSuffix"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="/val"
-                                    android:textSize="16sp"
-                                    android:textColor="@color/topic_text_secondary"/>
-                                    
-                                <ImageView
-                                    android:id="@+id/btnTopicCopy"
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:padding="2dp"
-                                    android:src="@drawable/ic_copy"
-                                    app:tint="#666666"
-                                    android:background="?attr/selectableItemBackgroundBorderless"
-                                    android:layout_marginStart="8dp"
-                                    android:contentDescription="Copy Topic"/>
-                                    
-                                <ImageView
-                                    android:id="@+id/btnTopicReset"
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:padding="2dp"
-                                    android:src="@drawable/ic_sync"
-                                    app:tint="#666666"
-                                    android:background="?attr/selectableItemBackgroundBorderless"
-                                    android:layout_marginStart="8dp"
-                                    android:contentDescription="Reset Topic Name"/>
-                            </LinearLayout>
-
-                            <!-- Divider: General vs Custom Settings -->
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="@drawable/divider_dashed"
-                                android:layerType="software"
-                                android:layout_marginTop="12dp"
-                                android:layout_marginBottom="12dp"
-                                android:layout_marginStart="24dp"
-                                android:layout_marginEnd="16dp"/>
-
-
-
-                            <!-- Color Selection -->
-                            <TextView
-                                android:text="@string/properties_label_color"
-                                android:textSize="12sp"
-                                android:textColor="#666666"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:paddingStart="24dp"
-                                android:paddingEnd="16dp"
-                                android:layout_marginBottom="4dp"/>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical"
-                                android:paddingStart="24dp"
-                                android:paddingEnd="16dp"
-                                android:layout_marginBottom="12dp">
-
-                                <TextView
-                                    android:id="@+id/vPropColorPreview"
-                                    android:layout_width="120dp"
-                                    android:layout_height="48dp"
-                                    android:gravity="center"
-                                    android:text="@string/properties_label_default"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold"
-                                    android:textColor="#000000"
-                                    android:background="@drawable/bg_color_preview"
-                                    android:clickable="true"
-                                    android:focusable="true"/>
-                            </LinearLayout>
-
-                            <!-- Button Specific Properties -->
-                            <LinearLayout
-                                android:id="@+id/containerButtonProps"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:visibility="gone">
-
-                                <!-- Payload (Message) -->
-                                <com.google.android.material.textfield.TextInputLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:hint="@string/project_hint_payload"
-                                    android:layout_marginStart="24dp"
-                                    android:layout_marginEnd="16dp"
-                                    android:layout_marginBottom="8dp"
-                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-                                    <com.google.android.material.textfield.TextInputEditText
-                                        android:id="@+id/etPropPayload"
-                                        android:inputType="text"
-                                        android:textSize="14sp"
-                                        android:text="1"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"/>
-                                </com.google.android.material.textfield.TextInputLayout>
-
-                                <!-- Button Text (Label) -->
-                                <com.google.android.material.textfield.TextInputLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:hint="@string/properties_label_button_text"
-                                    android:layout_marginStart="24dp"
-                                    android:layout_marginEnd="16dp"
-                                    android:layout_marginBottom="12dp"
-                                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-                                    <com.google.android.material.textfield.TextInputEditText
-                                        android:id="@+id/etPropButtonText"
-                                        android:inputType="text"
-                                        android:textSize="14sp"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"/>
-                                </com.google.android.material.textfield.TextInputLayout>
-
-                                <!-- Icon Selection -->
-                                <TextView
-                                    android:text="@string/app_logo" 
-                                    android:textSize="12sp"
-                                    android:textColor="#666666"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:paddingStart="24dp"
-                                    android:paddingEnd="16dp"
-                                    android:layout_marginBottom="4dp"/>
-                                <!-- Note: 'Icon' wasn't extracted, using app_logo or just hardcoding 'Icon' if no better generic? 
-                                     Actually 'Icon' -> '圖示' is better. I don't have 'label_icon'.
-                                     Wait, let me add 'label_icon' to strings first or reuse something?
-                                     I will use 'sidebar_components' which is 'Components'/'元件'. Not ideal.
-                                     I'll add 'label_icon' now to strings if possible, or just skip it for now and do it in next step.
-                                     For now, I'll use hardcoded 'Icon' since I didn't add the string. Or...
-                                     I'll assume I can add it? No, tool calls are strict.
-                                     I'll leave 'Icon' hardcoded for this block or use 'app_logo' (App Logo / 應用程式圖示) - weird.
-                                     I'll just leave "Icon" text but replace the other strings.
-                                     Actually, I will Add 'label_icon' to ReplaceFileContent in Step 1/2 of this batch? No, I can't modify prev tool calls.
-                                     I'll stick to replacing the known ones.
-                                 -->
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
                                     android:orientation="vertical"
                                     android:paddingStart="24dp"
-                                    android:paddingEnd="16dp"
-                                    android:layout_marginBottom="12dp">
+                                    android:paddingEnd="24dp"
+                                    android:paddingTop="6dp">
+
+                                    <!-- Display Name -->
+                                    <com.google.android.material.textfield.TextInputLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:hint="@string/project_prop_display_name"
+                                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                                        app:boxCornerRadiusTopStart="16dp"
+                                        app:boxCornerRadiusTopEnd="16dp"
+                                        app:boxCornerRadiusBottomStart="16dp"
+                                        app:boxCornerRadiusBottomEnd="16dp"
+                                        app:boxStrokeColor="@color/toolbar_text"
+                                        android:layout_marginBottom="8dp">
+                                        <com.google.android.material.textfield.TextInputEditText
+                                            android:id="@+id/etPropName"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:inputType="text"
+                                            android:textSize="17sp"
+                                            android:textColor="@color/prop_text_primary"/>
+                                    </com.google.android.material.textfield.TextInputLayout>
+
+                                    <!-- Row: Width / Height / Clone -->
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="horizontal"
+                                        android:layout_marginBottom="8dp">
+                                        
+                                        <com.google.android.material.textfield.TextInputLayout
+                                            android:layout_width="0dp"
+                                            android:layout_weight="1"
+                                            android:layout_height="wrap_content"
+                                            android:hint="@string/properties_label_width"
+                                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                                            app:boxCornerRadiusTopStart="16dp"
+                                            app:boxCornerRadiusTopEnd="16dp"
+                                            app:boxCornerRadiusBottomStart="16dp"
+                                            app:boxCornerRadiusBottomEnd="16dp"
+                                            app:boxStrokeColor="@color/toolbar_text">
+                                            <com.google.android.material.textfield.TextInputEditText
+                                                android:id="@+id/etPropWidth"
+                                                android:inputType="number"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:textSize="17sp"
+                                                android:textColor="@color/prop_text_primary"/>
+                                        </com.google.android.material.textfield.TextInputLayout>
+                                        
+                                        <Space android:layout_width="10dp" android:layout_height="wrap_content"/>
+                                        
+                                        <com.google.android.material.textfield.TextInputLayout
+                                            android:layout_width="0dp"
+                                            android:layout_weight="1"
+                                            android:layout_height="wrap_content"
+                                            android:hint="@string/properties_label_height"
+                                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                                            app:boxCornerRadiusTopStart="16dp"
+                                            app:boxCornerRadiusTopEnd="16dp"
+                                            app:boxCornerRadiusBottomStart="16dp"
+                                            app:boxCornerRadiusBottomEnd="16dp"
+                                            app:boxStrokeColor="@color/toolbar_text">
+                                            <com.google.android.material.textfield.TextInputEditText
+                                                android:id="@+id/etPropHeight"
+                                                android:inputType="number"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:textSize="17sp"
+                                                android:textColor="@color/prop_text_primary"/>
+                                        </com.google.android.material.textfield.TextInputLayout>
+
+                                        <Space android:layout_width="10dp" android:layout_height="wrap_content"/>
+                                        
+                                        <!-- Clone Button (Pill Shape) -->
+                                        <com.google.android.material.button.MaterialButton
+                                            android:id="@+id/btnClone"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="46dp"
+                                            android:text="@string/properties_btn_clone"
+                                            android:textColor="@color/toolbar_text"
+                                            android:textSize="16sp"
+                                            app:strokeColor="#E0E0E0"
+                                            app:strokeWidth="1dp"
+                                            app:cornerRadius="16dp"
+                                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                            android:insetTop="0dp"
+                                            android:insetBottom="0dp"/>
+                                    </LinearLayout>
+
+                                    <!-- Topic Section -->
+                                    <TextView
+                                        android:text="@string/properties_label_topic"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/prop_text_secondary"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="4dp"
+                                        android:layout_marginStart="4dp"/>
 
                                     <LinearLayout
-                                       android:layout_width="match_parent"
-                                       android:layout_height="wrap_content"
-                                       android:orientation="horizontal"
-                                       android:gravity="center_vertical">
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="horizontal"
+                                        android:gravity="center_vertical"
+                                        android:padding="8dp"
+                                        android:background="@drawable/bg_topic_container"
+                                        android:layout_marginBottom="8dp">
+
+                                        <TextView
+                                            android:id="@+id/tvTopicPrefix"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="..."
+                                            android:textSize="14sp"
+                                            android:textColor="@color/prop_text_secondary"
+                                            android:maxWidth="160dp"
+                                            android:ellipsize="start"
+                                            android:singleLine="true"/>
+
+                                        <EditText
+                                            android:id="@+id/etTopicName"
+                                            android:layout_width="0dp"
+                                            android:layout_weight="1"
+                                            android:layout_height="wrap_content"
+                                            android:background="@null"
+                                            android:hint="ID"
+                                            android:textSize="16sp"
+                                            android:textStyle="bold"
+                                            android:textColor="@color/toolbar_text"
+                                            android:gravity="center_horizontal"/>
+
+                                        <TextView
+                                            android:id="@+id/tvTopicSuffix"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text=""
+                                            android:textSize="14sp"
+                                            android:textColor="@color/prop_text_secondary"/>
 
                                         <ImageView
-                                            android:id="@+id/ivPropIconPreview"
-                                            android:layout_width="48dp"
-                                            android:layout_height="48dp"
-                                            android:scaleType="fitCenter"
-                                            android:src="@android:drawable/ic_menu_add"
-                                            android:padding="8dp"
-                                            android:background="@drawable/shape_edit_text_bg"/>
-
-                                        <Button
-                                            android:id="@+id/btnSelectIcon"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/properties_btn_select_icon"
-                                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                                            android:layout_marginStart="16dp"/>
-
-                                        <Button
-                                            android:id="@+id/btnClearIcon"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="@string/properties_btn_no_icon"
-                                            style="@style/Widget.MaterialComponents.Button.TextButton"
-                                            android:textColor="#666666"
-                                            android:layout_marginStart="8dp"/>
+                                            android:id="@+id/btnTopicCopy"
+                                            android:layout_width="24dp"
+                                            android:layout_height="24dp"
+                                            android:src="@drawable/ic_copy"
+                                            app:tint="@color/toolbar_text"
+                                            android:padding="4dp"
+                                            android:layout_marginStart="8dp"
+                                            android:background="?attr/selectableItemBackgroundBorderless"/>
+                                            
+                                        <ImageView
+                                            android:id="@+id/btnTopicReset"
+                                            android:layout_width="24dp"
+                                            android:layout_height="24dp"
+                                            android:src="@drawable/ic_sync"
+                                            app:tint="@color/toolbar_text"
+                                            android:padding="4dp"
+                                            android:layout_marginStart="8dp"
+                                            android:background="?attr/selectableItemBackgroundBorderless"/>
                                     </LinearLayout>
+
+                                    <!-- Color Section -->
+                                    <TextView
+                                        android:text="@string/properties_label_color"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/prop_text_secondary"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="4dp"
+                                        android:layout_marginStart="4dp"/>
+                                        
+                                    <TextView
+                                        android:id="@+id/vPropColorPreview"
+                                        android:layout_width="120dp"
+                                        android:layout_height="40dp"
+                                        android:gravity="center"
+                                        android:text="@string/properties_label_default"
+                                        android:textSize="14sp"
+                                        android:layout_marginBottom="8dp"
+                                        android:clickable="true"
+                                        android:focusable="true"/>
+
+                                    <!-- Specific Properties Injection Point -->
+                                    <LinearLayout
+                                        android:id="@+id/containerSpecificProps"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="vertical"
+                                        android:layout_marginBottom="8dp"/>
+
+                                    <!-- Button Properties (Hardcoded Block) -->
+                                    <LinearLayout
+                                        android:id="@+id/containerButtonProps"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:orientation="vertical"
+                                        android:visibility="gone">
+
+                                        <com.google.android.material.textfield.TextInputLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:hint="@string/project_hint_payload"
+                                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                                            app:boxCornerRadiusTopStart="16dp"
+                                            app:boxCornerRadiusTopEnd="16dp"
+                                            app:boxCornerRadiusBottomStart="16dp"
+                                            app:boxCornerRadiusBottomEnd="16dp"
+                                            app:boxStrokeColor="@color/toolbar_text"
+                                            android:layout_marginBottom="8dp">
+                                            <com.google.android.material.textfield.TextInputEditText
+                                                android:id="@+id/etPropPayload"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:textSize="17sp"
+                                                android:textColor="@color/prop_text_primary"/>
+                                        </com.google.android.material.textfield.TextInputLayout>
+
+                                        <com.google.android.material.textfield.TextInputLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:hint="@string/properties_label_button_text"
+                                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                                            app:boxCornerRadiusTopStart="16dp"
+                                            app:boxCornerRadiusTopEnd="16dp"
+                                            app:boxCornerRadiusBottomStart="16dp"
+                                            app:boxCornerRadiusBottomEnd="16dp"
+                                            app:boxStrokeColor="@color/primary"
+                                            android:layout_marginBottom="8dp">
+                                            <com.google.android.material.textfield.TextInputEditText
+                                                android:id="@+id/etPropButtonText"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:textSize="17sp"
+                                                android:textColor="@color/prop_text_primary"/>
+                                        </com.google.android.material.textfield.TextInputLayout>
+                                        
+                                        <!-- Icon Selection -->
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="horizontal"
+                                            android:gravity="center_vertical"
+                                            android:layout_marginBottom="8dp">
+                                            
+                                            <ImageView
+                                                android:id="@+id/ivPropIconPreview"
+                                                android:layout_width="40dp"
+                                                android:layout_height="40dp"
+                                                android:scaleType="fitCenter"
+                                                android:src="@android:drawable/ic_menu_add"
+                                                android:padding="6dp"
+                                                android:background="@drawable/bg_topic_container"/>
+                                                
+                                            <Button
+                                                android:id="@+id/btnSelectIcon"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="@string/properties_btn_select_icon"
+                                                android:textSize="16sp"
+                                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                                android:layout_marginStart="12dp"/>
+                                                
+                                            <Button
+                                                android:id="@+id/btnClearIcon"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:text="@string/properties_btn_no_icon"
+                                                android:textSize="16sp"
+                                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                                android:textColor="@color/prop_text_secondary"
+                                                android:layout_marginStart="6dp"/>
+                                        </LinearLayout>
+                                    </LinearLayout>
+
+                                    <!-- Save Button -->
+                                    <androidx.appcompat.widget.AppCompatButton
+                                        android:id="@+id/btnSaveProps"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="48dp"
+                                        android:text="@string/properties_btn_apply"
+                                        android:textColor="#FFFFFF"
+                                        android:textStyle="bold"
+                                        android:textSize="18sp"
+                                        android:background="@drawable/bg_btn_primary_large"
+                                        android:layout_marginTop="12dp"
+                                        android:layout_marginBottom="16dp"/>
+
                                 </LinearLayout>
-                            </LinearLayout>
-
-                            <!-- Compression (Hidden usually) -->
-                             <LinearLayout
-                                 android:id="@+id/containerCompression"
-                                 android:layout_width="match_parent"
-                                 android:layout_height="wrap_content"
-                                 android:orientation="vertical"
-                                 android:visibility="gone">
-                                 <TextView
-                                     android:layout_width="wrap_content"
-                                     android:layout_height="wrap_content"
-                                     android:text="Quality"
-                                     android:textSize="12sp"/>
-                                 <com.google.android.material.slider.Slider
-                                     android:id="@+id/sliderCompression"
-                                     android:layout_width="match_parent"
-                                     android:layout_height="wrap_content"
-                                     android:valueFrom="1.0"
-                                     android:valueTo="5.0"
-                                     android:stepSize="1.0"/>
-                             </LinearLayout>
-                             
-
-
-                             <!-- Buttons -->
-                             <Button
-                                 android:id="@+id/btnSaveProps"
-                                 android:layout_width="match_parent"
-                                 android:layout_height="wrap_content"
-                                 android:text="@string/properties_btn_apply"
-                                 android:visibility="gone"/>
-                              </LinearLayout>
 
                           </androidx.core.widget.NestedScrollView>
                          </LinearLayout>
@@ -749,6 +697,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:layout_gravity="top|end"
         android:layout_marginEnd="0dp"
+        android:layout_marginTop="42dp"
         android:elevation="10dp"
         android:visibility="visible" />
 
@@ -762,6 +711,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:layout_gravity="top|end"
         android:layout_marginEnd="58dp"
+        android:layout_marginTop="42dp"
         android:elevation="10dp"
         android:visibility="visible" />
 
@@ -775,6 +725,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:layout_gravity="top|end"
         android:layout_marginEnd="116dp"
+        android:layout_marginTop="42dp"
         android:elevation="10dp"
         android:visibility="visible" />
 

@@ -120,37 +120,58 @@ class SetupActivity : BaseActivity() {
 
 
     private fun setupWindowInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+        // vFix: Apply insets to Header Layout ONLY to allow gradient background to flow behind status bar
+        val headerLayout = findViewById<LinearLayout>(R.id.headerLayout)
+        
+        ViewCompat.setOnApplyWindowInsetsListener(headerLayout) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
-            view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
-
-            // vFix: Light Status Bar for SetupActivity
-            val isDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
-            if (!isDark) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                     window.insetsController?.setSystemBarsAppearance(
-                         android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                         android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-                     )
-                } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                     @Suppress("DEPRECATION")
-                     window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                }
-            } else {
-                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                     window.insetsController?.setSystemBarsAppearance(0, android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
-                } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                     @Suppress("DEPRECATION")
-                     window.decorView.systemUiVisibility = window.decorView.systemUiVisibility and android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-                }
-            }
-
+            // Only add top padding to header
+            view.setPadding(
+                view.paddingLeft,
+                bars.top + 48.dpToPx(), // Original 48dp + Status Bar
+                view.paddingRight,
+                view.paddingBottom
+            )
             WindowInsetsCompat.CONSUMED
         }
-        // com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, findViewById(R.id.bannerAdContainer))
+
+        // Apply bottom padding to ScrollView or root to avoid Nav Bar overlap
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+             view.setPadding(bars.left, 0, bars.right, bars.bottom)
+             WindowInsetsCompat.CONSUMED
+        }
+
+        // vFix: Light Status Bar for SetupActivity
+        val isDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        // Ensure Transparent Status Bar
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+
+        if (!isDark) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                 window.insetsController?.setSystemBarsAppearance(
+                     android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                     android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                 )
+            } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                 @Suppress("DEPRECATION")
+                 window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            }
+        } else {
+             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                 window.insetsController?.setSystemBarsAppearance(0, android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+            } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                 @Suppress("DEPRECATION")
+                 window.decorView.systemUiVisibility = window.decorView.systemUiVisibility and android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+            }
+        }
+        
         com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
         com.example.mqttpanelcraft.utils.AdManager.loadInterstitial(this)
+    }
+
+    private fun Int.dpToPx(): Int {
+        return (this * resources.displayMetrics.density).toInt()
     }
 
     private fun setupEditMode(id: String) {
@@ -180,26 +201,25 @@ class SetupActivity : BaseActivity() {
         
         btnSave.text = getString(R.string.setup_btn_update_start)
         findViewById<MaterialButton>(R.id.btnSaveProject).text = getString(R.string.setup_btn_update_only)
-        supportActionBar?.title = getString(R.string.setup_title_edit)
+        findViewById<TextView>(R.id.tvPageTitle).text = getString(R.string.setup_title_edit)
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(findViewById(R.id.toolbar))
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        
-        // Fix: Tint Back Arrow for Dark Mode
-        val backArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_thick)?.mutate()
-        val isDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        val color = if (isDark) Color.WHITE else Color.BLACK
-        backArrow?.setTint(color)
-        
-        supportActionBar?.setHomeAsUpIndicator(backArrow) 
+        val btnBack = findViewById<android.view.View>(R.id.btnBack)
+        btnBack.setOnClickListener { 
+            finish() 
+        }
+
+        val tvTitle = findViewById<TextView>(R.id.tvPageTitle)
+        if (projectId != null) {
+            tvTitle.text = getString(R.string.setup_title_edit)
+        } else {
+            tvTitle.text = getString(R.string.setup_title_new)
+        }
     }
     
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
-    }
+    // Removed onSupportNavigateUp as we use direct finish() now
+    // override fun onSupportNavigateUp(): Boolean ...
 
     private val saveJsonLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json")) { uri ->
         if (uri != null && pendingExportJson != null) {
@@ -660,6 +680,14 @@ class SetupActivity : BaseActivity() {
              return
         }
 
+        // New Feature: First Project is Free (No Ad)
+        // If creating new project (projectId == null) AND repository is empty
+        if (projectId == null && ProjectRepository.getAllProjects().isEmpty()) {
+             // First Project Bonus: Ad Skipped silently
+             saveAndFinish(newProject, targetProjectId)
+             return
+        }
+
         if (com.example.mqttpanelcraft.utils.AdManager.isRewardedReady()) {
             com.example.mqttpanelcraft.utils.AdManager.showRewarded(this,
                 onReward = {
@@ -781,35 +809,27 @@ class SetupActivity : BaseActivity() {
 
     private fun selectType(type: ProjectType) {
         selectedType = type
-        val primaryColor = ContextCompat.getColor(this, R.color.primary)
-        val greyColor = Color.parseColor("#757575")
+        val primaryColor = ContextCompat.getColor(this, R.color.icy_primary)
+        val greyColor = Color.parseColor("#94A3B8") // Slate 400
 
-        // 1. Reset all to unselected state
-        cardHome.setBackgroundResource(R.drawable.bg_card_unselected)
-        ivHome.setColorFilter(greyColor)
-        tvHome.setTextColor(greyColor)
+        if (type == ProjectType.HOME) {
+            cardHome.setBackgroundResource(R.drawable.bg_card_selected)
+            ivHome.setColorFilter(getColor(R.color.setup_accent_color)) // Purple
+            tvHome.setTextColor(getColor(R.color.setup_accent_color)) // Purple
 
-        cardWebview.setBackgroundResource(R.drawable.bg_card_unselected)
-        ivWebview.setColorFilter(greyColor)
-        tvWebview.setTextColor(greyColor)
+            cardWebview.setBackgroundResource(R.drawable.bg_card_unselected)
+            ivWebview.setColorFilter(Color.parseColor("#94A3B8"))
+            tvWebview.setTextColor(Color.parseColor("#94A3B8"))
+            findViewById<TextView>(R.id.tvThemeDescription).text = getString(R.string.setup_desc_panel)
+        } else {
+            cardHome.setBackgroundResource(R.drawable.bg_card_unselected)
+            ivHome.setColorFilter(Color.parseColor("#94A3B8"))
+            tvHome.setTextColor(Color.parseColor("#94A3B8"))
 
-        // 2. Highlight selected
-        val tvDesc = findViewById<TextView>(R.id.tvThemeDescription)
-        
-        when (type) {
-            ProjectType.HOME -> {
-                cardHome.setBackgroundResource(R.drawable.bg_card_selected)
-                ivHome.setColorFilter(primaryColor)
-                tvHome.setTextColor(primaryColor)
-                tvDesc.text = getString(R.string.setup_desc_panel)
-            }
-            ProjectType.WEBVIEW -> {
-                cardWebview.setBackgroundResource(R.drawable.bg_card_selected)
-                ivWebview.setColorFilter(primaryColor)
-                tvWebview.setTextColor(primaryColor)
-                tvDesc.text = getString(R.string.setup_desc_webview)
-            }
-            else -> {} // Handle OTHER or Legacy FACTORY (No UI)
+            cardWebview.setBackgroundResource(R.drawable.bg_card_selected)
+            ivWebview.setColorFilter(getColor(R.color.setup_accent_color)) // Purple
+            tvWebview.setTextColor(getColor(R.color.setup_accent_color)) // Purple
+            findViewById<TextView>(R.id.tvThemeDescription).text = getString(R.string.setup_desc_webview)
         }
     }
 

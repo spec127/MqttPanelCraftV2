@@ -13,29 +13,80 @@
     <color name="surface_color">#FFFFFF</color>
     <color name="grid_background_color">#F5F5F5</color>
     <color name="grid_stroke_color">#E0E0E0</color>
-    <color name="sidebar_background_color">#FAFAFA</color>
-    <color name="sidebar_text_primary">#000000</color>
-    <color name="sidebar_text_secondary">#666666</color>
-    <color name="sidebar_card_stroke">#DDDDDD</color>
-    <color name="sidebar_icon_tint">#666666</color>
-    <color name="sidebar_component_stroke">#999999</color>
-    <color name="sidebar_section_header">#666666</color>
+
+    <!-- HTML Mockup Palette -->
+    <color name="primary_deep_purple">#6A1B9A</color>
+    <color name="vivid_blue">#00B0FF</color>
+    <color name="warm_amber">#FF9100</color>
+    <color name="soft_purple">#D500F9</color>
+    <color name="sidebar_grey">#F5F5F5</color>
     
-    <!-- New Colors for Redesign -->
-    <color name="sidebar_header_background">#E1BEE7</color> <!-- Lighter Purple to match Toolbar -->
-    <color name="sidebar_header_text">#4A148C</color> <!-- Dark Purple -->
+    <!-- Properties Panel Colors -->
+    <color name="prop_container_bg">#F3F4F6</color>
+    <color name="prop_input_bg">#FFFFFF</color>
+    <color name="prop_text_primary">#1F2937</color>
+    <color name="prop_text_secondary">#6B7280</color>
+    <color name="prop_stroke_color">#E5E7EB</color>
     
-    <color name="grid_dot_color">#E0E0E0</color>
     <color name="canvas_background">#FFFFFF</color>
-    
+    <color name="grid_dot_color">#E0E0E0</color>
+
     <!-- Toolbar Colors -->
-    <color name="toolbar_bg">#a573bc</color>
-    <color name="toolbar_text">#FFFFFF</color>
-    <color name="toolbar_border">#00000000</color> <!-- Transparent or unused -->
+    <color name="toolbar_bg">#FFFFFF</color>
+    <color name="toolbar_text">#6A1B9A</color> <!-- Deep Purple -->
+    <color name="toolbar_border">#00000000</color>
+    
+    <!-- Sidebar Colors -->
+    <color name="sidebar_background_color">@color/sidebar_grey</color>
+    <color name="sidebar_card_bg">#FFFFFF</color>
+    <color name="sidebar_text_primary">#475569</color> <!-- Slate 600 -->
+    <color name="sidebar_header_text">#64748B</color> <!-- Slate 500 -->
+    <color name="sidebar_header_background">#00000000</color> <!-- Transparent -->
+    
+    <!-- Sidebar Missing Resources (Added to fix runtime crash) -->
+    <color name="sidebar_text_secondary">#757575</color>
+    <color name="sidebar_card_stroke">#616161</color> <!-- Stronger Grey -->
+    <color name="sidebar_icon_tint">#4A148C</color> <!-- Darker Purple for contrast -->
+    <color name="sidebar_component_stroke">#616161</color>
+    <color name="sidebar_section_header">@color/sidebar_header_text</color>
     
     <!-- Drawer Semantic Colors -->
-    <color name="drawer_background">#FAFAFA</color>
-    <color name="drawer_btn_bg">#EEEEEE</color>
-    <color name="drawer_btn_text">#212121</color>
-    <color name="drawer_btn_icon_tint">#212121</color>
+    <color name="drawer_background">#FFFFFF</color>
+    <color name="drawer_btn_bg">#FFFFFF</color>
+    <color name="drawer_btn_text">#475569</color> <!-- Slate 600 -->
+    <color name="drawer_btn_icon_tint">#475569</color>
+    <color name="drawer_btn_stroke">#E2E8F0</color> <!-- Slate 200 -->
+    
+    <color name="chip_background">#F3E5F5</color>
+    
+    <color name="status_border">#33000000</color>
+
+    <!-- Fresh Icy Blue Theme -->
+    <color name="icy_background">#F0F8FF</color> <!-- Alice Blue -->
+    <color name="icy_header_start">#B3E5FC</color>
+    <color name="icy_sidebar_header_start">@color/icy_header_start</color>
+    <color name="icy_header_end">#F0F8FF</color> <!-- Match Background for Seamless Fade -->
+    <color name="icy_primary">#7B1FA2</color> <!-- Deep Vivid Purple (700) -->
+    <color name="icy_card_bg">#FFFFFF</color>
+    <color name="icy_card_border">#80E1F5FE</color> <!-- Blue 50/50 -->
+    <color name="icy_chip_bg">#E0E7FF</color>
+    <color name="icy_chip_text">#4F46E5</color>
+    
+    <color name="setup_primary_button_bg">@color/icy_primary</color>
+    
+    <color name="setup_border_color">#A855F7</color> <!-- Lighter Purple -->
+    <color name="setup_accent_color">@color/icy_primary</color>
+    <color name="setup_bottom_btn_stroke">#475569</color>
+    <color name="setup_refresh_color">@color/setup_accent_color</color>
+    <color name="setup_input_text_color">@color/setup_accent_color</color>
+    <color name="setup_radio_ring">@color/setup_border_color</color>
+    <color name="setup_action_blue">#0284c7</color>
+    
+    <!-- Mappings for New Keys -->
+    <color name="setup_background_base">@color/icy_background</color>
+    <color name="setup_surface_color">@android:color/transparent</color>
+    <color name="setup_input_container_color">@android:color/transparent</color>
+    <color name="setup_header_start">@color/icy_header_start</color>
+    <color name="setup_header_end">@color/icy_header_end</color>
+    <color name="setup_primary_button_text">#FFFFFF</color>
 </resources>
