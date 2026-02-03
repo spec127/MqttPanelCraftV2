@@ -78,4 +78,14 @@
     <color name="setup_header_end">#121212</color>
     <color name="setup_primary_button_bg">#B388FF</color>
     <color name="setup_primary_button_text">#0D0D0D</color>
+
+    <!-- Sheet Colors -->
+    <color name="sheet_border_color">#22888888</color> <!-- Subtle Gray -->
+    <color name="drag_handle_tint">#64748B</color> <!-- Slate -->
+    
+    <!-- User Design Colors -->
+    <color name="props_primary">#a573bc</color>
+    <color name="props_bg_light">#0f172a</color> <!-- Maps to dark bg in night mode -->
+    <color name="props_card_bg_light">#1e293b</color>
+    <color name="props_card_bg_dark">#0f172a</color>
 </resources>

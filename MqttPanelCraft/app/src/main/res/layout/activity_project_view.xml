@@ -33,32 +33,78 @@
                 app:popupTheme="@style/Theme.Helloworld.PopupOverlay"/>
 
             <!-- Overlay for centered elements -->
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="?attr/actionBarSize"
+                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingStart="56dp"
-                android:paddingEnd="56dp">
-
-                <View
-                    android:id="@+id/indicatorMqttStatus"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_centerInParent="true"
-                    android:background="@drawable/shape_circle_grey" />
+                android:layout_gravity="center"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp">
 
                 <TextView
                     android:id="@+id/tvToolbarTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toStartOf="@id/indicatorMqttStatus"
-                    android:layout_marginEnd="12dp"
-                    android:layout_centerVertical="true"
-                    android:text=""
+                    android:layout_marginEnd="8dp"
+                    android:text="Project Title"
                     android:textColor="@color/toolbar_text"
                     android:textSize="20sp"
-                    android:textStyle="bold"/>
-            </RelativeLayout>
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:maxWidth="200dp"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="12sp"
+                    app:autoSizeMaxTextSize="20sp"
+                    app:autoSizeStepGranularity="2sp"/>
+
+                <View
+                    android:id="@+id/indicatorMqttStatus"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:background="@drawable/shape_circle_grey" />
+            </LinearLayout>
+
+            <!-- Action Buttons Group (Right Aligned) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_gravity="end|center_vertical"
+                android:paddingEnd="4dp">
+
+                <ImageView
+                    android:id="@+id/btnUndo"
+                    android:layout_width="54dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_undo_white"
+                    android:padding="11dp"
+                    app:tint="@color/toolbar_text"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:visibility="visible" />
+
+                <ImageView
+                     android:id="@+id/btnGrid"
+                     android:layout_width="54dp"
+                     android:layout_height="match_parent"
+                     android:src="@drawable/ic_grid_on"
+                     android:padding="11dp"
+                     app:tint="@color/toolbar_text"
+                     android:background="?attr/selectableItemBackgroundBorderless"
+                     android:visibility="visible" />
+
+                <ImageView
+                     android:id="@+id/btnSettings"
+                     android:layout_width="54dp"
+                     android:layout_height="match_parent"
+                     android:src="@drawable/ic_settings_custom"
+                     android:padding="11dp"
+                     app:tint="@color/toolbar_text"
+                     android:background="?attr/selectableItemBackgroundBorderless"
+                     android:visibility="visible" />
+            </LinearLayout>
         </FrameLayout>
         
     </com.google.android.material.appbar.AppBarLayout>
@@ -141,7 +187,7 @@
                 android:id="@+id/bottomSheet"
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
-                android:background="@drawable/bg_bottom_sheet"
+                android:background="@drawable/bg_sheet_gradient_style"
                 android:clickable="true"
                 android:focusable="true"
                 app:layout_behavior="com.example.mqttpanelcraft.ui.LockableBottomSheetBehavior"
@@ -168,7 +214,7 @@
                             android:layout_gravity="center_horizontal"
                             android:layout_marginTop="12dp"
                             android:src="@drawable/ic_drag_handle" 
-                            app:tint="#CCCCCC" />
+                            app:tint="@color/drag_handle_tint" />
                             
                         <TextView
                             android:id="@+id/tvHeaderDelete"
@@ -248,6 +294,7 @@
                                 android:layout_height="0dp"
                                 android:layout_weight="1"
                                 android:scrollbars="vertical"
+                                android:fadeScrollbars="false"
                                 android:layout_marginBottom="8dp"/>
                                 
                             <LinearLayout
@@ -344,6 +391,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="0dp"
                                 android:layout_weight="1"
+                                android:scrollbars="vertical"
+                                android:fadeScrollbars="false"
                                 android:fillViewport="true">
 
                                 <LinearLayout
@@ -354,28 +403,44 @@
                                     android:paddingEnd="24dp"
                                     android:paddingTop="6dp">
 
-                                    <!-- Display Name -->
-                                    <com.google.android.material.textfield.TextInputLayout
+                                    <!-- Row 1: Display Name + Clone -->
+                                    <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:hint="@string/project_prop_display_name"
-                                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                                        app:boxCornerRadiusTopStart="16dp"
-                                        app:boxCornerRadiusTopEnd="16dp"
-                                        app:boxCornerRadiusBottomStart="16dp"
-                                        app:boxCornerRadiusBottomEnd="16dp"
-                                        app:boxStrokeColor="@color/toolbar_text"
+                                        android:orientation="horizontal"
                                         android:layout_marginBottom="8dp">
-                                        <com.google.android.material.textfield.TextInputEditText
-                                            android:id="@+id/etPropName"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="wrap_content"
-                                            android:inputType="text"
-                                            android:textSize="17sp"
-                                            android:textColor="@color/prop_text_primary"/>
-                                    </com.google.android.material.textfield.TextInputLayout>
 
-                                    <!-- Row: Width / Height / Clone -->
+                                        <com.google.android.material.textfield.TextInputLayout
+                                            android:layout_width="0dp"
+                                            android:layout_weight="1"
+                                            android:layout_height="wrap_content"
+                                            android:hint="@string/project_prop_display_name"
+                                            style="@style/Widget.App.TextInputLayout.Properties">
+                                            <com.google.android.material.textfield.TextInputEditText
+                                                android:id="@+id/etPropName"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:inputType="text"
+                                                android:textSize="14sp"
+                                                android:textColor="@color/prop_text_primary"/>
+                                        </com.google.android.material.textfield.TextInputLayout>
+                                        
+                                        <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
+
+                                        <com.google.android.material.button.MaterialButton
+                                            android:id="@+id/btnClone"
+                                            android:layout_width="80dp"
+                                            android:layout_height="match_parent"
+                                            android:text="@string/properties_btn_clone"
+                                            android:textSize="13sp"
+                                            android:textStyle="bold"
+                                            style="@style/Widget.App.Button.Outlined.Properties"
+                                            android:layout_gravity="center_vertical"
+                                            android:insetTop="0dp"
+                                            android:insetBottom="0dp"/>
+                                    </LinearLayout>
+
+                                    <!-- Row 2: Width / Height -->
                                     <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
@@ -387,154 +452,191 @@
                                             android:layout_weight="1"
                                             android:layout_height="wrap_content"
                                             android:hint="@string/properties_label_width"
-                                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                                            app:boxCornerRadiusTopStart="16dp"
-                                            app:boxCornerRadiusTopEnd="16dp"
-                                            app:boxCornerRadiusBottomStart="16dp"
-                                            app:boxCornerRadiusBottomEnd="16dp"
-                                            app:boxStrokeColor="@color/toolbar_text">
+                                            style="@style/Widget.App.TextInputLayout.Properties">
                                             <com.google.android.material.textfield.TextInputEditText
                                                 android:id="@+id/etPropWidth"
                                                 android:inputType="number"
                                                 android:layout_width="match_parent"
                                                 android:layout_height="wrap_content"
-                                                android:textSize="17sp"
+                                                android:textSize="14sp"
                                                 android:textColor="@color/prop_text_primary"/>
                                         </com.google.android.material.textfield.TextInputLayout>
                                         
-                                        <Space android:layout_width="10dp" android:layout_height="wrap_content"/>
+                                        <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
                                         
                                         <com.google.android.material.textfield.TextInputLayout
                                             android:layout_width="0dp"
                                             android:layout_weight="1"
                                             android:layout_height="wrap_content"
                                             android:hint="@string/properties_label_height"
-                                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                                            app:boxCornerRadiusTopStart="16dp"
-                                            app:boxCornerRadiusTopEnd="16dp"
-                                            app:boxCornerRadiusBottomStart="16dp"
-                                            app:boxCornerRadiusBottomEnd="16dp"
-                                            app:boxStrokeColor="@color/toolbar_text">
+                                            style="@style/Widget.App.TextInputLayout.Properties">
                                             <com.google.android.material.textfield.TextInputEditText
                                                 android:id="@+id/etPropHeight"
                                                 android:inputType="number"
                                                 android:layout_width="match_parent"
                                                 android:layout_height="wrap_content"
-                                                android:textSize="17sp"
+                                                android:textSize="14sp"
                                                 android:textColor="@color/prop_text_primary"/>
                                         </com.google.android.material.textfield.TextInputLayout>
-
-                                        <Space android:layout_width="10dp" android:layout_height="wrap_content"/>
-                                        
-                                        <!-- Clone Button (Pill Shape) -->
-                                        <com.google.android.material.button.MaterialButton
-                                            android:id="@+id/btnClone"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="46dp"
-                                            android:text="@string/properties_btn_clone"
-                                            android:textColor="@color/toolbar_text"
-                                            android:textSize="16sp"
-                                            app:strokeColor="#E0E0E0"
-                                            app:strokeWidth="1dp"
-                                            app:cornerRadius="16dp"
-                                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                                            android:insetTop="0dp"
-                                            android:insetBottom="0dp"/>
                                     </LinearLayout>
 
-                                    <!-- Topic Section -->
-                                    <TextView
-                                        android:text="@string/properties_label_topic"
-                                        android:textSize="14sp"
-                                        android:textStyle="bold"
-                                        android:textColor="@color/prop_text_secondary"
-                                        android:layout_width="wrap_content"
+                                    <!-- Row 3: Topic (Outline Style Container) -->
+                                    <FrameLayout
+                                        android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_marginBottom="4dp"
-                                        android:layout_marginStart="4dp"/>
+                                        android:layout_marginTop="4dp"
+                                        android:layout_marginBottom="8dp">
 
+                                        <!-- Hack: Using TextInputLayout as a Container for consistency -->
+                                        <com.google.android.material.textfield.TextInputLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:hint="@string/properties_label_topic"
+                                            style="@style/Widget.App.TextInputLayout.Properties">
+                                            <com.google.android.material.textfield.TextInputEditText
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:focusable="false" 
+                                                android:clickable="false"
+                                                android:cursorVisible="false"
+                                                android:text=" " /> <!-- Placeholder spcae -->
+                                        </com.google.android.material.textfield.TextInputLayout>
+
+                                        <!-- Actual Content Overlay -->
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="horizontal"
+                                            android:gravity="center_vertical"
+                                            android:paddingStart="12dp"
+                                            android:paddingEnd="12dp"
+                                            android:paddingTop="16dp" 
+                                            android:paddingBottom="12dp">
+                                            
+                                            <!-- Topic Text Construct -->
+                                            <LinearLayout
+                                                android:layout_width="0dp"
+                                                android:layout_weight="1"
+                                                android:layout_height="wrap_content"
+                                                android:orientation="horizontal"
+                                                android:gravity="center_vertical">
+                                                
+                                                 <TextView
+                                                    android:id="@+id/tvTopicPrefix"
+                                                    android:layout_width="0dp"
+                                                    android:layout_weight="0.7"
+                                                    android:layout_height="wrap_content"
+                                                    android:text="..."
+                                                    android:maxLines="1"
+                                                    app:autoSizeTextType="uniform"
+                                                    app:autoSizeMinTextSize="8sp"
+                                                    app:autoSizeMaxTextSize="12sp"
+                                                    app:autoSizeStepGranularity="1sp"
+                                                    android:fontFamily="monospace"
+                                                    android:textColor="@color/prop_text_secondary"
+                                                    android:ellipsize="end"
+                                                    android:singleLine="true"/>
+                                                    
+                                                <EditText
+                                                    android:id="@+id/etTopicName"
+                                                    android:layout_width="0dp"
+                                                    android:layout_weight="0.3"
+                                                    android:layout_height="wrap_content"
+                                                    android:background="@null"
+                                                    android:hint="ID"
+                                                    android:textSize="13sp"
+                                                    android:textStyle="bold"
+                                                    android:textColor="@color/props_primary"
+                                                    android:gravity="start|center_vertical"
+                                                    android:paddingStart="4dp"/>
+                                                    
+                                                <TextView
+                                                    android:id="@+id/tvTopicSuffix"
+                                                    android:layout_width="wrap_content"
+                                                    android:layout_height="wrap_content"
+                                                    android:text=""
+                                                    android:textSize="12sp"
+                                                    android:textColor="@color/prop_text_secondary"/>
+                                            </LinearLayout>
+
+                                            <!-- Reset Icon -->
+                                            <ImageView
+                                                android:id="@+id/btnTopicReset"
+                                                android:layout_width="40dp"
+                                                android:layout_height="40dp"
+                                                android:src="@drawable/ic_sync"
+                                                app:tint="@color/prop_text_secondary"
+                                                android:padding="8dp"
+                                                android:layout_marginEnd="4dp"
+                                                android:background="?attr/selectableItemBackgroundBorderless"/>
+                                                
+                                            <!-- Copy Icon -->
+                                            <ImageView
+                                                android:id="@+id/btnTopicCopy"
+                                                android:layout_width="28dp"
+                                                android:layout_height="28dp"
+                                                android:src="@drawable/ic_copy"
+                                                app:tint="@color/prop_text_secondary"
+                                                android:padding="5dp"
+                                                android:background="?attr/selectableItemBackgroundBorderless"/>
+                                        </LinearLayout>
+                                    </FrameLayout>
+
+                                    <!-- Generic Payload + Dropdown -->
                                     <LinearLayout
+                                        android:id="@+id/containerGenericPayload"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:orientation="horizontal"
-                                        android:gravity="center_vertical"
-                                        android:padding="8dp"
-                                        android:background="@drawable/bg_topic_container"
-                                        android:layout_marginBottom="8dp">
-
-                                        <TextView
-                                            android:id="@+id/tvTopicPrefix"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:text="..."
-                                            android:textSize="14sp"
-                                            android:textColor="@color/prop_text_secondary"
-                                            android:maxWidth="160dp"
-                                            android:ellipsize="start"
-                                            android:singleLine="true"/>
-
-                                        <EditText
-                                            android:id="@+id/etTopicName"
+                                        android:layout_marginBottom="8dp"
+                                        android:visibility="gone">
+                                        
+                                        <com.google.android.material.textfield.TextInputLayout
+                                            android:id="@+id/tilGenericPayload"
                                             android:layout_width="0dp"
                                             android:layout_weight="1"
                                             android:layout_height="wrap_content"
-                                            android:background="@null"
-                                            android:hint="ID"
-                                            android:textSize="16sp"
-                                            android:textStyle="bold"
-                                            android:textColor="@color/toolbar_text"
-                                            android:gravity="center_horizontal"/>
-
-                                        <TextView
-                                            android:id="@+id/tvTopicSuffix"
+                                            android:hint="@string/project_label_message"
+                                            style="@style/Widget.App.TextInputLayout.Properties">
+                                            <com.google.android.material.textfield.TextInputEditText
+                                                android:id="@+id/etPropGenericPayload"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="wrap_content"
+                                                android:textSize="14sp"
+                                                android:textColor="@color/prop_text_primary"/>
+                                        </com.google.android.material.textfield.TextInputLayout>
+                                        
+                                        <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
+                                        
+                                        <!-- Payload Presets Dropdown -->
+                                        <FrameLayout
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text=""
-                                            android:textSize="14sp"
-                                            android:textColor="@color/prop_text_secondary"/>
-
-                                        <ImageView
-                                            android:id="@+id/btnTopicCopy"
-                                            android:layout_width="24dp"
-                                            android:layout_height="24dp"
-                                            android:src="@drawable/ic_copy"
-                                            app:tint="@color/toolbar_text"
-                                            android:padding="4dp"
-                                            android:layout_marginStart="8dp"
-                                            android:background="?attr/selectableItemBackgroundBorderless"/>
+                                            android:layout_gravity="center_vertical">
                                             
-                                        <ImageView
-                                            android:id="@+id/btnTopicReset"
-                                            android:layout_width="24dp"
-                                            android:layout_height="24dp"
-                                            android:src="@drawable/ic_sync"
-                                            app:tint="@color/toolbar_text"
-                                            android:padding="4dp"
-                                            android:layout_marginStart="8dp"
-                                            android:background="?attr/selectableItemBackgroundBorderless"/>
+                                            <Spinner
+                                                android:id="@+id/spPayloadPresets"
+                                                android:layout_width="56dp"
+                                                android:layout_height="56dp"
+                                                android:background="@drawable/bg_topic_container"
+                                                android:spinnerMode="dropdown"/>
+                                                
+                                            <ImageView
+                                                android:layout_width="24dp"
+                                                android:layout_height="24dp"
+                                                android:layout_gravity="center"
+                                                android:src="@android:drawable/ic_menu_more"
+                                                app:tint="@color/props_primary"/>
+                                        </FrameLayout>
                                     </LinearLayout>
 
-                                    <!-- Color Section -->
-                                    <TextView
-                                        android:text="@string/properties_label_color"
-                                        android:textSize="14sp"
-                                        android:textStyle="bold"
-                                        android:textColor="@color/prop_text_secondary"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginBottom="4dp"
-                                        android:layout_marginStart="4dp"/>
-                                        
-                                    <TextView
-                                        android:id="@+id/vPropColorPreview"
-                                        android:layout_width="120dp"
-                                        android:layout_height="40dp"
-                                        android:gravity="center"
-                                        android:text="@string/properties_label_default"
-                                        android:textSize="14sp"
-                                        android:layout_marginBottom="8dp"
-                                        android:clickable="true"
-                                        android:focusable="true"/>
+                                    <!-- Divider: Common vs Specific -->
+                                    <View
+                                        android:layout_width="match_parent"
+                                        android:layout_height="1dp"
+                                        android:background="#EEEEEE"
+                                        android:layout_marginTop="8dp"
+                                        android:layout_marginBottom="16dp"/>
 
                                     <!-- Specific Properties Injection Point -->
                                     <LinearLayout
@@ -686,48 +788,7 @@
 
     </androidx.drawerlayout.widget.DrawerLayout>
 
-    <!-- Settings Wrench (Overlay - replacing Custom Gear) -->
-    <ImageView
-        android:id="@+id/btnSettings"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:src="@drawable/ic_settings_custom"
-        android:padding="13dp"
-        app:tint="@color/toolbar_text"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_gravity="top|end"
-        android:layout_marginEnd="0dp"
-        android:layout_marginTop="42dp"
-        android:elevation="10dp"
-        android:visibility="visible" />
 
-    <ImageView
-        android:id="@+id/btnGrid"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:src="@drawable/ic_grid_on" 
-        android:padding="13dp"
-        app:tint="@color/toolbar_text"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_gravity="top|end"
-        android:layout_marginEnd="58dp"
-        android:layout_marginTop="42dp"
-        android:elevation="10dp"
-        android:visibility="visible" />
-
-    <ImageView
-        android:id="@+id/btnUndo"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:src="@drawable/ic_undo_white" 
-        android:padding="13dp"
-        app:tint="@android:color/white"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_gravity="top|end"
-        android:layout_marginEnd="116dp"
-        android:layout_marginTop="42dp"
-        android:elevation="10dp"
-        android:visibility="visible" />
 
     <!-- Drop to Delete Zone (Overlay Bar) -->
     <FrameLayout

@@ -48,9 +48,8 @@ class PropertiesSheetManager(
     private val etPropHeight: EditText? = propertyContainer.findViewById(R.id.etPropHeight)
     
     // Color Picker UI
-    private val vPropColorPreview: TextView? = propertyContainer.findViewById(R.id.vPropColorPreview)
-    // private val etPropColor: EditText? = propertyContainer.findViewById(R.id.etPropColor) // Removed
-    private val tvColorHex: TextView? = propertyContainer.findViewById(R.id.tvColorHex)
+    // private val vPropColorPreview: TextView? = propertyContainer.findViewById(R.id.vPropColorPreview)
+    // private val tvColorHex: TextView? = propertyContainer.findViewById(R.id.tvColorHex)
     
     // Composite Topic
     private val tvTopicPrefix: TextView? = propertyContainer.findViewById(R.id.tvTopicPrefix)
@@ -58,19 +57,19 @@ class PropertiesSheetManager(
     private val tvTopicSuffix: TextView? = propertyContainer.findViewById(R.id.tvTopicSuffix)
     private val btnTopicReset: View? = propertyContainer.findViewById(R.id.btnTopicReset)
     private val btnTopicCopy: View? = propertyContainer.findViewById(R.id.btnTopicCopy)
+
+    // Generic Payload (New)
+    private val tilGenericPayload: View? = propertyContainer.findViewById(R.id.tilGenericPayload)
+    private val etPropGenericPayload: EditText? = propertyContainer.findViewById(R.id.etPropGenericPayload)
     
     private val btnSaveProps: Button? = propertyContainer.findViewById(R.id.btnSaveProps)
     
     // Specific Props
     private val containerSpecificProps: LinearLayout? = propertyContainer.findViewById(R.id.containerSpecificProps)
     
-    // NEW: Button Specific Props
-    private val containerButtonProps: View? = propertyContainer.findViewById(R.id.containerButtonProps)
-    private val etPropPayload: EditText? = propertyContainer.findViewById(R.id.etPropPayload)
-    private val etPropButtonText: EditText? = propertyContainer.findViewById(R.id.etPropButtonText)
-    private val ivPropIconPreview: ImageView? = propertyContainer.findViewById(R.id.ivPropIconPreview)
-    private val btnSelectIcon: View? = propertyContainer.findViewById(R.id.btnSelectIcon)
-    private val btnClearIcon: View? = propertyContainer.findViewById(R.id.btnClearIcon)
+    // NEW: Button Specific Props - REMOVED (Handled in Definition)
+    // private val containerButtonProps: View? = propertyContainer.findViewById(R.id.containerButtonProps)
+    // private val etPropPayload: EditText? ...
 
     init {
         setupListeners()
@@ -100,15 +99,23 @@ class PropertiesSheetManager(
                     len > 15 -> 16f
                     else -> 18f
                 }
-                etTopicName.textSize = newSize // Note: In code logic, setTextSize calls might be needed for SP if property defaults to SP or PX? 
-                // TextView.setTextSize(unit, size) defaults to SP in java, but property accessor .textSize returns PX and sets... what?
-                // Kotlin property .textSize usually maps to getTextSize (px) and setTextSize(size) -> SP default.
-                // Let's use explicit method to be safe: etTopicName.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, newSize)
                 etTopicName.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, newSize)
             }
             override fun afterTextChanged(s: android.text.Editable?) {
                  if (!isBinding) saveCurrentProps()
             }
+        })
+        
+        // Generic Payload Binding
+        etPropGenericPayload?.addTextChangedListener(object : android.text.TextWatcher {
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (!isBinding && selectedViewId != View.NO_ID && currentData != null) {
+                    currentData?.props?.put("payload", s.toString())
+                    onPropertyUpdated(currentData!!)
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
         
         btnSaveProps?.visibility = View.GONE
@@ -129,33 +136,17 @@ class PropertiesSheetManager(
              Toast.makeText(propertyContainer.context, "Topic Copied", Toast.LENGTH_SHORT).show()
         }
         
-        vPropColorPreview?.setOnClickListener {
-            val currentColor = vPropColorPreview?.text.toString()
-            val defaultStr = propertyContainer.context.getString(R.string.properties_label_default)
-            val initialColor = if (currentColor == defaultStr || currentColor == "Default") "#FFFFFFFF" else currentColor
-            
-            ColorPickerDialog(
-                context = propertyContainer.context,
-                initialColor = initialColor,
-                showAlpha = true
-            ) { selectedHex ->
-                updateColorPreview(selectedHex)
-                saveCurrentProps()
-            }.show(vPropColorPreview!!)
+        btnTopicCopy?.setOnClickListener {
+             val full = getFullTopic()
+             val clipboard = propertyContainer.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+             val clip = ClipData.newPlainText("Topic", full)
+             clipboard.setPrimaryClip(clip)
+             Toast.makeText(propertyContainer.context, "Topic Copied", Toast.LENGTH_SHORT).show()
         }
         
-        // Button Props Listeners
-        etPropPayload?.addTextChangedListener(textWatcher)
-        etPropButtonText?.addTextChangedListener(textWatcher)
+        // vPropColorPreview Listener - REMOVED
         
-        btnSelectIcon?.setOnClickListener {
-            showIconSelector(btnSelectIcon)
-        }
-        
-        btnClearIcon?.setOnClickListener {
-            updateIconPreview(null)
-            saveCurrentProps()
-        }
+        // Button Props Listeners - REMOVED
     }
     
     private fun getFullTopic(): String {
@@ -164,6 +155,11 @@ class PropertiesSheetManager(
          val suffix = tvTopicSuffix?.text.toString()
          return "$prefix$name$suffix"
     }
+
+    // ... (Existing init) ...
+    // Removed legacy Color & Button bindings
+    
+    // ...
 
     fun updateDimensions(wPx: Int, hPx: Int) {
         if (isBinding) return
@@ -189,11 +185,6 @@ class PropertiesSheetManager(
                 val hPx = (hDp * density).toInt()
                 
                 val name = etPropName?.text.toString()
-                var color = vPropColorPreview?.text.toString()
-                
-                val defaultStr = propertyContainer.context.getString(R.string.properties_label_default)
-                if (color == defaultStr || color == "Default") color = ""
-
                 val topicConfig = getFullTopic()
                 
                 // Construct updated data
@@ -203,28 +194,7 @@ class PropertiesSheetManager(
                     height = hPx,
                     topicConfig = topicConfig
                 )
-                if (color.isNotEmpty() && color != "#FFFFFF") {
-                     updated.props["color"] = color
-                } else if (color == "#FFFFFF") {
-                     updated.props["color"] = color
-                } else {
-                     updated.props.remove("color")
-                }
-                
-                // Save Button Props
-                if (currentData?.type == "BUTTON") {
-                    val payload = etPropPayload?.text.toString()
-                    val btnText = etPropButtonText?.text.toString()
-                    val iconKey = ivPropIconPreview?.tag as? String ?: ""
-                    
-                    updated.props["payload"] = payload
-                    updated.props["text"] = btnText
-                    if (iconKey.isNotEmpty()) {
-                        updated.props["icon"] = iconKey
-                    } else {
-                        updated.props.remove("icon")
-                    }
-                }
+                // Color & Button Props are now handled via callbacks from Definitions
                 
                 onPropertyUpdated(updated)
             } catch (e: Exception) {
@@ -239,14 +209,11 @@ class PropertiesSheetManager(
         etPropName?.setText("")
         etPropWidth?.setText("")
         etPropHeight?.setText("")
-        etPropHeight?.setText("")
-        // etPropColor?.setText("")
-        vPropColorPreview?.text = "#FFFFFF" // Reset to White/Default visualization, will be overridden
-        // tvColorHex?.text = ""
-        vPropColorPreview?.background = null
         etTopicName?.setText("")
         tvTopicPrefix?.text = ""
         tvTopicSuffix?.text = ""
+        etPropGenericPayload?.setText("")
+        tilGenericPayload?.visibility = View.GONE
         containerSpecificProps?.removeAllViews()
         isBinding = false
     }
@@ -259,8 +226,6 @@ class PropertiesSheetManager(
         isBinding = true
         
         try {
-            // ... (Existing binding)
-            
             // Specific Props Architecture
             containerSpecificProps?.removeAllViews()
             
@@ -270,9 +235,21 @@ class PropertiesSheetManager(
                  val inflater = LayoutInflater.from(propertyContainer.context)
                  val root = inflater.inflate(def.propertiesLayoutId, containerSpecificProps, true)
                  def.bindPropertiesPanel(root, data) { key: String, value: String ->
-                      currentData?.props?.put(key, value)
-                      saveCurrentProps()
+                      // Immediate Update from Definition
+                      if (currentData != null) {
+                          if (value.isEmpty()) currentData?.props?.remove(key)
+                          else currentData?.props?.put(key, value)
+                          onPropertyUpdated(currentData!!)
+                      }
                  }
+            } 
+            
+            // Generic Payload Logic
+            if (def != null && def.group == "CONTROL") {
+                tilGenericPayload?.visibility = View.VISIBLE
+                etPropGenericPayload?.setText(data.props["payload"] ?: "")
+            } else {
+                tilGenericPayload?.visibility = View.GONE
             } 
 
             etPropName?.setText(data.label)
@@ -284,58 +261,56 @@ class PropertiesSheetManager(
             etPropWidth?.setText(wDp.toString())
             etPropHeight?.setText(hDp.toString())
             
-            // Color Logic (Try resolve background color)
-            var colorHex = "" // Default to empty (Transparent/Default)
-            
-            // Prefer prop if set
-            if (data.props.containsKey("color")) {
-                colorHex = data.props["color"] ?: ""
-            }
-            
-            updateColorPreview(colorHex)
-            
-            // Button Specific Visibility & Binding
-            if (data.type == "BUTTON") {
-                containerButtonProps?.visibility = View.VISIBLE
-                
-                val payload = data.props["payload"] ?: "1"
-                val btnText = data.props["text"] ?: ""
-                val iconKey = data.props["icon"]
-                
-                etPropPayload?.setText(payload)
-                etPropButtonText?.setText(btnText)
-                updateIconPreview(iconKey)
-                
-            } else {
-                containerButtonProps?.visibility = View.GONE
-            }
-
-            
-            // If empty, we show "Default" in UI
-            updateColorPreview(colorHex)
-            
             // Topic Parsing
             val topicConfig = data.topicConfig
             val parts = topicConfig.split("/")
             
             if (parts.size >= 2) {
-                 val prefixStr = "${parts[0]}/${parts[1]}/"
-                 val nameStr = if (parts.size > 2) parts.drop(2).joinToString("/") else ""
+                 // Reconstruct prefix (everything before the last part)
+                 val prefixParts = parts.dropLast(1)
+                 val nameStr = parts.last()
                  
-                 // Truncate Prefix if too long (User Request: Max 16 chars, else "...xyz")
-                 val displayPrefix = if (prefixStr.length > 16) {
-                     "..." + prefixStr.takeLast(13)
-                 } else {
-                     prefixStr
+                 var prefixStr = prefixParts.joinToString("/") + "/"
+                 
+                 // "Topic Prefix Fixed Size... Max 15 chars... Priority Hide ID"
+                 // ID is usually the random string at index 1 (p27/RANDOM/name)
+                 if (prefixStr.length > 15) {
+                     if (parts.size >= 3) {
+                         // Try hiding the middle ID part
+                         // Ex: p27/czr0r8jw0z/ -> p27/.../
+                         val first = parts[0]
+                         prefixStr = "$first/.../"
+                     }
+                     // If still too long, hard truncate
+                     if (prefixStr.length > 15) {
+                         prefixStr = prefixStr.take(12) + "..."
+                     }
                  }
                  
-                 tvTopicPrefix?.text = displayPrefix
+                 tvTopicPrefix?.text = prefixStr
                  etTopicName?.setText(nameStr)
                  tvTopicSuffix?.text = "" 
             } else {
                 tvTopicPrefix?.text = ""
                 etTopicName?.setText(topicConfig)
                 tvTopicSuffix?.text = ""
+            }
+            
+            // Payload Preset Spinner
+            val spPresets = propertyContainer.findViewById<android.widget.Spinner>(R.id.spPayloadPresets)
+            if (spPresets != null) {
+                val items = listOf("1", "0", "TRUE", "FALSE", "ON", "OFF")
+                val adapter = android.widget.ArrayAdapter(propertyContainer.context, android.R.layout.simple_spinner_dropdown_item, items)
+                spPresets.adapter = adapter
+                
+                spPresets.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        if (isBinding) return
+                        val sel = items[position]
+                        etPropGenericPayload?.setText(sel)
+                    }
+                    override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+                }
             }
             
         } catch (e: Exception) {
@@ -353,46 +328,7 @@ class PropertiesSheetManager(
         }
     }
     
-    private fun updateColorPreview(hex: String) {
-        try {
-            val defaultStr = propertyContainer.context.getString(R.string.properties_label_default)
-            if (hex.isEmpty() || hex == "Default" || hex == defaultStr) {
-                 vPropColorPreview?.text = defaultStr
-                 vPropColorPreview?.setTextColor(Color.BLACK)
-                 vPropColorPreview?.setShadowLayer(0f, 0f, 0f, 0)
-                 
-                 val bg = vPropColorPreview?.background as? GradientDrawable ?: GradientDrawable()
-                 bg.setColor(Color.WHITE) 
-                 val density = propertyContainer.resources.displayMetrics.density
-                 bg.setStroke((1 * density).toInt(), Color.LTGRAY, (5 * density).toFloat(), (3 * density).toFloat()) // Dashed border
-                 bg.cornerRadius = (12 * density)
-                 vPropColorPreview?.background = bg
-                 return
-            }
-
-            val color = Color.parseColor(hex)
-            // Update View Background
-            val bg = vPropColorPreview?.background as? GradientDrawable ?: GradientDrawable()
-            bg.setColor(color)
-            val density = propertyContainer.resources.displayMetrics.density
-            bg.setStroke((2 * density).toInt(), Color.parseColor("#808080")) // Solid border
-            bg.cornerRadius = (12 * density)
-            vPropColorPreview?.background = bg
-            
-            // Update Text
-            vPropColorPreview?.text = hex
-            
-            // Contrast Logic
-            val alpha = Color.alpha(color)
-            val luminescence = (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color))
-            
-            val contrastColor = if (alpha < 180 || luminescence > 186) Color.BLACK else Color.WHITE
-            
-            vPropColorPreview?.setTextColor(contrastColor)
-            vPropColorPreview?.setShadowLayer(0f, 0f, 0f, 0) // Ensure no shadow
-            
-        } catch(e: Exception) {}
-    }
+    // ... Helper functions (hide, showTitleOnly, restoreLastState) keep existing ...
 
     fun hide() {
         propertyContainer.visibility = View.GONE
@@ -403,12 +339,7 @@ class PropertiesSheetManager(
     fun showTitleOnly() {
         propertyContainer.visibility = View.VISIBLE
         val content = propertyContainer.findViewById<View>(R.id.svPropertiesContent)
-        content?.visibility = View.INVISIBLE // Or GONE? INVISIBLE keeps layout height maybe? GONE is safer for visual cleaniness.
-        // If GONE, the header is the only thing left.
         content?.visibility = View.GONE
-        
-        // Also ensure Behavior is Collapsed/Locked handled by Caller?
-        // Caller checks selectedComponentId.
     }
     
     fun getLastSelectedId(): Int? = if (lastComponentData != null && lastViewId != View.NO_ID) lastViewId else null
@@ -446,40 +377,5 @@ class PropertiesSheetManager(
             currentParent = currentParent.parent
         }
         return null
-    }
-
-    private fun updateIconPreview(iconKey: String?) {
-        if (iconKey.isNullOrEmpty()) {
-            ivPropIconPreview?.setImageDrawable(null)
-            ivPropIconPreview?.tag = null
-            btnClearIcon?.visibility = View.GONE
-        } else {
-            val resId = getDrawableIdFromKey(iconKey)
-            ivPropIconPreview?.setImageResource(resId)
-            ivPropIconPreview?.tag = iconKey
-            btnClearIcon?.visibility = View.VISIBLE
-        }
-    }
-    
-    private fun getDrawableIdFromKey(key: String): Int {
-        return when(key) {
-            "plus" -> android.R.drawable.ic_input_add
-            "delete" -> android.R.drawable.ic_delete
-            "send" -> android.R.drawable.ic_menu_send
-            "edit" -> android.R.drawable.ic_menu_edit
-            "info" -> android.R.drawable.ic_dialog_info
-            "mic" -> android.R.drawable.btn_star 
-            else -> android.R.drawable.ic_menu_help
-        }
-    }
-    
-    private fun showIconSelector(anchor: View) {
-        val popup = android.widget.PopupMenu(propertyContainer.context, anchor)
-        popup.menu.add(0, 1, 0, R.string.icon_desc_plus).setOnMenuItemClickListener { updateIconPreview("plus"); saveCurrentProps(); true }
-        popup.menu.add(0, 2, 0, R.string.icon_desc_delete).setOnMenuItemClickListener { updateIconPreview("delete"); saveCurrentProps(); true }
-        popup.menu.add(0, 3, 0, R.string.icon_desc_send).setOnMenuItemClickListener { updateIconPreview("send"); saveCurrentProps(); true }
-        popup.menu.add(0, 4, 0, R.string.icon_desc_edit).setOnMenuItemClickListener { updateIconPreview("edit"); saveCurrentProps(); true }
-        popup.menu.add(0, 5, 0, R.string.icon_desc_info).setOnMenuItemClickListener { updateIconPreview("info"); saveCurrentProps(); true }
-        popup.show()
     }
 }

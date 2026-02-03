@@ -75,11 +75,8 @@ class CanvasInteractionManager(
                 }
                 android.view.DragEvent.ACTION_DRAG_LOCATION -> {
                     val y = event.y
-                    val effectiveBottomPadding = canvasCanvas.paddingBottom + bottomInset
-                    // Drop Threshold: Canvas Height - Inset. 
-                    // (Matches "dragging bottom of component" logic if component height ~ offset)
-                    // Simple logic: If cursor is OVER the sheet (or bottom area), trigger delete.
-                    val limitY = (canvasCanvas.height - effectiveBottomPadding).toFloat()
+                    // FIX: Use only dynamic bottomInset (Current Sheet Top)
+                    val limitY = (canvasCanvas.height - bottomInset).toFloat()
                     
                     val inZone = y > limitY
                     if (inZone != isDeleteHovered) {
@@ -94,10 +91,11 @@ class CanvasInteractionManager(
                 android.view.DragEvent.ACTION_DROP -> {
                     // Check if dropped in Delete Zone
                     val y = event.y
-                    val effectiveBottomPadding = canvasCanvas.paddingBottom + bottomInset
-                    val limitY = (canvasCanvas.height - effectiveBottomPadding).toFloat()
+                    // FIX: paddingBottom is static XML padding (100dp), bottomInset is dynamic overlap (100dp).
+                    // We only want the dynamic overlap (Physical Sheet Top).
+                    val effectiveBottomLimit = canvasCanvas.height - bottomInset
                     
-                    if (y > limitY) {
+                    if (y > effectiveBottomLimit) {
                          // Dropped in Delete Zone - Cancel Creation
                          callbacks.onDeleteZoneHover(false)
                          // Trigger "Deleted" feedback even for new components
@@ -171,55 +169,43 @@ class CanvasInteractionManager(
                 if (currentMode == Mode.DRAGGING && activeView != null) {
                     var newX = snap(initX + dx)
                     
-                    // Y Axis Logic with Resistance
                     val rawTargetY = initY + dy
-                    // Calculate snapped Y intent
                     val nominalY = snap(rawTargetY)
-                    
+
                     val canvasH = canvasCanvas.height
                     val canvasW = canvasCanvas.width
                     val compH = activeView!!.height
                     val compW = activeView!!.width
                     
-                    // Dynamic Safe Limit:
-                    // Base padding + Dynamic Inset (Bottom Sheet) + Component Height + Buffer (30dp)
-                    // User requested lowering by 60dp (+30) then another 20dp (+40)
-                    // This allows dragging further into the sheet before resistance starts.
-                    val effectiveBottomPadding = canvasCanvas.paddingBottom + bottomInset
-                    val safeLimitY = (canvasH - effectiveBottomPadding - compH + (40 * density)).toFloat()
-                    
+                    // Resistance Logic
+                    // safeLimitY: The lowest point the component bottom can go before hitting the visual top of the sheet
+                    val safeLimitY = (canvasH - bottomInset - compH).toFloat()
+
                     var newY = nominalY
-                    
+
                     if (nominalY > safeLimitY) {
-                         // Check if Bottom Sheet is Expanded
+                         // Check if Bottom Sheet is Expanded (Hard Clamp)
                          if (isBottomSheetExpanded()) {
-                             // Hard Clamp: Cannot enter delete zone if sheet is expanded
                              newY = safeLimitY
                          } else {
-                             // Resistance Zone
+                             // Apply Resistance
                              val excess = nominalY - safeLimitY
-                             // Apply heavy damping (Resistance)
                              val resistedExcess = excess * 0.15f
                              newY = safeLimitY + resistedExcess
-                             
-                             // Threshold to trigger "Delete" state (e.g. pushed 15dp visually into the zone)
-                             // Allow deletion across full width (removed center-only check)
-                             if (resistedExcess > 15 * density) { 
-                                 if (!isDeleteHovered) {
-                                     isDeleteHovered = true
-                                     callbacks.onDeleteZoneHover(true)
-                                     activeView?.alpha = 0.5f
-                                 }
-                             } else {
-                                 if (isDeleteHovered) {
-                                     isDeleteHovered = false
-                                     callbacks.onDeleteZoneHover(false)
-                                     activeView?.alpha = 1.0f
-                                 }
-                             }
+                         }
+                    }
+
+                    // Check Delete Zone (Finger vs Sheet Top)
+                    val deleteTriggerY = (canvasH - bottomInset).toFloat()
+
+                    // ONLY Check Delete if Sheet is NOT Open
+                    if (!isBottomSheetExpanded() && y > deleteTriggerY) {
+                         if (!isDeleteHovered) {
+                             isDeleteHovered = true
+                             callbacks.onDeleteZoneHover(true)
+                             activeView?.alpha = 0.5f
                          }
                     } else {
-                         // Normal Zone
                          if (isDeleteHovered) {
                              isDeleteHovered = false
                              callbacks.onDeleteZoneHover(false)
@@ -228,11 +214,10 @@ class CanvasInteractionManager(
                     }
 
                     // Clamp X
-                    // Clamp X
                     if (newX < 0f) newX = 0f
                     if (newX > canvasW - compW) newX = (canvasW - compW).toFloat()
                     
-                    // Clamp Y Top only (Bottom is allowed to overlap now)
+                    // Clamp Y Top only
                     if (newY < 0f) newY = 0f
                     
                     activeView!!.x = newX
@@ -292,7 +277,30 @@ class CanvasInteractionManager(
                         isDeleteHovered = false
                         callbacks.onDeleteZoneHover(false) 
                     } else if (isDragDetected) {
-                        callbacks.onComponentMoved(activeView!!.id, activeView!!.x, activeView!!.y)
+                        // Elastic Snap-Back Logic
+                        val canvasH = canvasCanvas.height
+                        val compH = activeView!!.height
+                        val safeLimitY = (canvasH - bottomInset - compH).toFloat()
+                        
+                        if (activeView!!.y > safeLimitY && !isBottomSheetExpanded()) {
+                            // Bounce back effect
+                            activeView!!.animate()
+                                .y(safeLimitY)
+                                .setDuration(300)
+                                .setInterpolator(android.view.animation.OvershootInterpolator(0.8f))
+                                .start()
+                                
+                            // Update label visually to match animation end
+                            findLabelFor(activeView!!)?.let {
+                                it.animate().y(safeLimitY + compH + 4).setDuration(300).start()
+                            }
+                            
+                            // Save the CLAMPED position
+                            callbacks.onComponentMoved(activeView!!.id, activeView!!.x, safeLimitY)
+                        } else {
+                            // Normal Save
+                            callbacks.onComponentMoved(activeView!!.id, activeView!!.x, activeView!!.y)
+                        }
                     } else {
                         callbacks.onComponentClicked(activeView!!.id)
                     }

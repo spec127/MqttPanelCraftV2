@@ -43,11 +43,11 @@ class ProjectUIManager(
     private val containerLogs: View = root.findViewById(R.id.containerLogs)
     private val containerProperties: View = root.findViewById(R.id.containerProperties)
     private val btnUndo: ImageView = root.findViewById(R.id.btnUndo)
-    private val btnExitApp: View? = root.findViewById(R.id.btnExitApp) 
-    // Actually btnExitApp was in layout_sidebar_components.xml in the sidebar. 
-    // But btnEnterRunMode isn't standard. Let's stick to what Activity used.
+
+
     
     private val sheetBehavior = BottomSheetBehavior.from(bottomSheet)
+    private var currentSlideOffset = 0f
 
     init {
         setupStateMachine()
@@ -60,9 +60,17 @@ class ProjectUIManager(
 
         sheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
+                // Sync Offset for discrete states
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    currentSlideOffset = 1f
+                } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    currentSlideOffset = 0f
+                }
+                updateCanvasOcclusion()
                 updateBottomInset()
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                currentSlideOffset = slideOffset
                 updateCanvasOcclusion()
                 updateBottomInset()
             }
@@ -73,15 +81,6 @@ class ProjectUIManager(
         
         // Mode FAB
         fabMode.setOnClickListener {
-             // Toggle Mode via Callback or directly?
-             // Ideally Activity controls state, but here we can toggle a flag?
-             // Let's expose a listener or assume Activity handles the logic via standard variable?
-             // Refactoring restriction: Activity has `isEditMode`. 
-             // We should probably expose a "toggleMode" function or callback.
-             // For now, let's keep it simple: Access logic via callback?
-             // Better: ProjectUIManager doesn't own `isEditMode` state? 
-             // It should receive the state.
-             // But the click triggers the change.
              onModeToggleCallback?.invoke()
         }
         
@@ -92,6 +91,34 @@ class ProjectUIManager(
     }
     
     var onModeToggleCallback: (() -> Unit)? = null
+
+    fun toggleBottomSheet() {
+        if (sheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        } else {
+            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
+
+    fun setDeleteZoneHover(isHovered: Boolean) {
+        val header = root.findViewById<View>(R.id.bottomSheetHeader) ?: return
+        val handle = root.findViewById<View>(R.id.ivHeaderHandle)
+        val trash = root.findViewById<View>(R.id.ivHeaderTrash)
+        val text = root.findViewById<View>(R.id.tvHeaderDelete) 
+        
+        if (isHovered) {
+             header.setBackgroundResource(R.drawable.bg_delete_gradient)
+             handle?.visibility = View.GONE
+             trash?.visibility = View.VISIBLE
+             text?.visibility = View.GONE
+        } else {
+             header.background = null 
+             handle?.visibility = View.VISIBLE
+             trash?.visibility = View.GONE
+             text?.visibility = View.GONE
+        }
+    }
+
 
     fun setupToolbar() {
          activity.setSupportActionBar(toolbar)
@@ -149,7 +176,11 @@ class ProjectUIManager(
 
         if (isEditMode) {
             // EDIT MODE
-            editorCanvas.setOnTouchListener { _, event -> interactionManager.handleTouch(event) }
+            // Fix: Return TRUE to consume event and block NestedScrollView from scrolling on empty space
+            editorCanvas.setOnTouchListener { _, event -> 
+                interactionManager.handleTouch(event)
+                true 
+            }
             fabMode.setImageResource(android.R.drawable.ic_media_play)
             guideOverlay.visibility = View.VISIBLE
             sidebarManager.showComponentsPanel()
@@ -167,7 +198,7 @@ class ProjectUIManager(
             containerLogs.visibility = View.GONE
             containerProperties.visibility = View.VISIBLE
             
-            sheetBehavior.isHideable = true
+            sheetBehavior.isHideable = false
             if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                 sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
@@ -234,37 +265,51 @@ class ProjectUIManager(
         val actuallyEditMode = (containerProperties.visibility == View.VISIBLE)
 
         if (actuallyEditMode) {
-             // EDIT MODE Logic
+             // EDIT MODE
+             
+             // 1. Reset Natural Height (Fix "Too Long")
+             if (editorCanvas.minimumHeight != 0) {
+                 editorCanvas.minimumHeight = 0
+                 editorCanvas.requestLayout()
+             }
+             
+             // 2. Auto-Shift Logic (Continuous "Push Up")
+             // Calculates translation relative to current Sheet Top (smooths out during onSlide)
              val selectedId = (activity as? com.example.mqttpanelcraft.ProjectViewActivity)?.getSelectedComponentId()
-             
-             if (selectedId == null) {
+                 
+             if (selectedId != null) {
+                 // Optimization: If Sheet is fully collapsed, force Y=0 (Strict "Return to Zero")
+                 if (currentSlideOffset == 0f) {
+                     editorCanvas.translationY = 0f
+                 } else {
+                     val compView = renderer.getView(selectedId)
+                     if (compView != null) {
+                        val compLoc = IntArray(2)
+                        compView.getLocationOnScreen(compLoc) 
+                        val currentCompBottom = compLoc[1] + compView.height
+                        
+                        val sheetLoc = IntArray(2)
+                        bottomSheet.getLocationOnScreen(sheetLoc)
+                        val sheetTop = sheetLoc[1]
+                        
+                        // Margin: Interpolate 0dp (Collapsed) -> 20dp (Expanded) (User Request)
+                        val safeOffset = currentSlideOffset.coerceIn(0f, 1f)
+                        val margin = (20 * activity.resources.displayMetrics.density) * safeOffset
+                        
+                        val currentTrans = editorCanvas.translationY
+                        val rawBottom = currentCompBottom - currentTrans
+                        
+                        var targetTrans = (sheetTop - margin - rawBottom)
+                        if (targetTrans > 0f) targetTrans = 0f // Only shift UP
+                        
+                        editorCanvas.translationY = targetTrans
+                     } else {
+                        editorCanvas.translationY = 0f
+                     }
+                 }
+             } else {
                  editorCanvas.translationY = 0f
-                 return
              }
-             
-             val compView = renderer.getView(selectedId)
-             if (compView == null) {
-                  editorCanvas.translationY = 0f
-                  return
-             }
-    
-             val compLoc = IntArray(2)
-             compView.getLocationOnScreen(compLoc) 
-             val currentCompBottom = compLoc[1] + compView.height
-             
-             val sheetLoc = IntArray(2)
-             bottomSheet.getLocationOnScreen(sheetLoc)
-             val sheetTop = sheetLoc[1]
-             
-             val margin = (50 * activity.resources.displayMetrics.density)
-             
-             val currentTrans = editorCanvas.translationY
-             val rawBottom = currentCompBottom - currentTrans
-             
-             var targetTrans = (sheetTop - margin - rawBottom)
-             if (targetTrans > 0f) targetTrans = 0f
-             
-             editorCanvas.translationY = targetTrans
              
         } else {
              // RUN MODE Logic

@@ -53,7 +53,7 @@
     <string name="setup_hint_broker_url">wss://broker.emqx.io:8083</string>
     <string name="setup_label_theme">Theme / Type</string>
     <string name="setup_btn_test">Test Connect</string>
-    <string name="setup_btn_save_start">Save and Start</string>
+    <string name="setup_btn_save_start">Create Project</string>
     <string name="setup_btn_update_start">Update &amp; Start</string>
     <string name="setup_btn_update_only">Update Project</string>
     <string name="setup_theme_panel">Panel</string>
@@ -142,6 +142,14 @@
     <string name="properties_label_width">W</string>
     <string name="properties_label_default">Default</string>
     <string name="properties_label_button_text">Button Text</string>
+    <string name="properties_section_appearance">Appearance</string>
+    <string name="properties_section_interaction">Interaction</string>
+    <string name="properties_mode_text">Text</string>
+    <string name="properties_mode_icon">Icon</string>
+    <string name="properties_label_shape">Shape</string>
+    <string name="properties_label_payload_press">Press Payload</string>
+    <string name="properties_label_payload_release">Release Payload</string>
+    <string name="properties_label_haptic">Haptic Feedback</string>
     <string name="properties_btn_select_icon">Select Icon</string>
     <string name="properties_btn_no_icon">No Icon</string>
     <string name="project_msg_topic_copied">Topic Copied</string>

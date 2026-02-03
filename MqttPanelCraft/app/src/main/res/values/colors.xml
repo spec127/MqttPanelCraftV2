@@ -13,6 +13,7 @@
     <color name="surface_color">#FFFFFF</color>
     <color name="grid_background_color">#F5F5F5</color>
     <color name="grid_stroke_color">#E0E0E0</color>
+    <color name="error_red">#B00020</color>
 
     <!-- HTML Mockup Palette -->
     <color name="primary_deep_purple">#6A1B9A</color>
@@ -89,4 +90,13 @@
     <color name="setup_header_start">@color/icy_header_start</color>
     <color name="setup_header_end">@color/icy_header_end</color>
     <color name="setup_primary_button_text">#FFFFFF</color>
+
+    <color name="sheet_border_color">#673AB7</color> <!-- Deep Purple Frame -->
+    <color name="drag_handle_tint">#A0B0E0</color> <!-- Blue-ish -->
+
+    <!-- User Design Colors -->
+    <color name="props_primary">#a573bc</color>
+    <color name="props_bg_light">#f0f9ff</color>
+    <color name="props_card_bg_light">#ffffff</color>
+    <color name="props_card_bg_dark">#1e293b</color>
 </resources>

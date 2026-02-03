@@ -422,7 +422,7 @@
                 android:id="@+id/btnSaveProject"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="@string/setup_btn_update_only"
+                android:text="@string/setup_btn_save_start"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/setup_primary_button_text"
@@ -440,6 +440,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="12dp"
         android:background="@android:color/transparent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

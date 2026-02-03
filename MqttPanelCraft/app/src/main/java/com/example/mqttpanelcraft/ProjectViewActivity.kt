@@ -251,22 +251,7 @@ class ProjectViewActivity : BaseActivity() {
             }
             
             override fun onDeleteZoneHover(isHovered: Boolean) {
-                val header = findViewById<View>(R.id.bottomSheetHeader) ?: return
-                val handle = findViewById<View>(R.id.ivHeaderHandle)
-                val trash = findViewById<View>(R.id.ivHeaderTrash)
-                val text = findViewById<View>(R.id.tvHeaderDelete) 
-                
-                if (isHovered) {
-                     header.setBackgroundResource(R.drawable.bg_delete_gradient)
-                     handle?.visibility = View.GONE
-                     trash?.visibility = View.VISIBLE
-                     text?.visibility = View.GONE
-                } else {
-                     header.background = null 
-                     handle?.visibility = View.VISIBLE
-                     trash?.visibility = View.GONE
-                     text?.visibility = View.GONE
-                }
+                projectUIManager.setDeleteZoneHover(isHovered)
             }
 
             override fun onNewComponent(type: String, x: Float, y: Float) {
@@ -343,22 +328,10 @@ class ProjectViewActivity : BaseActivity() {
                          Toast.makeText(this, getString(R.string.project_msg_select_component), Toast.LENGTH_SHORT).show()
                      }
                  } else {
-                     val sheet = findViewById<View>(R.id.bottomSheet)
-                     val b = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
-                     if (b.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED) {
-                         b.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
-                     } else if (b.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED) {
-                         b.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
-                     }
+                     projectUIManager.toggleBottomSheet()
                  }
              } else {
-                 val sheet = findViewById<View>(R.id.bottomSheet)
-                 val b = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
-                 if (b.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED) {
-                     b.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
-                 } else {
-                     b.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
-                 }
+                 projectUIManager.toggleBottomSheet()
              }
         }
 
@@ -640,144 +613,7 @@ class ProjectViewActivity : BaseActivity() {
     }
 
 
-    private fun updateCanvasOcclusion(bottomSheet: View? = null) {
-        val sheet = bottomSheet ?: findViewById(R.id.bottomSheet) ?: return
-        
-        if (isEditMode) {
-            // LEGACY LOGIC: Shift Canvas Y to keep selected component visible
-            // This logic pushes the entire canvas up using translationY
-            val canvas = findViewById<View>(R.id.editorCanvas) ?: return
-            val selectedId = selectedComponentId
-            
-            if (selectedId == null) {
-                canvas.translationY = 0f
-                return
-            }
-            
-            val compView = renderer.getView(selectedId)
-            if (compView == null) {
-                 canvas.translationY = 0f
-                 return
-            }
-    
-            val compLoc = IntArray(2)
-            compView.getLocationOnScreen(compLoc) 
-            val currentCompBottom = compLoc[1] + compView.height
-            
-            val sheetLoc = IntArray(2)
-            sheet.getLocationOnScreen(sheetLoc)
-            val sheetTop = sheetLoc[1]
-            
-            val margin = (50 * resources.displayMetrics.density)
-            
-            val currentTrans = canvas.translationY
-            // Calculate where the component WOULD be without translation
-            val rawBottom = currentCompBottom - currentTrans
-            
-            // We want (rawBottom + newTrans) < (sheetTop - margin)
-            // newTrans < sheetTop - margin - rawBottom
-            var targetTrans = (sheetTop - margin - rawBottom)
-            
-            // Only translate UP (negative), never down positive (don't detach from top)
-            if (targetTrans > 0f) targetTrans = 0f
-            
-            canvas.translationY = targetTrans
-            
-        } else {
-            // RUN MODE LOGIC: Resize Canvas Height to enable Scrolling
-            // Ensure no residual translation
-            editorCanvas.translationY = 0f
-            
-            val density = resources.displayMetrics.density
-            val sheetLoc = IntArray(2)
-            sheet.getLocationOnScreen(sheetLoc)
-            val sheetTop = sheetLoc[1]
-            val screenHeight = resources.displayMetrics.heightPixels
-            val visibleSheetHeight = (screenHeight - sheetTop).coerceAtLeast(0)
-    
-            // MaxY stored in Tag from ViewModel observer
-            val maxY = (editorCanvas.tag as? Float) ?: 0f
-            val requiredHeight = (maxY + visibleSheetHeight + (20 * density)).toInt()
-            
-            if (editorCanvas.minimumHeight != requiredHeight) {
-                editorCanvas.minimumHeight = requiredHeight
-                editorCanvas.requestLayout()
-            }
-        }
-    }
 
-    private fun updateBottomInset(bottomSheet: View) {
-        // Calculate overlap between BottomSheet and Canvas to adjust Deletion Zone
-        if (bottomSheet.visibility != View.VISIBLE) {
-            interactionManager.updateBottomInset(0)
-            return
-        }
-        val sheetLoc = IntArray(2)
-        bottomSheet.getLocationOnScreen(sheetLoc)
-        val sheetTop = sheetLoc[1]
-        
-        val canvasLoc = IntArray(2)
-        editorCanvas.getLocationOnScreen(canvasLoc)
-        val canvasBottom = canvasLoc[1] + editorCanvas.height
-        
-        // Inset is the amount of canvas covered by the sheet
-        val overlap = (canvasBottom - sheetTop).coerceAtLeast(0)
-        interactionManager.updateBottomInset(overlap)
-    }
-
-    private fun ensureComponentVisible(componentId: Int) {
-        val view = renderer.getView(componentId) ?: return
-        val scrollView = findViewById<androidx.core.widget.NestedScrollView>(R.id.editorScrollView)
-        val sheet = findViewById<View>(R.id.bottomSheet)
-        if (scrollView == null || sheet == null) return
-
-        val compLoc = IntArray(2)
-        view.getLocationOnScreen(compLoc)
-        val compBottomScreen = compLoc[1] + view.height
-        
-        val sheetLoc = IntArray(2)
-        sheet.getLocationOnScreen(sheetLoc)
-        val sheetTopScreen = sheetLoc[1]
-        
-        val density = resources.displayMetrics.density
-        // Goal: Component Bottom must be at least 50dp above Sheet Top
-        val safetyMargin = (50 * density).toInt()
-        val visibleLimit = sheetTopScreen - safetyMargin
-        
-        if (compBottomScreen > visibleLimit) {
-            val diff = compBottomScreen - visibleLimit
-            
-            // Check if we can scroll
-            val currentScrollY = scrollView.scrollY
-            // Max scroll is Child Height - Scroll View Height (View port)
-            // Note: editorCanvas.height already includes any minimumHeight override
-            val maxScrollY = editorCanvas.height - scrollView.height
-            val targetScrollY = currentScrollY + diff
-            
-            // If we need to scroll MORE than currently possible
-            if (targetScrollY > maxScrollY) {
-                // Extend Canvas to allow scrolling
-                // We add the 'diff' to the current height essentially
-                // But precisely: We need new maxScrollY >= targetScrollY
-                // newHeight - scrollView.height >= targetScrollY
-                // newHeight >= targetScrollY + scrollView.height
-                
-                val requiredHeight = targetScrollY + scrollView.height
-                
-                if (editorCanvas.minimumHeight < requiredHeight) {
-                    editorCanvas.minimumHeight = requiredHeight
-                    editorCanvas.requestLayout()
-                }
-                
-                // Allow layout to settle before scrolling
-                scrollView.post {
-                    scrollView.smoothScrollBy(0, diff)
-                }
-            } else {
-                scrollView.smoothScrollBy(0, diff)
-            }
-        }
-    }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         if (ev?.action == MotionEvent.ACTION_DOWN) {

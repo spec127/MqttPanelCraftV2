@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 1. Base Layer: Solid Fill (Bottom/Main) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/icy_header_end" />
+            <corners android:topLeftRadius="16dp" android:topRightRadius="16dp" />
+        </shape>
+    </item>
+    
+    <!-- 2. Top Gradient Layer (Overlays Base) -->
+    <item android:gravity="top" android:height="135dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="@color/icy_header_start"
+                android:endColor="@color/icy_header_end"
+                android:type="linear" />
+            <corners android:topLeftRadius="16dp" android:topRightRadius="16dp" />
+        </shape>
+    </item>
+    
+    <!-- 3. Stroke Layer (Draws ON TOP of Gradient) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <corners android:topLeftRadius="16dp" android:topRightRadius="16dp" />
+            <stroke android:width="2dp" android:color="@color/sheet_border_color"/>
+        </shape>
+    </item>
+</layer-list>

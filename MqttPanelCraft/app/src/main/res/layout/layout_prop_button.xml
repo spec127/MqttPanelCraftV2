@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1A000000"
+        android:layout_marginBottom="16dp" />
+
+    <!-- SECTION 1: APPEARANCE -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@android:drawable/ic_menu_edit"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+            
+        <TextView
+            android:text="APPEARANCE"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- Shape & Color Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+        
+        <!-- Shape Selector (Spinner) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Shape"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            
+            <AutoCompleteTextView
+                 android:id="@+id/spPropShape"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:inputType="none"
+                 android:text="Rounded"
+                 android:textSize="14sp"
+                 android:textColor="@color/prop_text_primary"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+
+        <!-- Color Picker (Compact: 3 Dots + Custom) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_topic_container"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+            
+            <!-- Dot 1: Primary -->
+            <View
+                android:id="@+id/vColor1"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/shape_circle_grey"
+                android:backgroundTint="@color/props_primary"
+                android:layout_marginEnd="8dp"/>
+
+            <!-- Dot 2: Blue -->
+            <View
+                android:id="@+id/vColor2"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/shape_circle_grey"
+                android:backgroundTint="#2196F3"
+                android:layout_marginEnd="8dp"/>
+
+            <!-- Dot 3: Green -->
+            <View
+                android:id="@+id/vColor3"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/shape_circle_grey"
+                android:backgroundTint="#4CAF50"
+                android:layout_marginEnd="8dp"/>
+                
+            <!-- Custom Add -->
+            <ImageView
+                android:id="@+id/btnColorCustom"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_add"
+                app:tint="@color/prop_text_secondary"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <Space android:layout_width="match_parent" android:layout_height="24dp"/>
+
+    <!-- SECTION 2: INTERACTION -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@android:drawable/ic_menu_send"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+            
+        <TextView
+            android:text="INTERACTION"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- Trigger Mode & Release Payload (Since 'Press' is main payload) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Press Payload (Main) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Press Payload"
+            android:layout_marginBottom="8dp"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            <com.google.android.material.textfield.TextInputEditText
+                 android:id="@+id/etPropPayloadPress"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:inputType="text"
+                 android:textSize="14sp"
+                 android:textColor="@color/prop_text_primary"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Trigger"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            
+            <AutoCompleteTextView
+                 android:id="@+id/spPropTriggerMode"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:inputType="none"
+                 android:text="Standard"
+                 android:textSize="14sp"
+                 android:textColor="@color/prop_text_primary"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
+
+        <!-- Release Payload (Optional) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Release Value"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPropPayloadRelease"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textSize="14sp"
+                android:textColor="@color/prop_text_primary"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

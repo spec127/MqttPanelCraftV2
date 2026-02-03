@@ -25,10 +25,12 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="CATEGORY"
-        android:textSize="16sp"
+        android:textSize="13sp"
         android:textStyle="bold"
         android:textAllCaps="true"
-        android:letterSpacing="0.1"
+        android:letterSpacing="0.05"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:textColor="@color/sidebar_header_text"/>
 
     <ImageView
