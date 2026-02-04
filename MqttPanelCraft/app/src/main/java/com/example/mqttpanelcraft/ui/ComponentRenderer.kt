@@ -65,9 +65,20 @@ class ComponentRenderer(
                 val label = TextView(context).apply {
                     text = data.label
                     tag = "LABEL_FOR_${data.id}"
+                    
+                    // Explicit LayoutParams for FrameLayout
+                    layoutParams = FrameLayout.LayoutParams(data.width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                        gravity = android.view.Gravity.TOP or android.view.Gravity.START
+                    }
+                    
                     x = data.x
                     y = data.y + data.height + 4
-                    visibility = View.VISIBLE
+                    x = data.x
+                    y = data.y + data.height + 4
+                    gravity = android.view.Gravity.START
+                    textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+                    val isHidden = data.props?.get("showLabel") == "false"
+                    visibility = if (isHidden) View.GONE else View.VISIBLE
                 }
                 canvasCanvas.addView(label)
                 
@@ -97,8 +108,22 @@ class ComponentRenderer(
                 val label = canvasCanvas.findViewWithTag<TextView>("LABEL_FOR_${data.id}")
                 if (label != null) {
                     if (label.text != data.label) label.text = data.label
+                    
+                    // Update Params
+                    val params = label.layoutParams
+                    if (params.width != data.width) {
+                        params.width = data.width
+                        label.layoutParams = params
+                    }
+                    
                     label.x = data.x
                     label.y = data.y + data.height + 4
+                    label.x = data.x
+                    label.y = data.y + data.height + 4
+                    label.gravity = android.view.Gravity.START
+                    label.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+                    val isHidden = data.props?.get("showLabel") == "false"
+                    label.visibility = if (isHidden) View.GONE else View.VISIBLE
                 }
             }
         }
@@ -112,7 +137,7 @@ class ComponentRenderer(
              if (isEditMode && isSelected) {
                  view.setBackgroundResource(R.drawable.component_border_selected)
              } else {
-                 view.setBackgroundResource(R.drawable.component_border_normal)
+                 view.background = null
              }
 
              // Handle Visibility

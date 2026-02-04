@@ -28,7 +28,8 @@ class ColorPickerDialog(
     private val context: Context,
     private val initialColor: String = "#FFFFFFFF",
     private val showAlpha: Boolean = true,
-    private val onColorSelected: (String) -> Unit
+    private val onColorSelected: (String) -> Unit,
+    private val onDismiss: (() -> Unit)? = null
 ) {
     
     private var popupWindow: PopupWindow? = null
@@ -50,6 +51,7 @@ class ColorPickerDialog(
         ).apply {
             elevation = 20f
             setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Color.TRANSPARENT))
+            setOnDismissListener { onDismiss?.invoke() }
         }
         
         // 測量並定位

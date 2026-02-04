@@ -26,7 +26,7 @@ object ComponentContainer {
             background = android.graphics.drawable.ShapeDrawable(android.graphics.drawable.shapes.OvalShape()).apply {
                 paint.color = android.graphics.Color.parseColor("#6200EE")
             }
-            elevation = 20f
+            elevation = 100f
             visibility = View.GONE 
         }
         container.addView(handle)

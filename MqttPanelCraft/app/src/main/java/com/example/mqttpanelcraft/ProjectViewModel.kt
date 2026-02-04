@@ -179,8 +179,14 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         // safeItemName: "button1" -> "button_1"
         val safeItemName = newLabel.lowercase().replace(Regex("(?<=[a-z])(?=\\d)"), "_")
         
-        // Topic Config: ProjectName/ProjectID/ItemName
+    // Topic Config: ProjectName/ProjectID/ItemName
         return "$safeProjName/${proj.id}/$safeItemName"
+    }
+
+    fun getProjectTopicPrefix(): String {
+        val proj = project.value ?: return ""
+        val safeProjName = proj.name.lowercase().replace("/", "_").replace(" ", "_").replace("+", "")
+        return "$safeProjName/${proj.id}/"
     }
 
     // === Log Persistence ===

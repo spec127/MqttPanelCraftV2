@@ -64,11 +64,12 @@ object LedDefinition : IComponentDefinition {
              com.example.mqttpanelcraft.ui.ColorPickerDialog(
                 context = panelView.context,
                 initialColor = if (currentColor.isEmpty()) "#FFFFFFFF" else currentColor,
-                showAlpha = true
-            ) { selectedHex ->
-                onUpdate("color", selectedHex)
-                updateColorView(vPropColorPreview, selectedHex)
-            }.show(vPropColorPreview)
+                showAlpha = true,
+                onColorSelected = { selectedHex ->
+                    onUpdate("color", selectedHex)
+                    updateColorView(vPropColorPreview, selectedHex)
+                }
+            ).show(vPropColorPreview)
         }
     }
     

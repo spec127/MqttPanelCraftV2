@@ -23,6 +23,7 @@ class ProjectViewActivity : BaseActivity() {
 
     // ViewModel
     private lateinit var viewModel: ProjectViewModel
+    fun getViewModelAccess() = viewModel
 
     // UI
     private lateinit var editorCanvas: FrameLayout
@@ -374,7 +375,7 @@ class ProjectViewActivity : BaseActivity() {
         
         viewModel.project.observe(this) { project ->
             if (project != null) {
-                supportActionBar?.title = project.name
+                projectUIManager.updateTitle(project.name)
                 when (project.orientation) {
                     "PORTRAIT" -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     "LANDSCAPE" -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
@@ -388,20 +389,29 @@ class ProjectViewActivity : BaseActivity() {
              val light = findViewById<View>(R.id.indicatorMqttStatus) ?: return@observe
              val bg = light.background as? android.graphics.drawable.GradientDrawable
              bg?.mutate()
+             
+             // Define Colors explicitly
+             val colorGray = android.graphics.Color.parseColor("#B0BEC5") // Blue Grey 200 (Neutral)
+             val colorGreen = android.graphics.Color.parseColor("#4CAF50") // Green 500
+             val colorRed = android.graphics.Color.parseColor("#F44336")   // Red 500
+             
              val color = when(status) {
-                 ProjectViewModel.MqttStatus.CONNECTED -> android.graphics.Color.GREEN
+                 ProjectViewModel.MqttStatus.CONNECTED -> {
+                     light.tag = "CONNECTED"
+                     colorGreen
+                 }
                  ProjectViewModel.MqttStatus.FAILED -> {
                      if (light.tag != "FAILED_SHOWN") {
                           Toast.makeText(this, getString(R.string.project_msg_mqtt_failed), Toast.LENGTH_LONG).show()
                           light.tag = "FAILED_SHOWN" 
                      }
-                     android.graphics.Color.RED
+                     colorRed
                  }
                  ProjectViewModel.MqttStatus.CONNECTING -> {
                      light.tag = null
-                     android.graphics.Color.GRAY
+                     colorGray
                  }
-                 else -> android.graphics.Color.GRAY
+                 else -> colorGray // IDLE
              }
              bg?.setColor(color)
              viewModel.addLog(getString(R.string.project_log_mqtt_status, status))
@@ -410,7 +420,7 @@ class ProjectViewActivity : BaseActivity() {
                      Toast.makeText(this, getString(R.string.project_msg_mqtt_retrying), Toast.LENGTH_SHORT).show()
                      viewModel.retryMqtt()
                  } else {
-                     Toast.makeText(this, "Status: ${status}", Toast.LENGTH_SHORT).show()
+                     Toast.makeText(this, "Status: $status", Toast.LENGTH_SHORT).show()
                  }
              }
         }
@@ -497,16 +507,41 @@ class ProjectViewActivity : BaseActivity() {
             },
             { id -> // On Reset Topic
                  viewModel.components.value?.find { it.id == id }?.let { comp ->
-                    val freshTopic = viewModel.generateSmartTopic(comp.type)
-                    val updated = comp.copy(topicConfig = freshTopic)
-                    viewModel.updateComponent(updated)
-                    // Refresh UI
-                    val view = renderer.getView(id)
-                    if (view != null) {
-                        propertiesManager.showProperties(view, updated)
-                    }
-                }
-            }
+                     // Logic: Find first available default topic (e.g. button_1, button_2)
+                     // EXCLUDING the current component (so if it is button_1, it keeps button_1)
+                     
+                     val typeLower = comp.type.toLowerCase(Locale.ROOT)
+                     val projectPrefix = viewModel.getProjectTopicPrefix()
+                     
+                     var counter = 1
+                     var newTopic = ""
+                     val comps = viewModel.components.value ?: emptyList()
+                     
+                     while (true) {
+                         // Construct candidate suffix
+                         // Example: "button_1"
+                         val candidateSuffix = "${typeLower}_$counter"
+                         val candidateTopic = "${projectPrefix}${candidateSuffix}"
+                         
+                         // Check availability (Exclude Self)
+                         val isTaken = comps.any { it.id != id && it.topicConfig == candidateTopic }
+                         
+                         if (!isTaken) {
+                             newTopic = candidateTopic
+                             break
+                         }
+                         counter++
+                     }
+
+                     val updated = comp.copy(topicConfig = newTopic)
+                     viewModel.updateComponent(updated)
+                     // Refresh UI
+                     val view = renderer.getView(id)
+                     if (view != null) {
+                         propertiesManager.showProperties(view, updated)
+                     }
+                 }
+             }
         )
         
         logConsoleManager.setClearAction {

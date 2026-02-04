@@ -46,6 +46,7 @@ class PropertiesSheetManager(
     private val etPropName: EditText? = propertyContainer.findViewById(R.id.etPropName)
     private val etPropWidth: EditText? = propertyContainer.findViewById(R.id.etPropWidth)
     private val etPropHeight: EditText? = propertyContainer.findViewById(R.id.etPropHeight)
+    private val btnPropLabelVisibility: ImageView? = propertyContainer.findViewById(R.id.btnPropLabelVisibility)
     
     // Color Picker UI
     // private val vPropColorPreview: TextView? = propertyContainer.findViewById(R.id.vPropColorPreview)
@@ -91,6 +92,16 @@ class PropertiesSheetManager(
         etTopicName?.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Validation: Only allow Alphanumeric + Underscore
+                val input = s.toString()
+                val valid = input.matches(Regex("^[a-zA-Z0-9_]*$"))
+                
+                if (!valid) {
+                    etTopicName.error = "Invalid characters! Use (a-z, 0-9, _)"
+                } else {
+                    etTopicName.error = null
+                }
+
                 // Auto-shrink text
                 val len = s?.length ?: 0
                 val newSize = when {
@@ -102,7 +113,9 @@ class PropertiesSheetManager(
                 etTopicName.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, newSize)
             }
             override fun afterTextChanged(s: android.text.Editable?) {
-                 if (!isBinding) saveCurrentProps()
+                 // Only save if valid
+                 val valid = s.toString().matches(Regex("^[a-zA-Z0-9_]*$"))
+                 if (!isBinding && valid) saveCurrentProps()
             }
         })
         
@@ -147,6 +160,29 @@ class PropertiesSheetManager(
         // vPropColorPreview Listener - REMOVED
         
         // Button Props Listeners - REMOVED
+        // Button Props Listeners - REMOVED
+        btnPropLabelVisibility?.setOnClickListener {
+            if (selectedViewId != View.NO_ID && currentData != null) {
+                // Logic: Default is VISIBLE (null or "true"). Hidden is "false".
+                val currentShow = currentData?.props?.get("showLabel")
+                val isCurrentlyHidden = currentShow == "false"
+                
+                // Toggle
+                val checkNewHidden = !isCurrentlyHidden
+                
+                if (checkNewHidden) {
+                    // Hide it
+                    currentData?.props?.put("showLabel", "false")
+                    btnPropLabelVisibility.setImageResource(R.drawable.ic_visibility_off)
+                } else {
+                    // Show it (Remove prop to revert to default)
+                    currentData?.props?.remove("showLabel")
+                    btnPropLabelVisibility.setImageResource(R.drawable.ic_visibility_on)
+                }
+                
+                onPropertyUpdated(currentData!!)
+            }
+        }
     }
     
     private fun getFullTopic(): String {
@@ -253,6 +289,14 @@ class PropertiesSheetManager(
             } 
 
             etPropName?.setText(data.label)
+            
+            // Initial Visibility Icon State
+            val isLabelHidden = data.props["showLabel"] == "false"
+            if (isLabelHidden) {
+                btnPropLabelVisibility?.setImageResource(R.drawable.ic_visibility_off)
+            } else {
+                btnPropLabelVisibility?.setImageResource(R.drawable.ic_visibility_on)
+            }
             
             // Dimensions
             val density = propertyContainer.resources.displayMetrics.density

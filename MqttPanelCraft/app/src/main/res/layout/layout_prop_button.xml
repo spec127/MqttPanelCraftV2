@@ -28,7 +28,7 @@
             android:layout_marginEnd="6dp"/>
             
         <TextView
-            android:text="INTERACTION"
+            android:text="@string/properties_section_interaction"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/prop_text_secondary"
@@ -43,52 +43,105 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Press Payload (Main) -->
+        <!-- Press Payload (Main) - NOW WITH DROPDOWN -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Press Payload"
+            android:hint="@string/properties_label_payload_press"
             android:layout_marginBottom="8dp"
-            style="@style/Widget.App.TextInputLayout.Properties">
-            <com.google.android.material.textfield.TextInputEditText
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusBottomEnd="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            <AutoCompleteTextView
                  android:id="@+id/etPropPayloadPress"
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"
                  android:inputType="text"
+                 android:text="ON"
                  android:textSize="14sp"
-                 android:textColor="@color/prop_text_primary"/>
+                 android:textColor="@color/prop_text_primary"
+                 android:padding="0dp"
+                 android:popupBackground="@drawable/bg_popup_rounded"
+                 android:dropDownWidth="140dp"
+                 android:dropDownHeight="200dp"
+                 android:dropDownVerticalOffset="4dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <LinearLayout
+    <!-- Trigger Mode Subtitle -->
+    <TextView
+        android:text="@string/properties_label_trigger_mode"
+        android:textSize="12sp"
+        android:textColor="@color/prop_text_secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"/>
+
+    <!-- Trigger Mode (Toggle Group) -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/togglePropTrigger"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        app:selectionRequired="true"
+        app:singleSelection="true"
+        app:checkedButton="@+id/btnTriggerStandard">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTriggerTap"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_mode_tap"
+            android:padding="0dp"
+            android:textSize="12sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTriggerHold"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_mode_hold"
+            android:padding="0dp"
+            android:textSize="12sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTriggerTimer"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_mode_timer"
+            android:padding="0dp"
+            android:textSize="12sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+
+
+    <!-- Trigger Content (Release / Timer) - Below Toggles -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="12dp">
+    
+        <!-- Release Only -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/containerReleaseOnly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-        
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:hint="Trigger"
-            style="@style/Widget.App.TextInputLayout.Properties">
-            
-            <AutoCompleteTextView
-                 android:id="@+id/spPropTriggerMode"
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
-                 android:inputType="none"
-                 android:text="Standard"
-                 android:textSize="14sp"
-                 android:textColor="@color/prop_text_primary"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
-
-        <!-- Release Payload (Optional) -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:hint="Release Value"
+            android:hint="@string/properties_label_payload_release"
+            android:visibility="gone"
             style="@style/Widget.App.TextInputLayout.Properties">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPropPayloadRelease"
@@ -98,10 +151,66 @@
                 android:textSize="14sp"
                 android:textColor="@color/prop_text_primary"/>
         </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
+
+        <!-- Timer Mode -->
+        <LinearLayout
+            android:id="@+id/containerTimerMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+            
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_weight="0.4"
+                android:layout_height="wrap_content"
+                android:hint="@string/properties_unit_ms"
+                style="@style/Widget.App.TextInputLayout.Properties">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPropTimer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:textSize="14sp"
+                    android:textColor="@color/prop_text_primary"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            
+            <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
+            
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content"
+                android:hint="@string/properties_label_payload_release"
+                style="@style/Widget.App.TextInputLayout.Properties">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPropPayloadReleaseRef"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textSize="14sp"
+                    android:textColor="@color/prop_text_primary"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
     </LinearLayout>
 
-    <Space android:layout_width="match_parent" android:layout_height="24dp"/>
+    <!-- Trigger Mode Description (Moved Below) -->
+    <TextView
+        android:id="@+id/tvPropTriggerDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/prop_text_secondary"
+        android:lineSpacingExtra="2dp"
+        android:layout_marginBottom="12dp"
+        android:text="@string/desc_mode_tap"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1A000000"
+        android:layout_marginBottom="12dp" />
 
     <!-- SECTION 1: APPEARANCE -->
     <LinearLayout
@@ -109,24 +218,111 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="12dp">
+        android:layout_marginBottom="4dp">
         
         <ImageView
             android:layout_width="16dp"
             android:layout_height="16dp"
+            android:layout_gravity="center_vertical"
             android:src="@android:drawable/ic_menu_edit"
             app:tint="@color/props_primary"
             android:layout_marginEnd="6dp"/>
             
         <TextView
-            android:text="APPEARANCE"
+            android:text="@string/properties_section_appearance"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/prop_text_secondary"
             android:letterSpacing="0.05"
+            android:gravity="center_vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>
+
+    <!-- Appearance Mode Row (Dropdown + Content) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="top"
+        android:layout_marginBottom="12dp">
+        
+        <!-- Mode Dropdown -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.4"
+            android:layout_height="56dp"
+            android:hint="@string/properties_section_appearance"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusBottomEnd="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            <AutoCompleteTextView
+                 android:id="@+id/spPropApprMode"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:inputType="none"
+                 android:text="@string/properties_mode_text"
+                 android:textSize="14sp"
+                 android:textColor="@color/prop_text_primary"
+                 android:padding="0dp"
+                 android:popupBackground="@drawable/bg_popup_rounded"
+                 android:dropDownWidth="120dp"
+                 android:dropDownVerticalOffset="4dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        
+        <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+        
+        <!-- Mode Content (Text Input OR Icon Grid) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            
+            <!-- Text Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/containerPropText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/properties_label_button_text"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                style="@style/Widget.App.TextInputLayout.Properties">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPropText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textSize="14sp"
+                    android:textColor="@color/prop_text_primary"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            
+            <!-- Icon Container (Framed) -->
+            <LinearLayout
+                android:id="@+id/containerPropIcon"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_palette_border"
+                android:padding="4dp"
+                android:visibility="gone">
+                
+                <ImageView android:id="@+id/iconPreview0" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_none" app:tint="@color/prop_text_secondary"/>
+                <ImageView android:id="@+id/iconPreview1" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_power" app:tint="@color/prop_text_primary"/>
+                <ImageView android:id="@+id/iconPreview2" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_lighting" app:tint="@color/prop_text_secondary"/>
+                <ImageView android:id="@+id/iconPreview3" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_fan" app:tint="@color/prop_text_secondary"/>
+                <ImageView android:id="@+id/iconPreview4" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_play" app:tint="@color/prop_text_secondary"/>
+                <ImageView android:id="@+id/iconPreview5" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_tune" app:tint="@color/prop_text_secondary"/>
+                <ImageView android:id="@+id/iconPreview6" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_energy" app:tint="@color/prop_text_secondary"/>
+            </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
 
     <!-- Shape & Color Row -->
     <LinearLayout
@@ -139,68 +335,74 @@
         <!-- Shape Selector (Spinner) -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:hint="Shape"
-            style="@style/Widget.App.TextInputLayout.Properties">
+            android:layout_weight="0.4"
+             android:layout_height="56dp" 
+            android:hint="@string/properties_label_shape"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusBottomEnd="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
             
             <AutoCompleteTextView
                  android:id="@+id/spPropShape"
                  android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
+                 android:layout_height="match_parent"
                  android:inputType="none"
                  android:text="Rounded"
                  android:textSize="14sp"
-                 android:textColor="@color/prop_text_primary"/>
+                 android:textColor="@color/prop_text_primary"
+                 android:padding="0dp"
+                 android:gravity="center_vertical|start"
+                 android:popupBackground="@drawable/bg_popup_rounded"
+                 android:dropDownWidth="140dp"
+                 android:dropDownVerticalOffset="4dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
 
-        <!-- Color Picker (Compact: 3 Dots + Custom) -->
+        <!-- Color Picker -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/containerColorPalette"
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
             android:layout_height="56dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_topic_container"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp">
+            android:gravity="center"
+            android:background="@drawable/bg_palette_border"
+            android:padding="4dp">
             
-            <!-- Dot 1: Primary -->
-            <View
-                android:id="@+id/vColor1"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@drawable/shape_circle_grey"
-                android:backgroundTint="@color/props_primary"
-                android:layout_marginEnd="8dp"/>
-
-            <!-- Dot 2: Blue -->
-            <View
-                android:id="@+id/vColor2"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@drawable/shape_circle_grey"
-                android:backgroundTint="#2196F3"
-                android:layout_marginEnd="8dp"/>
-
-            <!-- Dot 3: Green -->
-            <View
-                android:id="@+id/vColor3"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@drawable/shape_circle_grey"
-                android:backgroundTint="#4CAF50"
-                android:layout_marginEnd="8dp"/>
-                
-            <!-- Custom Add -->
-            <ImageView
-                android:id="@+id/btnColorCustom"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_add"
-                app:tint="@color/prop_text_secondary"/>
+            <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+                <View android:id="@+id/vColor1" android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:background="@drawable/shape_circle_color" android:backgroundTint="#a573bc"/>
+            </FrameLayout>
+            
+            <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+                <View android:id="@+id/vColor2" android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:background="@drawable/shape_circle_color" android:backgroundTint="#2196F3"/>
+            </FrameLayout>
+            
+            <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+                <View android:id="@+id/vColor3" android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:background="@drawable/shape_circle_color" android:backgroundTint="#4CAF50"/>
+            </FrameLayout>
+            
+            <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+                <View android:id="@+id/vColor4" android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:background="@drawable/shape_circle_color" android:backgroundTint="#FFC107"/>
+            </FrameLayout>
+            
+            <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+                <View android:id="@+id/vColor5" android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:background="@drawable/shape_circle_color" android:backgroundTint="#FF5722"/>
+            </FrameLayout>
+            
+            <!-- Custom Add Button -->
+            <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+                <ImageView
+                     android:id="@+id/btnColorCustom"
+                     android:layout_width="28dp"
+                     android:layout_height="28dp"
+                     android:layout_gravity="center"
+                     android:src="@drawable/ic_palette_open"
+                     app:tint="@color/prop_text_secondary"/>
+            </FrameLayout>
         </LinearLayout>
-    </LinearLayout>
 
+</LinearLayout>
 </LinearLayout>

@@ -43,11 +43,13 @@ class ProjectUIManager(
     private val containerLogs: View = root.findViewById(R.id.containerLogs)
     private val containerProperties: View = root.findViewById(R.id.containerProperties)
     private val btnUndo: ImageView = root.findViewById(R.id.btnUndo)
+    private val tvToolbarTitle: android.widget.TextView = root.findViewById(R.id.tvToolbarTitle)
 
 
     
     private val sheetBehavior = BottomSheetBehavior.from(bottomSheet)
     private var currentSlideOffset = 0f
+    private var lastSelectedId: Int? = null
 
     init {
         setupStateMachine()
@@ -123,6 +125,7 @@ class ProjectUIManager(
     fun setupToolbar() {
          activity.setSupportActionBar(toolbar)
          activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+         activity.supportActionBar?.setDisplayShowTitleEnabled(false)
          
          val toolbarColor = ContextCompat.getColor(activity, R.color.toolbar_text)
          toolbar.setTitleTextColor(toolbarColor)
@@ -202,6 +205,12 @@ class ProjectUIManager(
             if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                 sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
+            
+            // Scroll to Top if Selection Changed
+            if (selectedId != lastSelectedId && selectedId != null) {
+                root.findViewById<NestedScrollView>(R.id.svPropertiesContent)?.scrollTo(0, 0)
+            }
+            lastSelectedId = selectedId
         } else {
             // RUN MODE
             editorCanvas.setOnTouchListener(null)
@@ -244,6 +253,10 @@ class ProjectUIManager(
         }
     }
 
+    fun updateTitle(title: String) {
+        tvToolbarTitle.text = title
+    }
+
     fun updateGridState(visible: Boolean) {
         val grid = root.findViewById<View>(R.id.backgroundGrid)
         val btn = root.findViewById<ImageView>(R.id.btnGrid)
@@ -276,6 +289,7 @@ class ProjectUIManager(
              // 2. Auto-Shift Logic (Continuous "Push Up")
              // Calculates translation relative to current Sheet Top (smooths out during onSlide)
              val selectedId = (activity as? com.example.mqttpanelcraft.ProjectViewActivity)?.getSelectedComponentId()
+
                  
              if (selectedId != null) {
                  // Optimization: If Sheet is fully collapsed, force Y=0 (Strict "Return to Zero")
