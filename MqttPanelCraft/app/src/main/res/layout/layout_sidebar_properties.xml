@@ -22,9 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/properties_label_topic"
-        android:textColorHint="?android:attr/textColorHint"
-        app:boxStrokeColor="?attr/colorPrimary"
-        app:hintTextColor="?attr/colorPrimary"
+        style="@style/Widget.App.TextInputLayout.Properties"
         android:layout_marginBottom="8dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPropTopicConfig"
@@ -45,9 +43,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:hint="@string/properties_label_width"
-            android:textColorHint="?android:attr/textColorHint"
-            app:boxStrokeColor="?attr/colorPrimary"
-            app:hintTextColor="?attr/colorPrimary"
+            style="@style/Widget.App.TextInputLayout.Properties"
             android:layout_marginEnd="8dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPropWidth"
@@ -55,6 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="?android:attr/textColorPrimary"/>
+
         </com.google.android.material.textfield.TextInputLayout>
         
         <com.google.android.material.textfield.TextInputLayout
@@ -62,9 +59,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:hint="@string/properties_label_height"
-            android:textColorHint="?android:attr/textColorHint"
-            app:boxStrokeColor="?attr/colorPrimary"
-            app:hintTextColor="?attr/colorPrimary">
+            style="@style/Widget.App.TextInputLayout.Properties">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPropHeight"
                 android:inputType="number"
@@ -78,8 +73,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@drawable/divider_dashed"
-        android:layerType="software"
+        android:background="@color/divider_line"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"/>
     

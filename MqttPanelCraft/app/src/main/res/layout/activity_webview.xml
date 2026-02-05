@@ -6,80 +6,114 @@
     android:id="@+id/rootCoordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:background="@android:color/white">
+    android:fitsSystemWindows="false"
+    android:background="@drawable/bg_canvas_gradient">
 
     <!-- AppBar / Toolbar -->
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        app:elevation="0dp"
+        android:stateListAnimator="@null"
+        android:background="@android:color/transparent"
         android:theme="@style/Theme.Helloworld.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@android:color/transparent"
             app:popupTheme="@style/Theme.Helloworld.PopupOverlay">
             
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                
+
+                <!-- Title (Left) -->
                 <TextView
                     android:id="@+id/tvToolbarTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
+                    android:maxWidth="140dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:text="Web Project"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/toolbar_text"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
-                <!-- Status Dot -->
+                <!-- Status Dot (Center Independent) -->
+                <!-- translationX="-35dp" compensates for Toolbar Navigation Icon offset (approx 56dp/2) -->
                 <View
                     android:id="@+id/viewStatusDot"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_toEndOf="@id/tvToolbarTitle"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="8dp"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_centerInParent="true"
+                    android:translationX="-35dp"
                     android:background="@drawable/shape_circle_green" />
 
-                <!-- Upload Icon -->
-                <ImageView
-                    android:id="@+id/btnUpload"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_toStartOf="@id/btnInfo"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_folder_open_custom"
-                    app:tint="@android:color/white" />
-
-                <!-- Info Icon -->
-                <ImageView
-                    android:id="@+id/btnInfo"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_toStartOf="@id/btnSettings"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="16dp"
-                    android:src="@android:drawable/ic_dialog_info"
-                    app:tint="@android:color/white" />
-
-                <!-- Settings Icon -->
-                <ImageView
-                    android:id="@+id/btnSettings"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                <!-- Right Side Buttons -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_settings_custom"
-                    app:tint="@android:color/white" />
+                    android:gravity="center_vertical"
+                    android:paddingEnd="4dp"
+                    android:orientation="horizontal">
+
+                    <!-- Edit Icon -->
+                    <ImageView
+                        android:id="@+id/btnEdit"
+                        android:layout_width="44dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_edit_document_custom"
+                        android:padding="10dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="@color/toolbar_text" />
+
+                    <!-- Upload Icon -->
+                    <ImageView
+                        android:id="@+id/btnUpload"
+                        android:layout_width="44dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_folder_open_custom"
+                        android:padding="10dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="@color/toolbar_text" />
+
+                    <!-- Info Icon -->
+                    <ImageView
+                        android:id="@+id/btnInfo"
+                        android:layout_width="44dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_info_custom"
+                        android:padding="10dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="@color/toolbar_text" />
+
+                    <!-- Settings Icon -->
+                    <ImageView
+                        android:id="@+id/btnSettings"
+                        android:layout_width="44dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_settings_custom"
+                        android:padding="10dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:tint="@color/toolbar_text" />
+                </LinearLayout>
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
+
+        <!-- Separator Line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1.5dp"
+            android:background="@color/toolbar_text" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -121,15 +155,5 @@
         </FrameLayout>
 
     </LinearLayout>
-
-    <!-- FAB for Code Editing -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabCode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:src="@android:drawable/ic_menu_edit"
-        app:tint="@android:color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

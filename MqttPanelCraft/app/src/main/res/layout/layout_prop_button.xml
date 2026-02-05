@@ -9,7 +9,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#1A000000"
+        android:background="@color/divider_line"
         android:layout_marginBottom="16dp" />
 
     <!-- SECTION 2: INTERACTION (MOVED TO TOP) -->
@@ -209,7 +209,8 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#1A000000"
+        android:background="@color/divider_line"
+        android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp" />
 
     <!-- SECTION 1: APPEARANCE -->
@@ -264,10 +265,15 @@
                  android:layout_height="wrap_content"
                  android:inputType="none"
                  android:text="@string/properties_mode_text"
-                 android:textSize="14sp"
+                 android:textSize="13sp"
+                 android:maxLines="1"
+                 android:ellipsize="end"
                  android:textColor="@color/prop_text_primary"
+                 android:gravity="center"
                  android:padding="0dp"
                  android:popupBackground="@drawable/bg_popup_rounded"
+                 android:dropDownWidth="120dp"
+                 android:dropDownVerticalOffset="4dp"/>
                  android:dropDownWidth="120dp"
                  android:dropDownVerticalOffset="4dp"/>
         </com.google.android.material.textfield.TextInputLayout>
@@ -312,7 +318,6 @@
                 android:padding="4dp"
                 android:visibility="gone">
                 
-                <ImageView android:id="@+id/iconPreview0" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_none" app:tint="@color/prop_text_secondary"/>
                 <ImageView android:id="@+id/iconPreview1" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_power" app:tint="@color/prop_text_primary"/>
                 <ImageView android:id="@+id/iconPreview2" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_lighting" app:tint="@color/prop_text_secondary"/>
                 <ImageView android:id="@+id/iconPreview3" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_fan" app:tint="@color/prop_text_secondary"/>
@@ -350,11 +355,15 @@
                  android:layout_height="match_parent"
                  android:inputType="none"
                  android:text="Rounded"
-                 android:textSize="14sp"
+                 android:textSize="13sp"
+                 android:maxLines="1"
+                 android:ellipsize="end"
                  android:textColor="@color/prop_text_primary"
+                 android:gravity="center"
                  android:padding="0dp"
-                 android:gravity="center_vertical|start"
                  android:popupBackground="@drawable/bg_popup_rounded"
+                 android:dropDownWidth="140dp"
+                 android:dropDownVerticalOffset="4dp"/>
                  android:dropDownWidth="140dp"
                  android:dropDownVerticalOffset="4dp"/>
         </com.google.android.material.textfield.TextInputLayout>

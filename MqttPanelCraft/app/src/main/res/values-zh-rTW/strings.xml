@@ -38,8 +38,8 @@
     <string name="dashboard_sort_date_old">建立日期 (最舊)</string>
     <string name="dashboard_sort_last_opened">最後開啟</string>
     <string name="dashboard_empty_state_msg">尚未建立任何專案</string>
-    <string name="dashboard_badge_premium">付費版</string>
-    <string name="dashboard_badge_free">免費版</string>
+    <string name="dashboard_badge_premium">Premium</string>
+    <string name="dashboard_badge_free">Free</string>
     
     <!-- Setup Activity -->
     <!-- Setup Activity -->
@@ -55,7 +55,7 @@
     <string name="setup_btn_test">測試連線</string>
     <string name="setup_btn_save_start">建立專案</string>
     <string name="setup_btn_update_start">更新並啟動</string>
-    <string name="setup_btn_update_only">僅更新專案</string>
+    <string name="setup_btn_update_only">更新專案</string>
     <string name="setup_theme_panel">面板 (Panel)</string>
     <string name="setup_theme_factory">工廠 (Factory)</string>
     <string name="setup_theme_webview">網頁 (Webview)</string>

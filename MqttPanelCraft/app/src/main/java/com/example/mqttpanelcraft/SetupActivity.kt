@@ -765,6 +765,7 @@ class SetupActivity : BaseActivity() {
     }
 
     private fun saveAndFinish(newProject: Project, targetProjectId: String) {
+        val returnToHome = intent.getBooleanExtra("RETURN_TO_HOME", false)
         if (projectId != null) {
             if (newProject.id != projectId) {
                 // ID Changed: Delete old, Add new
@@ -786,24 +787,28 @@ class SetupActivity : BaseActivity() {
 
         // If we want to open project immediately (optional, but standard flow usually returns to dashboard)
         // XML has "Save and Start" implies opening.
-        val returnToHome = intent.getBooleanExtra("RETURN_TO_HOME", false)
-
         if (returnToHome) {
              finish()
         } else {
-             val targetActivity = if (newProject.type == ProjectType.WEBVIEW) {
-                 WebViewActivity::class.java
+             // If we are editing (projectId != null), just finish and let the caller handle reload.
+             // If we are creating (projectId == null), open the new project.
+             if (projectId != null) {
+                 finish()
              } else {
-                 ProjectViewActivity::class.java
+                 val targetActivity = if (newProject.type == ProjectType.WEBVIEW) {
+                     WebViewActivity::class.java
+                 } else {
+                     ProjectViewActivity::class.java
+                 }
+                 val intent = android.content.Intent(this, targetActivity)
+                 intent.putExtra("PROJECT_ID", targetProjectId)
+                 
+                 // Fix: Clear Top to prevent duplicate ProjectViewActivity in stack
+                 intent.flags = android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+                 
+                 startActivity(intent)
+                 finish()
              }
-             val intent = android.content.Intent(this, targetActivity)
-             intent.putExtra("PROJECT_ID", targetProjectId)
-             
-             // Fix: Clear Top to prevent duplicate ProjectViewActivity in stack
-             intent.flags = android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
-             
-             startActivity(intent)
-             finish()
         }
     }
 

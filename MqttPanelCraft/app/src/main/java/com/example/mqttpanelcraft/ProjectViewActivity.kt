@@ -45,6 +45,7 @@ class ProjectViewActivity : BaseActivity() {
     
     private var selectedComponentId: Int? = null
     private var isEditMode = false
+    private var lastResizeUpdate = 0L
 
     // Manager
     private lateinit var projectUIManager: com.example.mqttpanelcraft.ui.ProjectUIManager
@@ -125,6 +126,34 @@ class ProjectViewActivity : BaseActivity() {
             e.printStackTrace()
             Toast.makeText(this, getString(R.string.project_msg_init_error, e.message), Toast.LENGTH_LONG).show()
         }
+    }
+    
+    // Result Launcher for Settings (Handle ID Renaming)
+    private val setupLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val newId = result.data?.getStringExtra("NEW_ID")
+            if (newId != null) {
+                // Update Intent for onResume reload logic
+                intent.putExtra("PROJECT_ID", newId)
+                viewModel.loadProject(newId) // Reload Immediately
+                
+                // Also update local selectedComponentId if strictly needed, but VM reload handles most.
+                Toast.makeText(this, "Project ID Updated", Toast.LENGTH_SHORT).show()
+            } else {
+                // Just content update, verify if we need to reload?
+                // onResume usually acts, but explicit reload is safer if onResume is optimized out or verified incorrectly.
+                // But let's rely on onResume for simple updates, or just force reload here.
+                val currentId = intent.getStringExtra("PROJECT_ID")
+                if (currentId != null) viewModel.loadProject(currentId)
+            }
+        }
+    }
+
+    fun launchSettings() {
+        val pid = viewModel.project.value?.id ?: return
+        val intent = Intent(this, com.example.mqttpanelcraft.SetupActivity::class.java)
+        intent.putExtra("PROJECT_ID", pid)
+        setupLauncher.launch(intent)
     }
     
     // Internal Accessor for Manager
@@ -236,6 +265,19 @@ class ProjectViewActivity : BaseActivity() {
             
             override fun onComponentResizing(id: Int, newW: Int, newH: Int) {
                 propertiesManager.updateDimensions(newW, newH)
+                
+                // Live Visual Update (Throttled ~30ms)
+                val now = System.currentTimeMillis()
+                if (now - lastResizeUpdate > 30) {
+                    lastResizeUpdate = now
+                    val comp = viewModel.components.value?.find { it.id == id }
+                    val view = renderer.getView(id)
+                    if (comp != null && view != null) {
+                         val tempData = comp.copy(width = newW, height = newH)
+                         val def = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(comp.type)
+                         def?.onUpdateView(view, tempData)
+                    }
+                }
             }
 
             override fun onComponentDeleted(id: Int) {

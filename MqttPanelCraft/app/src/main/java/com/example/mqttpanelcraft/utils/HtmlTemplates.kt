@@ -54,7 +54,7 @@ object HtmlTemplates {
         .belly { width: 25px; height: 38px; background: #fff; position: absolute; left: 8px; top: 8px; border-radius: 4px; }
         
         /* vivid Eyes */
-        .eye { width: 8px; height: 8px; background: #4FC3F7; position: absolute; top: 9px; border-radius: 50%; animation: blink 4s infinite; box-shadow: inset -3px 0 0 0 #000; z-index: 1; border: 1px solid #000; }
+        .eye { width: 8px; height: 8px; background: #4FC3F7; position: absolute; top: 9px; border-radius: 50%; animation: blink 4s infinite; box-shadow: inset 3px 0 0 0 #000; z-index: 1; border: 1px solid #000; }
         .e-l { left: 8px; } .e-r { left: 26px; }
         
         .beak { width: 8px; height: 4px; background: #333; position: absolute; left: 18px; top: 18px; }
@@ -68,18 +68,20 @@ object HtmlTemplates {
         @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
         
         .happy .a-r { animation: type 0.2s infinite alternate; } .happy .eye { background: #4FC3F7; }
-        .mad { animation: shake 0.1s infinite; } .mad .eye { top: 12px; height: 3px; width: 9px; background: #ff5252; box-shadow: inset -3px 0 0 0 #000; animation: none; }
+        .mad { animation: shake 0.1s infinite; } .mad .eye { top: 12px; height: 3px; width: 9px; background: #ff5252; box-shadow: inset 3px 0 0 0 #000; animation: none; }
         .sleep .eye { height: 1px; top: 14px; width: 8px; background: #000; border-radius: 0; box-shadow: none; animation: none; } .sleep::after { content: 'Zzz'; position: absolute; top: -15px; right: -5px; animation: zzz 2s infinite; font-weight: bold; color: #555; }
-        .super-mad .body { background: #FF5252; } .super-mad { animation: shake 0.05s infinite; } .super-mad .eye { background: #d50000; transform: scale(1.1); box-shadow: inset -3px 0 0 0 #000; }
-        .firework::before { content: '!'; position: absolute; top: -30px; left: 10px; color: red; font-size: 20px; font-weight: bold; } .firework .eye { height: 9px; width: 8px; top: 7px; background: #03A9F4; box-shadow: inset -3px 0 0 0 #000, inset 2px -2px 0 #fff; }
+        .super-mad .body { background: #FF5252; } .super-mad { animation: shake 0.05s infinite; } .super-mad .eye { background: #d50000; transform: scale(1.1); box-shadow: inset 3px 0 0 0 #000; }
+        .firework::before { content: '!'; position: absolute; top: -30px; left: 10px; color: red; font-size: 20px; font-weight: bold; } .firework .eye { height: 9px; width: 8px; top: 7px; background: #03A9F4; box-shadow: inset 3px 0 0 0 #000, inset 2px -2px 0 #fff; }
     """
 
     fun generateDefaultHtml(project: Project?): String {
-        val baseTopic = if (project != null) "${project.name}/${project.id}" else "test/project"
+        // Dynamic Topic Logic (Call Form)
+        val defaultBase = if (project != null) "${project.name}/${project.id}" else "test/project"
         
         // JS Logic split to prevent Kotlin String Template issues and size limits
         val jsLogic = """
-            const T_BASE = "$baseTopic";
+            // Dynamic Topic Retrieval
+            const T_BASE = (window.app) ? window.app.getBaseTopic() : "$defaultBase";
             const T_CHAT = T_BASE + "/chat";
             const T_SW = T_BASE + "/switch";
             const el = (id) => document.getElementById(id);

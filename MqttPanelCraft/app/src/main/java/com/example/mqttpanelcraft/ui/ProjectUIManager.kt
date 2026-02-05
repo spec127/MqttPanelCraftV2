@@ -147,9 +147,14 @@ class ProjectUIManager(
          val btnSettings = root.findViewById<ImageView>(R.id.btnSettings)
          btnSettings.setColorFilter(toolbarColor)
          btnSettings.setOnClickListener {
-             val intent = Intent(activity, com.example.mqttpanelcraft.SetupActivity::class.java)
-             intent.putExtra("PROJECT_ID", viewModel.project.value?.id)
-             activity.startActivity(intent)
+             if (activity is com.example.mqttpanelcraft.ProjectViewActivity) {
+                 activity.launchSettings()
+             } else {
+                 // Fallback (Should not happen for Panel)
+                 val intent = Intent(activity, com.example.mqttpanelcraft.SetupActivity::class.java)
+                 intent.putExtra("PROJECT_ID", viewModel.project.value?.id)
+                 activity.startActivity(intent)
+             }
          }
     }
 

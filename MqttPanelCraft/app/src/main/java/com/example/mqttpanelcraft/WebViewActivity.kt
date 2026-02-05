@@ -44,8 +44,8 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        val backArrow = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_thick)?.mutate()
-        backArrow?.setTint(android.graphics.Color.WHITE)
+        val backArrow = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_action_back_large)?.mutate()
+        backArrow?.setTint(androidx.core.content.ContextCompat.getColor(this, R.color.toolbar_text))
         supportActionBar?.setHomeAsUpIndicator(backArrow) // Ensure you have this or use default
         toolbar.setNavigationOnClickListener { finish() }
         
@@ -55,7 +55,8 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         webView = findViewById(R.id.webView)
         codeEditor = findViewById(R.id.etCodeEditor)
         val containerCode = findViewById<android.view.View>(R.id.containerCode)
-        val fabCode = findViewById<FloatingActionButton>(R.id.fabCode)
+        // Edit Button in Toolbar (Replaces FAB)
+        val btnEdit = findViewById<android.widget.ImageView>(R.id.btnEdit)
         
         projectId = intent.getStringExtra("PROJECT_ID")
         
@@ -68,12 +69,12 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
 
-        // Get Background Color (Handles Dark/Light mode via Resource System)
-        val bgColor = androidx.core.content.ContextCompat.getColor(this, R.color.background_color)
-        window.statusBarColor = bgColor
-        
-        // Also set on CoordinatorLayout (Crucial for Scrim)
-        findViewById<androidx.coordinatorlayout.widget.CoordinatorLayout>(R.id.rootCoordinator)?.setStatusBarBackgroundColor(bgColor)
+        // Transparent Status Bar for Gradient
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false) // Content behind bars
+
+        // Remove old Coordinator color setting (Let gradient show)
+        // findViewById<androidx.coordinatorlayout.widget.CoordinatorLayout>(R.id.rootCoordinator)?.setStatusBarBackgroundColor(bgColor)
         
         // MQTT Service Integration
         // Ensure Service is Connected using Project Defaults
@@ -93,15 +94,8 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         }
         startService(serviceIntent)
         
-        // Subscribe to Project Base Topic
-        if (project != null) {
-            val baseTopic = "${project!!.name}/${project!!.id}/#"
-            val subIntent = Intent(this, MqttService::class.java).apply {
-                action = "SUBSCRIBE"
-                putExtra("TOPIC", baseTopic)
-            }
-            startService(subIntent)
-        }
+        // Subscribe logic moved to connection observer to prevent race conditions
+        // if (project != null) { ... }
 
         // WebView Setup
         webView.webViewClient = WebViewClient()
@@ -132,12 +126,12 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         // Initial Load
         webView.loadDataWithBaseURL(null, initialCode, "text/html", "utf-8", null)
 
-        // FAB Action: Toggle Editor & Save/Run
-        fabCode.setOnClickListener {
+        // Toolbar Edit Action: Toggle Editor & Save/Run
+        btnEdit.setOnClickListener {
              if (containerCode.visibility == android.view.View.VISIBLE) {
                  // Close Editor -> Run Code
                  containerCode.visibility = android.view.View.GONE
-                 fabCode.setImageResource(android.R.drawable.ic_menu_edit)
+                 btnEdit.setImageResource(R.drawable.ic_edit_document_custom)
                  
                  // Hide Keyboard
                  val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
@@ -158,15 +152,29 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
              } else {
                  // Open Editor
                  containerCode.visibility = android.view.View.VISIBLE
-                 fabCode.setImageResource(android.R.drawable.ic_media_play)
+                 btnEdit.setImageResource(R.drawable.ic_run_custom)
              }
         }
         
+        // Result Launcher for SetupActivity (to handle ID renaming)
+        val setupLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == android.app.Activity.RESULT_OK) {
+                // Check if ID was changed
+                val newId = result.data?.getStringExtra("NEW_ID")
+                if (newId != null) {
+                     projectId = newId
+                     // Reload data immediately
+                     loadProjectConfig()
+                     Toast.makeText(this, "Project ID Updated", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
         findViewById<android.view.View>(R.id.btnSettings).setOnClickListener {
              if (projectId != null) {
                  val intent = Intent(this, SetupActivity::class.java)
                  intent.putExtra("PROJECT_ID", projectId)
-                 startActivity(intent)
+                 setupLauncher.launch(intent)
              }
         }
         
@@ -241,18 +249,34 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         }
         idleAdController.start()
     }
+    
+    // Track subscription state to avoid redundant calls or missing first call
+    private var hasSubscribed = false
 
     private fun updateStatusIndicator(status: Int) {
         val viewStatusDot = findViewById<android.view.View>(R.id.viewStatusDot)
         when(status) {
             1 -> { // Connected
                  viewStatusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.GREEN)
+                 
+                 // Fix: Subscribe ONLY when connected to ensure the Service is ready
+                 if (!hasSubscribed && project != null) {
+                     val baseTopic = "${project!!.name}/${project!!.id}/#"
+                     val subIntent = Intent(this, MqttService::class.java).apply {
+                         action = "SUBSCRIBE"
+                         putExtra("TOPIC", baseTopic)
+                     }
+                     startService(subIntent)
+                     hasSubscribed = true
+                 }
             }
             2 -> { // Failed
                  viewStatusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.RED)
+                 hasSubscribed = false // Reset so we retry on next connect
             }
             else -> { // Connecting
                  viewStatusDot.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.GRAY)
+                 hasSubscribed = false
             }
         }
     }

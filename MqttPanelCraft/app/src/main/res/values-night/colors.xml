@@ -32,7 +32,7 @@
     <color name="sidebar_section_header">@color/sidebar_header_text</color>
 
     <color name="prop_container_bg">#1E1E20</color>
-    <color name="prop_input_bg">#0F0F10</color>
+    <color name="prop_input_bg">#2A2A2D</color> <!-- Slightly lighter dark (Deep Grey) -->
     <color name="prop_text_primary">#FFFFFF</color>
     <color name="prop_text_secondary">#94A3B8</color>
     <color name="prop_stroke_color">#33FFFFFF</color>
@@ -88,4 +88,8 @@
     <color name="props_bg_light">#0f172a</color> <!-- Maps to dark bg in night mode -->
     <color name="props_card_bg_light">#1e293b</color>
     <color name="props_card_bg_dark">#0f172a</color>
+    
+    <!-- Dynamic Semantic Colors -->
+    <color name="popup_bg_color">#2D2D30</color>
+    <color name="divider_line">#1AFFFFFF</color>
 </resources>

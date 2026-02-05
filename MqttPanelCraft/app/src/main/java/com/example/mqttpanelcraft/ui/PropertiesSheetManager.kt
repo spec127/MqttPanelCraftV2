@@ -270,14 +270,18 @@ class PropertiesSheetManager(
             if (def != null && def.propertiesLayoutId != 0) {
                  val inflater = LayoutInflater.from(propertyContainer.context)
                  val root = inflater.inflate(def.propertiesLayoutId, containerSpecificProps, true)
-                 def.bindPropertiesPanel(root, data) { key: String, value: String ->
-                      // Immediate Update from Definition
-                      if (currentData != null) {
-                          if (value.isEmpty()) currentData?.props?.remove(key)
-                          else currentData?.props?.put(key, value)
-                          onPropertyUpdated(currentData!!)
-                      }
-                 }
+                  def.bindPropertiesPanel(root, data) { key: String, value: String ->
+                       // Immediate Update from Definition
+                       if (currentData != null) {
+                           // Allow "text" to be empty string (to override default label)
+                           if (value.isEmpty() && key != "text") {
+                               currentData?.props?.remove(key)
+                           } else {
+                               currentData?.props?.put(key, value)
+                           }
+                           onPropertyUpdated(currentData!!)
+                       }
+                  }
             } 
             
             // Generic Payload Logic

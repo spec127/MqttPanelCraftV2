@@ -209,7 +209,8 @@ class SidebarManager(
                  val groupColorHex = String.format("#%06X", (0xFFFFFF and groupColorInt))
 
                  // Create Real Preview View
-                 val previewView = def.createView(rootView.context, true) // isPreview = true
+                 val previewView = def.createView(rootView.context, false) // isPreview/EditMode = false for clean look
+                 previewView.background = null // CONFIG: Remove the "Gray Frame" (Component Border) for sidebar purposes
                  
                  // Init Dummy Data with Group Color
                  val dummyProps = mutableMapOf<String, String>()

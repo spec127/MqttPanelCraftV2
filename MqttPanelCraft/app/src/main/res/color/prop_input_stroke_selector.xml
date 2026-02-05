@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/props_primary" android:state_focused="true"/>
+    <item android:color="@color/props_primary" android:state_hovered="true"/>
+    <item android:color="@color/prop_text_secondary" android:alpha="0.5"/> <!-- Default Unfocused Stroke -->
+</selector>

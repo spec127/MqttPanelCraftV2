@@ -111,6 +111,13 @@
                      android:background="?attr/selectableItemBackgroundBorderless"
                      android:visibility="visible" />
             </LinearLayout>
+
+            <!-- Separator Line -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:background="@color/setup_accent_color"
+                android:layout_gravity="bottom" />
         </FrameLayout>
         
     </com.google.android.material.appbar.AppBarLayout>
@@ -144,14 +151,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:paddingBottom="100dp"
-                        android:clipToPadding="false"
-                        android:background="@drawable/bg_canvas_border">
+                        android:clipToPadding="false">
                         
                         <!-- Background Pattern -->
                         <com.example.mqttpanelcraft.ui.GridPatternView
                             android:id="@+id/backgroundGrid"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" />
+                        
+                        <!-- Border Overlay Removed -->
                         
                         <!-- Guidelines Overlay -->
                          <com.example.mqttpanelcraft.ui.AlignmentOverlayView

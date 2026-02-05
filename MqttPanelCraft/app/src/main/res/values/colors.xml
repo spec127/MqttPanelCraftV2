@@ -99,4 +99,8 @@
     <color name="props_bg_light">#f0f9ff</color>
     <color name="props_card_bg_light">#ffffff</color>
     <color name="props_card_bg_dark">#1e293b</color>
+    
+    <!-- Dynamic Semantic Colors -->
+    <color name="popup_bg_color">#FFFFFF</color>
+    <color name="divider_line">#1A000000</color>
 </resources>

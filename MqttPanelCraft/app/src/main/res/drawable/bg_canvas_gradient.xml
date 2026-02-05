@@ -8,7 +8,7 @@
     </item>
     
     <!-- Top Gradient Layer: Restricted Height (~15% Screen) -->
-    <item android:gravity="top" android:height="135dp">
+    <item android:gravity="top" android:height="80dp">
         <shape android:shape="rectangle">
             <gradient
                 android:angle="270"

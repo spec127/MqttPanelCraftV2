@@ -97,6 +97,7 @@ object ButtonDefinition : IComponentDefinition {
             button.text = ""
         } else {
             // Text or Text+Icon
+            // Use label ONLY if prop is NULL. If set (even empty), use it.
             button.text = data.props["text"] ?: data.label
             // Color set below for unified logic
         }
@@ -144,7 +145,8 @@ object ButtonDefinition : IComponentDefinition {
                     // Safety check for 0 width/height during init
                     if (w > 0 && h > 0) {
                         val minDim = kotlin.math.min(w, h)
-                        val targetSize = (minDim * 0.75f).toInt()
+                        // Scale reduced to 60% (from 75%)
+                        val targetSize = (minDim * 0.60f).toInt()
                         
                         val params = overlayIcon.layoutParams as? FrameLayout.LayoutParams 
                             ?: FrameLayout.LayoutParams(targetSize, targetSize)
@@ -165,8 +167,26 @@ object ButtonDefinition : IComponentDefinition {
             
             if (mode == "text") {
                 button.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
+                // Shift text up by 2dp to account for 3D shadow
+                val density = button.resources.displayMetrics.density
+                val bottomOffset = (2 * density).toInt()
+                button.setPadding(0, 0, 0, bottomOffset)
+
+                // AutoSize Text Configuration (Text Only: Big)
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults(
+                    button, 
+                    androidx.core.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM
+                )
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                    button,
+                    5,  // Min (Lowered to 5sp as requested)
+                    30, // Max (Big)
+                    1,  // Step
+                    android.util.TypedValue.COMPLEX_UNIT_SP
+                )
+
             } else {
-                // Text+Icon
+                // Text+Icon (Icon Top, Text Bottom as requested)
                 val iconKey = data.props["icon"]
                  val iconRes = when(iconKey) {
                     "power" -> R.drawable.ic_btn_power
@@ -180,17 +200,52 @@ object ButtonDefinition : IComponentDefinition {
                 val d = androidx.core.content.ContextCompat.getDrawable(button.context, iconRes)?.mutate()
                 d?.setTint(contentColor) 
                 
-                // Standard Size (24dp)
+                // Dynamic Icon Size (Scaled)
+                val w = data.width
+                val h = data.height
                 val density = button.resources.displayMetrics.density
-                val size = (24 * density).toInt()
+                
+                // Use 40% of min dimension, or fallback to 32dp if size is missing/0
+                val size = if (w > 0 && h > 0) {
+                     (kotlin.math.min(w, h) * 0.40f).toInt()
+                } else {
+                     (32 * density).toInt()
+                }
+                
                 d?.setBounds(0, 0, size, size)
                 
-                button.setCompoundDrawables(d, null, null, null)
+                // Icon TOP
+                button.setCompoundDrawables(null, d, null, null) 
                 button.gravity = android.view.Gravity.CENTER
                 button.textAlignment = android.view.View.TEXT_ALIGNMENT_CENTER
-                button.compoundDrawablePadding = 16 
+                
+                // Dynamic Gap (5% of height or min 2dp)
+                val gap = if (h > 0) (h * 0.05f).toInt() else (2 * density).toInt()
+                button.compoundDrawablePadding = gap
+                
+                // Shift text slightly to balance visual center with icon
+                // User reported "Icon too high", so we push content DOWN by increasing Top Padding.
+                // We add an extra offset (e.g. 4dp or half shadow) to Top.
+                val topPush = (4 * density).toInt()
+                val bottomOffset = gap
+                button.setPadding(0, gap + topPush, 0, bottomOffset)
+
+                // AutoSize Text Configuration (Text+Icon: Small)
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults(
+                    button, 
+                    androidx.core.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM
+                )
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                    button,
+                    5,  // Min (Lowered to 5sp)
+                    14, // Max
+                    1,  // Step
+                    android.util.TypedValue.COMPLEX_UNIT_SP
+                )
             }
         }
+        
+        button.maxLines = 1 // Ensure single line for valid scaling
         
         button.isClickable = true
         button.isFocusable = true
@@ -312,8 +367,8 @@ object ButtonDefinition : IComponentDefinition {
         val containerIcon = panelView.findViewById<View>(R.id.containerPropIcon)
         val etText = panelView.findViewById<EditText>(R.id.etPropText)
 
-        // Init Text Value
-        etText?.setText(data.props["text"] ?: "")
+        // Init Text Value (Use label if text prop is missing/null, effectively pre-filling default)
+        etText?.setText(data.props["text"] ?: data.label)
         etText?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) { onUpdate("text", s.toString()) }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -322,7 +377,6 @@ object ButtonDefinition : IComponentDefinition {
         
         // Icon Binding
         val iconMap = mapOf(
-            R.id.iconPreview0 to "none",
             R.id.iconPreview1 to "power",
             R.id.iconPreview2 to "lighting",
             R.id.iconPreview3 to "fan",
@@ -601,6 +655,28 @@ object ButtonDefinition : IComponentDefinition {
         }
         
 
+        // Helper for Dropdown Styling (AutoSize + Gravity)
+        fun setupDropdownAutoSize(tv: TextView?, gravity: Int = Gravity.CENTER) {
+            if (tv == null) return
+            tv.gravity = gravity
+            tv.maxLines = 1
+            tv.ellipsize = android.text.TextUtils.TruncateAt.END 
+            
+            androidx.core.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults(
+                tv, androidx.core.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM
+            )
+            androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                tv, 8, 14, 1, android.util.TypedValue.COMPLEX_UNIT_SP
+            )
+        }
+
+        // Apply to ApprMode (Left/Start)
+        setupDropdownAutoSize(spApprMode, Gravity.START or Gravity.CENTER_VERTICAL)
+        
+        // Apply to Shape (Left/Start as requested for Title Alignment)
+        // User requested "Title Left", usually linked to Content Alignment in standard TIL
+        setupDropdownAutoSize(spShape, Gravity.START or Gravity.CENTER_VERTICAL)
+
     }
     
     // Removed helpers (updateModeVisibility, updateIconPreview, showIconSelector) as they are unused now.
@@ -611,35 +687,116 @@ object ButtonDefinition : IComponentDefinition {
         val button = findButtonIn(container) ?: return
         
         button.setOnTouchListener { v, event ->
+            val overlayIcon = container.findViewWithTag<ImageView>("ICON_OVERLAY")
+            val mode = data.props["mode"] ?: "text"
+            val density = v.resources.displayMetrics.density
+            val shift = (8 * density).toInt() // Match shadow height
+            
+            // Base Padding Bottom (for text/icon mode) - 2dp offset
             val topic = data.topicConfig
-            if (topic.isNotEmpty()) {
-                when (event.action) {
-                    android.view.MotionEvent.ACTION_DOWN -> {
-                        // Press
-                        if (data.props["haptic"] == "true") {
-                             v.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
-                        }
-                        // Visual
-                        v.alpha = 0.7f
-                        
-                        // Payload
-                        val pPress = data.props["payloadPressed"] ?: data.props["payload"] ?: "1"
-                        if (pPress.isNotEmpty()) sendMqtt(topic, pPress)
+            
+            // Helper for Visual State
+            fun setVisualState(pressed: Boolean) {
+                // Determine base padding bottom dynamically based on mode logic above?
+                // Actually, I should recalc baseBot or use property.
+                // Re-calculating context-aware baseBot here:
+                val isTextIcon = (mode == "text_icon")
+                val h = data.height
+                val gap = if (h > 0) (h * 0.05f).toInt() else (2 * density).toInt()
+                val baseBot = if (isTextIcon) gap else (2 * density).toInt()
+                
+                if (pressed) {
+                    v.isPressed = true
+                    if (data.props["haptic"] == "true") {
+                         v.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
                     }
-                    android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
-                        // Release
-                        v.alpha = 1.0f
-                        
-                        // Payload
+                    v.alpha = 0.7f
+                    
+                    if (mode == "icon") {
+                        overlayIcon?.translationY = shift.toFloat()
+                    } else {
+                         // Push DOWN: Increase Top Padding, Keep Bottom same? 
+                         // Logic from before: button.setPadding(0, gap + topPush, 0, bottomOffset) for Text+Icon
+                         // Standard Text: setPadding(0, 0, 0, bottomOffset)
+                         // To Shift Down: Add shift to Top, SUBTRACT from bottom? No, just Add Top.
+                         // But if I add Top, text moves down.
+                         // Wait, previous logic:
+                         // Text Only: setPadding(0, 0, 0, baseBot) 
+                         // Pressed: setPadding(0, shift, 0, baseBot)
+                         // Text+Icon: setPadding(0, gap + topPush, 0, gap)
+                         // Pressed: setPadding(0, gap + topPush + shift, 0, gap)
+                         
+                         val currentTop = v.paddingTop
+                         // Check if already shifted? No, set absolute.
+                         val standardTop = if (isTextIcon) (gap + (4 * density).toInt()) else 0
+                         v.setPadding(0, standardTop + shift, 0, baseBot)
+                    }
+                } else {
+                    v.isPressed = false
+                    v.alpha = 1.0f
+                    
+                    if (mode == "icon") {
+                        overlayIcon?.translationY = 0f
+                    } else {
+                        // Reset
+                        val standardTop = if (isTextIcon) (gap + (4 * density).toInt()) else 0
+                        v.setPadding(0, standardTop, 0, baseBot)
+                    }
+                }
+                v.invalidate()
+            }
+
+            val triggerMode = data.props["triggerMode"] ?: "Standard" // Standard, Momentary, Timer
+            
+            if (event.action == android.view.MotionEvent.ACTION_DOWN) {
+                if (triggerMode == "Timer") {
+                     // TIMER MODE
+                     // 1. Visual Down + Send Press
+                     setVisualState(true)
+                     if (topic.isNotEmpty()) {
+                         val pPress = data.props["payloadPressed"] ?: data.props["payload"] ?: "1"
+                         if (pPress.isNotEmpty()) sendMqtt(topic, pPress)
+                     }
+                     
+                     // 2. Schedule UP
+                     val duration = (data.props["timerDuration"] ?: "1000").toLongOrNull() ?: 1000L
+                     v.handler?.postDelayed({
+                         setVisualState(false)
+                         if (topic.isNotEmpty()) {
+                             val pRelease = data.props["payloadReleased"]
+                             if (!pRelease.isNullOrEmpty()) sendMqtt(topic, pRelease)
+                         }
+                     }, duration)
+                     
+                } else {
+                    // STANDARD / MOMENTARY DOWN
+                    setVisualState(true)
+                    if (topic.isNotEmpty()) {
+                         val pPress = data.props["payloadPressed"] ?: data.props["payload"] ?: "1"
+                         if (pPress.isNotEmpty()) sendMqtt(topic, pPress)
+                    }
+                }
+                return@setOnTouchListener true
+            } else if (event.action == android.view.MotionEvent.ACTION_UP || event.action == android.view.MotionEvent.ACTION_CANCEL) {
+                if (triggerMode == "Timer") {
+                    // Ignore UP - Timer handles it
+                } else {
+                    // STANDARD / MOMENTARY UP
+                    setVisualState(false)
+                    if (topic.isNotEmpty()) {
                         val pRelease = data.props["payloadReleased"]
-                        // Only send release payload if explicitly set? Or default 0?
-                        // User requirement said "Separate payloads". 
-                        // If empty, do nothing?
+                        // Only send Release payload if configured (essential for Momentary, optional for Standard?)
+                        // Usually Standard is Toggle? No, Button is Push.
+                        // Standard = Push (Press sends, Release sends if confusing name? No)
+                        // Actually, Momentary usually means "Send Press, Send Release".
+                        // Use Standard?
+                        // If payloadReleased is set, sends it.
                         if (!pRelease.isNullOrEmpty()) sendMqtt(topic, pRelease)
                     }
                 }
+                return@setOnTouchListener true
             }
-            true // Consume event
+            true 
         }
     }
 

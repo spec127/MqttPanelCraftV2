@@ -86,6 +86,11 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun loadProject(projectId: String) {
+        // Force MQTT Reconnect on Project Load (Handle ID change)
+        connectionJob?.cancel()
+        connectionJob = null
+        mqttStatus.postValue(MqttStatus.IDLE)
+        
         _currentProjectId.value = projectId
     }
 
