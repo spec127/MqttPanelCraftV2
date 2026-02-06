@@ -145,10 +145,16 @@
     <string name="properties_section_appearance">外觀</string>
     <string name="properties_section_interaction">互動</string>
     <string name="properties_section_general">通用</string>
+
+    <string name="prop_section_general">通用</string>
+    <string name="prop_section_interaction">互動</string>
+    <string name="prop_section_appearance">外觀</string>
     <string name="properties_mode_text">文字</string>
     <string name="properties_mode_icon">圖示</string>
     <string name="properties_mode_text_icon">文字 + 圖示</string>
     <string name="properties_label_shape">形狀</string>
+    <string name="prop_title_switch">開關屬性</string>
+    <string name="prop_label_name">名稱</string>
     <string name="properties_label_payload_press">按下數值</string>
     <string name="properties_label_trigger_mode">按鈕模式</string>
     <string name="val_mode_standard">單擊</string>

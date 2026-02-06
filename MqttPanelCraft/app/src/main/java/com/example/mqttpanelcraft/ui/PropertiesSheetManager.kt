@@ -273,13 +273,21 @@ class PropertiesSheetManager(
                   def.bindPropertiesPanel(root, data) { key: String, value: String ->
                        // Immediate Update from Definition
                        if (currentData != null) {
-                           // Allow "text" to be empty string (to override default label)
-                           if (value.isEmpty() && key != "text") {
-                               currentData?.props?.remove(key)
+                           if (key == "w") {
+                               try { currentData?.width = value.toInt() } catch(e: Exception) {}
+                               onPropertyUpdated(currentData!!)
+                           } else if (key == "h") {
+                               try { currentData?.height = value.toInt() } catch(e: Exception) {}
+                               onPropertyUpdated(currentData!!)
                            } else {
-                               currentData?.props?.put(key, value)
+                               // Allow "text" to be empty string (to override default label)
+                               if (value.isEmpty() && key != "text") {
+                                   currentData?.props?.remove(key)
+                               } else {
+                                   currentData?.props?.put(key, value)
+                               }
+                               onPropertyUpdated(currentData!!)
                            }
-                           onPropertyUpdated(currentData!!)
                        }
                   }
             } 

@@ -1,30 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingBottom="8dp">
-
-    <!-- Color Section -->
-    <TextView
-        android:text="@string/properties_label_color"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:textColor="@color/prop_text_secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:layout_marginStart="4dp"/>
-
-    <TextView
-        android:id="@+id/vPropColorPreview"
-        android:layout_width="120dp"
-        android:layout_height="40dp"
-        android:gravity="center"
-        android:text="@string/properties_label_default"
-        android:textSize="14sp"
-        android:layout_marginBottom="8dp"
-        android:clickable="true"
-        android:focusable="true"/>
-
+    android:layout_height="48dp"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:background="@drawable/bg_palette_border"
+    android:padding="4dp">
+    
+    <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+        <View android:id="@+id/vColor1" android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:background="@drawable/shape_circle_color" android:backgroundTint="#a573bc"/>
+    </FrameLayout>
+    
+    <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+        <View android:id="@+id/vColor2" android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:background="@drawable/shape_circle_color" android:backgroundTint="#2196F3"/>
+    </FrameLayout>
+    
+    <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+        <View android:id="@+id/vColor3" android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:background="@drawable/shape_circle_color" android:backgroundTint="#4CAF50"/>
+    </FrameLayout>
+    
+    <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+        <View android:id="@+id/vColor4" android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:background="@drawable/shape_circle_color" android:backgroundTint="#FFC107"/>
+    </FrameLayout>
+    
+    <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+        <View android:id="@+id/vColor5" android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:background="@drawable/shape_circle_color" android:backgroundTint="#FF5722"/>
+    </FrameLayout>
+    
+    <!-- Custom Add Button -->
+    <FrameLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
+        <ImageView
+             android:id="@+id/btnColorCustom"
+             android:layout_width="24dp"
+             android:layout_height="24dp"
+             android:layout_gravity="center"
+             android:src="@drawable/ic_palette_open"
+             app:tint="@color/prop_text_secondary"/>
+    </FrameLayout>
 </LinearLayout>

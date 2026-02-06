@@ -244,6 +244,23 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         val maxId = proj.components.maxOfOrNull { it.id } ?: 100
         val newSystemId = maxId + 1
 
+        // 5. Default Props (Color from Group)
+        val initialProps = mutableMapOf<String, String>()
+        if (definition != null) {
+            val groupColor = when(definition.group) {
+                "CONTROL" -> "#00B0FF" // vivid_blue
+                "SENSOR" -> "#FF9100"  // warm_amber
+                "DISPLAY" -> "#D500F9" // soft_purple
+                else -> "#7C3AED"      // Default Purple
+            }
+            initialProps["color"] = groupColor
+            
+            // Special Default for Button label mode
+            if (type == "BUTTON") {
+                 // initialProps["mode"] = "text" // Default is text
+            }
+        }
+
         return ComponentData(
             id = newSystemId, 
             type = type,
@@ -253,7 +270,7 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
             width = wPx,
             height = hPx,
             label = newLabel,
-            props = mutableMapOf() // Empty props = Default Color (Transparent)
+            props = initialProps
         )
     }
 

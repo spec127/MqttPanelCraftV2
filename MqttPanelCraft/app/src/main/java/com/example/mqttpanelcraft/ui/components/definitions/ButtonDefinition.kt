@@ -23,8 +23,9 @@ object ButtonDefinition : IComponentDefinition {
     
     // 1. Identity
     override val type = "BUTTON"
+    // Larger default size as requested
     override val defaultSize = Size(120, 60)
-    override val labelPrefix = "btn"
+    override val labelPrefix = "button"
     override val iconResId = R.drawable.ic_btn_power
     override val group = "CONTROL"
 
@@ -33,17 +34,17 @@ object ButtonDefinition : IComponentDefinition {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode)
         
         val button = androidx.appcompat.widget.AppCompatButton(context).apply { 
-            text = "BTN"
-            stateListAnimator = null
-            elevation = 0f
-            textSize = 14f
-            isAllCaps = false
-            tag = "target" // Mark as target for behavior
-            
-            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT).apply {
-                gravity = Gravity.CENTER
-                setMargins(8, 8, 8, 8)
-            }
+             text = "Button" // Default Text
+             stateListAnimator = null
+             elevation = 0f
+             textSize = 14f
+             isAllCaps = false
+             tag = "target"
+             
+             layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT).apply {
+                 gravity = Gravity.CENTER
+                 setMargins(8, 8, 8, 8)
+             }
         }
         container.addView(button, 0)
         
@@ -55,7 +56,7 @@ object ButtonDefinition : IComponentDefinition {
             scaleType = ImageView.ScaleType.FIT_CENTER
             isClickable = false
             isFocusable = false
-            elevation = 50f // Very high to ensure on top of button
+            elevation = 50f 
             translationZ = 50f
         }
         container.addView(iconView)
@@ -68,11 +69,10 @@ object ButtonDefinition : IComponentDefinition {
         val button = findButtonIn(container) ?: return
         
         // 1. Color
-        val colorHex = data.props["color"] ?: "#7C3AED" // Default Vivid Purple
+        val colorHex = data.props["color"] ?: "#00B0FF" // Default Vivid Blue
         val color = try { android.graphics.Color.parseColor(colorHex) } catch(e: Exception) { android.graphics.Color.LTGRAY }
         
         // 2. Shape
-        // 2. Shape & Tactile Background
         val shapeMode = data.props["shape"] ?: "pill" // circle, rect, pill
         val cornerRadius = when(shapeMode) {
              "rect" -> 16f
@@ -81,209 +81,167 @@ object ButtonDefinition : IComponentDefinition {
         }
         val isOval = (shapeMode == "circle")
         
+        // Create Visuals (Updated)
         button.background = createTactileDrawable(color, isOval, cornerRadius)
         
         // Elevation (Physical feel)
         button.elevation = 6f
         button.stateListAnimator = android.animation.AnimatorInflater.loadStateListAnimator(button.context, R.animator.anim_btn_tactile_elevation)
-        // If animator resource missing, fall back to manual elevation or null
-        // Since I haven't created the XML animator yet, I'll use simple ViewPropertyAnimator in code or just rely on elevation.
-        // Actually, let's create the animator XML next. For now, set elevation.
         
-        // 3. Mode (Text vs Icon)
-        val mode = data.props["mode"] ?: "text" // text, icon
-        
-        if (mode == "icon") {
-            button.text = ""
-        } else {
-            // Text or Text+Icon
-            // Use label ONLY if prop is NULL. If set (even empty), use it.
-            button.text = data.props["text"] ?: data.label
-            // Color set below for unified logic
-        }
-
-
-        
-        // Set Colors (Text & Icon)
-        val contentColor = if (isLightColor(color)) android.graphics.Color.BLACK else android.graphics.Color.WHITE
+        // 3. Mode & Content Color
+        /*
+          Text Color Logic Request: 
+           - When (White Level > 50%) OR (Transparency > 50%) OR (Sum > 50%) -> Turn text BLACK.
+           - Otherwise WHITE.
+        */
+        val isLight = isLightColorNewLogic(color)
+        val contentColor = if (isLight) android.graphics.Color.BLACK else android.graphics.Color.WHITE
         button.setTextColor(contentColor)
         
-        // Find Overlay Icon
+        // Mode Handling
+        val mode = data.props["mode"] ?: "text"
         val overlayIcon = container.findViewWithTag<ImageView>("ICON_OVERLAY")
+        val density = button.resources.displayMetrics.density
+        val minDimDp = kotlin.math.min(data.width, data.height) / density
+        val isSmall = minDimDp < 140
         
         if (mode == "icon") {
-            // ICON ONLY MODE: Use Overlay for perfect centering and resizing
             button.text = ""
             button.setCompoundDrawables(null, null, null, null)
-            
-            if (overlayIcon != null) {
+             if (overlayIcon != null) {
                 overlayIcon.visibility = View.VISIBLE
-                
-                // key mapping
                 val iconKey = data.props["icon"]
                 
                 if (iconKey == "none") {
                     overlayIcon.visibility = View.GONE
                 } else {
-                    val iconRes = when(iconKey) {
-                        "power" -> R.drawable.ic_btn_power
-                        "lighting" -> R.drawable.ic_btn_lighting
-                        "fan" -> R.drawable.ic_btn_fan
-                        "play" -> R.drawable.ic_btn_play
-                        "tune" -> R.drawable.ic_btn_tune
-                        "energy" -> R.drawable.ic_btn_energy
-                        else -> R.drawable.ic_btn_power // Default
-                    }
-                    
+                    val iconRes = getIconRes(iconKey)
                     overlayIcon.setImageResource(iconRes)
                     overlayIcon.setColorFilter(contentColor)
                     
-                    // Size Calculation: 75% of button
                     val w = data.width
                     val h = data.height
-                    
-                    // Safety check for 0 width/height during init
-                    if (w > 0 && h > 0) {
+                     if (w > 0 && h > 0) {
                         val minDim = kotlin.math.min(w, h)
-                        // Scale reduced to 60% (from 75%)
-                        val targetSize = (minDim * 0.60f).toInt()
+                        val targetSize = (minDim * 0.60f).toInt() // 60% Scale
                         
                         val params = overlayIcon.layoutParams as? FrameLayout.LayoutParams 
                             ?: FrameLayout.LayoutParams(targetSize, targetSize)
-                        
                         params.width = targetSize
                         params.height = targetSize
                         params.gravity = Gravity.CENTER
                         overlayIcon.layoutParams = params
                     }
                     overlayIcon.bringToFront()
-                    overlayIcon.requestLayout()
                 }
-            }
-            
+             }
         } else {
-            // TEXT or TEXT+ICON Mode: Use standard button features
             overlayIcon?.visibility = View.GONE
-            
-            if (mode == "text") {
+             if (mode == "text") {
+                button.text = data.props["text"] ?: data.label
                 button.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
-                // Shift text up by 2dp to account for 3D shadow
-                val density = button.resources.displayMetrics.density
                 val bottomOffset = (2 * density).toInt()
                 button.setPadding(0, 0, 0, bottomOffset)
 
-                // AutoSize Text Configuration (Text Only: Big)
-                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults(
-                    button, 
-                    androidx.core.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM
-                )
-                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-                    button,
-                    5,  // Min (Lowered to 5sp as requested)
-                    30, // Max (Big)
-                    1,  // Step
-                    android.util.TypedValue.COMPLEX_UNIT_SP
-                )
+                // Text AutoSize
+                val maxSp = if (isSmall) 18 else 30
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults(button, androidx.core.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM)
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(button, 5, maxSp, 1, android.util.TypedValue.COMPLEX_UNIT_SP)
 
             } else {
-                // Text+Icon (Icon Top, Text Bottom as requested)
+                // Text+Icon
+                button.text = data.props["text"] ?: data.label
                 val iconKey = data.props["icon"]
-                 val iconRes = when(iconKey) {
-                    "power" -> R.drawable.ic_btn_power
-                    "lighting" -> R.drawable.ic_btn_lighting
-                    "fan" -> R.drawable.ic_btn_fan
-                    "play" -> R.drawable.ic_btn_play
-                    "tune" -> R.drawable.ic_btn_tune
-                    "energy" -> R.drawable.ic_btn_energy
-                    else -> R.drawable.ic_btn_power
-                }
+                val iconRes = getIconRes(iconKey)
                 val d = androidx.core.content.ContextCompat.getDrawable(button.context, iconRes)?.mutate()
-                d?.setTint(contentColor) 
+                d?.setTint(contentColor)
                 
-                // Dynamic Icon Size (Scaled)
                 val w = data.width
                 val h = data.height
-                val density = button.resources.displayMetrics.density
-                
-                // Use 40% of min dimension, or fallback to 32dp if size is missing/0
-                val size = if (w > 0 && h > 0) {
-                     (kotlin.math.min(w, h) * 0.40f).toInt()
-                } else {
-                     (32 * density).toInt()
-                }
-                
+                val size = if (w > 0 && h > 0) (kotlin.math.min(w, h) * 0.40f).toInt() else (32 * density).toInt()
                 d?.setBounds(0, 0, size, size)
+                button.setCompoundDrawables(null, d, null, null)
                 
-                // Icon TOP
-                button.setCompoundDrawables(null, d, null, null) 
-                button.gravity = android.view.Gravity.CENTER
-                button.textAlignment = android.view.View.TEXT_ALIGNMENT_CENTER
-                
-                // Dynamic Gap (5% of height or min 2dp)
-                val gap = if (h > 0) (h * 0.05f).toInt() else (2 * density).toInt()
+                // Gap between icon and text
+                val gap = if (h > 0) (h * 0.01f).toInt() else (2 * density).toInt() 
                 button.compoundDrawablePadding = gap
                 
-                // Shift text slightly to balance visual center with icon
-                // User reported "Icon too high", so we push content DOWN by increasing Top Padding.
-                // We add an extra offset (e.g. 4dp or half shadow) to Top.
-                val topPush = (4 * density).toInt()
-                val bottomOffset = gap
-                button.setPadding(0, gap + topPush, 0, bottomOffset)
-
-                // AutoSize Text Configuration (Text+Icon: Small)
-                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults(
-                    button, 
-                    androidx.core.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM
-                )
-                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-                    button,
-                    5,  // Min (Lowered to 5sp)
-                    14, // Max
-                    1,  // Step
-                    android.util.TypedValue.COMPLEX_UNIT_SP
-                )
+                // Safe Zone & Centering (Sync with attachBehavior)
+                val shadowHeight = (8 * density).toInt()
+                val faceHeight = if (h > 0) h - shadowHeight else (40 * density).toInt()
+                val topNudge = (faceHeight * 0.10f).toInt()
+                
+                // Normal State: Push down by Nudge; Protect Bottom Shadow
+                button.setPadding(0, topNudge, 0, shadowHeight)
+                
+                // Fix "Gap not improved": Disable font padding to remove invisible text whitespace
+                button.includeFontPadding = false
+                button.gravity = Gravity.CENTER
+                
+                val maxSp = if (isSmall) 16 else 24
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults(button, androidx.core.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM)
+                androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(button, 8, maxSp, 1, android.util.TypedValue.COMPLEX_UNIT_SP)
             }
         }
         
-        button.maxLines = 1 // Ensure single line for valid scaling
-        
+        button.maxLines = 1
         button.isClickable = true
         button.isFocusable = true
     }
     
-    private fun isLightColor(color: Int): Boolean {
-        return androidx.core.graphics.ColorUtils.calculateLuminance(color) > 0.5
+    private fun getIconRes(key: String?): Int {
+         return when(key) {
+             "power" -> R.drawable.ic_btn_power
+             "lighting" -> R.drawable.ic_btn_lighting
+             "fan" -> R.drawable.ic_btn_fan
+             "play" -> R.drawable.ic_btn_play
+             "tune" -> R.drawable.ic_btn_tune
+             "energy" -> R.drawable.ic_btn_energy
+             else -> R.drawable.ic_btn_power
+         }
+    }
+
+    private fun isLightColorNewLogic(color: Int): Boolean {
+         val luminance = androidx.core.graphics.ColorUtils.calculateLuminance(color) // 0.0 (Black) to 1.0 (White)
+         val alpha = android.graphics.Color.alpha(color) / 255.0 // 0.0 to 1.0
+         val transparency = 1.0 - alpha // 0.0 (Opaque) to 1.0 (Transparent)
+         
+         /*
+          User Rules: 
+           1. Luminance > 0.5 (White degree 50%)
+           2. Transparency > 0.5 (Transparent degree 50%)
+           3. (Luminance + Transparency) > 0.5 (Sum 50%)
+           If ANY is true -> return TRUE (Light/Bright context -> Black Text)
+         */
+         
+         if (luminance > 0.5) return true
+         if (transparency > 0.5) return true
+         if ((luminance + transparency) > 0.5) return true
+         
+         return false
     }
 
     private fun createTactileDrawable(baseColor: Int, isOval: Boolean, radius: Float): android.graphics.drawable.Drawable {
-        // Normal State Drawable
+        // Normal State
         val normalDrawable = createTactileLayer(baseColor, isOval, radius, false)
-        
-        // Pressed State Drawable
+        // Pressed State
         val pressedDrawable = createTactileLayer(baseColor, isOval, radius, true)
         
         val sld = android.graphics.drawable.StateListDrawable()
         sld.addState(intArrayOf(android.R.attr.state_pressed), pressedDrawable)
         sld.addState(intArrayOf(), normalDrawable)
-        
-        // Ensure changes in state trigger redraw
-        // In some API levels, resizing layers inside StateListDrawable needs explicit bounds handling, 
-        // but typically standard Views handle it fine.
         return sld
     }
     
     private fun createTactileLayer(color: Int, isOval: Boolean, radius: Float, isPressed: Boolean): android.graphics.drawable.LayerDrawable {
         val density = android.content.res.Resources.getSystem().displayMetrics.density
-        // 3D Height Configuration (Increased for visibility)
         val heightNormal = (8 * density).toInt()
-        
-        // When pressed, top inset increases (shift down), bottom inset becomes 0 (shadow hidden)
+
         val topInset = if (isPressed) heightNormal else 0
         val bottomInset = if (isPressed) 0 else heightNormal
         
-        // Layer 0: Side/Bottom (Darker Shadow)
-        // This is the full background, but effectively visible only at the bottom
-        val sideColor = darkenColor(color, 0.6f) // Darker for the side
+        // Layer 0: Side (Darker Shadow)
+        val sideColor = darkenColor(color, 0.6f) 
         val sideLayer = android.graphics.drawable.GradientDrawable().apply {
             setColor(sideColor)
             if (isOval) shape = android.graphics.drawable.GradientDrawable.OVAL
@@ -293,60 +251,75 @@ object ButtonDefinition : IComponentDefinition {
             }
         }
         
-        // Layer 1: Face (Main Color)
-        val faceLayer = android.graphics.drawable.GradientDrawable().apply {
-            setColor(color) // Keep original color even when pressed
+        // Layer 1: Face (Main Color with GRADIENT logic)
+        /* User Req: 
+           "Top 10% is white gradient to specified color".
+           This implies a Vertical Gradient: Start=White, End=Color.
+           Since we can't easily control the "Stop" at 10% without API 24 arrays,
+           we will simulate it by adding a Highlight Layer *on top* of a Solid Face.
+        */
+        
+        // Base Face (Solid Color)
+        val faceBaseLayer = android.graphics.drawable.GradientDrawable().apply {
+            setColor(color) 
+            // setStroke((1 * density).toInt(), Color.WHITE) // "Have a border" - applied here?
             if (isOval) shape = android.graphics.drawable.GradientDrawable.OVAL
             else {
-                shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-                cornerRadius = radius
+                 shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                 cornerRadius = radius
             }
         }
         
-        // Layer 2: Gloss/Gradient (On Top of Face)
-        // ADJUSTED: Removed heavy black overlay for pressed state to avoid "grey" look.
-        val gradientColors = if (isPressed) {
-            intArrayOf(
-                androidx.core.graphics.ColorUtils.setAlphaComponent(android.graphics.Color.WHITE, 20), // Subtle shine even when pressed
-                androidx.core.graphics.ColorUtils.setAlphaComponent(android.graphics.Color.WHITE, 0)
-            )
-        } else {
-             intArrayOf(
-                androidx.core.graphics.ColorUtils.setAlphaComponent(android.graphics.Color.WHITE, 100), // High Gloss Top
-                androidx.core.graphics.ColorUtils.setAlphaComponent(android.graphics.Color.WHITE, 0)
-            )
-        }
-         val glossLayer = android.graphics.drawable.GradientDrawable(
-            android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
-            gradientColors
+        // Highlight Layer (Top 20% White Gradient)
+        // We use a multi-stop gradient.
+        // Array Size determines the "step" size. 
+        // Size 6 => Gap is 1/(6-1) = 1/5 = 20%? No, GradientDrawable distributes evenly.
+        // If passed 6 colors: Pos 0.0, 0.2, 0.4, 0.6, 0.8, 1.0.
+        // Stop 0 = White. Stop 1 = Color. Transition White->Color is 0.0 to 0.2 (20%).
+        // To tune this: Change 'layers' size.
+        // Size 11 => 10% (0.0 to 0.1).
+        // Size 6 => 20% (0.0 to 0.2).
+        val layers = 6 // <--- Modify this to change ratio (e.g. 11 for 10%, 6 for 20%)
+        val stops = IntArray(layers)
+        stops[0] = Color.WHITE
+        for (i in 1 until layers) stops[i] = color
+        
+        val highlightLayer = android.graphics.drawable.GradientDrawable(
+             android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+             stops
         ).apply {
+             gradientType = android.graphics.drawable.GradientDrawable.LINEAR_GRADIENT
              if (isOval) shape = android.graphics.drawable.GradientDrawable.OVAL
              else {
                  shape = android.graphics.drawable.GradientDrawable.RECTANGLE
                  cornerRadius = radius
              }
-             gradientType = android.graphics.drawable.GradientDrawable.LINEAR_GRADIENT
+             // Border: Silver Gray (#C0C0C0), Thinner (1dp)
+             val borderWidth = kotlin.math.max(1, (1 * density).toInt())
+             setStroke(borderWidth, Color.parseColor("#C0C0C0")) 
         }
+
+        // Just use highlightLayer as the Face for now if it contains the color logic.
+        // Wait, if I replace the solid face with this gradient face:
+        val faceLayer = highlightLayer
         
-        // Combine Face + Gloss
-        val faceWithGloss = android.graphics.drawable.LayerDrawable(arrayOf(faceLayer, glossLayer))
+        // Gloss Layer (Additional shine? Or is the gradient enough?) 
+        // User asked for specific gradient. I'll rely on faceLayer being the main gradient.
+        // But the "Top 10%" part suggests a sharp transition. 
+        // I will add a discrete "Gloss Cap" layer if needed, but let's stick to the Gradient Face for simplicity and robustness.
+
+        // Composite
+        val layerDrawables = arrayOf(sideLayer, faceLayer)
+        val layerDrawable = android.graphics.drawable.LayerDrawable(layerDrawables)
         
-        // Final Composite
-        // We wrap faceWithGloss to apply insets
-        val layers = arrayOf(sideLayer, faceWithGloss)
-        val layerDrawable = android.graphics.drawable.LayerDrawable(layers)
-        
-        // Inset Side Layer (Index 0) - NEW: Shift down when pressed to avoid dark top artifact
         val sideTopInset = if (isPressed) heightNormal else 0
         layerDrawable.setLayerInset(0, 0, sideTopInset, 0, 0)
-        
-        // Inset Face Layer (Index 1)
-        // left, top, right, bottom
         layerDrawable.setLayerInset(1, 0, topInset, 0, bottomInset)
         
         return layerDrawable
     }
     
+    // Updated darken color helper
     private fun darkenColor(color: Int, factor: Float): Int {
         val a = android.graphics.Color.alpha(color)
         val r = (android.graphics.Color.red(color) * factor).toInt()
@@ -367,7 +340,6 @@ object ButtonDefinition : IComponentDefinition {
         val containerIcon = panelView.findViewById<View>(R.id.containerPropIcon)
         val etText = panelView.findViewById<EditText>(R.id.etPropText)
 
-        // Init Text Value (Use label if text prop is missing/null, effectively pre-filling default)
         etText?.setText(data.props["text"] ?: data.label)
         etText?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) { onUpdate("text", s.toString()) }
@@ -375,7 +347,6 @@ object ButtonDefinition : IComponentDefinition {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
         
-        // Icon Binding
         val iconMap = mapOf(
             R.id.iconPreview1 to "power",
             R.id.iconPreview2 to "lighting",
@@ -388,7 +359,6 @@ object ButtonDefinition : IComponentDefinition {
              panelView.findViewById<View>(id)?.setOnClickListener { onUpdate("icon", key) }
         }
         
-        // Helper to update visibility
         fun updateApprMode(mode: String) {
             when(mode) {
                 "text" -> {
@@ -406,7 +376,6 @@ object ButtonDefinition : IComponentDefinition {
             }
         }
 
-        // Init Mode Dropdown
         val appModes = listOf(
             context.getString(R.string.properties_mode_text),
             context.getString(R.string.properties_mode_icon),
@@ -434,31 +403,8 @@ object ButtonDefinition : IComponentDefinition {
              updateApprMode(newMode)
         }
 
-
-        // --- 1. Shape Spinner --- (unchanged, skipping lines 167-194)
-
-        // ... [Skipping Shape Spinner Block for simplicity in replacement if possible, or I include it] ...
-        // Since I'm using replace_file_content, I must include or carefully target.
-        // I will target the RANGE from Line 130 to 269? That covers Shape too.
-        // No, I can do MultiReplace.
-        // Wait, the user tool call had StartLine 130 EndLine 269.
-        // I should just replace the Whole Block if it's easier.
-        // But Shape Spinner is in the middle (Lines 167-194).
-        // I will use MultiChunk replacement.
-        
-        // Actually, looking at the range: 130 (Top Appr) -> ... -> 167 (Shape) -> ... -> 197 (Payload) -> 220 (Trigger)
-        // I need to replace 130-165 (Appr) AND 221-269 (Trigger).
-        // I will use `multi_replace_file_content` ? No, `replace_file_content` is requested?
-        // Ah, I am the model.
-        // I will use `multi_replace_file_content`.
-        
-        // Wait, the previous tool call instructions for ME? No.
-        // I will generate a `multi_replace_file_content` call.
-
-
         // --- 1. Shape Spinner ---
         val spShape = panelView.findViewById<android.widget.AutoCompleteTextView>(R.id.spPropShape)
-        // Values: "Rounded", "Circle", "Rect" -> Translated
         val shapeLabels = listOf(
             context.getString(R.string.val_shape_rounded),
             context.getString(R.string.val_shape_circle),
@@ -467,7 +413,6 @@ object ButtonDefinition : IComponentDefinition {
         val shapeAdapter = android.widget.ArrayAdapter(context, android.R.layout.simple_dropdown_item_1line, shapeLabels)
         spShape.setAdapter(shapeAdapter)
         
-        // Init Value
         val currentShape = data.props["shape"] ?: "pill"
         spShape.setText(when(currentShape) {
             "circle" -> context.getString(R.string.val_shape_circle)
@@ -476,7 +421,6 @@ object ButtonDefinition : IComponentDefinition {
         }, false)
         
         spShape.setOnItemClickListener { _, _, position, _ ->
-            // Map Back (0->pill, 1->circle, 2->rect)
             val code = when(position) {
                 1 -> "circle"
                 2 -> "rect"
@@ -485,8 +429,7 @@ object ButtonDefinition : IComponentDefinition {
             onUpdate("shape", code)
         }
 
-
-        // --- 4. Press Payload (Dropdown) ---
+        // --- 4. Press Payload ---
         val spPress = panelView.findViewById<android.widget.AutoCompleteTextView>(R.id.etPropPayloadPress)
         if (spPress != null) {
             val pressAdapter = android.widget.ArrayAdapter(context, android.R.layout.simple_dropdown_item_1line, listOf("ON", "OFF", "TRUE", "FALSE", "1", "0"))
@@ -496,27 +439,24 @@ object ButtonDefinition : IComponentDefinition {
             val currPress = data.props["payloadPressed"] ?: data.props["payload"]
             val displayText = if (currPress.isNullOrEmpty()) "ON" else currPress
             spPress.setText(displayText, false)
-            
             spPress.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) { onUpdate("payloadPressed", s.toString()) }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             })
-            
             spPress.setOnItemClickListener { _, _, position, _ ->
                  val sel = pressAdapter.getItem(position) ?: "ON"
                  onUpdate("payloadPressed", sel)
             }
         }
 
-        // --- 5. Button Mode & Dynamic Inputs ---
+        // --- 5. Button Mode ---
         val toggleTrigger = panelView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.togglePropTrigger)
-        val tvTriggerDesc = panelView.findViewById<TextView>(R.id.tvPropTriggerDesc) // New Description
+        val tvTriggerDesc = panelView.findViewById<TextView>(R.id.tvPropTriggerDesc)
         val containerReleaseOnly = panelView.findViewById<View>(R.id.containerReleaseOnly)
         val containerTimerMode = panelView.findViewById<View>(R.id.containerTimerMode)
         val etTimer = panelView.findViewById<EditText>(R.id.etPropTimer)
         
-        // Helper to update visibility & Description
         fun updateVisibility(mode: String) {
             when (mode.lowercase()) {
                 "timer" -> {
@@ -529,7 +469,7 @@ object ButtonDefinition : IComponentDefinition {
                     containerTimerMode?.visibility = View.GONE
                     tvTriggerDesc?.text = context.getString(R.string.desc_mode_hold)
                 }
-                else -> { // Standard
+                else -> {
                     containerReleaseOnly?.visibility = View.GONE 
                     containerTimerMode?.visibility = View.GONE
                     tvTriggerDesc?.text = context.getString(R.string.desc_mode_tap)
@@ -537,15 +477,13 @@ object ButtonDefinition : IComponentDefinition {
             }
         }
 
-        // Init Mode
-        val currMode = data.props["triggerMode"] ?: "Standard"
+        val currTrigMode = data.props["triggerMode"] ?: "Standard"
         if (toggleTrigger != null) {
-            when(currMode.lowercase()) {
+            when(currTrigMode.lowercase()) {
                 "momentary" -> toggleTrigger.check(R.id.btnTriggerHold)
                 "timer" -> toggleTrigger.check(R.id.btnTriggerTimer)
                 else -> toggleTrigger.check(R.id.btnTriggerTap)
             }
-            
             toggleTrigger.addOnButtonCheckedListener { _, checkedId, isChecked ->
                 if (isChecked) {
                      val code = when(checkedId) {
@@ -558,16 +496,13 @@ object ButtonDefinition : IComponentDefinition {
                 }
             }
         }
-        updateVisibility(currMode)
+        updateVisibility(currTrigMode)
         
-        // Release Payload
         val etRelease1 = panelView.findViewById<EditText>(R.id.etPropPayloadRelease)
         val etRelease2 = panelView.findViewById<EditText>(R.id.etPropPayloadReleaseRef)
-        
         val releaseVal = data.props["payloadReleased"] ?: "0"
         etRelease1?.setText(releaseVal)
         etRelease2?.setText(releaseVal)
-        
         val releaseWatcher = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) { onUpdate("payloadReleased", s.toString()) }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -575,8 +510,6 @@ object ButtonDefinition : IComponentDefinition {
         }
         etRelease1?.addTextChangedListener(releaseWatcher)
         etRelease2?.addTextChangedListener(releaseWatcher) 
-        
-        // Timer Input
         etTimer?.setText(data.props["timerDuration"] ?: "1000")
         etTimer?.addTextChangedListener(object: TextWatcher {
             override fun afterTextChanged(s: Editable?) { onUpdate("timerDuration", s.toString()) }
@@ -584,27 +517,10 @@ object ButtonDefinition : IComponentDefinition {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        // --- 6. Color Palette (Memory) ---
-        // Load recent colors from SP using ProjectId
-        val projectId = (context as? com.example.mqttpanelcraft.ProjectViewActivity)?.getViewModelAccess()?.project?.value?.id ?: "global"
-        val prefs = context.getSharedPreferences("colors_$projectId", Context.MODE_PRIVATE)
+        // --- 6. Color Palette ---
+        // Use Global History
+        val recentColors = com.example.mqttpanelcraft.data.ColorHistoryManager.load(context)
         
-        fun loadRecentColors(): List<String> {
-            val saved = prefs.getString("recent_colors", null)
-            return saved?.split(",")?.filter { it.isNotEmpty() } ?: listOf("#a573bc", "#2196F3", "#4CAF50", "#FFC107", "#FF5722") // Default
-        }
-        
-        fun saveRecentColor(newColor: String) {
-            val current = loadRecentColors().toMutableList()
-            current.remove(newColor) // Move to top
-            current.add(0, newColor)
-            if (current.size > 5) current.removeAt(current.size - 1)
-            prefs.edit().putString("recent_colors", current.joinToString(",")).apply()
-        }
-        
-        val recentColors = loadRecentColors()
-        
-        // Bind to Views (vColor1..5)
         val colorViews = listOf(
             panelView.findViewById<View>(R.id.vColor1),
             panelView.findViewById<View>(R.id.vColor2),
@@ -612,7 +528,6 @@ object ButtonDefinition : IComponentDefinition {
             panelView.findViewById<View>(R.id.vColor4),
             panelView.findViewById<View>(R.id.vColor5)
         )
-        
         colorViews.forEachIndexed { index, view ->
             if (index < recentColors.size) {
                 val cHex = recentColors[index]
@@ -623,63 +538,48 @@ object ButtonDefinition : IComponentDefinition {
                 } catch(e: Exception) {}
             }
         }
-        
-        // Custom Color
         panelView.findViewById<View>(R.id.btnColorCustom)?.setOnClickListener {
              val cur = data.props["color"] ?: "#a573bc"
              var tempColor = cur 
-             
              com.example.mqttpanelcraft.ui.ColorPickerDialog(
-                 context, 
-                 cur, 
-                 true,
-                 onColorSelected = { newColor ->
-                     tempColor = newColor
-                     onUpdate("color", newColor)
-                 },
+                 context, cur, true,
+                 onColorSelected = { tempColor = it; onUpdate("color", it) },
                  onDismiss = {
-                     // Save ONLY when closed
-                     if (tempColor != cur) { // Save only if changed? Or always? User said "save only when closed" to avoid flood.
-                        saveRecentColor(tempColor)
-                        // Refresh Palette logic (Visually update views with NEW LIST including the new saved color)
-                         val updated = loadRecentColors()
-                         colorViews.forEachIndexed { i, v ->
-                             if (i < updated.size) {
-                                 v?.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(updated[i]))
-                                 v?.setOnClickListener { onUpdate("color", updated[i]) }
-                             }
-                         }
-                     }
+                     if (tempColor != cur) {
+                         com.example.mqttpanelcraft.data.ColorHistoryManager.save(context, tempColor)
+                          val updated = com.example.mqttpanelcraft.data.ColorHistoryManager.load(context)
+                          colorViews.forEachIndexed { i, v ->
+                              if (i < updated.size) {
+                                  try {
+                                      v?.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(updated[i]))
+                                      v?.setOnClickListener { onUpdate("color", updated[i]) }
+                                  } catch(e: Exception) {}
+                              }
+                          }
+                      }
                  }
              ).show(it)
         }
         
-
-        // Helper for Dropdown Styling (AutoSize + Gravity)
         fun setupDropdownAutoSize(tv: TextView?, gravity: Int = Gravity.CENTER) {
             if (tv == null) return
             tv.gravity = gravity
             tv.maxLines = 1
             tv.ellipsize = android.text.TextUtils.TruncateAt.END 
-            
-            androidx.core.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults(
-                tv, androidx.core.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM
-            )
-            androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
-                tv, 8, 14, 1, android.util.TypedValue.COMPLEX_UNIT_SP
-            )
+            androidx.core.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults(tv, androidx.core.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM)
+            androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(tv, 8, 14, 1, android.util.TypedValue.COMPLEX_UNIT_SP)
         }
-
-        // Apply to ApprMode (Left/Start)
         setupDropdownAutoSize(spApprMode, Gravity.START or Gravity.CENTER_VERTICAL)
-        
-        // Apply to Shape (Left/Start as requested for Title Alignment)
-        // User requested "Title Left", usually linked to Content Alignment in standard TIL
         setupDropdownAutoSize(spShape, Gravity.START or Gravity.CENTER_VERTICAL)
-
     }
-    
-    // Removed helpers (updateModeVisibility, updateIconPreview, showIconSelector) as they are unused now.
+
+    private fun findButtonIn(container: FrameLayout): Button? {
+        for (i in 0 until container.childCount) {
+             val child = container.getChildAt(i)
+             if (child is Button) return child
+        }
+        return null
+    }
 
     // 4. Runtime Behavior
     override fun attachBehavior(view: View, data: ComponentData, sendMqtt: (topic: String, payload: String) -> Unit) {
@@ -690,75 +590,62 @@ object ButtonDefinition : IComponentDefinition {
             val overlayIcon = container.findViewWithTag<ImageView>("ICON_OVERLAY")
             val mode = data.props["mode"] ?: "text"
             val density = v.resources.displayMetrics.density
-            val shift = (8 * density).toInt() // Match shadow height
+            val shift = (8 * density).toInt() 
             
-            // Base Padding Bottom (for text/icon mode) - 2dp offset
-            val topic = data.topicConfig
+            // Re-calc layout vars
+            val isTextIcon = (mode == "text_icon")
+            val h = data.height
+            val shadowHeight = (8 * density).toInt()
             
-            // Helper for Visual State
-            fun setVisualState(pressed: Boolean) {
-                // Determine base padding bottom dynamically based on mode logic above?
-                // Actually, I should recalc baseBot or use property.
-                // Re-calculating context-aware baseBot here:
-                val isTextIcon = (mode == "text_icon")
-                val h = data.height
-                val gap = if (h > 0) (h * 0.05f).toInt() else (2 * density).toInt()
-                val baseBot = if (isTextIcon) gap else (2 * density).toInt()
-                
+            // "Icon too top" -> We want center to be lower than Face Center.
+            // Face is H - shadowHeight. Face Center is (H - 8) / 2.
+            // We want to push it down. 
+            // Let's add a fixed percentage of Face Height as "Nudge".
+            val faceHeight = if (h > 0) h - shadowHeight else (40 * density).toInt()
+            val nudge = (faceHeight * 0.10f).toInt() // 10% down from face center
+            
+            // Normal State Padding
+            val normalTop = nudge
+            val normalBot = shadowHeight // PROTECT THE SHADOW
+            
+            // Pressed State Padding (Face moves down by shadowHeight)
+            val pressedTop = normalTop + shadowHeight
+            val pressedBot = 0 
+            
+             fun setVisualState(pressed: Boolean) {
                 if (pressed) {
                     v.isPressed = true
                     if (data.props["haptic"] == "true") {
                          v.performHapticFeedback(android.view.HapticFeedbackConstants.CONTEXT_CLICK)
                     }
                     v.alpha = 0.7f
-                    
                     if (mode == "icon") {
-                        overlayIcon?.translationY = shift.toFloat()
+                        overlayIcon?.translationY = (normalTop + shadowHeight).toFloat() // Shift down
                     } else {
-                         // Push DOWN: Increase Top Padding, Keep Bottom same? 
-                         // Logic from before: button.setPadding(0, gap + topPush, 0, bottomOffset) for Text+Icon
-                         // Standard Text: setPadding(0, 0, 0, bottomOffset)
-                         // To Shift Down: Add shift to Top, SUBTRACT from bottom? No, just Add Top.
-                         // But if I add Top, text moves down.
-                         // Wait, previous logic:
-                         // Text Only: setPadding(0, 0, 0, baseBot) 
-                         // Pressed: setPadding(0, shift, 0, baseBot)
-                         // Text+Icon: setPadding(0, gap + topPush, 0, gap)
-                         // Pressed: setPadding(0, gap + topPush + shift, 0, gap)
-                         
-                         val currentTop = v.paddingTop
-                         // Check if already shifted? No, set absolute.
-                         val standardTop = if (isTextIcon) (gap + (4 * density).toInt()) else 0
-                         v.setPadding(0, standardTop + shift, 0, baseBot)
+                        v.setPadding(0, pressedTop, 0, pressedBot)
                     }
                 } else {
                     v.isPressed = false
                     v.alpha = 1.0f
-                    
                     if (mode == "icon") {
-                        overlayIcon?.translationY = 0f
+                        overlayIcon?.translationY = normalTop.toFloat() // Reset
                     } else {
-                        // Reset
-                        val standardTop = if (isTextIcon) (gap + (4 * density).toInt()) else 0
-                        v.setPadding(0, standardTop, 0, baseBot)
+                        v.setPadding(0, normalTop, 0, normalBot)
                     }
                 }
                 v.invalidate()
             }
 
-            val triggerMode = data.props["triggerMode"] ?: "Standard" // Standard, Momentary, Timer
+            val triggerMode = data.props["triggerMode"] ?: "Standard"
+            val topic = data.topicConfig
             
             if (event.action == android.view.MotionEvent.ACTION_DOWN) {
                 if (triggerMode == "Timer") {
-                     // TIMER MODE
-                     // 1. Visual Down + Send Press
                      setVisualState(true)
                      if (topic.isNotEmpty()) {
                          val pPress = data.props["payloadPressed"] ?: data.props["payload"] ?: "1"
                          if (pPress.isNotEmpty()) sendMqtt(topic, pPress)
                      }
-                     
-                     // 2. Schedule UP
                      val duration = (data.props["timerDuration"] ?: "1000").toLongOrNull() ?: 1000L
                      v.handler?.postDelayed({
                          setVisualState(false)
@@ -767,9 +654,7 @@ object ButtonDefinition : IComponentDefinition {
                              if (!pRelease.isNullOrEmpty()) sendMqtt(topic, pRelease)
                          }
                      }, duration)
-                     
                 } else {
-                    // STANDARD / MOMENTARY DOWN
                     setVisualState(true)
                     if (topic.isNotEmpty()) {
                          val pPress = data.props["payloadPressed"] ?: data.props["payload"] ?: "1"
@@ -778,35 +663,20 @@ object ButtonDefinition : IComponentDefinition {
                 }
                 return@setOnTouchListener true
             } else if (event.action == android.view.MotionEvent.ACTION_UP || event.action == android.view.MotionEvent.ACTION_CANCEL) {
-                if (triggerMode == "Timer") {
-                    // Ignore UP - Timer handles it
-                } else {
-                    // STANDARD / MOMENTARY UP
+                if (triggerMode != "Timer") {
                     setVisualState(false)
                     if (topic.isNotEmpty()) {
                         val pRelease = data.props["payloadReleased"]
-                        // Only send Release payload if configured (essential for Momentary, optional for Standard?)
-                        // Usually Standard is Toggle? No, Button is Push.
-                        // Standard = Push (Press sends, Release sends if confusing name? No)
-                        // Actually, Momentary usually means "Send Press, Send Release".
-                        // Use Standard?
-                        // If payloadReleased is set, sends it.
                         if (!pRelease.isNullOrEmpty()) sendMqtt(topic, pRelease)
                     }
                 }
-                return@setOnTouchListener true
             }
-            true 
+            true
         }
     }
-
-    override fun onMqttMessage(view: View, data: ComponentData, payload: String) {}
-
-    private fun findButtonIn(container: FrameLayout): androidx.appcompat.widget.AppCompatButton? {
-        for (i in 0 until container.childCount) {
-             val child = container.getChildAt(i)
-             if (child is androidx.appcompat.widget.AppCompatButton) return child
-        }
-        return null
+    
+    override fun onMqttMessage(view: View, data: ComponentData, payload: String) {
+        // Optional: Update Button state/color if needed? 
+        // For now, no specific receive behavior defined for standard button.
     }
 }

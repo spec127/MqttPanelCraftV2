@@ -142,12 +142,18 @@
     <string name="properties_section_appearance">Appearance</string>
     <string name="properties_section_interaction">Interaction</string>
     <string name="properties_section_general">General</string>
+
+    <string name="prop_section_general">General</string>
+    <string name="prop_section_interaction">Interaction</string>
+    <string name="prop_section_appearance">Appearance</string>
     
     <string name="properties_mode_text">Text</string>
     <string name="properties_mode_icon">Icon</string>
     <string name="properties_mode_text_icon">Text + Icon</string>
     <string name="properties_label_shape">Shape</string>
-    <string name="properties_label_payload_press">Press Payload</string>
+    <string name="prop_title_switch">Switch Properties</string>
+    <string name="prop_label_name">Name</string>
+    <string name="properties_label_payload_press">Press Message</string>
     <string name="properties_label_trigger_mode">Button Mode</string>
     
     <string name="val_mode_standard">Tap</string>
@@ -164,7 +170,7 @@
     <string name="val_shape_circle">Circle</string>
     <string name="val_shape_rect">Rect</string>
     
-    <string name="properties_label_payload_release">Release Payload</string>
+    <string name="properties_label_payload_release">Release Message</string>
     <string name="properties_unit_ms">ms</string>
     
     <string name="properties_label_haptic">Haptic Feedback</string>

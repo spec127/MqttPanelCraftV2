@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:baselineAligned="false"
+    android:layout_marginBottom="8dp">
+
+    <!-- Label Input -->
+    <EditText
+        android:id="@+id/etSegLabel"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_weight="1"
+        android:background="@drawable/bg_input_filled_light"
+        android:hint="e.g. Low"
+        android:inputType="text"
+        android:textSize="13sp"
+        android:textColor="@color/prop_text_primary"
+        android:textColorHint="@color/prop_text_secondary"
+        android:gravity="center_vertical"
+        android:singleLine="true"/>
+
+    <Space
+        android:layout_width="8dp"
+        android:layout_height="wrap_content"/>
+
+    <!-- Value Input -->
+    <EditText
+        android:id="@+id/etSegValue"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_weight="1"
+        android:background="@drawable/bg_input_filled_light"
+        android:hint="Value"
+        android:inputType="text"
+        android:textSize="13sp"
+        android:textColor="@color/prop_text_primary"
+        android:textColorHint="@color/prop_text_secondary"
+        android:gravity="center"
+        android:singleLine="true"/>
+
+</LinearLayout>
