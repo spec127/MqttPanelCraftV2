@@ -59,14 +59,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvBrokerUrl" />
 
-        <ImageView
+        <!-- Menu Button (Large Touch Target) -->
+        <ImageButton
             android:id="@+id/ivMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:src="@drawable/ic_more_vert"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            app:tint="#757575"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="#757575" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Status Dot -->
         <LinearLayout

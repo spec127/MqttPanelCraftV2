@@ -23,7 +23,7 @@ class ProjectAdapter(
         val tvBrokerUrl: TextView = itemView.findViewById(R.id.tvBrokerUrl)
         val chipType: Chip = itemView.findViewById(R.id.chipType)
         val viewStatus: View = itemView.findViewById(R.id.viewStatus)
-        val ivMenu: ImageView = itemView.findViewById(R.id.ivMenu)
+        val ivMenu: View = itemView.findViewById(R.id.ivMenu)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectViewHolder {
