@@ -2,20 +2,22 @@ package com.example.mqttpanelcraft
 
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.mqttpanelcraft.data.ProjectRepository
 import com.example.mqttpanelcraft.model.Project
 import com.example.mqttpanelcraft.model.ProjectType
+import com.example.mqttpanelcraft.ui.CodeExportDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.CoroutineScope
@@ -25,16 +27,12 @@ import kotlinx.coroutines.withContext
 import org.eclipse.paho.client.mqttv3.MqttClient
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
-import android.graphics.Rect
-import android.view.MotionEvent
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 
 class SetupActivity : BaseActivity() {
 
     private var selectedType: ProjectType = ProjectType.HOME
     private var projectId: String? = null
-    
+
     // UI Elements
     private lateinit var tilName: com.google.android.material.textfield.TextInputLayout
     private lateinit var etName: TextInputEditText
@@ -50,10 +48,10 @@ class SetupActivity : BaseActivity() {
 
     // Data State
     private var originalProject: Project? = null // For Edit Mode
-    private var pendingComponents: MutableList<com.example.mqttpanelcraft.model.ComponentData>? = null
+    private var pendingComponents: MutableList<com.example.mqttpanelcraft.model.ComponentData>? =
+            null
     private var pendingCustomCode: String? = null // Store imported code
     private var pendingExportJson: String? = null // Temporary hold for export
-
 
     // Theme Cards
     private lateinit var cardHome: LinearLayout
@@ -68,15 +66,18 @@ class SetupActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setup)
         ProjectRepository.initialize(this)
-        
+
         // Apply Global Theme
         com.example.mqttpanelcraft.utils.ThemeManager.applyTheme(this)
-        
+
         setupToolbar()
         setupViews()
-        
+
         // Initialize Views for ID
-        val tilProjectId = findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.tilProjectId)
+        val tilProjectId =
+                findViewById<com.google.android.material.textfield.TextInputLayout>(
+                        R.id.tilProjectId
+                )
         val etProjectId = findViewById<TextInputEditText>(R.id.etProjectId)
 
         // Global ID Generation Logic (Refresh Button)
@@ -84,25 +85,36 @@ class SetupActivity : BaseActivity() {
             // Confirmation only needed if editing existing project to prevent breaking links
             if (projectId != null) {
                 AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.dialog_change_id_title))
-                    .setMessage(getString(R.string.dialog_change_id_msg))
-                    .setPositiveButton(getString(R.string.common_btn_gen_id)) { _, _ ->
-                         etProjectId.setText(ProjectRepository.generateId())
-                    }
-                    .setNegativeButton(getString(R.string.common_btn_cancel), null)
-                    .show()
+                        .setTitle(getString(R.string.dialog_change_id_title))
+                        .setMessage(getString(R.string.dialog_change_id_msg))
+                        .setPositiveButton(getString(R.string.common_btn_gen_id)) { _, _ ->
+                            etProjectId.setText(ProjectRepository.generateId())
+                        }
+                        .setNegativeButton(getString(R.string.common_btn_cancel), null)
+                        .show()
             } else {
                 // Create Mode: Just generate
                 etProjectId.setText(ProjectRepository.generateId())
             }
         }
-        
+
         // Copy ID
         etProjectId.setOnClickListener {
-            val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText(getString(R.string.project_id), etProjectId.text.toString())
+            val clipboard =
+                    getSystemService(android.content.Context.CLIPBOARD_SERVICE) as
+                            android.content.ClipboardManager
+            val clip =
+                    android.content.ClipData.newPlainText(
+                            getString(R.string.project_id),
+                            etProjectId.text.toString()
+                    )
             clipboard.setPrimaryClip(clip)
-            android.widget.Toast.makeText(this, getString(R.string.project_msg_id_copied), android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(
+                            this,
+                            getString(R.string.project_msg_id_copied),
+                            android.widget.Toast.LENGTH_SHORT
+                    )
+                    .show()
         }
 
         // Check for Edit Mode
@@ -110,62 +122,72 @@ class SetupActivity : BaseActivity() {
         if (projectId != null) {
             setupEditMode(projectId!!)
         } else {
-             // Create Mode: Generate initial random ID
-             etProjectId.setText(ProjectRepository.generateId())
+            // Create Mode: Generate initial random ID
+            etProjectId.setText(ProjectRepository.generateId())
         }
 
         setupWindowInsets()
     }
 
-
-
     private fun setupWindowInsets() {
-        // vFix: Apply insets to Header Layout ONLY to allow gradient background to flow behind status bar
+        // vFix: Apply insets to Header Layout ONLY to allow gradient background to flow behind
+        // status bar
         val headerLayout = findViewById<LinearLayout>(R.id.headerLayout)
-        
+
         ViewCompat.setOnApplyWindowInsetsListener(headerLayout) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             // Only add top padding to header
             view.setPadding(
-                view.paddingLeft,
-                bars.top + 48.dpToPx(), // Original 48dp + Status Bar
-                view.paddingRight,
-                view.paddingBottom
+                    view.paddingLeft,
+                    bars.top + 48.dpToPx(), // Original 48dp + Status Bar
+                    view.paddingRight,
+                    view.paddingBottom
             )
             WindowInsetsCompat.CONSUMED
         }
 
         // Apply bottom padding to ScrollView or root to avoid Nav Bar overlap
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
-             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-             view.setPadding(bars.left, 0, bars.right, bars.bottom)
-             WindowInsetsCompat.CONSUMED
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets
+            ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(bars.left, 0, bars.right, bars.bottom)
+            WindowInsetsCompat.CONSUMED
         }
 
         // vFix: Light Status Bar for SetupActivity
-        val isDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val isDark =
+                (resources.configuration.uiMode and
+                        android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+                        android.content.res.Configuration.UI_MODE_NIGHT_YES
         // Ensure Transparent Status Bar
         window.statusBarColor = android.graphics.Color.TRANSPARENT
 
         if (!isDark) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                 window.insetsController?.setSystemBarsAppearance(
-                     android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                     android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-                 )
+                window.insetsController?.setSystemBarsAppearance(
+                        android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                        android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                )
             } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                 @Suppress("DEPRECATION")
-                 window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                @Suppress("DEPRECATION")
+                window.decorView.systemUiVisibility =
+                        window.decorView.systemUiVisibility or
+                                android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             }
         } else {
-             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                 window.insetsController?.setSystemBarsAppearance(0, android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                window.insetsController?.setSystemBarsAppearance(
+                        0,
+                        android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                )
             } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                 @Suppress("DEPRECATION")
-                 window.decorView.systemUiVisibility = window.decorView.systemUiVisibility and android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+                @Suppress("DEPRECATION")
+                window.decorView.systemUiVisibility =
+                        window.decorView.systemUiVisibility and
+                                android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
             }
         }
-        
+
         com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
         com.example.mqttpanelcraft.utils.AdManager.loadInterstitial(this)
     }
@@ -180,7 +202,8 @@ class SetupActivity : BaseActivity() {
 
         // Show Export & Arduino Code
         btnExport.visibility = android.view.View.VISIBLE
-        findViewById<android.view.View>(R.id.btnExportArduino).visibility = android.view.View.VISIBLE
+        findViewById<android.view.View>(R.id.btnExportArduino).visibility =
+                android.view.View.VISIBLE
 
         etName.setText(project.name)
         etBroker.setText(project.broker)
@@ -195,20 +218,19 @@ class SetupActivity : BaseActivity() {
         // etName is already set above
         // etBroker is already set above
         selectType(project.type)
-        
+
         // Load Orientation
         setOrientationUI(project.orientation)
-        
+
         btnSave.text = getString(R.string.setup_btn_update_start)
-        findViewById<MaterialButton>(R.id.btnSaveProject).text = getString(R.string.setup_btn_update_only)
+        findViewById<MaterialButton>(R.id.btnSaveProject).text =
+                getString(R.string.setup_btn_update_only)
         findViewById<TextView>(R.id.tvPageTitle).text = getString(R.string.setup_title_edit)
     }
 
     private fun setupToolbar() {
         val btnBack = findViewById<android.view.View>(R.id.btnBack)
-        btnBack.setOnClickListener { 
-            finish() 
-        }
+        btnBack.setOnClickListener { finish() }
 
         val tvTitle = findViewById<TextView>(R.id.tvPageTitle)
         if (projectId != null) {
@@ -217,45 +239,68 @@ class SetupActivity : BaseActivity() {
             tvTitle.text = getString(R.string.setup_title_new)
         }
     }
-    
+
     // Removed onSupportNavigateUp as we use direct finish() now
     // override fun onSupportNavigateUp(): Boolean ...
 
-    private val saveJsonLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json")) { uri ->
-        if (uri != null && pendingExportJson != null) {
-            try {
-                contentResolver.openOutputStream(uri)?.use { outputStream ->
-                    outputStream.write(pendingExportJson!!.toByteArray())
+    private val saveJsonLauncher =
+            registerForActivityResult(
+                    androidx.activity.result.contract.ActivityResultContracts.CreateDocument(
+                            "application/json"
+                    )
+            ) { uri ->
+                if (uri != null && pendingExportJson != null) {
+                    try {
+                        contentResolver.openOutputStream(uri)?.use { outputStream ->
+                            outputStream.write(pendingExportJson!!.toByteArray())
+                        }
+                        android.widget.Toast.makeText(
+                                        this,
+                                        getString(R.string.project_msg_file_saved),
+                                        android.widget.Toast.LENGTH_SHORT
+                                )
+                                .show()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        android.widget.Toast.makeText(
+                                        this,
+                                        getString(R.string.project_msg_file_save_failed, e.message),
+                                        android.widget.Toast.LENGTH_SHORT
+                                )
+                                .show()
+                    }
                 }
-                android.widget.Toast.makeText(this, getString(R.string.project_msg_file_saved), android.widget.Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                android.widget.Toast.makeText(this, getString(R.string.project_msg_file_save_failed, e.message), android.widget.Toast.LENGTH_SHORT).show()
             }
-        }
-    }
 
-    private val openJsonLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) {
-            try {
-                contentResolver.openInputStream(uri)?.use { inputStream ->
-                    val json = inputStream.bufferedReader().use { it.readText() }
-                    processImportedJson(json)
+    private val openJsonLauncher =
+            registerForActivityResult(
+                    androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+            ) { uri ->
+                if (uri != null) {
+                    try {
+                        contentResolver.openInputStream(uri)?.use { inputStream ->
+                            val json = inputStream.bufferedReader().use { it.readText() }
+                            processImportedJson(json)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        android.widget.Toast.makeText(
+                                        this,
+                                        getString(R.string.project_msg_file_read_failed, e.message),
+                                        android.widget.Toast.LENGTH_SHORT
+                                )
+                                .show()
+                    }
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                android.widget.Toast.makeText(this, getString(R.string.project_msg_file_read_failed, e.message), android.widget.Toast.LENGTH_SHORT).show()
             }
-        }
-    }
 
     private fun setupViews() {
         tilName = findViewById(R.id.tilProjectName)
         etName = findViewById(R.id.etProjectName)
-        
+
         tilBroker = findViewById(R.id.tilBroker)
         etBroker = findViewById(R.id.etBroker)
-        
+
         etPort = findViewById(R.id.etPort)
         etUser = findViewById(R.id.etUser)
         etPassword = findViewById(R.id.etPassword)
@@ -269,63 +314,82 @@ class SetupActivity : BaseActivity() {
         setOrientationUI("SENSOR")
 
         btnImport.setOnClickListener { showImportDialog() }
-        
-        btnExport.setOnClickListener { 
-             if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
-                 showExportDialog()
-             } else {
-                 com.example.mqttpanelcraft.utils.AdManager.showInterstitial(this) {
-                     showExportDialog()
-                 }
-             }
+
+        btnExport.setOnClickListener {
+            if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
+                showExportDialog()
+            } else {
+                com.example.mqttpanelcraft.utils.AdManager.showInterstitial(this) {
+                    showExportDialog()
+                }
+            }
         }
-        
+
         findViewById<android.view.View>(R.id.btnExportArduino).setOnClickListener {
             // Generate temporary project object for valid state
-            val tempProject = originalProject ?: run {
-                 val name = etName.text.toString().ifBlank { "Untitled" }
-                 val broker = etBroker.text.toString().ifBlank { "broker" }
-                 
-                 Project(
-                    id = projectId ?: "temp_id",
-                    name = name,
-                    broker = broker,
-                    port = etPort.text.toString().toIntOrNull() ?: 1883,
-                    username = etUser.text.toString(),
-                    password = etPassword.text.toString(),
-                    type = selectedType,
-                    components = pendingComponents ?: mutableListOf(),
-                    customCode = pendingCustomCode ?: ""
-                 )
-            }
-            
-            if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
-                 com.example.mqttpanelcraft.ui.ArduinoExportManager.showExportDialog(this, tempProject)
-            } else {
-                 // Check if Ad is Ready
-                 if (com.example.mqttpanelcraft.utils.AdManager.isRewardedReady()) {
-                     var isRewardEarned = false
-                     com.example.mqttpanelcraft.utils.AdManager.showRewarded(this,
-                        onReward = {
-                            isRewardEarned = true
-                        },
-                        onClosed = {
-                            if (isRewardEarned) {
-                                com.example.mqttpanelcraft.ui.ArduinoExportManager.showExportDialog(this, tempProject)
-                            } else {
-                                android.widget.Toast.makeText(this, getString(R.string.msg_limit_reached).replace("Project Limit Reached", "必須完整觀看廣告才能匯出"), android.widget.Toast.LENGTH_LONG).show() // Or custom string
+            val tempProject =
+                    originalProject
+                            ?: run {
+                                val name = etName.text.toString().ifBlank { "Untitled" }
+                                val broker = etBroker.text.toString().ifBlank { "broker" }
+
+                                Project(
+                                        id = projectId ?: "temp_id",
+                                        name = name,
+                                        broker = broker,
+                                        port = etPort.text.toString().toIntOrNull() ?: 1883,
+                                        username = etUser.text.toString(),
+                                        password = etPassword.text.toString(),
+                                        type = selectedType,
+                                        components = pendingComponents ?: mutableListOf(),
+                                        customCode = pendingCustomCode ?: ""
+                                )
                             }
-                        }
-                     )
-                 } else {
-                     android.widget.Toast.makeText(this, "廣告載入中...請稍後再試", android.widget.Toast.LENGTH_SHORT).show()
-                     com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
-                 }
+
+            if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
+                com.example.mqttpanelcraft.ui.ArduinoExportManager.showExportDialog(
+                        this,
+                        tempProject
+                )
+            } else {
+                // Check if Ad is Ready
+                if (com.example.mqttpanelcraft.utils.AdManager.isRewardedReady()) {
+                    var isRewardEarned = false
+                    com.example.mqttpanelcraft.utils.AdManager.showRewarded(
+                            this,
+                            onReward = { isRewardEarned = true },
+                            onClosed = {
+                                if (isRewardEarned) {
+                                    com.example.mqttpanelcraft.ui.ArduinoExportManager
+                                            .showExportDialog(this, tempProject)
+                                } else {
+                                    android.widget.Toast.makeText(
+                                                    this,
+                                                    getString(R.string.msg_limit_reached)
+                                                            .replace(
+                                                                    "Project Limit Reached",
+                                                                    "必須完整觀看廣告才能匯出"
+                                                            ),
+                                                    android.widget.Toast.LENGTH_LONG
+                                            )
+                                            .show() // Or custom string
+                                }
+                            }
+                    )
+                } else {
+                    android.widget.Toast.makeText(
+                                    this,
+                                    "廣告載入中...請稍後再試",
+                                    android.widget.Toast.LENGTH_SHORT
+                            )
+                            .show()
+                    com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
+                }
             }
         }
-        
+
         // shadowed var removals
-        
+
         cardHome = findViewById(R.id.cardHome)
         ivHome = findViewById(R.id.ivHome)
         tvHome = findViewById(R.id.tvHome)
@@ -339,14 +403,10 @@ class SetupActivity : BaseActivity() {
         cardWebview.setOnClickListener { selectType(ProjectType.WEBVIEW) }
 
         // Test Connection (Mock)
-        btnTest.setOnClickListener {
-           testConnection()
-        }
+        btnTest.setOnClickListener { testConnection() }
 
         // Save
-        btnSave.setOnClickListener {
-            saveProject()
-        }
+        btnSave.setOnClickListener { saveProject() }
 
         // Real-time Validation on Focus Loss
         etName.setOnFocusChangeListener { _, hasFocus ->
@@ -367,10 +427,10 @@ class SetupActivity : BaseActivity() {
                 }
             }
         }
-        
+
         etBroker.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
-                 if (etBroker.text.toString().isBlank()) {
+                if (etBroker.text.toString().isBlank()) {
                     tilBroker.error = getString(R.string.setup_error_broker_required)
                     tilBroker.isErrorEnabled = true
                 } else {
@@ -380,51 +440,30 @@ class SetupActivity : BaseActivity() {
             }
         }
     }
-    
+
     // ... (Lines 296-528 Omitted for brevity, assume unchanged logic between) ...
 
-    /** 
-     * Need to target saveProject construction of Project object. 
-     * Since REPLACE tool requires contiguous block, I will replace the Project construction part specifically.
-     * Wait, I need a larger chunk or targeted replacement. 
-     * Let's look at line 529 area.
+    /**
+     * Need to target saveProject construction of Project object. Since REPLACE tool requires
+     * contiguous block, I will replace the Project construction part specifically. Wait, I need a
+     * larger chunk or targeted replacement. Let's look at line 529 area.
      */
-     
-
-    
     private fun showImportDialog() {
-        val context = this
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(getString(R.string.dialog_import_title))
-
-        val input = android.widget.EditText(context)
-        input.hint = getString(R.string.hint_paste_json)
-        input.isSingleLine = false
-        input.minLines = 10
-        input.gravity = android.view.Gravity.TOP or android.view.Gravity.START
-        input.setPadding(40, 40, 40, 40)
-        input.textSize = 12f
-
-        builder.setView(input)
-
-        builder.setPositiveButton(getString(R.string.common_btn_load_text)) { _, _ ->
-            val json = input.text.toString()
-            if (json.isNotBlank()) {
-                processImportedJson(json)
-            }
-        }
-
-        builder.setNeutralButton(getString(R.string.common_btn_load_file)) { _, _ ->
-             // MIME types: json, text, or any
-             openJsonLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
-        }
-
-        builder.setNegativeButton(getString(R.string.common_btn_cancel), null)
-
-        val dialog = builder.create()
-        // Fix: Set input mode on the dialog's window, not via view
-        dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        dialog.show()
+        val dialog =
+                CodeExportDialogFragment.newInstance(
+                        code = "",
+                        mode = CodeExportDialogFragment.Mode.IMPORT_JSON,
+                        onImport = { result: String ->
+                            if (result == "action:OPEN_FILE") {
+                                openJsonLauncher.launch(
+                                        arrayOf("application/json", "text/plain", "*/*")
+                                )
+                            } else {
+                                processImportedJson(result)
+                            }
+                        }
+                )
+        dialog.show(supportFragmentManager, "ImportJson")
     }
 
     private fun processImportedJson(json: String) {
@@ -434,7 +473,7 @@ class SetupActivity : BaseActivity() {
             var newName = imported.name + "_copy"
             // Simple check to avoid loop, though repository check later handles strict uniqueness
             if (ProjectRepository.isProjectNameTaken(newName)) {
-                 newName += "_" + System.currentTimeMillis() % 1000
+                newName += "_" + System.currentTimeMillis() % 1000
             }
             etName.setText(newName)
 
@@ -449,52 +488,35 @@ class SetupActivity : BaseActivity() {
 
             // vFix: Sanitize Imported IDs to prevent collisions and crashes
             // Resetting to NO_ID causes restoreProjectState to generate fresh unique IDs.
-            pendingComponents?.forEach {
-                it.id = android.view.View.NO_ID
-            }
+            pendingComponents?.forEach { it.id = android.view.View.NO_ID }
 
             pendingCustomCode = imported.customCode
 
-            android.widget.Toast.makeText(this, getString(R.string.project_msg_components_loaded, imported.components.size), android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(
+                            this,
+                            getString(
+                                    R.string.project_msg_components_loaded,
+                                    imported.components.size
+                            ),
+                            android.widget.Toast.LENGTH_SHORT
+                    )
+                    .show()
         } else {
-             android.widget.Toast.makeText(this, "Invalid JSON", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(this, "Invalid JSON", android.widget.Toast.LENGTH_SHORT)
+                    .show()
         }
     }
 
     private fun showExportDialog() {
         if (originalProject == null) return
-
         val json = ProjectRepository.exportProjectToJson(originalProject!!)
-        val context = this
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(getString(R.string.dialog_export_title))
 
-        val input = android.widget.EditText(context)
-        input.setText(json)
-        input.isSingleLine = false
-        input.minLines = 10
-        input.maxLines = 15
-        input.isFocusable = false // Read only-ish
-        input.setPadding(40, 40, 40, 40)
-        input.textSize = 10f
-        input.typeface = android.graphics.Typeface.MONOSPACE
-
-        builder.setView(input)
-
-        builder.setPositiveButton(getString(R.string.common_btn_copy)) { _, _ ->
-             val clipboard = getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-             val clip = android.content.ClipData.newPlainText("Config JSON", json)
-             clipboard.setPrimaryClip(clip)
-              android.widget.Toast.makeText(context, getString(R.string.common_msg_copied_clipboard), android.widget.Toast.LENGTH_SHORT).show()
-        }
-
-        builder.setNeutralButton(getString(R.string.common_btn_save)) { _, _ ->
-             pendingExportJson = json
-             saveJsonLauncher.launch("${originalProject?.name ?: "config"}.json")
-        }
-
-        builder.setNegativeButton(getString(R.string.common_btn_close), null)
-        builder.show()
+        val dialog =
+                CodeExportDialogFragment.newInstance(
+                        code = json,
+                        mode = CodeExportDialogFragment.Mode.EXPORT_JSON
+                )
+        dialog.show(supportFragmentManager, "ExportJson")
     }
 
     private fun testConnection() {
@@ -540,7 +562,9 @@ class SetupActivity : BaseActivity() {
                     btnTest.strokeColor = ColorStateList.valueOf(Color.GREEN)
 
                     if (client.isConnected) {
-                        try { client.disconnect() } catch (e: Exception) {}
+                        try {
+                            client.disconnect()
+                        } catch (e: Exception) {}
                     }
                 }
             } catch (e: Exception) {
@@ -552,16 +576,15 @@ class SetupActivity : BaseActivity() {
                         btnTest.strokeColor = ColorStateList.valueOf(Color.RED)
 
                         AlertDialog.Builder(this@SetupActivity)
-                            .setTitle("Connection Failed")
-                            .setMessage(e.message ?: "Unknown Error")
-                            .setPositiveButton("OK", null)
-                            .show()
+                                .setTitle("Connection Failed")
+                                .setMessage(e.message ?: "Unknown Error")
+                                .setPositiveButton("OK", null)
+                                .show()
                     }
                 }
             }
         }
     }
-
 
     private fun saveProject() {
         val name = etName.text.toString()
@@ -589,7 +612,7 @@ class SetupActivity : BaseActivity() {
             tilName.isErrorEnabled = true
             return
         }
-        
+
         tilName.isErrorEnabled = false
 
         if (broker.isBlank()) {
@@ -597,7 +620,7 @@ class SetupActivity : BaseActivity() {
             tilBroker.isErrorEnabled = true
             return
         }
-        
+
         tilBroker.isErrorEnabled = false
 
         val port = portStr.toIntOrNull() ?: 1883
@@ -607,143 +630,156 @@ class SetupActivity : BaseActivity() {
 
         // Check if ID was changed in UI (Only in Edit Mode)
         if (projectId != null) {
-             val etProjectId = findViewById<TextInputEditText>(R.id.etProjectId)
-             val currentUiId = etProjectId.text.toString()
-             if (currentUiId.isNotEmpty() && currentUiId != projectId) {
-                 finalId = currentUiId
-             }
+            val etProjectId = findViewById<TextInputEditText>(R.id.etProjectId)
+            val currentUiId = etProjectId.text.toString()
+            if (currentUiId.isNotEmpty() && currentUiId != projectId) {
+                finalId = currentUiId
+            }
         }
-        
+
         // ...
 
         // Determine Components & Custom Code
-        val finalComponents = pendingComponents
-            ?: originalProject?.components?.toMutableList() // Copy to avoid mutation issues
-            ?: mutableListOf()
+        val finalComponents =
+                pendingComponents
+                        ?: originalProject?.components
+                                ?.toMutableList() // Copy to avoid mutation issues
+                         ?: mutableListOf()
 
-        val finalCustomCode = pendingCustomCode
-            ?: originalProject?.customCode
-            ?: ""
-            
+        val finalCustomCode = pendingCustomCode ?: originalProject?.customCode ?: ""
+
         val finalOrientation = getSelectedOrientation()
 
         // Update Component Topics if ID changed
         // Smart Topic Sync 3.0: Split & Match ID
         if (originalProject != null) {
-             val oldId = originalProject?.id ?: ""
-             if (oldId.isNotEmpty()) {
-                 val newSafeName = name.lowercase().replace("/", "_").replace(" ", "_").replace("+", "")
-                 val newSafeId = finalId
-                 var updatedCount = 0
-                 
-                 finalComponents.forEach { component ->
-                     val parts = component.topicConfig.split("/")
-                     // Expecting format: Name/ID/Item...
-                     if (parts.size >= 3) {
-                         // Check if middle part is the Old ID (Case Insensitive)
-                         if (parts[1].equals(oldId, ignoreCase = true)) {
-                             val suffix = parts.drop(2).joinToString("/")
-                             component.topicConfig = "$newSafeName/$newSafeId/$suffix"
-                             updatedCount++
-                         }
-                     }
-                 }
-                 if (updatedCount > 0) {
-                     android.widget.Toast.makeText(this, "Updated $updatedCount component topics", android.widget.Toast.LENGTH_SHORT).show()
-                 }
-             }
+            val oldId = originalProject?.id ?: ""
+            if (oldId.isNotEmpty()) {
+                val newSafeName =
+                        name.lowercase().replace("/", "_").replace(" ", "_").replace("+", "")
+                val newSafeId = finalId
+                var updatedCount = 0
+
+                finalComponents.forEach { component ->
+                    val parts = component.topicConfig.split("/")
+                    // Expecting format: Name/ID/Item...
+                    if (parts.size >= 3) {
+                        // Check if middle part is the Old ID (Case Insensitive)
+                        if (parts[1].equals(oldId, ignoreCase = true)) {
+                            val suffix = parts.drop(2).joinToString("/")
+                            component.topicConfig = "$newSafeName/$newSafeId/$suffix"
+                            updatedCount++
+                        }
+                    }
+                }
+                if (updatedCount > 0) {
+                    android.widget.Toast.makeText(
+                                    this,
+                                    "Updated $updatedCount component topics",
+                                    android.widget.Toast.LENGTH_SHORT
+                            )
+                            .show()
+                }
+            }
         }
 
-
-
-        val newProject = Project(
-            id = finalId,
-            name = name,
-            broker = broker,
-            port = port,
-            username = user,
-            password = pass,
-            type = selectedType,
-            isConnected = false,
-            components = finalComponents,
-            customCode = finalCustomCode,
-            orientation = finalOrientation
-        )
+        val newProject =
+                Project(
+                        id = finalId,
+                        name = name,
+                        broker = broker,
+                        port = port,
+                        username = user,
+                        password = pass,
+                        type = selectedType,
+                        isConnected = false,
+                        components = finalComponents,
+                        customCode = finalCustomCode,
+                        orientation = finalOrientation
+                )
 
         // Unified Flow: Always Show Rewarded (unless disabled)
         val targetProjectId = newProject.id
         var isRewardEarned = false
 
         if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
-             // Skip Ads
-             saveAndFinish(newProject, targetProjectId)
-             return
+            // Skip Ads
+            saveAndFinish(newProject, targetProjectId)
+            return
         }
 
         // New Feature: First Project is Free (No Ad)
         // If creating new project (projectId == null) AND repository is empty
         if (projectId == null && ProjectRepository.getAllProjects().isEmpty()) {
-             // First Project Bonus: Ad Skipped silently
-             saveAndFinish(newProject, targetProjectId)
-             return
+            // First Project Bonus: Ad Skipped silently
+            saveAndFinish(newProject, targetProjectId)
+            return
         }
 
         if (com.example.mqttpanelcraft.utils.AdManager.isRewardedReady()) {
-            com.example.mqttpanelcraft.utils.AdManager.showRewarded(this,
-                onReward = {
-                    isRewardEarned = true
-                },
-                onClosed = {
-                    if (isRewardEarned) {
-                        saveAndFinish(newProject, targetProjectId)
-                    } else {
-                        android.widget.Toast.makeText(this, "You must watch the full ad to save/update!", android.widget.Toast.LENGTH_LONG).show()
+            com.example.mqttpanelcraft.utils.AdManager.showRewarded(
+                    this,
+                    onReward = { isRewardEarned = true },
+                    onClosed = {
+                        if (isRewardEarned) {
+                            saveAndFinish(newProject, targetProjectId)
+                        } else {
+                            android.widget.Toast.makeText(
+                                            this,
+                                            "You must watch the full ad to save/update!",
+                                            android.widget.Toast.LENGTH_LONG
+                                    )
+                                    .show()
+                        }
                     }
-                }
             )
         } else {
-             // Fallback: Show Placeholder UI (Non-Ad) and Proceed
-             // User Request: If ad fails, show internal placeholder instead of just waiting
-             val dialogView = layoutInflater.inflate(R.layout.layout_ad_placeholder_banner, null)
-             val dialogBuilder = androidx.appcompat.app.AlertDialog.Builder(this)
-                 .setTitle("Saving Project")
-                 .setView(dialogView)
-                 .setCancelable(false)
-                 .setNegativeButton("Cancel", null) // Just dismiss -> No Save
-                 .setPositiveButton("Continue (30)") { _, _ ->
-                      saveAndFinish(newProject, targetProjectId)
-                 }
+            // Fallback: Show Placeholder UI (Non-Ad) and Proceed
+            // User Request: If ad fails, show internal placeholder instead of just waiting
+            val dialogView = layoutInflater.inflate(R.layout.layout_ad_placeholder_banner, null)
+            val dialogBuilder =
+                    androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle("Saving Project")
+                            .setView(dialogView)
+                            .setCancelable(false)
+                            .setNegativeButton("Cancel", null) // Just dismiss -> No Save
+                            .setPositiveButton("Continue (30)") { _, _ ->
+                                saveAndFinish(newProject, targetProjectId)
+                            }
 
-             val dialog = dialogBuilder.create()
-             dialog.show()
-             
-             // Setup Countdown
-             val btnContinue = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
-             btnContinue.isEnabled = false
-             btnContinue.setTextColor(Color.GRAY)
-             
-             object : android.os.CountDownTimer(30000, 1000) {
-                 override fun onTick(millisUntilFinished: Long) {
-                     if (dialog.isShowing) {
-                        btnContinue.text = "Continue (${millisUntilFinished / 1000})"
-                     } else {
-                        cancel()
-                     }
-                 }
-                 override fun onFinish() {
-                     if (dialog.isShowing) {
-                        btnContinue.text = "Continue"
-                        btnContinue.isEnabled = true
-                        btnContinue.setTextColor(ContextCompat.getColor(this@SetupActivity, R.color.primary))
-                     }
-                 }
-             }.start()
-             
-             // Background Re-load for next time
-             com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
+            val dialog = dialogBuilder.create()
+            dialog.show()
+
+            // Setup Countdown
+            val btnContinue = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+            btnContinue.isEnabled = false
+            btnContinue.setTextColor(Color.GRAY)
+
+            object : android.os.CountDownTimer(30000, 1000) {
+                        override fun onTick(millisUntilFinished: Long) {
+                            if (dialog.isShowing) {
+                                btnContinue.text = "Continue (${millisUntilFinished / 1000})"
+                            } else {
+                                cancel()
+                            }
+                        }
+                        override fun onFinish() {
+                            if (dialog.isShowing) {
+                                btnContinue.text = "Continue"
+                                btnContinue.isEnabled = true
+                                btnContinue.setTextColor(
+                                        ContextCompat.getColor(this@SetupActivity, R.color.primary)
+                                )
+                            }
+                        }
+                    }
+                    .start()
+
+            // Background Re-load for next time
+            com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
         }
     }
-    
+
     // Helper to get Orientation String
     private fun getSelectedOrientation(): String {
         val rg = findViewById<android.widget.RadioGroup>(R.id.rgOrientation)
@@ -753,7 +789,7 @@ class SetupActivity : BaseActivity() {
             else -> "SENSOR"
         }
     }
-    
+
     // Helper to set UI
     private fun setOrientationUI(value: String) {
         val rg = findViewById<android.widget.RadioGroup>(R.id.rgOrientation)
@@ -772,7 +808,7 @@ class SetupActivity : BaseActivity() {
                 ProjectRepository.deleteProject(projectId!!)
                 ProjectRepository.addProject(newProject)
 
-                 // Return result to Caller
+                // Return result to Caller
                 val resultIntent = android.content.Intent()
                 resultIntent.putExtra("NEW_ID", newProject.id)
                 setResult(RESULT_OK, resultIntent)
@@ -785,30 +821,34 @@ class SetupActivity : BaseActivity() {
             setResult(RESULT_OK)
         }
 
-        // If we want to open project immediately (optional, but standard flow usually returns to dashboard)
+        // If we want to open project immediately (optional, but standard flow usually returns to
+        // dashboard)
         // XML has "Save and Start" implies opening.
         if (returnToHome) {
-             finish()
+            finish()
         } else {
-             // If we are editing (projectId != null), just finish and let the caller handle reload.
-             // If we are creating (projectId == null), open the new project.
-             if (projectId != null) {
-                 finish()
-             } else {
-                 val targetActivity = if (newProject.type == ProjectType.WEBVIEW) {
-                     WebViewActivity::class.java
-                 } else {
-                     ProjectViewActivity::class.java
-                 }
-                 val intent = android.content.Intent(this, targetActivity)
-                 intent.putExtra("PROJECT_ID", targetProjectId)
-                 
-                 // Fix: Clear Top to prevent duplicate ProjectViewActivity in stack
-                 intent.flags = android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
-                 
-                 startActivity(intent)
-                 finish()
-             }
+            // If we are editing (projectId != null), just finish and let the caller handle reload.
+            // If we are creating (projectId == null), open the new project.
+            if (projectId != null) {
+                finish()
+            } else {
+                val targetActivity =
+                        if (newProject.type == ProjectType.WEBVIEW) {
+                            WebViewActivity::class.java
+                        } else {
+                            ProjectViewActivity::class.java
+                        }
+                val intent = android.content.Intent(this, targetActivity)
+                intent.putExtra("PROJECT_ID", targetProjectId)
+
+                // Fix: Clear Top to prevent duplicate ProjectViewActivity in stack
+                intent.flags =
+                        android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+
+                startActivity(intent)
+                finish()
+            }
         }
     }
 
@@ -825,7 +865,8 @@ class SetupActivity : BaseActivity() {
             cardWebview.setBackgroundResource(R.drawable.bg_card_unselected)
             ivWebview.setColorFilter(Color.parseColor("#94A3B8"))
             tvWebview.setTextColor(Color.parseColor("#94A3B8"))
-            findViewById<TextView>(R.id.tvThemeDescription).text = getString(R.string.setup_desc_panel)
+            findViewById<TextView>(R.id.tvThemeDescription).text =
+                    getString(R.string.setup_desc_panel)
         } else {
             cardHome.setBackgroundResource(R.drawable.bg_card_unselected)
             ivHome.setColorFilter(Color.parseColor("#94A3B8"))
@@ -834,7 +875,8 @@ class SetupActivity : BaseActivity() {
             cardWebview.setBackgroundResource(R.drawable.bg_card_selected)
             ivWebview.setColorFilter(getColor(R.color.setup_accent_color)) // Purple
             tvWebview.setTextColor(getColor(R.color.setup_accent_color)) // Purple
-            findViewById<TextView>(R.id.tvThemeDescription).text = getString(R.string.setup_desc_webview)
+            findViewById<TextView>(R.id.tvThemeDescription).text =
+                    getString(R.string.setup_desc_webview)
         }
     }
 
@@ -854,4 +896,3 @@ class SetupActivity : BaseActivity() {
         return super.dispatchTouchEvent(ev)
     }
 }
-

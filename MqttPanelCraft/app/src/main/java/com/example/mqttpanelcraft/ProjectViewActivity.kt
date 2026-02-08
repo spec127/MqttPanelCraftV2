@@ -1,22 +1,18 @@
 package com.example.mqttpanelcraft
 
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
-import com.example.mqttpanelcraft.model.ComponentData
-import com.example.mqttpanelcraft.model.ProjectType
 import com.example.mqttpanelcraft.ui.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import androidx.appcompat.app.AlertDialog
-import android.graphics.Rect
-import android.view.MotionEvent
-import android.view.inputmethod.InputMethodManager
 import java.util.Locale
 
 class ProjectViewActivity : BaseActivity() {
@@ -36,13 +32,13 @@ class ProjectViewActivity : BaseActivity() {
     private lateinit var renderer: ComponentRenderer
     private lateinit var interactionManager: CanvasInteractionManager
     private lateinit var behaviorManager: ComponentBehaviorManager
-    
+
     // Others
     private lateinit var sidebarManager: SidebarManager
     private lateinit var propertiesManager: PropertiesSheetManager
     private lateinit var logConsoleManager: LogConsoleManager
     private lateinit var idleAdController: com.example.mqttpanelcraft.ui.IdleAdController
-    
+
     private var selectedComponentId: Int? = null
     private var isEditMode = false
     private var lastResizeUpdate = 0L
@@ -55,7 +51,7 @@ class ProjectViewActivity : BaseActivity() {
         try {
             // Globals Init
             com.example.mqttpanelcraft.data.ProjectRepository.initialize(applicationContext)
-            
+
             setContentView(R.layout.activity_project_view)
             viewModel = ViewModelProvider(this)[ProjectViewModel::class.java]
 
@@ -68,31 +64,38 @@ class ProjectViewActivity : BaseActivity() {
             dropDeleteZone.visibility = View.GONE
             guideOverlay.isClickable = false
 
+            // Allow resize handles to bleed out
+            editorCanvas.clipChildren = false
+            editorCanvas.clipToPadding = false
+
             // --- Initialize Managers ---
-            initializeHelpers() 
+            initializeHelpers()
             initializeArchitecture()
 
             // Initialize UI Manager
-            projectUIManager = com.example.mqttpanelcraft.ui.ProjectUIManager(
-                this, 
-                window.decorView.findViewById(android.R.id.content),
-                viewModel,
-                interactionManager,
-                sidebarManager,
-                propertiesManager,
-                renderer
-            )
-            
+            projectUIManager =
+                    com.example.mqttpanelcraft.ui.ProjectUIManager(
+                            this,
+                            window.decorView.findViewById(android.R.id.content),
+                            viewModel,
+                            interactionManager,
+                            sidebarManager,
+                            propertiesManager,
+                            renderer
+                    )
+
             // Wire UI Manager Callbacks
             projectUIManager.onModeToggleCallback = {
-                 isEditMode = !isEditMode
-                 idleAdController.onUserInteraction() // Keep Ad Alive
-                 
-                 selectedComponentId = null
-                 projectUIManager.updateModeUI(isEditMode, selectedComponentId)
-                 
-                 viewModel.components.value?.let { renderer.render(it, isEditMode, selectedComponentId) }
-                 if (!isEditMode) viewModel.saveProject()
+                isEditMode = !isEditMode
+                idleAdController.onUserInteraction() // Keep Ad Alive
+
+                selectedComponentId = null
+                projectUIManager.updateModeUI(isEditMode, selectedComponentId)
+
+                viewModel.components.value?.let {
+                    renderer.render(it, isEditMode, selectedComponentId)
+                }
+                if (!isEditMode) viewModel.saveProject()
             }
 
             // Subscribers
@@ -106,48 +109,58 @@ class ProjectViewActivity : BaseActivity() {
             } else {
                 finish()
             }
-            
+
             // UI Setup
             projectUIManager.setupToolbar()
             projectUIManager.updateSystemBars()
-            
+
             // Check Prefs
             val prefs = getSharedPreferences("ProjectPrefs", MODE_PRIVATE)
             val gridVisible = prefs.getBoolean("GRID_VISIBLE", true)
             val guidesVisible = prefs.getBoolean("GUIDES_VISIBLE", true)
             viewModel.setGridVisibility(gridVisible)
             viewModel.setGuidesVisibility(guidesVisible)
-            
-            projectUIManager.updateModeUI(isEditMode, selectedComponentId) // Initial State
-            
-            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+            projectUIManager.updateModeUI(isEditMode, selectedComponentId) // Initial State
+
+            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, getString(R.string.project_msg_init_error, e.message), Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                            this,
+                            getString(R.string.project_msg_init_error, e.message),
+                            Toast.LENGTH_LONG
+                    )
+                    .show()
         }
     }
-    
+
     // Result Launcher for Settings (Handle ID Renaming)
-    private val setupLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == android.app.Activity.RESULT_OK) {
-            val newId = result.data?.getStringExtra("NEW_ID")
-            if (newId != null) {
-                // Update Intent for onResume reload logic
-                intent.putExtra("PROJECT_ID", newId)
-                viewModel.loadProject(newId) // Reload Immediately
-                
-                // Also update local selectedComponentId if strictly needed, but VM reload handles most.
-                Toast.makeText(this, "Project ID Updated", Toast.LENGTH_SHORT).show()
-            } else {
-                // Just content update, verify if we need to reload?
-                // onResume usually acts, but explicit reload is safer if onResume is optimized out or verified incorrectly.
-                // But let's rely on onResume for simple updates, or just force reload here.
-                val currentId = intent.getStringExtra("PROJECT_ID")
-                if (currentId != null) viewModel.loadProject(currentId)
+    private val setupLauncher =
+            registerForActivityResult(
+                    androidx.activity.result.contract.ActivityResultContracts
+                            .StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == android.app.Activity.RESULT_OK) {
+                    val newId = result.data?.getStringExtra("NEW_ID")
+                    if (newId != null) {
+                        // Update Intent for onResume reload logic
+                        intent.putExtra("PROJECT_ID", newId)
+                        viewModel.loadProject(newId) // Reload Immediately
+
+                        // Also update local selectedComponentId if strictly needed, but VM reload
+                        // handles most.
+                        Toast.makeText(this, "Project ID Updated", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Just content update, verify if we need to reload?
+                        // onResume usually acts, but explicit reload is safer if onResume is
+                        // optimized out or verified incorrectly.
+                        // But let's rely on onResume for simple updates, or just force reload here.
+                        val currentId = intent.getStringExtra("PROJECT_ID")
+                        if (currentId != null) viewModel.loadProject(currentId)
+                    }
+                }
             }
-        }
-    }
 
     fun launchSettings() {
         val pid = viewModel.project.value?.id ?: return
@@ -155,16 +168,16 @@ class ProjectViewActivity : BaseActivity() {
         intent.putExtra("PROJECT_ID", pid)
         setupLauncher.launch(intent)
     }
-    
+
     // Internal Accessor for Manager
     fun getSelectedComponentId(): Int? = selectedComponentId
-    
+
     // ... initializeArchitecture ... (Keep as is)
     // ... subscribeToViewModel ... (Keep as is, but remove View updates replaced by Manager if any)
-    
-    // Removed: setupToolbar(), updateModeUI(), updateSheetState(), updateCanvasOcclusion(), updateBottomInset()
-    // These are now handled by ProjectUIManager. logic.
 
+    // Removed: setupToolbar(), updateModeUI(), updateSheetState(), updateCanvasOcclusion(),
+    // updateBottomInset()
+    // These are now handled by ProjectUIManager. logic.
 
     // ... (Skipping sections) ...
 
@@ -175,229 +188,299 @@ class ProjectViewActivity : BaseActivity() {
         // 2. Behavior (Logic)
         behaviorManager = ComponentBehaviorManager { topic, payload ->
             // Send MQTT
-            val intent = Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java).apply {
-                action = "PUBLISH"
-                putExtra("TOPIC", topic)
-                putExtra("PAYLOAD", payload)
-            }
+            val intent =
+                    Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java).apply {
+                        action = "PUBLISH"
+                        putExtra("TOPIC", topic)
+                        putExtra("PAYLOAD", payload)
+                    }
             startService(intent)
         }
 
         // 3. Interaction (Input)
         val peekHeightPx = (100 * resources.displayMetrics.density).toInt()
-        interactionManager = CanvasInteractionManager(editorCanvas, guideOverlay, peekHeightPx, object : CanvasInteractionManager.InteractionCallbacks {
-            override fun onComponentSelected(id: Int) {
-                if (isEditMode) {
-                     if (selectedComponentId != id) {
-                         selectedComponentId = id
-                         val comp = viewModel.components.value?.find { it.id == id }
-                         val view = renderer.getView(id)
-                         if (comp != null && view != null) {
-                             // Selection Only: Bind Properties but force collapse
-                             val sheet = findViewById<View>(R.id.bottomSheet)
-                             val behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
-                             behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
-                             propertiesManager.showProperties(view, comp, autoExpand = false)
-                         }
-                         // Render Selection Border
-                         viewModel.components.value?.let { renderer.render(it, isEditMode, selectedComponentId) }
-                         
-                         // Update UI Manager
-                         projectUIManager.updateModeUI(isEditMode, selectedComponentId)
-                         projectUIManager.updateCanvasOcclusion()
-                      }
-                }
-            }
+        interactionManager =
+                CanvasInteractionManager(
+                        editorCanvas,
+                        guideOverlay,
+                        peekHeightPx,
+                        object : CanvasInteractionManager.InteractionCallbacks {
+                            override fun onComponentSelected(id: Int) {
+                                if (isEditMode) {
+                                    if (selectedComponentId != id) {
+                                        selectedComponentId = id
+                                        val comp = viewModel.components.value?.find { it.id == id }
+                                        val view = renderer.getView(id)
+                                        if (comp != null && view != null) {
+                                            // Selection Only: Bind Properties but force collapse
+                                            val sheet = findViewById<View>(R.id.bottomSheet)
+                                            val behavior =
+                                                    com.google.android.material.bottomsheet
+                                                            .BottomSheetBehavior.from(sheet)
+                                            behavior.state =
+                                                    com.google.android.material.bottomsheet
+                                                            .BottomSheetBehavior.STATE_COLLAPSED
+                                            propertiesManager.showProperties(
+                                                    view,
+                                                    comp,
+                                                    autoExpand = false
+                                            )
+                                        }
+                                        // Render Selection Border
+                                        viewModel.components.value?.let {
+                                            renderer.render(it, isEditMode, selectedComponentId)
+                                        }
 
-            override fun onComponentClicked(id: Int) {
-                if (isEditMode) {
-                    val sheet = findViewById<View>(R.id.bottomSheet)
-                    val behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
-                    
-                    if (id == -1) {
-                        // Background Click -> Deselect & Collapse (Don't Hide)
-                        selectedComponentId = null
-                        behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
-                        // Clear visible properties or set "No Selection" state
-                        propertiesManager.showTitleOnly() 
-                    } else {
-                        // Component Logic:
-                        // 1. If ALREADY selected -> EXPAND (Second Click)
-                        // 2. If NEW selection -> SELECT (First Click)
-                        
-                        if (selectedComponentId == id) {
-                             // Second Click: Expand
-                             val comp = viewModel.components.value?.find { it.id == id }
-                             val view = renderer.getView(id)
-                             if (comp != null && view != null) {
-                                 propertiesManager.showProperties(view, comp, autoExpand = true)
-                             }
-                        } else {
-                             // First Click: Select Only 
-                             onComponentSelected(id)
+                                        // Update UI Manager
+                                        projectUIManager.updateModeUI(
+                                                isEditMode,
+                                                selectedComponentId
+                                        )
+                                        projectUIManager.updateCanvasOcclusion()
+                                    }
+                                }
+                            }
+
+                            override fun onComponentClicked(id: Int) {
+                                if (isEditMode) {
+                                    val sheet = findViewById<View>(R.id.bottomSheet)
+                                    val behavior =
+                                            com.google.android.material.bottomsheet
+                                                    .BottomSheetBehavior.from(sheet)
+
+                                    if (id == -1) {
+                                        // Background Click -> Deselect & Collapse (Don't Hide)
+                                        selectedComponentId = null
+                                        behavior.state =
+                                                com.google.android.material.bottomsheet
+                                                        .BottomSheetBehavior.STATE_COLLAPSED
+                                        // Clear visible properties or set "No Selection" state
+                                        propertiesManager.showTitleOnly()
+                                    } else {
+                                        // Component Logic:
+                                        // 1. If ALREADY selected -> EXPAND (Second Click)
+                                        // 2. If NEW selection -> SELECT (First Click)
+
+                                        if (selectedComponentId == id) {
+                                            // Second Click: Expand
+                                            val comp =
+                                                    viewModel.components.value?.find { it.id == id }
+                                            val view = renderer.getView(id)
+                                            if (comp != null && view != null) {
+                                                propertiesManager.showProperties(
+                                                        view,
+                                                        comp,
+                                                        autoExpand = true
+                                                )
+                                            }
+                                        } else {
+                                            // First Click: Select Only
+                                            onComponentSelected(id)
+                                        }
+                                    }
+                                    // Trigger Re-render to update Selection Border
+                                    viewModel.components.value?.let {
+                                        renderer.render(it, isEditMode, selectedComponentId)
+                                    }
+
+                                    projectUIManager.updateCanvasOcclusion()
+                                    projectUIManager.updateModeUI(isEditMode, selectedComponentId)
+                                }
+                            }
+
+                            override fun onComponentMoved(id: Int, newX: Float, newY: Float) {
+                                val comp = viewModel.components.value?.find { it.id == id }
+                                if (comp != null) {
+                                    viewModel.saveSnapshot()
+                                    val updated = comp.copy(x = newX, y = newY)
+                                    viewModel.updateComponent(updated)
+                                }
+                            }
+
+                            override fun onComponentResized(id: Int, newW: Int, newH: Int) {
+                                val comp = viewModel.components.value?.find { it.id == id }
+                                if (comp != null) {
+                                    viewModel.saveSnapshot()
+                                    val updated = comp.copy(width = newW, height = newH)
+                                    viewModel.updateComponent(updated)
+                                }
+                            }
+
+                            override fun onComponentResizing(id: Int, newW: Int, newH: Int) {
+                                propertiesManager.updateDimensions(newW, newH)
+
+                                // Live Visual Update (Throttled ~30ms)
+                                val now = System.currentTimeMillis()
+                                if (now - lastResizeUpdate > 30) {
+                                    lastResizeUpdate = now
+                                    val comp = viewModel.components.value?.find { it.id == id }
+                                    val view = renderer.getView(id)
+                                    if (comp != null && view != null) {
+                                        val tempData = comp.copy(width = newW, height = newH)
+                                        val def =
+                                                com.example.mqttpanelcraft.ui.components
+                                                        .ComponentDefinitionRegistry.get(comp.type)
+                                        def?.onUpdateView(view, tempData)
+                                    }
+                                }
+                            }
+
+                            override fun onComponentDeleted(id: Int) {
+                                if (id != -1) {
+                                    viewModel.saveSnapshot()
+                                    viewModel.removeComponent(id)
+                                    if (selectedComponentId == id) {
+                                        selectedComponentId = null
+                                        propertiesManager.showTitleOnly()
+                                        projectUIManager.updateModeUI(
+                                                isEditMode,
+                                                selectedComponentId
+                                        )
+                                    }
+                                }
+                                Toast.makeText(
+                                                this@ProjectViewActivity,
+                                                getString(R.string.project_msg_component_deleted),
+                                                Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                            }
+
+                            override fun onDeleteZoneHover(isHovered: Boolean) {
+                                projectUIManager.setDeleteZoneHover(isHovered)
+                            }
+
+                            override fun onNewComponent(type: String, x: Float, y: Float) {
+                                // Close Drawer on Drop success
+                                sidebarManager.closeDrawer()
+
+                                viewModel.saveSnapshot()
+
+                                val tempData = viewModel.createNewComponentData(type, x, y)
+                                val w = tempData.width
+                                val h = tempData.height
+
+                                val editorW = editorCanvas.width
+                                val editorH = editorCanvas.height
+                                val maxX = (editorW - w).toFloat().coerceAtLeast(0f)
+                                val maxY = (editorH - h).toFloat().coerceAtLeast(0f)
+                                var finalX = x.coerceIn(0f, maxX)
+                                var finalY = y.coerceIn(0f, maxY)
+
+                                val density = resources.displayMetrics.density
+                                val gridPx = 10 * density
+                                finalX = (kotlin.math.round(finalX / gridPx) * gridPx)
+                                finalY = (kotlin.math.round(finalY / gridPx) * gridPx)
+                                finalX = finalX.coerceIn(0f, maxX)
+                                finalY = finalY.coerceIn(0f, maxY)
+
+                                val finalData = tempData.copy(x = finalX, y = finalY)
+                                val newComp = viewModel.addComponent(finalData)
+
+                                if (newComp != null) {
+                                    val newId = newComp.id
+                                    viewModel.selectComponent(newId)
+                                    selectedComponentId = newId
+
+                                    viewModel.project.value?.components?.let {
+                                        renderer.render(it, isEditMode, newId)
+                                    }
+
+                                    val view = renderer.getView(newId)
+                                    if (view != null) {
+                                        propertiesManager.showProperties(
+                                                view,
+                                                newComp,
+                                                autoExpand = true
+                                        )
+                                    }
+                                    projectUIManager.updateModeUI(isEditMode, selectedComponentId)
+                                }
+                            }
+                        }
+                )
+
+        drawerLayout.addDrawerListener(
+                object : androidx.drawerlayout.widget.DrawerLayout.SimpleDrawerListener() {
+                    override fun onDrawerOpened(drawerView: View) {
+                        val sheet = findViewById<View>(R.id.bottomSheet)
+                        val behavior =
+                                com.google.android.material.bottomsheet.BottomSheetBehavior.from(
+                                        sheet
+                                )
+
+                        if (behavior.state ==
+                                        com.google.android.material.bottomsheet.BottomSheetBehavior
+                                                .STATE_EXPANDED ||
+                                        behavior.state ==
+                                                com.google.android.material.bottomsheet
+                                                        .BottomSheetBehavior.STATE_HIDDEN
+                        ) {
+                            behavior.state =
+                                    com.google.android.material.bottomsheet.BottomSheetBehavior
+                                            .STATE_COLLAPSED
                         }
                     }
-                    // Trigger Re-render to update Selection Border
-                    viewModel.components.value?.let { renderer.render(it, isEditMode, selectedComponentId) }
-                    
-                    projectUIManager.updateCanvasOcclusion()
-                    projectUIManager.updateModeUI(isEditMode, selectedComponentId)
                 }
-            }
+        )
 
-            override fun onComponentMoved(id: Int, newX: Float, newY: Float) {
-                val comp = viewModel.components.value?.find { it.id == id }
-                if (comp != null) {
-                    viewModel.saveSnapshot()
-                    val updated = comp.copy(x = newX, y = newY)
-                    viewModel.updateComponent(updated)
-                }
-            }
-
-            override fun onComponentResized(id: Int, newW: Int, newH: Int) {
-                 val comp = viewModel.components.value?.find { it.id == id }
-                 if (comp != null) {
-                     viewModel.saveSnapshot()
-                     val updated = comp.copy(width = newW, height = newH)
-                     viewModel.updateComponent(updated)
-                 }
-            }
-            
-            override fun onComponentResizing(id: Int, newW: Int, newH: Int) {
-                propertiesManager.updateDimensions(newW, newH)
-                
-                // Live Visual Update (Throttled ~30ms)
-                val now = System.currentTimeMillis()
-                if (now - lastResizeUpdate > 30) {
-                    lastResizeUpdate = now
-                    val comp = viewModel.components.value?.find { it.id == id }
-                    val view = renderer.getView(id)
-                    if (comp != null && view != null) {
-                         val tempData = comp.copy(width = newW, height = newH)
-                         val def = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(comp.type)
-                         def?.onUpdateView(view, tempData)
-                    }
-                }
-            }
-
-            override fun onComponentDeleted(id: Int) {
-                if (id != -1) {
-                    viewModel.saveSnapshot()
-                    viewModel.removeComponent(id)
-                    if (selectedComponentId == id) {
-                        selectedComponentId = null
-                        propertiesManager.showTitleOnly()
-                        projectUIManager.updateModeUI(isEditMode, selectedComponentId)
-                    }
-                }
-                Toast.makeText(this@ProjectViewActivity, getString(R.string.project_msg_component_deleted), Toast.LENGTH_SHORT).show()
-            }
-            
-            override fun onDeleteZoneHover(isHovered: Boolean) {
-                projectUIManager.setDeleteZoneHover(isHovered)
-            }
-
-            override fun onNewComponent(type: String, x: Float, y: Float) {
-                // Close Drawer on Drop success
-                sidebarManager.closeDrawer()
-                
-                viewModel.saveSnapshot()
-                
-                val tempData = viewModel.createNewComponentData(type, x, y)
-                val w = tempData.width
-                val h = tempData.height
-                
-                val editorW = editorCanvas.width
-                val editorH = editorCanvas.height
-                val maxX = (editorW - w).toFloat().coerceAtLeast(0f)
-                val maxY = (editorH - h).toFloat().coerceAtLeast(0f)
-                var finalX = x.coerceIn(0f, maxX)
-                var finalY = y.coerceIn(0f, maxY)
-                
-                val density = resources.displayMetrics.density
-                val gridPx = 10 * density 
-                finalX = (kotlin.math.round(finalX / gridPx) * gridPx)
-                finalY = (kotlin.math.round(finalY / gridPx) * gridPx)
-                finalX = finalX.coerceIn(0f, maxX)
-                finalY = finalY.coerceIn(0f, maxY)
-
-                val finalData = tempData.copy(x = finalX, y = finalY)
-                val newComp = viewModel.addComponent(finalData)
-                
-                if (newComp != null) {
-                    val newId = newComp.id
-                    viewModel.selectComponent(newId)
-                    selectedComponentId = newId
-                    
-                    viewModel.project.value?.components?.let { renderer.render(it, isEditMode, newId) }
-                    
-                    val view = renderer.getView(newId)
-                    if (view != null) {
-                        propertiesManager.showProperties(view, newComp, autoExpand = true)
-                    }
-                    projectUIManager.updateModeUI(isEditMode, selectedComponentId)
-                }
-            }
-        })
-        
-        drawerLayout.addDrawerListener(object : androidx.drawerlayout.widget.DrawerLayout.SimpleDrawerListener() {
-            override fun onDrawerOpened(drawerView: View) {
-                val sheet = findViewById<View>(R.id.bottomSheet)
-                val behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
-                
-                if (behavior.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED ||
-                    behavior.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN) {
-                    behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
-                }
-            }
-        })
-        
         findViewById<View>(R.id.rootCoordinator)?.setOnDragListener { _, event ->
             if (event.action == android.view.DragEvent.ACTION_DROP) {
-                 true 
+                true
             } else {
-                 true
+                true
             }
         }
-        
+
         val header = findViewById<View>(R.id.bottomSheetHeader)
         header.setOnClickListener {
-             if (isEditMode) {
-                 if (selectedComponentId == null) {
-                     val comps = viewModel.components.value
-                     if (comps.isNullOrEmpty()) {
-                         Toast.makeText(this, getString(R.string.project_msg_add_component), Toast.LENGTH_SHORT).show()
-                     } else {
-                         Toast.makeText(this, getString(R.string.project_msg_select_component), Toast.LENGTH_SHORT).show()
-                     }
-                 } else {
-                     projectUIManager.toggleBottomSheet()
-                 }
-             } else {
-                 projectUIManager.toggleBottomSheet()
-             }
+            if (isEditMode) {
+                if (selectedComponentId == null) {
+                    val comps = viewModel.components.value
+                    if (comps.isNullOrEmpty()) {
+                        Toast.makeText(
+                                        this,
+                                        getString(R.string.project_msg_add_component),
+                                        Toast.LENGTH_SHORT
+                                )
+                                .show()
+                    } else {
+                        Toast.makeText(
+                                        this,
+                                        getString(R.string.project_msg_select_component),
+                                        Toast.LENGTH_SHORT
+                                )
+                                .show()
+                    }
+                } else {
+                    projectUIManager.toggleBottomSheet()
+                }
+            } else {
+                projectUIManager.toggleBottomSheet()
+            }
         }
 
         interactionManager.setup(
-            isEditMode = { isEditMode },
-            isGridEnabled = { viewModel.isGridVisible.value ?: true },
-            isBottomSheetExpanded = {
-                val sheet = findViewById<View>(R.id.bottomSheet)
-                val behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
-                behavior.state == com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
-            }
+                isEditMode = { isEditMode },
+                isGridEnabled = { viewModel.isGridVisible.value ?: true },
+                isBottomSheetExpanded = {
+                    val sheet = findViewById<View>(R.id.bottomSheet)
+                    val behavior =
+                            com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
+                    behavior.state ==
+                            com.google.android.material.bottomsheet.BottomSheetBehavior
+                                    .STATE_EXPANDED
+                }
         )
     }
 
     private fun subscribeToViewModel() {
-        viewModel.logs.observe(this) { logs ->
-             logConsoleManager.updateLogs(logs)
-        }
+        viewModel.logs.observe(this) { logs -> logConsoleManager.updateLogs(logs) }
 
         viewModel.components.observe(this) { components ->
             logConsoleManager.updateTopics(components, viewModel.project.value)
             renderer.render(components, isEditMode, selectedComponentId)
-            
+
             components.forEach { comp ->
                 val view = renderer.getView(comp.id)
                 if (view != null) {
@@ -414,283 +497,335 @@ class ProjectViewActivity : BaseActivity() {
                 editorCanvas.post { projectUIManager.updateCanvasOcclusion(0f) }
             }
         }
-        
+
         viewModel.project.observe(this) { project ->
             if (project != null) {
                 projectUIManager.updateTitle(project.name)
                 when (project.orientation) {
-                    "PORTRAIT" -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    "LANDSCAPE" -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                    else -> requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED 
+                    "PORTRAIT" ->
+                            requestedOrientation =
+                                    android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    "LANDSCAPE" ->
+                            requestedOrientation =
+                                    android.content.pm.ActivityInfo
+                                            .SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                    else ->
+                            requestedOrientation =
+                                    android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
                 }
                 viewModel.initMqtt()
             }
         }
-        
+
         viewModel.mqttStatus.observe(this) { status ->
-             val light = findViewById<View>(R.id.indicatorMqttStatus) ?: return@observe
-             val bg = light.background as? android.graphics.drawable.GradientDrawable
-             bg?.mutate()
-             
-             // Define Colors explicitly
-             val colorGray = android.graphics.Color.parseColor("#B0BEC5") // Blue Grey 200 (Neutral)
-             val colorGreen = android.graphics.Color.parseColor("#4CAF50") // Green 500
-             val colorRed = android.graphics.Color.parseColor("#F44336")   // Red 500
-             
-             val color = when(status) {
-                 ProjectViewModel.MqttStatus.CONNECTED -> {
-                     light.tag = "CONNECTED"
-                     colorGreen
-                 }
-                 ProjectViewModel.MqttStatus.FAILED -> {
-                     if (light.tag != "FAILED_SHOWN") {
-                          Toast.makeText(this, getString(R.string.project_msg_mqtt_failed), Toast.LENGTH_LONG).show()
-                          light.tag = "FAILED_SHOWN" 
-                     }
-                     colorRed
-                 }
-                 ProjectViewModel.MqttStatus.CONNECTING -> {
-                     light.tag = null
-                     colorGray
-                 }
-                 else -> colorGray // IDLE
-             }
-             bg?.setColor(color)
-             viewModel.addLog(getString(R.string.project_log_mqtt_status, status))
-             light.setOnClickListener {
-                 if (status == ProjectViewModel.MqttStatus.FAILED) {
-                     Toast.makeText(this, getString(R.string.project_msg_mqtt_retrying), Toast.LENGTH_SHORT).show()
-                     viewModel.retryMqtt()
-                 } else {
-                     Toast.makeText(this, "Status: $status", Toast.LENGTH_SHORT).show()
-                 }
-             }
+            val light = findViewById<View>(R.id.indicatorMqttStatus) ?: return@observe
+            val bg = light.background as? android.graphics.drawable.GradientDrawable
+            bg?.mutate()
+
+            // Define Colors explicitly
+            val colorGray = android.graphics.Color.parseColor("#B0BEC5") // Blue Grey 200 (Neutral)
+            val colorGreen = android.graphics.Color.parseColor("#4CAF50") // Green 500
+            val colorRed = android.graphics.Color.parseColor("#F44336") // Red 500
+
+            val color =
+                    when (status) {
+                        ProjectViewModel.MqttStatus.CONNECTED -> {
+                            light.tag = "CONNECTED"
+                            colorGreen
+                        }
+                        ProjectViewModel.MqttStatus.FAILED -> {
+                            if (light.tag != "FAILED_SHOWN") {
+                                Toast.makeText(
+                                                this,
+                                                getString(R.string.project_msg_mqtt_failed),
+                                                Toast.LENGTH_LONG
+                                        )
+                                        .show()
+                                light.tag = "FAILED_SHOWN"
+                            }
+                            colorRed
+                        }
+                        ProjectViewModel.MqttStatus.CONNECTING -> {
+                            light.tag = null
+                            colorGray
+                        }
+                        else -> colorGray // IDLE
+                    }
+            bg?.setColor(color)
+            viewModel.addLog(getString(R.string.project_log_mqtt_status, status))
+            light.setOnClickListener {
+                if (status == ProjectViewModel.MqttStatus.FAILED) {
+                    Toast.makeText(
+                                    this,
+                                    getString(R.string.project_msg_mqtt_retrying),
+                                    Toast.LENGTH_SHORT
+                            )
+                            .show()
+                    viewModel.retryMqtt()
+                } else {
+                    Toast.makeText(this, "Status: $status", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         viewModel.isGridVisible.observe(this) { visible ->
             projectUIManager.updateGridState(visible)
         }
-        
+
         viewModel.isGuidesVisible.observe(this) { visible ->
-             guideOverlay.visibility = if (visible) View.VISIBLE else View.GONE
+            guideOverlay.visibility = if (visible) View.VISIBLE else View.GONE
         }
-        
-        viewModel.canUndo.observe(this) { can ->
-            projectUIManager.updateUndoState(can)
-        }
+
+        viewModel.canUndo.observe(this) { can -> projectUIManager.updateUndoState(can) }
     }
 
     // --- Helpers (Sidebar, Props, Logs) ---
     private fun initializeHelpers() {
         logConsoleManager = LogConsoleManager(window.decorView)
-        
-        propertiesManager = PropertiesSheetManager(
-            findViewById(R.id.containerProperties),
-            { // On Expand
-                val sheet = findViewById<View>(R.id.bottomSheet)
-                com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet).state = 
-                    com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
-            },
-{ updatedData -> // On Update
-                viewModel.updateComponent(updatedData)
-            },
-            { id -> // On Clone
-                viewModel.components.value?.find { it.id == id }?.let { source ->
-                    // 1. Naming Logic
-                    val name = source.label
-                    val regex = "(.*)_copy(\\d*)$".toRegex()
-                    val match = regex.find(name)
-                    val newLabel = if (match != null) {
-                        val base = match.groupValues[1]
-                        val numStr = match.groupValues[2]
-                        val num = if (numStr.isEmpty()) 2 else numStr.toInt() + 1
-                        "${base}_copy$num"
-                    } else {
-                        "${name}_copy"
-                    }
-                
-                    // 2. Add Component
-                    val newComp = viewModel.addComponent(source.copy(
-                        x = source.x + 40f, 
-                        y = source.y + 40f,
-                        label = newLabel
-                    )) 
-                    
-                    if (newComp != null) {
-                         val newId = newComp.id
 
-                        // 3. Selection & Props
-                        viewModel.selectComponent(newId)
-                        selectedComponentId = newId
-                        
-                        // Force prop update: Use the RETURNED object directly!
-                        val view = renderer.getView(newId)
-                        if (view != null) {
-                             propertiesManager.showProperties(view, newComp)
-                        } else {
-                             // Fallback if renderer hasn't updated view cache yet (synchronization)
-                             // Usually renderer updates via Observer.
-                             // But if we are here before observer...
-                             // We can't get the VIEW until renderer creates it.
-                             // So we rely on Observer to eventually call render?
-                             // NO. 'showProperties' needs the VIEW immediately for location/highlight.
-                             // If Observer is async, 'getView' returns null.
-                             
-                             // Hack: Force Renderer Update with current (mutated) list from VM
-                             // VM.components.value might be stale, BUT VM.project.value.components IS updated.
-                             viewModel.project.value?.components?.let { 
-                                 renderer.render(it, isEditMode, newId) 
-                                 val freshView = renderer.getView(newId)
-                                 if (freshView != null) propertiesManager.showProperties(freshView, newComp)
-                             }
+        propertiesManager =
+                PropertiesSheetManager(
+                        findViewById(R.id.containerProperties),
+                        { // On Expand
+                            val sheet = findViewById<View>(R.id.bottomSheet)
+                            com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
+                                    .state =
+                                    com.google.android.material.bottomsheet.BottomSheetBehavior
+                                            .STATE_EXPANDED
+                        },
+                        { updatedData -> // On Update
+                            viewModel.updateComponent(updatedData)
+                        },
+                        { id -> // On Clone
+                            viewModel.components.value?.find { it.id == id }?.let { source ->
+                                // 1. Naming Logic
+                                val name = source.label
+                                val regex = "(.*)_copy(\\d*)$".toRegex()
+                                val match = regex.find(name)
+                                val newLabel =
+                                        if (match != null) {
+                                            val base = match.groupValues[1]
+                                            val numStr = match.groupValues[2]
+                                            val num =
+                                                    if (numStr.isEmpty()) 2 else numStr.toInt() + 1
+                                            "${base}_copy$num"
+                                        } else {
+                                            "${name}_copy"
+                                        }
+
+                                // 2. Add Component
+                                val newComp =
+                                        viewModel.addComponent(
+                                                source.copy(
+                                                        x = source.x + 40f,
+                                                        y = source.y + 40f,
+                                                        label = newLabel
+                                                )
+                                        )
+
+                                if (newComp != null) {
+                                    val newId = newComp.id
+
+                                    // 3. Selection & Props
+                                    viewModel.selectComponent(newId)
+                                    selectedComponentId = newId
+
+                                    // Force prop update: Use the RETURNED object directly!
+                                    val view = renderer.getView(newId)
+                                    if (view != null) {
+                                        propertiesManager.showProperties(view, newComp)
+                                    } else {
+                                        // Fallback if renderer hasn't updated view cache yet
+                                        // (synchronization)
+                                        // Usually renderer updates via Observer.
+                                        // But if we are here before observer...
+                                        // We can't get the VIEW until renderer creates it.
+                                        // So we rely on Observer to eventually call render?
+                                        // NO. 'showProperties' needs the VIEW immediately for
+                                        // location/highlight.
+                                        // If Observer is async, 'getView' returns null.
+
+                                        // Hack: Force Renderer Update with current (mutated) list
+                                        // from VM
+                                        // VM.components.value might be stale, BUT
+                                        // VM.project.value.components IS updated.
+                                        viewModel.project.value?.components?.let {
+                                            renderer.render(it, isEditMode, newId)
+                                            val freshView = renderer.getView(newId)
+                                            if (freshView != null)
+                                                    propertiesManager.showProperties(
+                                                            freshView,
+                                                            newComp
+                                                    )
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        { id -> // On Reset Topic
+                            viewModel.components.value?.find { it.id == id }?.let { comp ->
+                                // Logic: Find first available default topic (e.g. button_1,
+                                // button_2)
+                                // EXCLUDING the current component (so if it is button_1, it keeps
+                                // button_1)
+
+                                val typeLower = comp.type.toLowerCase(Locale.ROOT)
+                                val projectPrefix = viewModel.getProjectTopicPrefix()
+
+                                var counter = 1
+                                var newTopic = ""
+                                val comps = viewModel.components.value ?: emptyList()
+
+                                while (true) {
+                                    // Construct candidate suffix
+                                    // Example: "button_1"
+                                    val candidateSuffix = "${typeLower}_$counter"
+                                    val candidateTopic = "${projectPrefix}${candidateSuffix}"
+
+                                    // Check availability (Exclude Self)
+                                    val isTaken =
+                                            comps.any {
+                                                it.id != id && it.topicConfig == candidateTopic
+                                            }
+
+                                    if (!isTaken) {
+                                        newTopic = candidateTopic
+                                        break
+                                    }
+                                    counter++
+                                }
+
+                                val updated = comp.copy(topicConfig = newTopic)
+                                viewModel.updateComponent(updated)
+                                // Refresh UI
+                                val view = renderer.getView(id)
+                                if (view != null) {
+                                    propertiesManager.showProperties(view, updated)
+                                }
+                            }
                         }
-                    }
-                }
-            },
-            { id -> // On Reset Topic
-                 viewModel.components.value?.find { it.id == id }?.let { comp ->
-                     // Logic: Find first available default topic (e.g. button_1, button_2)
-                     // EXCLUDING the current component (so if it is button_1, it keeps button_1)
-                     
-                     val typeLower = comp.type.toLowerCase(Locale.ROOT)
-                     val projectPrefix = viewModel.getProjectTopicPrefix()
-                     
-                     var counter = 1
-                     var newTopic = ""
-                     val comps = viewModel.components.value ?: emptyList()
-                     
-                     while (true) {
-                         // Construct candidate suffix
-                         // Example: "button_1"
-                         val candidateSuffix = "${typeLower}_$counter"
-                         val candidateTopic = "${projectPrefix}${candidateSuffix}"
-                         
-                         // Check availability (Exclude Self)
-                         val isTaken = comps.any { it.id != id && it.topicConfig == candidateTopic }
-                         
-                         if (!isTaken) {
-                             newTopic = candidateTopic
-                             break
-                         }
-                         counter++
-                     }
+                )
 
-                     val updated = comp.copy(topicConfig = newTopic)
-                     viewModel.updateComponent(updated)
-                     // Refresh UI
-                     val view = renderer.getView(id)
-                     if (view != null) {
-                         propertiesManager.showProperties(view, updated)
-                     }
-                 }
-             }
-        )
-        
-        logConsoleManager.setClearAction {
-            viewModel.clearLogs()
-        }
+        logConsoleManager.setClearAction { viewModel.clearLogs() }
 
-        sidebarManager = SidebarManager(
-            drawerLayout,
-            null,
-            findViewById(R.id.sidebarEditMode)
-        ) { view, type ->
-            // On Drag Start from Sidebar
-            // Create a temporary component to drag
-            val def = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(type)
-            if (def != null) {
-                // ... same logic usually handled inside SidebarManager? 
-                // Wait, SidebarManager handles startDragAndDrop internally using the touch listener.
-                // The callback is for... checking?
-                // Actually SidebarManager's constructor last arg is `onComponentDragStart`.
-                // Let's check SidebarManager definition again.
-            }
-        }
+        sidebarManager =
+                SidebarManager(
+                        drawerLayout,
+                        null,
+                        findViewById(R.id.sidebarEditMode),
+                        { type ->
+                            // On Click: Add to Center
+                            val centerX = editorCanvas.width / 2f
+                            val centerY = editorCanvas.height / 2f
+                            interactionManager.callbacks.onNewComponent(type, centerX, centerY)
+                        }
+                )
         sidebarManager.setupComponentPalette(drawerLayout)
-        
+
         // Exit App Button Logic
         findViewById<android.view.View>(R.id.btnExitApp)?.setOnClickListener {
-             finishAffinity() // Close all activities and exit app
+            finishAffinity() // Close all activities and exit app
         }
-        
-        // sidebarRunMode removed
-        
-        // sidebarRunMode removed
-        
+
+        // Exit App Button Logic
+
         // Ensure AdManager is ready and pre-load Interstitial
         com.example.mqttpanelcraft.utils.AdManager.initialize(this)
         com.example.mqttpanelcraft.utils.AdManager.loadInterstitial(this)
-        
+
         // Idle Ad Controller
-        idleAdController = com.example.mqttpanelcraft.ui.IdleAdController(this) {
-             // Ad Closed
-             if (isEditMode) {
-                 // Resume behavior if needed
-             }
-        }
+        idleAdController =
+                com.example.mqttpanelcraft.ui.IdleAdController(this) {
+                    // Ad Closed
+                    if (isEditMode) {
+                        // Resume behavior if needed
+                    }
+                }
     }
 
     private fun subscribeToMqtt() {
         // 1. Message Listener
-        com.example.mqttpanelcraft.MqttRepository.registerListener(object : com.example.mqttpanelcraft.MqttRepository.MessageListener {
-            override fun onMessageReceived(topic: String, payload: String) {
-                 runOnUiThread {
-                     // Log Logic: Filter System? (Only clean messages here)
-                     // Match Component Label
-                     val matched = viewModel.components.value?.find { 
-                         // Exact match or wildcard match
-                         it.topicConfig == topic || (it.topicConfig.endsWith("/#") && topic.startsWith(it.topicConfig.dropLast(2)))
-                     }
-                     
-                     val logMsg = if (matched != null) {
-                         "${matched.label}: $payload"
-                     } else {
-                         "$topic: $payload"
-                     }
-                     
-                     // Send to VM instead of Manager
-                     viewModel.addLog(logMsg)
+        com.example.mqttpanelcraft.MqttRepository.registerListener(
+                object : com.example.mqttpanelcraft.MqttRepository.MessageListener {
+                    override fun onMessageReceived(topic: String, payload: String) {
+                        runOnUiThread {
+                            // Log Logic: Filter System? (Only clean messages here)
+                            // Match Component Label
+                            val matched =
+                                    viewModel.components.value?.find {
+                                        // Exact match or wildcard match
+                                        it.topicConfig == topic ||
+                                                (it.topicConfig.endsWith("/#") &&
+                                                        topic.startsWith(
+                                                                it.topicConfig.dropLast(2)
+                                                        ))
+                                    }
 
-                     // Update UI for all components that match the topic
-                     viewModel.components.value?.forEach { comp ->
-                         // Check for exact topic match or wildcard match
-                         if (comp.topicConfig == topic || (comp.topicConfig.endsWith("/#") && topic.startsWith(comp.topicConfig.dropLast(2)))) {
-                             val view = renderer.getView(comp.id)
-                             if (view != null) behaviorManager.onMqttMessageReceived(view, comp, payload)
-                         }
-                     }
-                 }
-            }
-        })
-        
+                            val logMsg =
+                                    if (matched != null) {
+                                        "${matched.label}: $payload"
+                                    } else {
+                                        "$topic: $payload"
+                                    }
+
+                            // Send to VM instead of Manager
+                            viewModel.addLog(logMsg)
+
+                            // Update UI for all components that match the topic
+                            viewModel.components.value?.forEach { comp ->
+                                // Check for exact topic match or wildcard match
+                                if (comp.topicConfig == topic ||
+                                                (comp.topicConfig.endsWith("/#") &&
+                                                        topic.startsWith(
+                                                                comp.topicConfig.dropLast(2)
+                                                        ))
+                                ) {
+                                    val view = renderer.getView(comp.id)
+                                    if (view != null)
+                                            behaviorManager.onMqttMessageReceived(
+                                                    view,
+                                                    comp,
+                                                    payload
+                                            )
+                                }
+                            }
+                        }
+                    }
+                }
+        )
+
         // 2. Default Subscription on Connect
         var hasSubscribed = false
         // Observe Repository Connection Status directly or via VM
         com.example.mqttpanelcraft.MqttRepository.connectionStatus.observe(this) { status ->
-             if (status == 1) { // Connected
-                 if (!hasSubscribed) {
-                     val proj = viewModel.project.value
-                     if (proj != null) {
-                         val defaultTopic = "${proj.name}/${proj.id}/#"
-                         val context = applicationContext
-                         val intent = android.content.Intent(context, com.example.mqttpanelcraft.service.MqttService::class.java).apply {
-                             action = "SUBSCRIBE"
-                             putExtra("TOPIC", defaultTopic)
-                         }
-                         context.startService(intent)
-                         // Log Subscription
-                         viewModel.addLog("Auto-Subscribing to: $defaultTopic")
-                         hasSubscribed = true
-                     }
-                 }
-             } else {
-                 hasSubscribed = false
-             }
+            if (status == 1) { // Connected
+                if (!hasSubscribed) {
+                    val proj = viewModel.project.value
+                    if (proj != null) {
+                        val defaultTopic = "${proj.name}/${proj.id}/#"
+                        val context = applicationContext
+                        val intent =
+                                android.content.Intent(
+                                                context,
+                                                com.example.mqttpanelcraft.service
+                                                                .MqttService::class
+                                                        .java
+                                        )
+                                        .apply {
+                                            action = "SUBSCRIBE"
+                                            putExtra("TOPIC", defaultTopic)
+                                        }
+                        context.startService(intent)
+                        // Log Subscription
+                        viewModel.addLog("Auto-Subscribing to: $defaultTopic")
+                        hasSubscribed = true
+                    }
+                }
+            } else {
+                hasSubscribed = false
+            }
         }
     }
-
-
-
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         if (ev?.action == MotionEvent.ACTION_DOWN) {
@@ -714,15 +849,16 @@ class ProjectViewActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         if (::idleAdController.isInitialized) {
-             idleAdController.start()
+            idleAdController.start()
         }
-        
+
         // Reload Project Data (In case updated via SetupActivity)
-        intent.getStringExtra("PROJECT_ID")?.let { id ->
-            viewModel.loadProject(id)
-        }
-        
-        projectUIManager.updateModeUI(isEditMode, selectedComponentId) // Ensure UI state is consistent
+        intent.getStringExtra("PROJECT_ID")?.let { id -> viewModel.loadProject(id) }
+
+        projectUIManager.updateModeUI(
+                isEditMode,
+                selectedComponentId
+        ) // Ensure UI state is consistent
     }
 
     override fun onPause() {
