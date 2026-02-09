@@ -1,6 +1,9 @@
 package com.example.mqttpanelcraft.ui.components
 
 import android.content.Context
+import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
@@ -9,9 +12,29 @@ import com.example.mqttpanelcraft.R
 
 object ComponentContainer {
 
-    fun createEndpoint(context: Context, tag: String, isEditMode: Boolean): FrameLayout {
+    fun createEndpoint(
+            context: Context,
+            tag: String,
+            isEditMode: Boolean,
+            group: String = "CONTROL"
+    ): FrameLayout {
         val container = InterceptableFrameLayout(context)
-        container.setBackgroundResource(R.drawable.component_border)
+
+        // Dynamic border color based on component group
+        val isDark =
+                (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+                        Configuration.UI_MODE_NIGHT_YES
+        val borderColor = getGroupColor(group, isDark)
+
+        val borderDrawable =
+                GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    setStroke(2 * context.resources.displayMetrics.density.toInt(), borderColor)
+                    cornerRadius = 8 * context.resources.displayMetrics.density
+                    setColor(Color.TRANSPARENT)
+                }
+        container.background = borderDrawable
+
         container.setPadding(8, 8, 8, 8)
         container.tag = tag // Important for Renderer
         container.isEditMode = isEditMode
@@ -20,18 +43,10 @@ object ComponentContainer {
         val handle =
                 View(context).apply {
                     this.tag = "RESIZE_HANDLE"
-                    // Enlarged view (48dp) for better touch targets.
-                    // But centered at the corner: Half of 48dp is 24dp.
-                    // Using 48px/dp depends on density, here we use fixed px for relative offset
-                    // logic if needed
-                    // or better, rely on Gravity and negative Margins to center the "Visual Center"
-                    // on the corner.
                     val handleSize = 48
                     layoutParams =
                             FrameLayout.LayoutParams(handleSize, handleSize).apply {
                                 gravity = Gravity.BOTTOM or Gravity.END
-                                // Pivot the center (24, 24) onto the corner (0, 0) relative to
-                                // bottom-end
                                 setMargins(0, 0, -handleSize / 2, -handleSize / 2)
                             }
                     setBackgroundResource(R.drawable.bg_resize_handle)
@@ -59,5 +74,14 @@ object ComponentContainer {
         }
 
         return container
+    }
+
+    private fun getGroupColor(group: String, isDark: Boolean): Int {
+        return when (group) {
+            "CONTROL" -> if (isDark) Color.parseColor("#1976D2") else Color.parseColor("#2196F3")
+            "SENSOR" -> if (isDark) Color.parseColor("#FBC02D") else Color.parseColor("#FFEB3B")
+            "DISPLAY" -> if (isDark) Color.parseColor("#D32F2F") else Color.parseColor("#F44336")
+            else -> if (isDark) Color.parseColor("#757575") else Color.parseColor("#9E9E9E")
+        }
     }
 }

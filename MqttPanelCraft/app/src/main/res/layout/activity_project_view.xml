@@ -574,20 +574,11 @@
                                         android:paddingStart="4dp"
                                         android:paddingEnd="4dp">
 
-                                        <!-- Center Guide -->
-                                        <androidx.constraintlayout.widget.Guideline
-                                            android:id="@+id/guideCenter"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:orientation="vertical"
-                                            app:layout_constraintGuide_percent="0.5" />
-
                                         <!-- Prefix (Left) -->
                                         <TextView
                                             android:id="@+id/tvTopicPrefix"
-                                            android:layout_width="0dp"
+                                            android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:layout_marginEnd="5dp"
                                             android:gravity="start|center_vertical"
                                             android:text="prefix/"
                                             android:textColor="@color/prop_text_secondary"
@@ -599,10 +590,9 @@
                                             app:autoSizeMaxTextSize="18sp"
                                             app:autoSizeStepGranularity="2sp"
                                             app:layout_constraintBottom_toBottomOf="parent"
-                                            app:layout_constraintEnd_toStartOf="@id/guideCenter"
                                             app:layout_constraintStart_toStartOf="parent"
                                             app:layout_constraintTop_toTopOf="parent"
-                                            android:layout_marginStart="8dp"/>
+                                            android:layout_marginStart="12dp"/>
 
                                         <!-- Name (Right) -->
                                         <EditText
@@ -612,14 +602,14 @@
                                             android:background="@null"
                                             android:hint="name"
                                             android:inputType="textNoSuggestions|textVisiblePassword"
-                                            android:paddingStart="4dp"
+                                            android:paddingStart="2dp"
                                             android:paddingEnd="4dp"
                                             android:textColor="@color/props_primary"
                                             android:textSize="18sp"
                                             android:textStyle="bold"
                                             android:gravity="start|center_vertical"
                                             app:layout_constraintBottom_toBottomOf="parent"
-                                            app:layout_constraintStart_toEndOf="@id/guideCenter"
+                                            app:layout_constraintStart_toEndOf="@id/tvTopicPrefix"
                                             app:layout_constraintTop_toTopOf="parent"
                                             app:layout_constraintEnd_toStartOf="@id/btnTopicReset"
                                             android:layout_marginEnd="4dp"/>

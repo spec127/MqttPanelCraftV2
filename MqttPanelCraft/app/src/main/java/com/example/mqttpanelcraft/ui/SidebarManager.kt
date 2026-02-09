@@ -360,17 +360,26 @@ class SidebarManager(
                                                 rootView.context,
                                                 false
                                         ) // isPreview/EditMode = false for clean look
-                                previewView.background =
-                                        null // CONFIG: Remove the "Gray Frame" (Component Border)
-                                // for sidebar
-                                // purposes
+                                previewView.background = null // Card has border, component does not
 
-                                // Init Dummy Data with Group Color
+                                // Init Dummy Data
                                 val dummyProps = mutableMapOf<String, String>()
-                                dummyProps["color"] = groupColorHex
-                                dummyProps["colorOn"] = groupColorHex // For switches
-                                dummyProps["colorOff"] = "#BDBDBD" // Grey for off state
-                                // Special handling for some types if needed?
+                                // Default colors (respect component specific overrides if needed)
+                                val initialColor = "#2196F3" // Always Blue for preview base
+                                dummyProps["color"] = initialColor
+                                dummyProps["colorOn"] = initialColor
+                                dummyProps["colorOff"] = "#BDBDBD"
+
+                                // Special handling for specific component types
+                                when (def.type) {
+                                        "BUTTON" -> {
+                                                dummyProps["text"] = "" // Remove text, icon only
+                                                dummyProps["label"] = ""
+                                        }
+                                        "SWITCH" -> {
+                                                dummyProps["state"] = "2" // ON state (solid track)
+                                        }
+                                }
 
                                 val dummyData =
                                         com.example.mqttpanelcraft.model.ComponentData(
@@ -458,6 +467,12 @@ class SidebarManager(
                                 card.setOnTouchListener(touchListener)
 
                                 grid.addView(card)
+
+                                // Dynamic Card Border
+                                if (card is com.google.android.material.card.MaterialCardView) {
+                                        card.strokeColor = groupColorInt
+                                        card.strokeWidth = dpToPx(2) // Make it more visible
+                                }
 
                                 // Add to search list
                                 searchList.add(Triple(card, def.type, labelText))

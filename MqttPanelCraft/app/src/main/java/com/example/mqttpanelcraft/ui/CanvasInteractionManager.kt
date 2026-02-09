@@ -590,13 +590,14 @@ class CanvasInteractionManager(
                 val centerX = child.x + handle.x + (handle.width / 2)
                 val centerY = child.y + handle.y + (handle.height / 2)
 
-                // Effective touch radius (more than half of 48px)
-                val radius = 32f
+                // Expand touch area towards bottom-right (outside the component) as requested
+                val toleranceInside = 24f // Towards top-left (inside component)
+                val toleranceOutside = 72f // Towards bottom-right (outside component)
 
-                if (x >= centerX - radius &&
-                                x <= centerX + radius &&
-                                y >= centerY - radius &&
-                                y <= centerY + radius
+                if (x >= centerX - toleranceInside &&
+                                x <= centerX + toleranceOutside &&
+                                y >= centerY - toleranceInside &&
+                                y <= centerY + toleranceOutside
                 ) {
                     return child
                 }

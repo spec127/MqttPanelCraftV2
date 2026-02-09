@@ -7,30 +7,29 @@
     android:clipChildren="false"
     android:clipToPadding="false">
 
-    <!-- Track -->
+    <!-- The Track: The background pill/rect -->
     <View
         android:id="@+id/viewTrack"
         android:layout_width="0dp"
-        android:layout_height="32dp"
-        android:background="@drawable/bg_track_rounded"
-        android:backgroundTint="#F0F0F0"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.9" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Click Zones (Invisible but clickable) -->
+    <!-- Click Zones: Three equal areas across the track -->
     <View
         android:id="@+id/zoneLeft"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clickable="true"
         android:focusable="true"
-        app:layout_constraintBottom_toBottomOf="@id/viewTrack"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/zoneCenter"
-        app:layout_constraintStart_toStartOf="@id/viewTrack"
-        app:layout_constraintTop_toTopOf="@id/viewTrack" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/zoneCenter"
@@ -38,10 +37,10 @@
         android:layout_height="0dp"
         android:clickable="true"
         android:focusable="true"
-        app:layout_constraintBottom_toBottomOf="@id/viewTrack"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/zoneRight"
         app:layout_constraintStart_toEndOf="@id/zoneLeft"
-        app:layout_constraintTop_toTopOf="@id/viewTrack" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/zoneRight"
@@ -49,109 +48,32 @@
         android:layout_height="0dp"
         android:clickable="true"
         android:focusable="true"
-        app:layout_constraintBottom_toBottomOf="@id/viewTrack"
-        app:layout_constraintEnd_toEndOf="@id/viewTrack"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/zoneCenter"
-        app:layout_constraintTop_toTopOf="@id/viewTrack" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Tactile Dividers -->
-    <View
-        android:id="@+id/vDivider1"
-        android:layout_width="1dp"
-        android:layout_height="0dp"
-        android:background="#E2E8F0"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/viewTrack"
-        app:layout_constraintTop_toTopOf="@id/viewTrack"
-        app:layout_constraintStart_toStartOf="@id/viewTrack"
-        app:layout_constraintHorizontal_bias="0.33"
-        app:layout_constraintEnd_toEndOf="@id/viewTrack"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"/>
-        
-    <View
-        android:id="@+id/vDivider2"
-        android:layout_width="1dp"
-        android:layout_height="0dp"
-        android:background="#E2E8F0"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/viewTrack"
-        app:layout_constraintTop_toTopOf="@id/viewTrack"
-        app:layout_constraintStart_toStartOf="@id/viewTrack"
-        app:layout_constraintHorizontal_bias="0.67"
-        app:layout_constraintEnd_toEndOf="@id/viewTrack"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"/>
-
-    <!-- Thumb -->
+    <!-- The Thumb: The sliding part -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cvThumb"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="50dp"
         app:cardElevation="4dp"
-        app:layout_constraintBottom_toBottomOf="@id/viewTrack"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintHeight_percent="0.9"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@id/viewTrack"
+        app:layout_constraintBottom_toBottomOf="@id/viewTrack"
         app:layout_constraintEnd_toEndOf="@id/viewTrack"
+        app:layout_constraintStart_toStartOf="@id/viewTrack"
         app:layout_constraintTop_toTopOf="@id/viewTrack">
-        
-        <!-- Inner Dot (Optional) -->
+
+        <!-- Inner Indicator: Used for Lever style bar or Classic dot -->
         <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/bg_circle_gradient_gloss" 
-            android:alpha="0.1"/>
+            android:id="@+id/innerIndicator"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_track_rounded" />
+            
     </androidx.cardview.widget.CardView>
-
-    <!-- Lever Labels (HI/LO) -->
-    <TextView
-        android:id="@+id/tvLabelTop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="HI"
-        android:textSize="10sp"
-        android:textStyle="bold"
-        android:textColor="#94A3B8"
-        android:letterSpacing="0.2"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@id/viewTrack"
-        app:layout_constraintStart_toStartOf="@id/viewTrack"
-        app:layout_constraintEnd_toEndOf="@id/viewTrack"
-        android:layout_marginTop="8dp"/>
-
-    <TextView
-        android:id="@+id/tvLabelBottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="LO"
-        android:textSize="10sp"
-        android:textStyle="bold"
-        android:textColor="#94A3B8"
-        android:letterSpacing="0.2"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/viewTrack"
-        app:layout_constraintStart_toStartOf="@id/viewTrack"
-        app:layout_constraintEnd_toEndOf="@id/viewTrack"
-        android:layout_marginBottom="8dp"/>
-
-    <!-- Lever Thumb (Rectangle) -->
-    <View
-        android:id="@+id/vLeverThumb"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/bg_switch_thumb_lever"
-        android:backgroundTint="#a573bc"
-        android:visibility="gone"
-        app:layout_constraintWidth_percent="1.2"
-        app:layout_constraintDimensionRatio="2:1" 
-        app:layout_constraintBottom_toBottomOf="@id/viewTrack"
-        app:layout_constraintStart_toStartOf="@id/viewTrack"
-        app:layout_constraintEnd_toEndOf="@id/viewTrack"
-        app:layout_constraintTop_toTopOf="@id/viewTrack"
-        app:layout_constraintVertical_bias="0.5"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

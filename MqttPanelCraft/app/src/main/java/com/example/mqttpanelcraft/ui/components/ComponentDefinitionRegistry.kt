@@ -1,25 +1,24 @@
 package com.example.mqttpanelcraft.ui.components
 
-import com.example.mqttpanelcraft.ui.components.definitions.ButtonDefinition
-// Import other definitions as created
+import com.example.mqttpanelcraft.ui.components.definitions.*
 
 object ComponentDefinitionRegistry {
-    
+
     private val definitions = mutableMapOf<String, IComponentDefinition>()
 
     init {
-        // We will register them here
         register(ButtonDefinition)
-        register(com.example.mqttpanelcraft.ui.components.definitions.SwitchDefinition)
-        register(com.example.mqttpanelcraft.ui.components.definitions.LedDefinition)
-        register(com.example.mqttpanelcraft.ui.components.definitions.TextDefinition)
-        register(com.example.mqttpanelcraft.ui.components.definitions.SliderDefinition)
-        register(com.example.mqttpanelcraft.ui.components.definitions.ImageDefinition)
-        register(com.example.mqttpanelcraft.ui.components.definitions.CameraDefinition)
-        register(com.example.mqttpanelcraft.ui.components.definitions.ThermometerDefinition)
-        register(com.example.mqttpanelcraft.ui.components.definitions.TextInputDefinition)
-        register(com.example.mqttpanelcraft.ui.components.definitions.LevelIndicatorDefinition)
-        register(com.example.mqttpanelcraft.ui.components.definitions.LineChartDefinition)
+        register(SwitchDefinition)
+        register(LedDefinition)
+        register(TextDefinition)
+        register(SliderDefinition)
+        register(SelectorDefinition)
+        register(ImageDefinition)
+        register(CameraDefinition)
+        register(ThermometerDefinition)
+        register(TextInputDefinition)
+        register(LevelIndicatorDefinition)
+        register(LineChartDefinition)
     }
 
     fun register(def: IComponentDefinition) {

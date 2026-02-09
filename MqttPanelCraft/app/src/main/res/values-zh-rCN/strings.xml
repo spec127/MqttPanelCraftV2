@@ -25,7 +25,6 @@
     <string name="drawer_item_ads">广告</string>
     <string name="drawer_item_language">语言 (Language)</string>
     <string name="lang_system_default">系统默认</string>
-    <string name="dashboard_btn_exit">退出应用</string>
     <string name="action_edit">编辑</string>
 
     <!-- Dashboard -->
@@ -40,9 +39,7 @@
     <string name="dashboard_sort_last_opened">上次打开</string>
     <string name="dashboard_empty_state_msg">尚无项目</string>
     <!-- Badges kept English as requested -->
-    <string name="dashboard_badge_premium">Premium</string>
-    <string name="dashboard_badge_free">Free</string>
-    
+
     <!-- Setup Activity -->
     <!-- Setup Activity -->
     <string name="setup_title_create">项目设置</string>

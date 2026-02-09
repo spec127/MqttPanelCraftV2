@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MqttPanelCraft</string>
     <string name="mqttpanelcraft">MqttPanelCraft</string>
@@ -24,7 +25,7 @@
     <string name="drawer_item_ads">Ads</string>
     <string name="drawer_item_language">Language</string>
     <string name="lang_system_default">System Default</string>
-    <string name="dashboard_btn_exit">Exit App</string>
+    <string name="dashboard_btn_exit">Exit</string>
     <string name="action_edit">Edit</string>
 
     <!-- Dashboard -->
@@ -39,6 +40,8 @@
     <string name="dashboard_empty_state_msg">No projects yet</string>
     <string name="dashboard_badge_premium">Premium</string>
     <string name="dashboard_badge_free">Free</string>
+    <string name="dashboard_msg_project_deleted">Project Deleted</string>
+    <string name="dashboard_msg_opening_project">Opening %s...</string>
     
     <!-- Setup Activity -->
     <string name="setup_title_create">Project Setup</string>
@@ -63,161 +66,213 @@
     <string name="setup_error_broker_required">Broker URL is required</string>
     <string name="setup_error_only_letters">Only letters, numbers, and underscores allowed</string>
     <string name="setup_error_name_exists">Project name already exists</string>
-
-    <!-- Project View Activity -->
-    <string name="project_view_title">Project Editor</string>
-    <string name="project_sidebar_title_components">Components</string>
-    <string name="project_sidebar_category_display">Media Components</string>
-    <string name="project_component_text">Text Value</string>
-    <string name="project_component_switch">Switch</string>
-    <string name="project_component_gauge">Gauge</string>
-    <string name="project_sidebar_title_properties">Properties</string>
-    <string name="project_prop_helper">Select a component to edit</string>
-    <string name="project_prop_topic">MQTT Topic</string>
-    <string name="project_prop_label">Label</string>
-    <string name="project_console_title">MQTT/System Logs</string>
-    <string name="project_hint_topic">Topic</string>
-    <string name="project_hint_payload">Payload</string>
-    <string name="project_btn_send">SEND</string>
-    <string name="project_lock_portrait">Lock Portrait</string>
-    <string name="project_lock_landscape">Lock Landscape</string>
-    <string name="project_hint_topic_target">Topic (Target)</string>
-    <string name="project_label_message">Message</string>
-    <string name="project_btn_send_console">Send</string>
-    <string name="project_prop_display_name">Display Name</string>
     
-    <!-- Messages & Toasts -->
-    <string name="project_msg_logs_copied">Logs Copied</string>
-    <string name="project_msg_init_error">Init Error: %s</string>
-    <string name="project_msg_component_deleted">Component Deleted</string>
-    <string name="common_msg_network_error">Network Error</string>
-    <string name="msg_mqtt_failed">Connection Failed, Check Broker</string>
-    <string name="msg_mqtt_retry">Retrying Connection...</string>
-    <string name="msg_mqtt_connected">Connected</string>
-    <string name="project_msg_select_component">Please select a component first</string>
-    <string name="project_msg_add_component">Please add a component first</string>
-    <string name="project_msg_id_copied">ID Copied</string>
-    <string name="project_msg_components_loaded">Loaded %d components!</string>
-    <string name="dashboard_msg_project_deleted">Project Deleted</string>
-    <string name="dashboard_msg_opening_project">Opening %s...</string>
-    <string name="project_msg_file_saved">Saved to file!</string>
-    <string name="project_msg_file_save_failed">Save Failed: %s</string>
-    <string name="project_msg_file_read_failed">Read Failed: %s</string>
-    <string name="common_msg_copied_clipboard">Copied to Clipboard</string>
-    
-    <!-- Dialogs -->
-    <string name="dialog_language_title">Select Language</string>
-    <string name="dialog_delete_title">Delete Project</string>
-    <string name="dialog_delete_message">Are you sure you want to delete \'%s\'?</string>
-    <string name="dialog_change_id_title">Change Project ID</string>
-    <string name="dialog_change_id_msg">Warning: Changing the ID will treat this as a new entry. Are you sure?</string>
-    <string name="dialog_import_title">Import Configuration Payload</string>
-    <string name="dialog_export_title">Export Configuration</string>
-    
-    <!-- Common Buttons & Hints -->
-    <string name="common_btn_delete">Delete</string>
-    <string name="common_btn_cancel">Cancel</string>
-    <string name="common_btn_close">Close</string>
-    <string name="common_btn_copy">Copy</string>
-    <string name="common_btn_gen_id">Generate New ID</string>
-    <string name="hint_paste_json">Paste JSON here...</string>
-    <string name="common_btn_load_text">Load Text</string>
-    <string name="common_btn_load_file">Load File</string>
-    <string name="common_btn_save">Save File</string>
-    <string name="arduino_code_export">Export Arduino Code</string>
-    <string name="copy_code">Copy Code</string>
-    <string name="btn_copy_topic_only">Copy Topic</string>
-
-    <!-- Properties Sidebar -->
-    <string name="properties_label_topic">Topic</string>
-    <string name="properties_btn_clone">Clone</string>
-    <string name="properties_label_color">Color</string>
-    <string name="properties_btn_apply">Apply</string>
-    <string name="properties_title">Properties</string>
-    <string name="properties_label_height">H</string>
-    <string name="properties_label_width">W</string>
-    <string name="properties_label_default">Default</string>
-    <string name="properties_label_button_text">Button Text</string>
-    
-    <string name="properties_section_appearance">Appearance</string>
-    <string name="properties_section_interaction">Interaction</string>
-    <string name="properties_section_general">General</string>
-
-    <string name="prop_section_general">General</string>
-    <string name="prop_section_interaction">Interaction</string>
-    <string name="prop_section_appearance">Appearance</string>
-    
-    <string name="properties_mode_text">Text</string>
-    <string name="properties_mode_icon">Icon</string>
-    <string name="properties_mode_text_icon">Text + Icon</string>
-    <string name="properties_label_shape">Shape</string>
-    <string name="prop_title_switch">Switch Properties</string>
-    <string name="prop_label_name">Name</string>
-    <string name="properties_label_payload_press">Press Message</string>
-    <string name="properties_label_trigger_mode">Button Mode</string>
-    
-    <string name="val_mode_standard">Tap</string>
-    <string name="val_mode_momentary">Hold</string>
-    <string name="val_mode_tap">Tap</string>
-    <string name="val_mode_hold">Hold</string>
-    <string name="val_mode_timer">Timer</string>
-    
-    <string name="desc_mode_tap">Sends command on click.</string>
-    <string name="desc_mode_hold">Sends on press, sends reset command on release.</string>
-    <string name="desc_mode_timer">Sends on press, auto-sends reset command after time.</string>
-    
-    <string name="val_shape_rounded">Rounded</string>
-    <string name="val_shape_circle">Circle</string>
-    <string name="val_shape_rect">Rect</string>
-    
-    <string name="properties_label_payload_release">Release Message</string>
-    <string name="properties_unit_ms">ms</string>
-    
-    <string name="properties_label_haptic">Haptic Feedback</string>
-    <string name="properties_btn_select_icon">Select Icon</string>
-    <string name="properties_btn_no_icon">No Icon</string>
-    <string name="project_msg_topic_copied">Topic Copied</string>
-    <string name="icon_desc_plus">Plus</string>
-    <string name="icon_desc_delete">Delete</string>
-    <string name="icon_desc_send">Send</string>
-    <string name="icon_desc_edit">Edit</string>
-    <string name="icon_desc_info">Info</string>
-    <string name="import_json">Import JSON</string>
-    <string name="export_json">Export JSON</string>
-    <string name="project_id">Project ID</string>
-    <string name="webview">Webview</string>
+    <!-- Auth & Orientation -->
+    <string name="user">User</string>
+    <string name="password">Password</string>
     <string name="auto">Auto</string>
     <string name="portrait">Portrait</string>
     <string name="landscape">Landscape</string>
-    <string name="user">User</string>
-    <string name="password">Password</string>
-    
-    <string name="project_hint_search">Search...</string>
-    <string name="project_btn_exit_app">Exit App</string>
+    <string name="webview">Webview</string>
+    <string name="import_json">Import JSON</string>
+    <string name="export_json">Export JSON</string>
+    <string name="hint_paste_json">Paste JSON here...</string>
+
+    <!-- Project Editor & Sidebar -->
+    <string name="project_view_title">Project Editor</string>
+    <string name="project_sidebar_title_components">Components</string>
+    <string name="project_sidebar_category_display">Media Components</string>
+    <string name="project_sidebar_title_properties">Properties</string>
     <string name="project_cat_control">Operation Components</string>
     <string name="project_cat_sensor">Status Components</string>
-    <string name="project_msg_mqtt_failed">Connection failed. Check Broker settings...</string>
-    <string name="project_msg_mqtt_retrying">Retrying connection...</string>
-    <string name="project_dialog_title_debug_logs">Debug Logs</string>
-    <string name="project_log_mqtt_status">MQTT Status: %1$s</string>
-    <string name="msg_limit_reached">Free version is limited to 3 projects.</string>
-    <string name="title_limit_reached">Limit Reached</string>
-    <string name="dialog_btn_upgrade">Upgrade</string>
-    <!-- Component Labels (Sidebar) -->
+    <string name="project_prop_helper">Select a component to edit</string>
+    <string name="project_sidebar_btn_more">More</string>
+    <string name="project_sidebar_btn_collapse">Collapse</string>
+    
+    <string name="project_lock_portrait">Lock Portrait</string>
+    <string name="project_lock_landscape">Lock Landscape</string>
+    <string name="project_lock_auto">Auto Orientation</string>
+    <string name="project_btn_exit_app">Exit App</string>
+    <string name="project_id">Project ID</string>
+    <string name="project_hint_search">Search components...</string>
+
+    <!-- Project View Specific (Mapping old IDs) -->
+    <string name="project_hint_topic_target">Target Topic</string>
+    <string name="project_label_message">Payload Message</string>
+    <string name="project_btn_send_console">SEND</string>
+    <string name="project_prop_display_name">Display Name</string>
+    <string name="properties_label_button_text">Button Label</string>
+    <string name="properties_btn_select_icon">Select Icon</string>
+    <string name="properties_btn_no_icon">No Icon</string>
+    <string name="properties_btn_apply">Apply Changes</string>
+    <string name="properties_label_payload_press">Press Payload</string>
+    <string name="properties_label_trigger_mode">Trigger Mode</string>
+    <string name="properties_label_payload_release">Release Payload</string>
+    <string name="properties_mode_text">Text</string>
+    <string name="properties_mode_icon">Icon</string>
+    <string name="properties_mode_text_icon">Text + Icon</string>
+    <string name="properties_label_default">Default Value</string>
+    <string name="copy_code">Copy Code</string>
+
+    <!-- Component Labels -->
     <string name="component_label_button">Button</string>
     <string name="component_label_switch">Switch</string>
     <string name="component_label_slider">Slider</string>
     <string name="component_label_input">Input Box</string>
     <string name="component_label_camera">Camera</string>
-    
     <string name="component_label_led">LED</string>
     <string name="component_label_thermometer">Thermometer</string>
     <string name="component_label_level">Level Indicator</string>
-    
     <string name="component_label_text">Text Display</string>
     <string name="component_label_image">Image</string>
     <string name="component_label_chart">Chart</string>
-    <string name="project_sidebar_btn_more">More</string>
-    <string name="project_sidebar_btn_collapse">Collapse</string>
+
+    <!-- MQTT & Console -->
+    <string name="project_console_title">MQTT/System Logs</string>
+    <string name="project_hint_topic">Topic</string>
+    <string name="project_hint_payload">Payload</string>
+    <string name="project_btn_send">SEND</string>
+    <string name="msg_mqtt_failed">Connection Failed, Check Broker</string>
+    <string name="msg_mqtt_retry">Retrying Connection...</string>
+    <string name="msg_mqtt_connected">Connected</string>
+    <string name="project_log_mqtt_status">MQTT Status: %1$s</string>
+    <string name="project_msg_logs_copied">Logs Copied</string>
+    <string name="project_dialog_title_debug_logs">Debug Logs</string>
+
+    <!-- Common Messages & Dialogs -->
+    <string name="msg_limit_reached">Free version is limited to 3 projects.</string>
+    <string name="title_limit_reached">Limit Reached</string>
+    <string name="dialog_btn_upgrade">Upgrade</string>
+    <string name="dialog_language_title">Select Language</string>
+    <string name="dialog_delete_title">Delete Project</string>
+    <string name="dialog_delete_message">Are you sure you want to delete \'%s\'?</string>
+    <string name="dialog_change_id_title">Change Project ID</string>
+    <string name="dialog_import_title">Import Configuration</string>
+    <string name="dialog_export_title">Export Configuration</string>
+    <string name="common_msg_network_error">Network Error</string>
+    <string name="common_msg_copied_clipboard">Copied to Clipboard</string>
+    <string name="project_dialog_title_bottom_sheet">Status Detail</string>
+    <string name="dialog_change_id_msg">Enter the new project ID below.</string>
+    
+    <!-- Common Buttons & Actions -->
+    <string name="common_btn_delete">Delete</string>
+    <string name="common_btn_cancel">Cancel</string>
+    <string name="common_btn_close">Close</string>
+    <string name="common_btn_copy">Copy</string>
+    <string name="common_btn_save">Save File</string>
+    <string name="common_btn_gen_id">New ID</string>
+    <string name="arduino_code_export">Export Arduino Code</string>
+    <string name="btn_copy_topic_only">Copy Topic</string>
+    <string name="common_btn_load_file">Load File</string>
+    <string name="common_btn_load_text">Load Text</string>
+
+    <!-- Properties & Appearance -->
+    <string name="properties_title">Properties</string>
+    <string name="properties_section_general">General</string>
+    <string name="properties_section_interaction">Interaction Logic</string>
+    <string name="properties_section_appearance">Visual Appearance</string>
+    <string name="properties_label_topic">MQTT Topic</string>
+    <string name="properties_label_width">Width</string>
+    <string name="properties_label_height">Height</string>
+    <string name="properties_label_color">Accent Color</string>
+    <string name="properties_btn_clone">Clone</string>
+
+    <!-- Slider Properties -->
+    <string name="properties_section_range">Value Range</string>
+    <string name="prop_label_min">Min</string>
+    <string name="prop_label_max">Max</string>
+    <string name="prop_label_step">Step</string>
+    <string name="prop_label_send_mode">Send Mode</string>
+    <string name="prop_val_on_release">On Release</string>
+    <string name="prop_val_continuous">Continuous</string>
+    <string name="prop_label_interval">Send Interval (ms)</string>
+    <string name="prop_helper_interval">Minimum 100ms</string>
+    <string name="prop_label_orientation">Orientation</string>
+    <string name="prop_label_track_style">Track Style</string>
+    <string name="prop_label_thumb_style">Thumb Style</string>
+    <string name="prop_label_feedback">Hint</string>
+    <string name="prop_label_center_content">Center Content</string>
+
+    <string name="val_orient_horizontal">Horizontal</string>
+    <string name="val_orient_vertical">Vertical</string>
+    <string name="val_orient_semi_circle">Semi-Circle</string>
+    <string name="val_orient_full_circle">Full Circle</string>
+    <string name="val_track_thin">Classic Thin</string>
+    <string name="val_track_thick">Thick Tube</string>
+    <string name="val_thumb_glow">Circle Glow</string>
+    <string name="val_thumb_led">Square LED</string>
+    <string name="val_slider_style_classic">Classic</string>
+    <string name="val_slider_style_capsule">Capsule</string>
+    <string name="val_slider_style_arc">Arc</string>
+    <string name="val_slider_style_ring">Ring</string>
+    <string name="val_shape_square">Square</string>
+    <string name="val_shape_circle">Circle</string>
+    <string name="val_feedback_none">None</string>
+    <string name="val_feedback_ticks">Ticks</string>
+    <string name="val_feedback_bubble">Bubble</string>
+    <string name="val_feedback_both">Ticks + Bubble</string>
+    <string name="val_center_none">None</string>
+    <string name="val_center_value">Real-time Value</string>
+    <string name="val_center_icon">Icon</string>
+    
+    <!-- Component Specific Properties -->
+    <string name="prop_label_messages_lr">Messages (L / R)</string>
+    <string name="prop_label_messages_lcr">Messages (L / C / R)</string>
+    <string name="prop_label_left">L</string>
+    <string name="prop_label_center">C</string>
+    <string name="prop_label_right">R</string>
+    <string name="prop_hint_style">Style</string>
+    <string name="prop_hint_shape">Shape</string>
+    
+    <string name="val_style_classic">Classic</string>
+    <string name="val_style_lever">Lever</string>
+    <string name="val_shape_rounded_rect">Rounded</string>
+
+    <string name="val_shape_circle_style">Circle</string>
+    <string name="val_style_rounded">Rounded</string>
+    
+    <string name="val_mode_tap">Tap</string>
+    <string name="val_mode_hold">Hold</string>
+    <string name="val_mode_timer">Timer</string>
+    <string name="properties_unit_ms">ms</string>
+    
+    <string name="desc_mode_tap">Sends command on click.</string>
+    <string name="desc_mode_hold">Sends on press, reset on release.</string>
+    <string name="desc_mode_timer">Sends on press, auto-reset after time.</string>
+    
+    <string name="properties_switch_mode_standard">Standard</string>
+    <string name="properties_switch_mode_tri_state">Tri-State</string>
+    
+    <!-- Icons & Helper Descriptions -->
+    <string name="icon_none">None</string>
+    <string name="icon_power">Power</string>
+    <string name="icon_lighting">Lighting</string>
+    <string name="icon_fan">Fan</string>
+    <string name="icon_play">Play</string>
+    <string name="icon_tune">Tune</string>
+    <string name="icon_energy">Energy</string>
+    <string name="icon_desc_delete">Delete</string>
+    <string name="icon_desc_edit">Edit</string>
+    <string name="icon_desc_info">Info</string>
+    <string name="icon_desc_plus">Add</string>
+    <string name="icon_desc_send">Send</string>
+    
+    <!-- Messages & Status -->
+    <string name="project_component_gauge">Gauge</string>
+    <string name="project_component_text">Text</string>
+    <string name="project_msg_add_component">Component added</string>
+    <string name="project_msg_component_deleted">Component deleted</string>
+    <string name="project_msg_components_loaded">Components loaded</string>
+    <string name="project_msg_file_read_failed">Read failed</string>
+    <string name="project_msg_file_save_failed">Save failed</string>
+    <string name="project_msg_file_saved">Saved</string>
+    <string name="project_msg_id_copied">ID copied</string>
+    <string name="project_msg_init_error">Init error</string>
+    <string name="project_msg_mqtt_failed">MQTT failed</string>
+    <string name="project_msg_mqtt_retrying">Retrying MQTT...</string>
+    <string name="project_msg_select_component">Select a component</string>
+    <string name="project_msg_topic_copied">Topic copied</string>
+    <string name="project_prop_label">Label</string>
+    <string name="project_prop_topic">Topic</string>
 
 </resources>

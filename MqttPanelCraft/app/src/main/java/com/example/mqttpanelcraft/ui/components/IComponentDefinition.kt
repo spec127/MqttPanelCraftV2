@@ -6,31 +6,44 @@ import android.view.View
 import com.example.mqttpanelcraft.model.ComponentData
 
 /**
- * The "Soul" of a component.
- * Encapsulates its Identity (Type, Size), Appearance (Factory), 
+ * The "Soul" of a component. Encapsulates its Identity (Type, Size), Appearance (Factory),
  * Properties Logic (Binder), and Runtime Behavior (Behavior).
  */
 interface IComponentDefinition {
-    // 1. Identity & Defaults
-    val type: String
-    val defaultSize: Size // Ensure unify 100x100 if needed
-    val labelPrefix: String // e.g. "button"
-    
-    // 1.5 Sidebar Presentation
-    val iconResId: Int // e.g. R.drawable.ic_button
-    val group: String // e.g. "CONTROL", "DISPLAY", "SENSOR"
+        // 1. Identity & Defaults
+        val type: String
+        val defaultSize: Size // Ensure unify 100x100 if needed
+        val labelPrefix: String // e.g. "button"
 
-    // 2. Appearance (Factory)
-    fun createView(context: Context, isEditMode: Boolean): View
+        // 1.5 Sidebar Presentation
+        val iconResId: Int // e.g. R.drawable.ic_button
+        val group: String // e.g. "CONTROL", "DISPLAY", "SENSOR"
 
-    // 2.5 Dynamic Updates (Appearance changes after creation, e.g. Color)
-    fun onUpdateView(view: View, data: ComponentData)
+        // 2. Appearance (Factory)
+        fun createView(context: Context, isEditMode: Boolean): View
 
-    // 3. Properties (Binder)
-    val propertiesLayoutId: Int // Resource ID for specific properties (0 if none)
-    fun bindPropertiesPanel(panelView: View, data: ComponentData, onUpdate: (String, String) -> Unit)
+        // 2.5 Dynamic Updates (Appearance changes after creation, e.g. Color)
+        fun onUpdateView(view: View, data: ComponentData)
 
-    // 4. Runtime Behavior (BehaviorManager)
-    fun attachBehavior(view: View, data: ComponentData, sendMqtt: (topic: String, payload: String) -> Unit)
-    fun onMqttMessage(view: View, data: ComponentData, payload: String)
+        // 3. Properties (Binder)
+        val propertiesLayoutId: Int // Resource ID for specific properties (0 if none)
+        fun bindPropertiesPanel(
+                panelView: View,
+                data: ComponentData,
+                onUpdate: (String, String) -> Unit
+        )
+
+        // 4. Runtime Behavior (BehaviorManager)
+        fun attachBehavior(
+                view: View,
+                data: ComponentData,
+                sendMqtt: (topic: String, payload: String) -> Unit,
+                onUpdateProp: (key: String, value: String) -> Unit
+        )
+        fun onMqttMessage(
+                view: View,
+                data: ComponentData,
+                payload: String,
+                onUpdateProp: (key: String, value: String) -> Unit
+        )
 }

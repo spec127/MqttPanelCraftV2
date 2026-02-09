@@ -30,109 +30,132 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
-    <!-- Mode Toggle (2-Way / 3-Way) -->
-    <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/toggleMode"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_marginBottom="16dp"
-        app:singleSelection="true"
-        app:selectionRequired="true"
-        app:checkedButton="@+id/btnMode2Way">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMode2Way"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/properties_switch_mode_standard"
-            android:textSize="12sp"
-            android:padding="0dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMode3Way"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/properties_switch_mode_tri_state"
-            android:textSize="12sp"
-            android:padding="0dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"/>
-    </com.google.android.material.button.MaterialButtonToggleGroup>
-
-    <!-- Container: Tri-State (Switch Config) -->
+    <!-- Multi-Segment Config (Primary for Selector) -->
     <LinearLayout
-        android:id="@+id/containerTriStateConfig"
+        android:id="@+id/containerMultiConfig"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvPayloadLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Messages (L / C / R)"
-            android:textSize="12sp"
-            android:textColor="@color/prop_text_secondary"
-            android:layout_marginBottom="6dp"/>
-
+        <!-- Orientation & Count -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
             
-            <com.google.android.material.textfield.TextInputLayout
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleOrientation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:checkedButton="@+id/btnOrientHorz">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnOrientHorz"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="32dp"
+                    android:text="Horizontal"
+                    android:textSize="10sp"
+                    android:padding="0dp"
+                    app:cornerRadius="16dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnOrientVert"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="32dp"
+                    android:text="Vertical"
+                    android:textSize="10sp"
+                    android:padding="0dp"
+                    app:cornerRadius="16dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"/>
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <!-- Segments Count Control -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_input_outline"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="4dp">
+                <ImageView
+                    android:id="@+id/btnSegRemove"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_remove"
+                    app:tint="#796383"
+                    android:padding="6dp"
+                    android:background="?selectableItemBackgroundBorderless"/>
+                <TextView
+                    android:id="@+id/tvSegCount"
+                    android:layout_width="24dp"
+                    android:layout_height="wrap_content"
+                    android:text="3"
+                    android:gravity="center"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+                <ImageView
+                    android:id="@+id/btnSegAdd"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_add"
+                    app:tint="@color/props_primary"
+                    android:padding="6dp"
+                    android:background="?selectableItemBackgroundBorderless"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Headers -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                style="@style/Widget.App.TextInputLayout.Properties">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etPayloadLeft"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="L"
-                    android:inputType="text"
-                    android:textSize="14sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
-            
-            <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
+                android:text="LABEL"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:letterSpacing="0.05"
+                android:textAllCaps="true"/>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilPayloadCenter"
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="wrap_content"/>
+
+            <TextView
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                style="@style/Widget.App.TextInputLayout.Properties">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etPayloadCenter"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="C"
-                    android:inputType="text"
-                    android:textSize="14sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                android:text="VALUE"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:letterSpacing="0.05"
+                android:textAllCaps="true"/>
+        </LinearLayout>
 
-            <Space android:id="@+id/spacePayloadCenter" android:layout_width="8dp" android:layout_height="wrap_content"/>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                style="@style/Widget.App.TextInputLayout.Properties">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etPayloadRight"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="R"
-                    android:inputType="text"
-                    android:textSize="14sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
+        <!-- Segment List (Dynamic) -->
+        <LinearLayout
+            android:id="@+id/llSegmentsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:color/transparent"
+            android:padding="0dp">
         </LinearLayout>
     </LinearLayout>
 
@@ -170,7 +193,6 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
-    <!-- Style & Color Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

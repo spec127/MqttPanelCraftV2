@@ -186,16 +186,40 @@ class ProjectViewActivity : BaseActivity() {
         renderer = ComponentRenderer(editorCanvas, this)
 
         // 2. Behavior (Logic)
-        behaviorManager = ComponentBehaviorManager { topic, payload ->
-            // Send MQTT
-            val intent =
-                    Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java).apply {
-                        action = "PUBLISH"
-                        putExtra("TOPIC", topic)
-                        putExtra("PAYLOAD", payload)
-                    }
-            startService(intent)
-        }
+        behaviorManager =
+                ComponentBehaviorManager(
+                        { topic, payload ->
+                            // Send MQTT
+                            val intent =
+                                    Intent(
+                                                    this,
+                                                    com.example.mqttpanelcraft.service
+                                                                    .MqttService::class
+                                                            .java
+                                            )
+                                            .apply {
+                                                action = "PUBLISH"
+                                                putExtra("TOPIC", topic)
+                                                putExtra("PAYLOAD", payload)
+                                            }
+                            startService(intent)
+                        },
+                        { id, key, value ->
+                            // Sync property to ViewModel (and then to disk)
+                            viewModel.components.value?.find { it.id == id }?.let { comp ->
+                                if (comp.props[key] != value) {
+                                    val updated =
+                                            comp.copy(
+                                                    props =
+                                                            comp.props.toMutableMap().apply {
+                                                                put(key, value)
+                                                            }
+                                            )
+                                    viewModel.updateComponent(updated)
+                                }
+                            }
+                        }
+                )
 
         // 3. Interaction (Input)
         val peekHeightPx = (100 * resources.displayMetrics.density).toInt()

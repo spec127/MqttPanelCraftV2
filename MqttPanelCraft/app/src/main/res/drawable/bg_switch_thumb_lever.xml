@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Main Body -->
-    <item>
-        <shape android:shape="rectangle">
-            <corners android:radius="4dp" />
-            <solid android:color="#FFFFFF"/> <!-- Dynamic tint applied in code -->
-        </shape>
-    </item>
-    <!-- Top Highlight (Bevel) -->
-    <item android:top="1dp" android:left="1dp" android:right="1dp" android:bottom="2dp">
+    <!-- Glow Layer (Halo) -->
+    <item android:gravity="center">
          <shape android:shape="rectangle">
-            <corners android:radius="3dp"/>
-            <solid android:color="#20FFFFFF"/>
+            <corners android:radius="100dp"/>
+            <solid android:color="#00FFFFFF"/>
          </shape>
     </item>
-    <!-- Grip Line -->
-    <item android:gravity="center" android:width="24dp" android:height="2dp">
+    <!-- Slot Layer (Core) - Shorter than Glow via Insets -->
+    <item 
+        android:gravity="center"
+        android:top="1dp"
+        android:bottom="1dp">
          <shape android:shape="rectangle">
-             <corners android:radius="1dp"/>
-             <solid android:color="#40FFFFFF"/>
+             <size android:width="2dp" />
+             <corners android:radius="100dp"/>
+             <solid android:color="#40000000"/>
          </shape>
     </item>
 </layer-list>
