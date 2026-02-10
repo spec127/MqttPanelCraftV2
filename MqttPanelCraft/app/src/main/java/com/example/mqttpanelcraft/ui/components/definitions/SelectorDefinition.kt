@@ -1,6 +1,7 @@
 package com.example.mqttpanelcraft.ui.components.definitions
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
@@ -12,8 +13,10 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
@@ -59,9 +62,8 @@ object SelectorDefinition : IComponentDefinition {
 
         val style = data.props["style"] ?: Style.ROUNDED
         val orient = data.props["orientation"] ?: "horz"
-        val segmentsJson = data.props["segments"] ?: ""
-
-        val signature = "style:$style|orient:$orient|segs:${parseSegments(segmentsJson).size}"
+        // Signature includes style/orient but NOT segment count/value to allow optimized reuse
+        val signature = "style:$style|orient:$orient"
 
         if (root.tag != signature) {
             root.removeAllViews()
@@ -87,17 +89,26 @@ object SelectorDefinition : IComponentDefinition {
         val density = container.resources.displayMetrics.density
         val isVertical = (orientation == "vert")
         container.orientation = if (isVertical) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL
-        container.layoutTransition = android.animation.LayoutTransition()
+        container.layoutTransition =
+                null // Disable auto transition to prevent flicker during updates
 
         val bg = GradientDrawable()
         val style = data.props["style"] ?: Style.ROUNDED
         val isCircle = (style == Style.CIRCLE)
 
-        bg.setColor(Color.parseColor("#F8FAFC"))
-        bg.setStroke((2 * density).toInt(), Color.parseColor("#94A3B8"))
+        val isDark =
+                (container.context.resources.configuration.uiMode and
+                        android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+                        android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+        val bgColor = if (isDark) Color.parseColor("#1E293B") else Color.parseColor("#F8FAFC")
+        val strokeColor = if (isDark) Color.parseColor("#475569") else Color.parseColor("#94A3B8")
+
+        bg.setColor(bgColor)
+        bg.setStroke((2 * density).toInt(), strokeColor)
 
         if (isCircle) {
-            bg.shape = GradientDrawable.RECTANGLE
+            bg.shape = GradientDrawable.RECTANGLE // Container is still rect
             bg.cornerRadius = (999 * density)
         } else {
             bg.shape = GradientDrawable.RECTANGLE
@@ -110,9 +121,21 @@ object SelectorDefinition : IComponentDefinition {
 
         val render = {
             if (container.width > 0 && container.height > 0) {
-                container.removeAllViews()
                 val segments = parseSegments(data.props["segments"] ?: "")
                 if (segments.isEmpty()) segments.add(Segment("Err", "0"))
+
+                // Optimization: Reuse views if count matches
+                if (container.childCount != segments.size) {
+                    container.removeAllViews()
+                    segments.forEach { _ ->
+                        val btn = TextView(container.context)
+                        btn.gravity = Gravity.CENTER
+                        btn.textSize = 11f
+                        btn.typeface = Typeface.DEFAULT_BOLD
+                        btn.isAllCaps = true
+                        container.addView(btn)
+                    }
+                }
 
                 val w = container.width - container.paddingLeft - container.paddingRight
                 val h = container.height - container.paddingTop - container.paddingBottom
@@ -126,18 +149,43 @@ object SelectorDefinition : IComponentDefinition {
                     val gapSize = (4 * density).toInt()
 
                     segments.forEachIndexed { index, seg ->
-                        val btn = TextView(container.context)
-                        btn.text = seg.label
+                        val btn = container.getChildAt(index) as TextView
                         btn.tag = seg
-                        btn.gravity = Gravity.CENTER
-                        btn.textSize = 11f
-                        btn.typeface = Typeface.DEFAULT_BOLD
-                        btn.isAllCaps = true
 
-                        val lp = LinearLayout.LayoutParams(0, 0)
+                        // Icon vs Text logic
+                        if (seg.type == "icon") {
+                            btn.text = ""
+                            val iconRes = getIconRes(seg.label) // Label stores icon key
+                            val d = ContextCompat.getDrawable(container.context, iconRes)?.mutate()
+                            val iconSize = (itemSize * 0.5f).toInt()
+                            d?.setBounds(0, 0, iconSize, iconSize)
+                            // Tint will be set in updateMultiSegmentButtons
+                            btn.setCompoundDrawables(
+                                    null,
+                                    d,
+                                    null,
+                                    null
+                            ) // Top drawable as icon? Or explicit?
+                            // Centering drawable in TextView can be tricky. Using
+                            // setCompoundDrawables with centered gravity works if text is empty.
+                            // But better: use a simpler approach. Left/Top/Right/Bottom doesn't
+                            // center well without text.
+                            // Let's use setCompoundDrawablesWithIntrinsicBounds if we scale it?
+                            // Manual scaling:
+                            btn.setCompoundDrawables(null, d, null, null)
+                        } else {
+                            btn.text = seg.label
+                            btn.setCompoundDrawables(null, null, null, null)
+                        }
+
+                        val lp =
+                                btn.layoutParams as? LinearLayout.LayoutParams
+                                        ?: LinearLayout.LayoutParams(0, 0)
+
                         if (isCircle) {
                             lp.width = itemSize
                             lp.height = itemSize
+                            lp.weight = 0f // No weight for circles to keep aspect ratio
                         } else {
                             lp.width = if (isVertical) LinearLayout.LayoutParams.MATCH_PARENT else 0
                             lp.height =
@@ -146,11 +194,19 @@ object SelectorDefinition : IComponentDefinition {
                         }
 
                         if (index > 0) {
-                            if (isVertical) lp.topMargin = gapSize else lp.leftMargin = gapSize
+                            if (isVertical) {
+                                lp.topMargin = gapSize
+                                lp.leftMargin = 0
+                            } else {
+                                lp.leftMargin = gapSize
+                                lp.topMargin = 0
+                            }
+                        } else {
+                            lp.topMargin = 0
+                            lp.leftMargin = 0
                         }
 
                         btn.layoutParams = lp
-                        container.addView(btn)
                     }
                     val savedValue = data.props["value"]
                     updateMultiSegmentButtons(container, savedValue, color, isCircle, itemSize)
@@ -173,6 +229,11 @@ object SelectorDefinition : IComponentDefinition {
             size: Int
     ) {
         val density = container.resources.displayMetrics.density
+        val isDark =
+                (container.context.resources.configuration.uiMode and
+                        android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+                        android.content.res.Configuration.UI_MODE_NIGHT_YES
+
         for (i in 0 until container.childCount) {
             val child = container.getChildAt(i) as? TextView ?: continue
             val seg = child.tag as? Segment
@@ -186,27 +247,38 @@ object SelectorDefinition : IComponentDefinition {
             bg.shape = if (isCircle) GradientDrawable.OVAL else GradientDrawable.RECTANGLE
             bg.cornerRadius = radius
 
+            val activeTextColor = Color.WHITE
+            val inactiveTextColor =
+                    if (isDark) Color.parseColor("#94A3B8") else Color.parseColor("#64748B")
+            val inactiveStrokeColor =
+                    if (isDark) Color.parseColor("#334155") else Color.parseColor("#E2E8F0")
+
             if (isSelected) {
                 bg.setColor(color)
                 bg.setStroke(0, 0)
-                child.setTextColor(Color.WHITE)
+                child.setTextColor(activeTextColor)
                 child.elevation = (4 * density)
                 child.translationZ = (2 * density)
-                child.animate().scaleX(0.95f).scaleY(0.95f).setDuration(120).start()
+                child.compoundDrawables.forEach { it?.setTint(activeTextColor) }
+                // Only animate if state changed - hard to track prev state here efficiently without
+                // extra tag
+                // keeping it simple for now, but reducing duraion
+                child.animate().scaleX(0.95f).scaleY(0.95f).setDuration(50).start()
             } else {
                 if (isCircle) {
-                    bg.setColor(Color.WHITE)
-                    bg.setStroke((1 * density).toInt(), Color.parseColor("#E2E8F0"))
-                    child.setTextColor(Color.parseColor("#94A3B8"))
+                    bg.setColor(if (isDark) Color.parseColor("#0F172A") else Color.WHITE)
+                    bg.setStroke((1 * density).toInt(), inactiveStrokeColor)
+                    child.setTextColor(inactiveTextColor)
                     child.elevation = (1 * density)
                 } else {
                     bg.setColor(Color.TRANSPARENT)
                     bg.setStroke(0, 0)
-                    child.setTextColor(Color.parseColor("#64748B"))
+                    child.setTextColor(inactiveTextColor)
                     child.elevation = 0f
                 }
                 child.translationZ = 0f
-                child.animate().scaleX(1.0f).scaleY(1.0f).setDuration(120).start()
+                child.compoundDrawables.forEach { it?.setTint(inactiveTextColor) }
+                child.animate().scaleX(1.0f).scaleY(1.0f).setDuration(50).start()
             }
             child.background = bg
         }
@@ -221,7 +293,7 @@ object SelectorDefinition : IComponentDefinition {
     ) {
         val context = panelView.context
 
-        // 0. Topic Config (Shared)
+        // Topic
         val etTopic = panelView.rootView.findViewById<EditText>(R.id.etPropTopicConfig)
         etTopic?.setText(data.topicConfig)
         etTopic?.addTextChangedListener(
@@ -234,25 +306,26 @@ object SelectorDefinition : IComponentDefinition {
                 }
         )
 
+        // Style
         val spStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spPropStyle)
         val styles =
                 listOf(
                         context.getString(R.string.val_style_rounded),
                         context.getString(R.string.val_shape_circle_style)
                 )
-        val adapterS = ArrayAdapter(context, R.layout.list_item_dropdown, styles)
-        spStyle.setAdapter(adapterS)
+        spStyle?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, styles))
         val curStyle = data.props["style"] ?: Style.ROUNDED
         val displayStyle =
                 if (curStyle == Style.CIRCLE) context.getString(R.string.val_shape_circle_style)
                 else context.getString(R.string.val_style_rounded)
-        spStyle.setText(displayStyle, false)
+        spStyle?.setText(displayStyle, false)
 
-        spStyle.setOnItemClickListener { _, _, position, _ ->
+        spStyle?.setOnItemClickListener { _, _, position, _ ->
             val key = if (position == 1) Style.CIRCLE else Style.ROUNDED
             onUpdate("style", key)
         }
 
+        // Orientation
         val toggleOrient = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleOrientation)
         toggleOrient.check(
                 if (data.props["orientation"] == "vert") R.id.btnOrientVert else R.id.btnOrientHorz
@@ -272,54 +345,50 @@ object SelectorDefinition : IComponentDefinition {
 
         setupSegmentEditor(panelView, context, data, onUpdate)
 
-        // Colors
-        val colorViews =
-                listOf(
-                        panelView.findViewById<View>(R.id.vColor1),
-                        panelView.findViewById<View>(R.id.vColor2),
-                        panelView.findViewById<View>(R.id.vColor3),
-                        panelView.findViewById<View>(R.id.vColor4),
-                        panelView.findViewById<View>(R.id.vColor5)
-                )
-
-        fun refreshColors() {
-            val recentColors = com.example.mqttpanelcraft.data.ColorHistoryManager.load(context)
-            colorViews.forEachIndexed { index, view ->
-                if (index < recentColors.size) {
-                    val cHex = recentColors[index]
-                    try {
-                        val colorInt = Color.parseColor(cHex)
-                        view?.backgroundTintList =
-                                android.content.res.ColorStateList.valueOf(colorInt)
-                        view?.setOnClickListener { onUpdate("color", cHex) }
-                    } catch (e: Exception) {}
+        // Colors (Simplified for brevity, assuming ColorHistoryManager exists)
+        panelView.findViewById<View>(R.id.containerColorPalette)?.let { container ->
+            // Reusing generic color logic if possible, or bind custom here
+            // For now assume standard binding...
+            val colorViews =
+                    listOf(
+                            container.findViewById<View>(R.id.vColor1),
+                            container.findViewById<View>(R.id.vColor2),
+                            container.findViewById<View>(R.id.vColor3),
+                            container.findViewById<View>(R.id.vColor4),
+                            container.findViewById<View>(R.id.vColor5)
+                    )
+            fun refreshColors() {
+                val recent = com.example.mqttpanelcraft.data.ColorHistoryManager.load(context)
+                colorViews.forEachIndexed { i, v ->
+                    if (i < recent.size) {
+                        v?.backgroundTintList = ColorStateList.valueOf(Color.parseColor(recent[i]))
+                        v?.setOnClickListener { onUpdate("color", recent[i]) }
+                    }
                 }
             }
-        }
-        refreshColors()
+            refreshColors()
 
-        panelView.findViewById<View>(R.id.btnColorCustom)?.setOnClickListener { anchor ->
-            val cur = data.props["color"] ?: "#a573bc"
-            var tempColor = cur
-            ColorPickerDialog(
-                            context = context,
-                            initialColor = cur,
-                            showAlpha = true,
-                            onColorSelected = {
-                                tempColor = it
-                                onUpdate("color", it)
-                            },
-                            onDismiss = {
-                                if (tempColor != cur) {
+            container.findViewById<View>(R.id.btnColorCustom)?.setOnClickListener { anchor ->
+                val cur = data.props["color"] ?: "#a573bc"
+                var tempColor = cur
+                ColorPickerDialog(
+                                context,
+                                cur,
+                                true,
+                                { c ->
+                                    tempColor = c
+                                    onUpdate("color", c)
+                                },
+                                {
                                     com.example.mqttpanelcraft.data.ColorHistoryManager.save(
                                             context,
                                             tempColor
                                     )
                                     refreshColors()
                                 }
-                            }
-                    )
-                    .show(anchor)
+                        )
+                        .show(anchor)
+            }
         }
     }
 
@@ -337,7 +406,12 @@ object SelectorDefinition : IComponentDefinition {
         fun save() {
             val json = JSONArray()
             segmentList.forEach {
-                json.put(JSONObject().put("label", it.label).put("value", it.value))
+                json.put(
+                        JSONObject()
+                                .put("label", it.label)
+                                .put("value", it.value)
+                                .put("type", it.type)
+                )
             }
             onUpdate("segments", json.toString())
             tvCount.text = "${segmentList.size}"
@@ -351,14 +425,44 @@ object SelectorDefinition : IComponentDefinition {
                                 .inflate(R.layout.layout_switch_segment_row, llSegs, false)
                 val etLabel = row.findViewById<EditText>(R.id.etSegLabel)
                 val etValue = row.findViewById<EditText>(R.id.etSegValue)
+                val btnToggle = row.findViewById<ImageView>(R.id.btnSegIconToggle)
+
                 etLabel.setText(seg.label)
                 etValue.setText(seg.value)
+
+                // Toggle Icon State
+                fun updateRefIcon() {
+                    if (seg.type == "icon") {
+                        btnToggle.setImageResource(
+                                R.drawable.ic_text_fields
+                        ) // Shows T (Click to switch to text)
+                        etLabel.hint = "Icon Key" // e.g. power
+                    } else {
+                        btnToggle.setImageResource(
+                                R.drawable.ic_emoji_emotions
+                        ) // Shows Smile (Click to switch to icon)
+                        etLabel.hint = "Label"
+                    }
+                }
+                updateRefIcon()
+
+                btnToggle.setOnClickListener {
+                    if (seg.type == "text") {
+                        seg.type = "icon"
+                        // Suggest current text as icon key if it matches known keys?
+                        // For now just keep text
+                    } else {
+                        seg.type = "text"
+                    }
+                    updateRefIcon()
+                    save()
+                }
 
                 val watcher =
                         object : android.text.TextWatcher {
                             override fun afterTextChanged(s: android.text.Editable?) {
-                                segmentList[index] =
-                                        Segment(etLabel.text.toString(), etValue.text.toString())
+                                seg.label = etLabel.text.toString()
+                                seg.value = etValue.text.toString()
                                 save()
                             }
                             override fun beforeTextChanged(
@@ -409,6 +513,7 @@ object SelectorDefinition : IComponentDefinition {
             for (i in 0 until m.childCount) {
                 val btn = m.getChildAt(i)
                 val seg = btn.tag as? Segment
+                btn.isClickable = true
                 btn.setOnClickListener {
                     if (seg != null) {
                         sendMqtt(data.topicConfig, seg.value)
@@ -461,7 +566,7 @@ object SelectorDefinition : IComponentDefinition {
         }
     }
 
-    data class Segment(val label: String, val value: String)
+    data class Segment(var label: String, var value: String, var type: String = "text")
     private fun parseSegments(json: String): MutableList<Segment> {
         val list = mutableListOf<Segment>()
         if (json.isEmpty()) {
@@ -471,11 +576,28 @@ object SelectorDefinition : IComponentDefinition {
             val arr = JSONArray(json)
             for (i in 0 until arr.length()) {
                 val obj = arr.getJSONObject(i)
-                list.add(Segment(obj.getString("label"), obj.getString("value")))
+                list.add(
+                        Segment(
+                                obj.optString("label", "?"),
+                                obj.optString("value", "0"),
+                                obj.optString("type", "text")
+                        )
+                )
             }
         } catch (e: Exception) {
             return mutableListOf(Segment("Error", "0"))
         }
         return list
     }
+
+    private fun getIconRes(key: String): Int =
+            when (key) {
+                "power" -> R.drawable.ic_btn_power
+                "lighting" -> R.drawable.ic_btn_lighting
+                "fan" -> R.drawable.ic_btn_fan
+                "play" -> R.drawable.ic_btn_play
+                "tune" -> R.drawable.ic_btn_tune
+                "energy" -> R.drawable.ic_btn_energy
+                else -> R.drawable.ic_btn_power
+            }
 }

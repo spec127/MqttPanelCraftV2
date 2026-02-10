@@ -135,6 +135,7 @@
     <string name="msg_mqtt_failed">Connection Failed, Check Broker</string>
     <string name="msg_mqtt_retry">Retrying Connection...</string>
     <string name="msg_mqtt_connected">Connected</string>
+    <string name="msg_mqtt_disconnected">Disconnected</string>
     <string name="project_log_mqtt_status">MQTT Status: %1$s</string>
     <string name="project_msg_logs_copied">Logs Copied</string>
     <string name="project_dialog_title_debug_logs">Debug Logs</string>
@@ -169,8 +170,8 @@
     <!-- Properties & Appearance -->
     <string name="properties_title">Properties</string>
     <string name="properties_section_general">General</string>
-    <string name="properties_section_interaction">Interaction Logic</string>
-    <string name="properties_section_appearance">Visual Appearance</string>
+    <string name="properties_section_interaction">Interaction</string>
+    <string name="properties_section_appearance">Appearance</string>
     <string name="properties_label_topic">MQTT Topic</string>
     <string name="properties_label_width">Width</string>
     <string name="properties_label_height">Height</string>
@@ -181,12 +182,12 @@
     <string name="properties_section_range">Value Range</string>
     <string name="prop_label_min">Min</string>
     <string name="prop_label_max">Max</string>
-    <string name="prop_label_step">Step</string>
+    <string name="prop_label_step">Interval</string>
     <string name="prop_label_send_mode">Send Mode</string>
     <string name="prop_val_on_release">On Release</string>
     <string name="prop_val_continuous">Continuous</string>
     <string name="prop_label_interval">Send Interval (ms)</string>
-    <string name="prop_helper_interval">Minimum 100ms</string>
+    <string name="prop_helper_interval">Minimum 50ms</string>
     <string name="prop_label_orientation">Orientation</string>
     <string name="prop_label_track_style">Track Style</string>
     <string name="prop_label_thumb_style">Thumb Style</string>
@@ -274,5 +275,7 @@
     <string name="project_msg_topic_copied">Topic copied</string>
     <string name="project_prop_label">Label</string>
     <string name="project_prop_topic">Topic</string>
+
+
 
 </resources>

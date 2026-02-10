@@ -512,6 +512,24 @@ class ProjectViewActivity : BaseActivity() {
                 }
             }
 
+            // V18.5: Critical Fix for Property Reset Bug
+            // Ensure PropertiesSheetManager has the latest geometry data
+            if (selectedComponentId != null) {
+                val selectedComp = components.find { it.id == selectedComponentId }
+                if (selectedComp != null) {
+                    // Update the internal data reference without re-binding everything (which would
+                    // kill focus)
+                    // We need a new method in PropertiesSheetManager for this "silent update"
+                    propertiesManager.updateCurrentData(selectedComp)
+
+                    // Also update dimensions UI if it's open, but careful not to interrupt typing
+                    // propertiesManager.updateDimensions(selectedComp.width, selectedComp.height)
+                    // is safe as it checks isBinding
+                    val density = resources.displayMetrics.density
+                    propertiesManager.updateDimensions(selectedComp.width, selectedComp.height)
+                }
+            }
+
             if (components.isNotEmpty()) {
                 val maxY = components.maxOf { it.y + it.height }
                 editorCanvas.tag = maxY // Store for occlusion logic

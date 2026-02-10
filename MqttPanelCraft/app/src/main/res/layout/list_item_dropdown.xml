@@ -10,6 +10,6 @@
     android:paddingTop="12dp"
     android:paddingBottom="12dp"
     android:minHeight="48dp"
-    android:textColor="#1F2937"
+    android:textColor="?android:attr/textColorPrimary"
     android:ellipsize="end"
     android:maxLines="1" />

@@ -379,6 +379,11 @@ class SidebarManager(
                                         "SWITCH" -> {
                                                 dummyProps["state"] = "2" // ON state (solid track)
                                         }
+                                        "SLIDER" -> {
+                                                dummyProps["value"] =
+                                                        "35" // V18.4: Set to 35% for better
+                                                // visibility in sidebar
+                                        }
                                 }
 
                                 val dummyData =

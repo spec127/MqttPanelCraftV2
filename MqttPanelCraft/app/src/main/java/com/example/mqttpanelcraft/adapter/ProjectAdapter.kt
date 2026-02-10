@@ -4,18 +4,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.Project
 import com.google.android.material.chip.Chip
 
-import android.widget.PopupMenu
-
 class ProjectAdapter(
-    private var projects: List<Project>,
-    private val onProjectClick: (Project) -> Unit,
-    private val onMenuClick: (Project, String) -> Unit
+        private var projects: List<Project>,
+        private val onProjectClick: (Project) -> Unit,
+        private val onMenuClick: (Project, String) -> Unit
 ) : RecyclerView.Adapter<ProjectAdapter.ProjectViewHolder>() {
 
     class ProjectViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -23,12 +22,12 @@ class ProjectAdapter(
         val tvBrokerUrl: TextView = itemView.findViewById(R.id.tvBrokerUrl)
         val chipType: Chip = itemView.findViewById(R.id.chipType)
         val viewStatus: View = itemView.findViewById(R.id.viewStatus)
+        val tvStatusText: TextView = itemView.findViewById(R.id.tvStatusText)
         val ivMenu: ImageView = itemView.findViewById(R.id.ivMenu)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_project, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_project, parent, false)
         return ProjectViewHolder(view)
     }
 
@@ -36,23 +35,31 @@ class ProjectAdapter(
         val project = projects[position]
         holder.tvProjectName.text = project.name
         holder.tvBrokerUrl.text = project.broker
-        holder.chipType.text = when(project.type.name) {
-            "HOME" -> "PANEL"
-            else -> project.type.name
-        }
+        holder.chipType.text =
+                when (project.type.name) {
+                    "HOME" -> "PANEL"
+                    else -> project.type.name
+                }
 
-        // Status Dot Color
-        val statusDrawable = if (project.isConnected) {
-            R.drawable.shape_circle_green
-        } else {
-            R.drawable.shape_circle_red
-        }
+        // Status Dot Color & Text
+        val statusDrawable =
+                if (project.isConnected) {
+                    holder.tvStatusText.text =
+                            holder.itemView.context.getString(R.string.msg_mqtt_connected)
+                    holder.tvStatusText.setTextColor(
+                            android.graphics.Color.parseColor("#4CAF50")
+                    ) // Green
+                    R.drawable.shape_circle_green
+                } else {
+                    holder.tvStatusText.text =
+                            holder.itemView.context.getString(R.string.msg_mqtt_disconnected)
+                    holder.tvStatusText.setTextColor(android.graphics.Color.RED)
+                    R.drawable.shape_circle_red
+                }
         holder.viewStatus.setBackgroundResource(statusDrawable)
 
-        holder.itemView.setOnClickListener {
-            onProjectClick(project)
-        }
-        
+        holder.itemView.setOnClickListener { onProjectClick(project) }
+
         // Handle menu click
         holder.ivMenu.setOnClickListener { view ->
             val popup = PopupMenu(view.context, view)
@@ -70,7 +77,7 @@ class ProjectAdapter(
     }
 
     override fun getItemCount() = projects.size
-    
+
     fun updateData(newProjects: List<Project>) {
         projects = newProjects
         notifyDataSetChanged()

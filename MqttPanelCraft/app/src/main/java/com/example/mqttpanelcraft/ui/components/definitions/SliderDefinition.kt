@@ -23,18 +23,22 @@ import com.google.android.material.textfield.TextInputLayout
 object SliderDefinition : IComponentDefinition {
 
     override val type = "SLIDER"
-    override val defaultSize = Size(160, 100)
+    override val defaultSize = Size(150, 70)
     override val labelPrefix = "slider"
     override val iconResId = android.R.drawable.ic_menu_preferences
     override val group = "CONTROL"
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
+        // V17.0: Allow bubble to overflow
+        container.clipChildren = false
+        container.clipToPadding = false
+
         val slider =
                 com.example.mqttpanelcraft.ui.views.PanelSliderView(context).apply {
                     minValue = 0f
-                    maxValue = 100f
-                    value = 50f
+                    maxValue = 10f
+                    value = 0f
                     stepSize = 1.0f
                     layoutParams =
                             FrameLayout.LayoutParams(
@@ -47,6 +51,7 @@ object SliderDefinition : IComponentDefinition {
     }
 
     override fun onUpdateView(view: View, data: ComponentData) {
+        view.tag = data // V15.2: Update tag with latest properties
         val container = view as? FrameLayout ?: return
         val slider = findSliderIn(container) ?: return
 
@@ -60,9 +65,6 @@ object SliderDefinition : IComponentDefinition {
         slider.feedback = data.props["feedback"] ?: "None"
 
         // Advanced props
-        // slider.unit = data.props["unit"] ?: ""
-        slider.label = data.props["label"] ?: ""
-        slider.iconKey = data.props["icon"] ?: "tune"
 
         data.props["color"]?.let { colorCode ->
             try {
@@ -160,16 +162,29 @@ object SliderDefinition : IComponentDefinition {
             onUpdate("sliderStyle", newStyle)
         }
 
-        setupDropdown(
-                panelView.findViewById(R.id.spOrientation),
-                listOf("Horizontal", "Vertical"),
-                data.props["orientation"] ?: "Horizontal"
-        ) { newOrientation ->
+        // Orientation
+        val spOrient = panelView.findViewById<AutoCompleteTextView>(R.id.spOrientation)
+        val orientKeys = listOf("Horizontal", "Vertical")
+        val orientOptions =
+                listOf(
+                        context.getString(R.string.val_orient_horizontal),
+                        context.getString(R.string.val_orient_vertical)
+                )
+
+        spOrient?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, orientOptions))
+        val currentOrient = data.props["orientation"] ?: "Horizontal"
+        val orientIndex = orientKeys.indexOf(currentOrient).coerceAtLeast(0)
+        spOrient?.setText(orientOptions[orientIndex], false)
+
+        spOrient?.setOnItemClickListener { _, _, position, _ ->
+            val newOrientation = orientKeys[position]
             val oldOrientation = data.props["orientation"] ?: "Horizontal"
             if (newOrientation != oldOrientation) {
-                // Update dimensions via 'w' and 'h' keys to match PropertiesSheetManager listeners
-                onUpdate("w", data.height.toString())
-                onUpdate("h", data.width.toString())
+                // Swap W and H to reflect rotation in the editor
+                val oldW = data.width
+                val oldH = data.height
+                onUpdate("w", oldH.toString())
+                onUpdate("h", oldW.toString())
             }
             onUpdate("orientation", newOrientation)
         }
@@ -225,50 +240,25 @@ object SliderDefinition : IComponentDefinition {
         }
 
         // --- Bottom Row: Hint & Color ---
-        val containerFeedbackUnit = panelView.findViewById<View>(R.id.containerFeedbackUnit)
-        val etFeedbackUnit =
-                panelView.findViewById<com.google.android.material.textfield.TextInputEditText>(
-                        R.id.etFeedbackUnit
+        val currentFeedback = data.props["feedback"] ?: "None"
+        val feedbackDropdown = panelView.findViewById<AutoCompleteTextView>(R.id.spFeedback)
+        val feedbackKeys = listOf("None", "Ticks", "Bubble", "Both")
+        val feedbackOptions =
+                listOf(
+                        context.getString(R.string.val_feedback_none),
+                        context.getString(R.string.val_feedback_ticks),
+                        context.getString(R.string.val_feedback_bubble),
+                        context.getString(R.string.val_feedback_both)
                 )
 
-        etFeedbackUnit?.setText(data.props["unit"] ?: "")
-        etFeedbackUnit?.addTextChangedListener(watcher("unit"))
+        feedbackDropdown?.setAdapter(
+                ArrayAdapter(context, R.layout.list_item_dropdown, feedbackOptions)
+        )
+        val fbIndex = feedbackKeys.indexOf(currentFeedback).coerceAtLeast(0)
+        feedbackDropdown?.setText(feedbackOptions[fbIndex], false)
 
-        /* Removed Unit Binding for V6
-        fun updateFeedbackUnitVisibility(feedback: String) {
-            val showUnit = feedback == "Bubble" || feedback == "Both"
-            containerFeedbackUnit?.visibility = if (showUnit) View.VISIBLE else View.GONE
-        }
-        */
-        val currentFeedback = data.props["feedback"] ?: "None"
-        // updateFeedbackUnitVisibility(currentFeedback)
-
-        setupDropdown(
-                panelView.findViewById(R.id.spFeedback),
-                listOf("None", "Ticks", "Bubble", "Both"),
-                currentFeedback
-        ) {
-            onUpdate("feedback", it)
-            // updateFeedbackUnitVisibility(it)
-        }
-    }
-
-    private fun setupDropdown(
-            view: AutoCompleteTextView?,
-            options: List<String>,
-            current: String,
-            onSelect: (String) -> Unit
-    ) {
-        view?.apply {
-            val adapter =
-                    android.widget.ArrayAdapter(
-                            context,
-                            android.R.layout.simple_dropdown_item_1line,
-                            options
-                    )
-            setAdapter(adapter)
-            setText(current, false)
-            setOnItemClickListener { _, _, position, _ -> onSelect(options[position]) }
+        feedbackDropdown?.setOnItemClickListener { _, _, position, _ ->
+            onUpdate("feedback", feedbackKeys[position])
         }
     }
 
@@ -283,33 +273,57 @@ object SliderDefinition : IComponentDefinition {
         val container = view as? FrameLayout ?: return
         val slider = findSliderIn(container) ?: return
 
-        var lastSendTime = 0L
+        // REMOVED: Local variables caused reset on re-attach
+        // var lastSendTime = 0L
+        // var isFirstMoveSinceActionUp = true
 
-        slider.onValueChange = { value ->
-            // 1. Sync value to property (Persistence)
-            onUpdateProp("value", value.toString())
+        // V17.3: Use onActionDown to start continuous sending loop
+        slider.onActionDown = {
+            val currentData = (view.tag as? ComponentData) ?: data
+            val sendMode = currentData.props["sendMode"] ?: "release"
 
-            // 2. Throttled Continuous Send Mode
-            val sendMode = data.props["sendMode"] ?: "release"
             if (sendMode == "continuous") {
-                val interval = data.props["interval"]?.toLongOrNull() ?: 200L
-                val now = System.currentTimeMillis()
+                // Min interval 50ms as requested
+                val interval =
+                        (currentData.props["interval"]?.toLongOrNull() ?: 200L).coerceAtLeast(50L)
 
-                if (now - lastSendTime >= interval) {
-                    val topic = data.topicConfig
+                android.util.Log.d("SliderMode", "🔄 START Loop: interval=$interval ms")
+
+                // Start loop: Sends immediately, then every interval
+                slider.startRepeatingTask(interval) {
+                    val topic = currentData.topicConfig
+                    val valToSend = slider.value.toInt().toString()
                     if (topic.isNotEmpty()) {
-                        sendMqtt(topic, value.toInt().toString())
-                        lastSendTime = now
+                        android.util.Log.d("SliderMode", "✅ SEND: Loop ($valToSend)")
+                        sendMqtt(topic, valToSend)
                     }
                 }
             }
         }
 
+        slider.onValueChange = { value ->
+            // Just update model, NO MQTT here for continuous mode
+            onUpdateProp("value", value.toString())
+        }
+
         slider.onActionUp = {
-            // Always send on release to ensure final value correctness
-            val topic = data.topicConfig
+            val currentData = (view.tag as? ComponentData) ?: data
+            val currentValue = slider.value
+
+            // Stop continuous loop
+            slider.stopRepeatingTask()
+            android.util.Log.d("SliderMode", "🛑 STOP Loop")
+
+            // Always update model on release
+            onUpdateProp("value", currentValue.toString())
+
+            // Always send final value on action up (ensures last value is sent)
+            val topic = currentData.topicConfig
             if (topic.isNotEmpty()) {
-                sendMqtt(topic, slider.value.toInt().toString())
+                android.util.Log.d("SliderMode", "✅ SEND: Final/Release ($currentValue)")
+                sendMqtt(topic, currentValue.toInt().toString())
+            } else {
+                android.util.Log.w("SliderMode", "⚠️ Release but topic is empty")
             }
         }
     }
