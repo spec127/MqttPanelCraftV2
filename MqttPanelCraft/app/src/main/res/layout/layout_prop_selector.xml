@@ -59,7 +59,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="32dp"
-                    android:text="Horizontal"
+                    android:text="@string/val_orient_horizontal"
                     android:textSize="10sp"
                     android:padding="0dp"
                     app:cornerRadius="16dp"
@@ -71,7 +71,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="32dp"
-                    android:text="Vertical"
+                    android:text="@string/val_orient_vertical"
                     android:textSize="10sp"
                     android:padding="0dp"
                     app:cornerRadius="16dp"
@@ -119,28 +119,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:paddingHorizontal="2dp">
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_weight="0.6"
                 android:layout_height="wrap_content"
-                android:text="LABEL"
+                android:text="@string/prop_label_label_caps"
+                android:paddingStart="12dp"
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:textColor="@color/prop_text_secondary"
                 android:letterSpacing="0.05"
                 android:textAllCaps="true"/>
 
-            <Space
-                android:layout_width="8dp"
-                android:layout_height="wrap_content"/>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:visibility="invisible"/>
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_weight="0.4"
                 android:layout_height="wrap_content"
-                android:text="VALUE"
+                android:text="@string/prop_label_value_caps"
+                android:gravity="start"
+                android:paddingStart="8dp"
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:textColor="@color/prop_text_secondary"

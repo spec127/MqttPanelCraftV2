@@ -17,20 +17,43 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <EditText
-            android:id="@+id/etSegLabel"
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@null"
-            android:hint="Label"
-            android:paddingStart="12dp"
-            android:paddingEnd="4dp"
-            android:inputType="text"
-            android:textSize="13sp"
-            android:textColor="?attr/colorOnSurface"
-            android:textColorHint="@color/prop_text_secondary"
-            android:singleLine="true"/>
+            android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/etSegLabel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:hint="Label"
+                android:paddingStart="12dp"
+                android:paddingEnd="4dp"
+                android:inputType="text"
+                android:textSize="13sp"
+                android:gravity="center_vertical"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="@color/prop_text_secondary"
+                android:singleLine="true"/>
+
+            <LinearLayout
+                android:id="@+id/llIconSelector"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <ImageView android:tag="power" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="6dp" android:src="@drawable/ic_btn_power" app:tint="@color/prop_text_secondary" android:background="?selectableItemBackgroundBorderless"/>
+                <ImageView android:tag="light" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="6dp" android:src="@drawable/ic_btn_lighting" app:tint="@color/prop_text_secondary" android:background="?selectableItemBackgroundBorderless"/>
+                <ImageView android:tag="fan" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="6dp" android:src="@drawable/ic_btn_fan" app:tint="@color/prop_text_secondary" android:background="?selectableItemBackgroundBorderless"/>
+                <ImageView android:tag="play" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="6dp" android:src="@drawable/ic_btn_play" app:tint="@color/prop_text_secondary" android:background="?selectableItemBackgroundBorderless"/>
+                <ImageView android:tag="tune" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="6dp" android:src="@drawable/ic_btn_tune" app:tint="@color/prop_text_secondary" android:background="?selectableItemBackgroundBorderless"/>
+                <ImageView android:tag="energy" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:padding="6dp" android:src="@drawable/ic_btn_energy" app:tint="@color/prop_text_secondary" android:background="?selectableItemBackgroundBorderless"/>
+
+            </LinearLayout>
+        </FrameLayout>
 
         <ImageView
             android:id="@+id/btnSegIconToggle"
@@ -57,7 +80,8 @@
         android:layout_weight="0.4"
         android:background="@null"
         android:hint="Value"
-        android:gravity="center"
+        android:gravity="start|center_vertical"
+        android:paddingStart="8dp"
         android:inputType="text"
         android:textSize="13sp"
         android:textColor="?attr/colorOnSurface"

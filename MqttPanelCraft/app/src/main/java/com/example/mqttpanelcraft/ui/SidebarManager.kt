@@ -384,6 +384,13 @@ class SidebarManager(
                                                         "35" // V18.4: Set to 35% for better
                                                 // visibility in sidebar
                                         }
+                                        "SELECTOR" -> {
+                                                // V21.8: Use 3 segments for sidebar icon to
+                                                // increase clarity in small 42dp container
+                                                dummyProps["segments"] =
+                                                        "[{\"label\":\"S1\",\"val\":\"1\"},{\"label\":\"S2\",\"val\":\"2\"},{\"label\":\"S3\",\"val\":\"3\"}]"
+                                                dummyProps["style"] = "rounded"
+                                        }
                                 }
 
                                 val dummyData =
@@ -420,12 +427,80 @@ class SidebarManager(
                                 }
 
                                 // Add to Container
+                                // Individualized Dimensions (V21.10)
+                                val (pWidth, pHeight) =
+                                        when (def.type) {
+                                                "SELECTOR" ->
+                                                        Pair(
+                                                                android.widget.FrameLayout
+                                                                        .LayoutParams.MATCH_PARENT,
+                                                                (28 * density).toInt()
+                                                        )
+                                                "SLIDER" ->
+                                                        Pair(
+                                                                android.widget.FrameLayout
+                                                                        .LayoutParams.MATCH_PARENT,
+                                                                (32 * density).toInt()
+                                                        )
+                                                "BUTTON" ->
+                                                        Pair(
+                                                                (100 * density).toInt(),
+                                                                (30 * density).toInt()
+                                                        )
+                                                "SWITCH" ->
+                                                        Pair(
+                                                                (80 * density).toInt(),
+                                                                (26 * density).toInt()
+                                                        )
+                                                "CAMERA" ->
+                                                        Pair(
+                                                                android.widget.FrameLayout
+                                                                        .LayoutParams.MATCH_PARENT,
+                                                                (32 * density).toInt()
+                                                        )
+                                                "INPUT" ->
+                                                        Pair(
+                                                                android.widget.FrameLayout
+                                                                        .LayoutParams.MATCH_PARENT,
+                                                                (26 * density).toInt()
+                                                        )
+                                                "LED" ->
+                                                        Pair(
+                                                                (28 * density).toInt(),
+                                                                (28 * density).toInt()
+                                                        )
+                                                "THERMOMETER", "LEVEL" ->
+                                                        Pair(
+                                                                (30 * density).toInt(),
+                                                                (34 * density).toInt()
+                                                        )
+                                                "TEXT", "IMAGE" ->
+                                                        Pair(
+                                                                (100 * density).toInt(),
+                                                                (28 * density).toInt()
+                                                        )
+                                                "CHART" ->
+                                                        Pair(
+                                                                android.widget.FrameLayout
+                                                                        .LayoutParams.MATCH_PARENT,
+                                                                (34 * density).toInt()
+                                                        )
+                                                else ->
+                                                        Pair(
+                                                                android.widget.FrameLayout
+                                                                        .LayoutParams.MATCH_PARENT,
+                                                                (32 * density).toInt()
+                                                        )
+                                        }
+
                                 val previewParams =
-                                        android.widget.FrameLayout.LayoutParams(
-                                                android.widget.FrameLayout.LayoutParams
-                                                        .MATCH_PARENT,
-                                                android.widget.FrameLayout.LayoutParams.MATCH_PARENT
-                                        )
+                                        android.widget.FrameLayout.LayoutParams(pWidth, pHeight)
+                                                .apply {
+                                                        gravity =
+                                                                android.view.Gravity
+                                                                        .CENTER_HORIZONTAL or
+                                                                        android.view.Gravity.BOTTOM
+                                                }
                                 previewView.layoutParams = previewParams
                                 previewContainer.addView(previewView)
                                 previewContainer.isClickable = false

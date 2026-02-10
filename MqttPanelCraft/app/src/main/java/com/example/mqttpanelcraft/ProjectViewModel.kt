@@ -274,6 +274,9 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
             // Special Default for Button
             if (type == "BUTTON") {
                 initialProps["text"] = newLabel // Default text is the label name
+            } else if (type == "SELECTOR") {
+                initialProps["segments"] = "" // Triggers 4 segments fallback in definition
+                initialProps["style"] = "rounded"
             }
         }
 

@@ -23,7 +23,7 @@ import com.google.android.material.textfield.TextInputLayout
 object SliderDefinition : IComponentDefinition {
 
     override val type = "SLIDER"
-    override val defaultSize = Size(150, 70)
+    override val defaultSize = Size(200, 70)
     override val labelPrefix = "slider"
     override val iconResId = android.R.drawable.ic_menu_preferences
     override val group = "CONTROL"

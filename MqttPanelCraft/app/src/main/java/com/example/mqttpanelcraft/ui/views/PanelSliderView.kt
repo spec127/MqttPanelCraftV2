@@ -320,7 +320,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
         // 1. Track
         trackPaint.strokeWidth = trackThickness
-        trackPaint.color = ColorUtils.setAlphaComponent(Color.LTGRAY, 80)
+        trackPaint.color =
+                ColorUtils.setAlphaComponent(
+                        Color.LTGRAY,
+                        160
+                ) // V21.6: Increased from 80 to 160 for better definition
         canvas.drawLine(startX, startY, endX, endY, trackPaint)
 
         // 2. Ticks & Labels

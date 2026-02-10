@@ -27,9 +27,10 @@ import com.example.mqttpanelcraft.data.ColorHistoryManager
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.google.android.material.button.MaterialButtonToggleGroup
 
-object SwitchDefinition : com.example.mqttpanelcraft.ui.components.IComponentDefinition {
+object SwitchDefinition : IComponentDefinition {
 
     object Mode {
         const val TWO_WAY = "switch_2"
@@ -45,7 +46,7 @@ object SwitchDefinition : com.example.mqttpanelcraft.ui.components.IComponentDef
     override val type = "SWITCH"
     override val defaultSize = android.util.Size(120, 70)
     override val labelPrefix = "switch"
-    override val iconResId = R.drawable.ic_grid_view
+    override val iconResId = R.drawable.ic_toggle_on
     override val group = "CONTROL"
 
     override fun createView(
@@ -235,58 +236,49 @@ object SwitchDefinition : com.example.mqttpanelcraft.ui.components.IComponentDef
         val isDark =
                 (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
-        // Reset track alpha before state logic
-        track.alpha = 1.0f
+        // V19.5 & V19.7 & V19.8 & V20.1 & V20.2: Glass & Neon Design
+        val baseTrackColor =
+                if (isDark) Color.parseColor("#1A2234") else Color.parseColor("#DDE4ED")
 
-        when (state) {
-            0 -> {
-                // User Spec v8: 60% Transparent = 40% Opacity (Alpha 102)
-                trackBg.setColor(ColorUtils.setAlphaComponent(color, 102))
-                track.alpha = 0.40f
-
-                // User spec: Switch should have colored border even when OFF
-                val strokeColor = if (isDark) color else ColorUtils.setAlphaComponent(color, 180)
-                trackBg.setStroke((1.5f * density).toInt(), strokeColor)
-
-                if (style == Style.LEVER) {
-                    updateNeonColors(innerIndicator, state, color, isDark)
+        // V21.5: Dynamic track color based on state (desaturated OFF, saturated ON)
+        val trackStateColor =
+                when (state) {
+                    0 -> Color.parseColor(if (isDark) "#334155" else "#CBD5E1") // Desaturated Slate
+                    else -> color // Saturated Theme Color
                 }
-            }
-            1 -> {
-                val hslDim = hsl.copyOf()
-                if (isDark) {
-                    hslDim[1] = hslDim[1] * 0.5f
-                    hslDim[2] = 0.20f
-                } else {
-                    hslDim[1] = hslDim[1] * 0.6f
-                    hslDim[2] = 0.40f
+
+        val blendRatio = if (state == 0) 0.05f else (if (isDark) 0.15f else 0.25f)
+        val tintedTrackColor = ColorUtils.blendARGB(baseTrackColor, trackStateColor, blendRatio)
+
+        val alphaFactor = if (isDark) (if (state == 0) 200 else 240) else 255
+        trackBg.setColor(ColorUtils.setAlphaComponent(tintedTrackColor, alphaFactor))
+
+        // Stroke behavior
+        val strokeAlpha = if (state == 0) (if (isDark) 180 else 200) else (if (isDark) 240 else 220)
+        val strokeColor =
+                when (state) {
+                    0 ->
+                            Color.parseColor(
+                                    if (isDark) "#94A3B8" else "#475569"
+                            ) // V21.6: Specific grey borders for OFF
+                    else -> trackStateColor
                 }
-                trackBg.setColor(ColorUtils.setAlphaComponent(ColorUtils.HSLToColor(hslDim), 150))
-                track.alpha = 0.6f
 
-                val strokeColor = if (isDark) color else ColorUtils.setAlphaComponent(color, 180)
-                trackBg.setStroke((1.5f * density).toInt(), strokeColor)
+        trackBg.setStroke(
+                (if (isDark) 3f else 1.8f * density).toInt(),
+                ColorUtils.setAlphaComponent(strokeColor, strokeAlpha)
+        )
 
-                if (style == Style.LEVER) {
-                    updateNeonColors(innerIndicator, state, color, isDark)
+        // State-specific transparency for the entire track view
+        track.alpha =
+                when (state) {
+                    0 -> if (isDark) 0.5f else 0.6f
+                    1 -> if (isDark) 0.8f else 0.85f
+                    else -> 1.0f
                 }
-            }
-            2 -> {
-                // User Spec v8: 20% Transparent = 80% Opacity (Alpha 204)
-                // "變得更深一些" -> Higher opacity shows the color more purely
-                val hslOn = hsl.copyOf()
-                hslOn[1] = Math.min(1.0f, hslOn[1] * 1.1f)
-                hslOn[2] = if (isDark) 0.15f else 0.40f
-                trackBg.setColor(ColorUtils.setAlphaComponent(ColorUtils.HSLToColor(hslOn), 204))
-                track.alpha = 0.80f
 
-                val strokeW = if (isDark) (1.5f * density).toInt() else (2 * density).toInt()
-                trackBg.setStroke(strokeW, color)
-
-                if (style == Style.LEVER) {
-                    updateNeonColors(innerIndicator, state, color, isDark)
-                }
-            }
+        if (style == Style.LEVER) {
+            updateNeonColors(innerIndicator, state, color, isDark)
         }
         track.background = trackBg
     }
@@ -526,8 +518,9 @@ object SwitchDefinition : com.example.mqttpanelcraft.ui.components.IComponentDef
 
     private fun resolveColor(data: ComponentData): Int =
             try {
-                Color.parseColor(data.props["color"] ?: "#2196F3")
+                // V20.1: Default Indigo #6366F1 to match modern branding
+                Color.parseColor(data.props["color"] ?: "#6366F1")
             } catch (e: Exception) {
-                Color.parseColor("#2196F3")
+                Color.parseColor("#6366F1")
             }
 }
