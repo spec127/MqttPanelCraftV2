@@ -265,6 +265,41 @@ class CanvasInteractionManager(
                     var newW = kotlin.math.round(newWDp * density).toInt().coerceAtLeast(gridUnitPx)
                     var newH = kotlin.math.round(newHDp * density).toInt().coerceAtLeast(gridUnitPx)
 
+                    // Aspect Ratio Locking
+                    val compId = activeView!!.id
+                    // Note: In this project, IDs are managed by ProjectUIManager and Renderer.
+                    // We need the data once more. We assume Renderer has a way to get it.
+                    // Since Renderer is not easily accessible here as a singleton, we check
+                    // definition by ID if possible.
+                    // Wait, I can't easily get ComponentData here. I'll use a tag or check if view
+                    // ID matches renderer cache.
+                    // Actually, I'll pass the data or definition if possible, but let's look at how
+                    // activeView is used.
+
+                    // FALLBACK: If we can't find definition easily, we check if it's a JOYSTICK.
+                    // Better: We added IComponentDefinition, let's use ComponentDefinitionRegistry.
+                    val tag = activeView!!.tag?.toString() ?: ""
+                    val def =
+                            com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry
+                                    .get(tag)
+
+                    // We need to know if it's 2-way or 4-way.
+                    // Let's assume the view itself has the property if it's a JoystickView.
+                    val finalView = activeView!!.findViewWithTag<View>("target")
+                    if (finalView is com.example.mqttpanelcraft.ui.views.JoystickView) {
+                        if (finalView.axes == "4-Way") {
+                            // Maintain aspect ratio (1:1 for Joystick)
+                            if (dx > dy) {
+                                newH = newW
+                            } else {
+                                newW = newH
+                            }
+                        }
+                    } else if (def != null) {
+                        // Generic check if possible, but we don't have ComponentData here.
+                        // For now, Joystick is the only one with dynamic lock.
+                    }
+
                     val params = activeView!!.layoutParams
                     params.width = newW
                     params.height = newH

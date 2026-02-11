@@ -56,12 +56,30 @@
          "var_decl": "float num_{{INDEX}} = 0.0; // {{LABEL}} (Sensor: PUB Only)",
          "setup_sub": "",
          "loop_logic": "  static unsigned long last_num_{{INDEX}} = 0;\n  if (millis() - last_num_{{INDEX}} > 5000) {\n    last_num_{{INDEX}} = millis();\n    // num_{{INDEX}} = random(200, 300) / 10.0; // Mock Data\n    mqttpanel_pub(String(mqtt_topic_head) + \"{{REL_TOPIC_VAL}}\", String(num_{{INDEX}}));\n  }"
+      },
+      "SELECTOR_CTRL": {
+         "type": "selector",
+         "index_key": "sel",
+         "var_decl": "String sel_{{INDEX}} = \"\"; // {{LABEL}} (Selector: SUB+PUB)",
+         "setup_sub": "  mqttpanel_sub(String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\");",
+         "loop_logic": "  // Example Pub\n  if (Serial.readString() == \"{{TYPE_KEY}}{{INDEX}}\") {\n    mqttpanel_pub(String(mqtt_topic_head) + \"{{REL_TOPIC_VAL}}\", sel_{{INDEX}});\n  }",
+         "receiver_logic": "  if (topic == String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\") {\n    sel_{{INDEX}} = msg;\n    Serial.println(\"Set Selector {{INDEX}} to \" + sel_{{INDEX}});\n    // TODO: if (sel_{{INDEX}} == \"val1\") { ... }\n  }"
+      },
+      "JOYSTICK_CTRL": {
+         "type": "joystick",
+         "index_key": "joy",
+         "var_decl": "int joy_{{INDEX}}_x = 0; int joy_{{INDEX}}_y = 0; // {{LABEL}} (Joystick: SUB+PUB)",
+         "setup_sub": "  mqttpanel_sub(String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\");",
+         "loop_logic": "  // Example Pub (Continuous Send requires JSON string)\n  // mqttpanel_pub(String(mqtt_topic_head) + \"{{REL_TOPIC_VAL}}\", \"{\\\"x\\\":0, \\\"y\\\":0}\");",
+         "receiver_logic": "  if (topic == String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\") {\n    Serial.println(\"Joystick {{INDEX}} Data: \" + msg);\n    // TODO: Use a JSON library (like ArduinoJson) to parse msg\n    // Or manual parsing: if (msg.indexOf(\\\"up\\\") != -1) { ... }\n  }"
       }
    },
    "mappings": {
       "BUTTON": "BUTTON_CTRL",
       "SWITCH": "SWITCH_CTRL",
       "SLIDER": "DIMMER_CTRL",
+      "SELECTOR": "SELECTOR_CTRL",
+      "JOYSTICK": "JOYSTICK_CTRL",
       "TEXT": "TEXT_DISP",
       "LED": "LED_DISP",
       "THERMOMETER": "NUMBER_VAL"

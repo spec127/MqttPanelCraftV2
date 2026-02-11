@@ -120,6 +120,24 @@
     <string name="component_label_text">文字顯示</string>
     <string name="component_label_image">圖片</string>
     <string name="component_label_chart">圖表</string>
+    <string name="component_label_selector">選擇器</string>
+    <string name="component_label_joystick">搖桿</string>
+
+    <!-- Joystick Properties -->
+    <string name="properties_label_joystick_mode">搖桿模式</string>
+    <string name="properties_label_axes">軸向設定</string>
+    <string name="val_joystick_mode_standard">搖桿 (座標)</string>
+    <string name="val_joystick_mode_buttons">按鈕 (方向)</string>
+    <string name="val_axes_2way">2 維 (2-Way)</string>
+    <string name="val_axes_4way">4 維 (4-Way)</string>
+    <string name="prop_label_direction">移動方向</string>
+    <string name="val_dir_horz">水平</string>
+    <string name="val_dir_vert">垂直</string>
+    <string name="properties_label_joystick_style">視覺風格</string>
+    <string name="val_joystick_style_neon">霓虹 (Neon)</string>
+    <string name="val_joystick_style_sharp">俐落 (Sharp)</string>
+    <string name="val_joystick_style_smooth">圓滑 (Smooth)</string>
+    <string name="val_joystick_style_arrow">箭頭 (Arrow)</string>
 
     <!-- MQTT & Console -->
     <string name="project_console_title">MQTT/系統日誌</string>
@@ -161,9 +179,9 @@
 
     <!-- Properties & Appearance -->
     <string name="properties_title">屬性</string>
-    <string name="properties_section_general">一般</string>
-    <string name="properties_section_interaction">互動</string>
-    <string name="properties_section_appearance">外觀</string>
+    <string name="properties_section_general">一般設定</string>
+    <string name="properties_section_interaction">互動功能</string>
+    <string name="properties_section_appearance">視覺外觀</string>
     <string name="properties_label_topic">MQTT 主題</string>
     <string name="properties_label_width">寬度</string>
     <string name="properties_label_height">高度</string>
@@ -178,7 +196,7 @@
     <string name="prop_label_send_mode">發送模式</string>
     <string name="prop_val_on_release">放開時發送</string>
     <string name="prop_val_continuous">連續發送</string>
-    <string name="prop_label_interval">發送間隔 (ms)</string>
+    <string name="prop_label_interval">傳送間隔 (ms)</string>
     <string name="prop_helper_interval">最小值 50ms</string>
     <string name="prop_label_orientation">顯示方向</string>
     <string name="prop_label_track_style">軌道樣式</string>

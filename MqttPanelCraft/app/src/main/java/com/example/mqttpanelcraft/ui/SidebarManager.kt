@@ -427,69 +427,41 @@ class SidebarManager(
                                 }
 
                                 // Add to Container
-                                // Individualized Dimensions (V21.10)
+                                // Individualized Dimensions (V21.12: Even Shorter)
                                 val (pWidth, pHeight) =
                                         when (def.type) {
-                                                "SELECTOR" ->
-                                                        Pair(
-                                                                android.widget.FrameLayout
-                                                                        .LayoutParams.MATCH_PARENT,
-                                                                (28 * density).toInt()
-                                                        )
-                                                "SLIDER" ->
-                                                        Pair(
-                                                                android.widget.FrameLayout
-                                                                        .LayoutParams.MATCH_PARENT,
-                                                                (32 * density).toInt()
-                                                        )
-                                                "BUTTON" ->
-                                                        Pair(
-                                                                (100 * density).toInt(),
-                                                                (30 * density).toInt()
-                                                        )
-                                                "SWITCH" ->
-                                                        Pair(
-                                                                (80 * density).toInt(),
-                                                                (26 * density).toInt()
-                                                        )
+                                                "SELECTOR" -> Pair(dpToPx(85), dpToPx(36))
+                                                "SLIDER" -> Pair(dpToPx(76), dpToPx(36))
+                                                "JOYSTICK" -> Pair(dpToPx(42), dpToPx(42))
+                                                "BUTTON" -> Pair(dpToPx(50), dpToPx(42))
+                                                "SWITCH" -> Pair(dpToPx(40), dpToPx(42))
                                                 "CAMERA" ->
                                                         Pair(
                                                                 android.widget.FrameLayout
                                                                         .LayoutParams.MATCH_PARENT,
-                                                                (32 * density).toInt()
+                                                                dpToPx(36)
                                                         )
                                                 "INPUT" ->
                                                         Pair(
                                                                 android.widget.FrameLayout
                                                                         .LayoutParams.MATCH_PARENT,
-                                                                (26 * density).toInt()
+                                                                dpToPx(32)
                                                         )
-                                                "LED" ->
-                                                        Pair(
-                                                                (28 * density).toInt(),
-                                                                (28 * density).toInt()
-                                                        )
+                                                "LED" -> Pair(dpToPx(32), dpToPx(32))
                                                 "THERMOMETER", "LEVEL" ->
-                                                        Pair(
-                                                                (30 * density).toInt(),
-                                                                (34 * density).toInt()
-                                                        )
-                                                "TEXT", "IMAGE" ->
-                                                        Pair(
-                                                                (100 * density).toInt(),
-                                                                (28 * density).toInt()
-                                                        )
+                                                        Pair(dpToPx(32), dpToPx(40))
+                                                "TEXT", "IMAGE" -> Pair(dpToPx(100), dpToPx(32))
                                                 "CHART" ->
                                                         Pair(
                                                                 android.widget.FrameLayout
                                                                         .LayoutParams.MATCH_PARENT,
-                                                                (34 * density).toInt()
+                                                                dpToPx(38)
                                                         )
                                                 else ->
                                                         Pair(
                                                                 android.widget.FrameLayout
                                                                         .LayoutParams.MATCH_PARENT,
-                                                                (32 * density).toInt()
+                                                                dpToPx(32)
                                                         )
                                         }
 

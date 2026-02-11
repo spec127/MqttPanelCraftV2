@@ -46,4 +46,10 @@ interface IComponentDefinition {
                 payload: String,
                 onUpdateProp: (key: String, value: String) -> Unit
         )
+
+        /**
+         * Returns true if the component should maintain its aspect ratio during resizing. Default
+         * is false (free resizing).
+         */
+        fun isFixedAspectRatio(data: ComponentData): Boolean = false
 }

@@ -81,10 +81,10 @@
     <!-- Project Editor & Sidebar -->
     <string name="project_view_title">Project Editor</string>
     <string name="project_sidebar_title_components">Components</string>
-    <string name="project_sidebar_category_display">顯示元件</string>
-    <string name="project_sidebar_title_properties">屬性配置</string>
-    <string name="project_cat_control">互動控制</string>
-    <string name="project_cat_sensor">感測狀態</string>
+    <string name="project_sidebar_category_display">Display</string>
+    <string name="project_sidebar_title_properties">Properties</string>
+    <string name="project_cat_control">Control</string>
+    <string name="project_cat_sensor">Sensor</string>
     <string name="project_prop_helper">Select a component to edit</string>
     <string name="project_sidebar_btn_more">More</string>
     <string name="project_sidebar_btn_collapse">Collapse</string>
@@ -115,18 +115,35 @@
     <string name="copy_code">Copy Code</string>
 
     <!-- Component Labels -->
-    <string name="component_label_button">按鈕</string>
-    <string name="component_label_switch">開關</string>
-    <string name="component_label_slider">滑桿</string>
-    <string name="component_label_input">輸入框</string>
-    <string name="component_label_camera">攝影機</string>
-    <string name="component_label_led">指示燈</string>
-    <string name="component_label_thermometer">溫度計</string>
-    <string name="component_label_level">液位計</string>
-    <string name="component_label_text">文字顯示</string>
-    <string name="component_label_image">圖片渲染</string>
-    <string name="component_label_chart">圖表</string>
-    <string name="component_label_selector">選擇器</string>
+    <string name="component_label_button">Button</string>
+    <string name="component_label_switch">Switch</string>
+    <string name="component_label_slider">Slider</string>
+    <string name="component_label_input">Input</string>
+    <string name="component_label_camera">Camera</string>
+    <string name="component_label_led">LED</string>
+    <string name="component_label_thermometer">Thermometer</string>
+    <string name="component_label_level">Level</string>
+    <string name="component_label_text">Text Display</string>
+    <string name="component_label_image">Image Render</string>
+    <string name="component_label_chart">Chart</string>
+    <string name="component_label_selector">Selector</string>
+    <string name="component_label_joystick">Joystick</string>
+
+    <!-- Joystick Properties -->
+    <string name="properties_label_joystick_mode">Joystick Mode</string>
+    <string name="properties_label_axes">Axes Setting</string>
+    <string name="val_joystick_mode_standard">Joystick (Coord)</string>
+    <string name="val_joystick_mode_buttons">Buttons (Direct)</string>
+    <string name="val_axes_2way">2-Way</string>
+    <string name="val_axes_4way">4-Way</string>
+    <string name="prop_label_direction">Movement Dir</string>
+    <string name="val_dir_horz">Horizontal</string>
+    <string name="val_dir_vert">Vertical</string>
+    <string name="properties_label_joystick_style">Visual Style</string>
+    <string name="val_joystick_style_neon">Neon</string>
+    <string name="val_joystick_style_sharp">Sharp</string>
+    <string name="val_joystick_style_smooth">Smooth</string>
+    <string name="val_joystick_style_arrow">Arrow</string>
 
     <!-- MQTT & Console -->
     <string name="project_console_title">MQTT/System Logs</string>
@@ -171,8 +188,8 @@
     <!-- Properties & Appearance -->
     <string name="properties_title">Properties</string>
     <string name="properties_section_general">General</string>
-    <string name="properties_section_interaction">互動功能</string>
-    <string name="properties_section_appearance">外觀樣式</string>
+    <string name="properties_section_interaction">Interaction</string>
+    <string name="properties_section_appearance">Appearance</string>
     <string name="properties_label_topic">MQTT Topic</string>
     <string name="properties_label_width">Width</string>
     <string name="properties_label_height">Height</string>
@@ -277,6 +294,6 @@
     <string name="project_msg_topic_copied">Topic copied</string>
     <string name="project_prop_label">Label</string>
     <string name="project_prop_topic">Topic</string>
-    <string name="prop_label_label_caps">標籤</string>
-    <string name="prop_label_value_caps">數值</string>
+    <string name="prop_label_label_caps">LABEL</string>
+    <string name="prop_label_value_caps">VALUE</string>
 </resources>

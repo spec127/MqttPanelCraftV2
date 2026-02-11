@@ -19,6 +19,7 @@ object ComponentDefinitionRegistry {
         register(TextInputDefinition)
         register(LevelIndicatorDefinition)
         register(LineChartDefinition)
+        register(JoystickDefinition)
     }
 
     fun register(def: IComponentDefinition) {

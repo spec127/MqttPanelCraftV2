@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Section: Interaction -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_touch_app"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+        <TextView
+            android:text="@string/properties_section_interaction"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- Joystick Mode (Joystick / Button) -->
+    <TextView
+        android:text="@string/properties_label_joystick_mode"
+        android:textSize="12sp"
+        android:textColor="@color/prop_text_secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"/>
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleJoystickMode"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnModeStandard"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_joystick_mode_standard"
+            android:textSize="12sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnModeButtons"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_joystick_mode_buttons"
+            android:textSize="12sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- Interval (Only if Joystick mode) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/containerJoystickInterval"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/prop_label_interval"
+        app:helperText="@string/prop_helper_interval"
+        app:helperTextEnabled="true"
+        android:layout_marginBottom="12dp"
+        style="@style/Widget.App.TextInputLayout.Properties">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPropInterval"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textSize="14sp"
+            android:textColor="@color/prop_text_primary"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Axes (2-way / 4-way) -->
+    <TextView
+        android:text="@string/properties_label_axes"
+        android:textSize="12sp"
+        android:textColor="@color/prop_text_secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"/>
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleJoystickAxes"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAxes4Way"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_axes_4way"
+            android:textSize="12sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAxes2Way"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_axes_2way"
+            android:textSize="12sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- Direction (Only if 2-way) -->
+    <LinearLayout
+        android:id="@+id/containerJoystickDir"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <TextView
+            android:text="@string/prop_label_direction"
+            android:textSize="12sp"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"/>
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleJoystickDir"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDirHorz"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:text="@string/val_dir_horz"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDirVert"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:text="@string/val_dir_vert"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+    </LinearLayout>
+
+
+    <!-- Section: Appearance -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_line"
+        android:layout_marginBottom="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+        <TextView
+            android:text="@string/properties_section_appearance"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <!-- Style Selection (Spinner/Dropdown) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/menuJoystickStyle"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:hint="@string/properties_label_joystick_style">
+            <AutoCompleteTextView
+                android:id="@+id/tvJoystickStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textSize="12sp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Color Palette -->
+        <include
+            android:id="@+id/containerColorPalette"
+            layout="@layout/layout_prop_generic_color"
+            android:layout_width="0dp"
+            android:layout_weight="6"
+            android:layout_height="48dp"/>
+    </LinearLayout>
+
+</LinearLayout>
