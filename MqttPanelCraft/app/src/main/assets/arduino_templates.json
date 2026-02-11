@@ -68,10 +68,18 @@
       "JOYSTICK_CTRL": {
          "type": "joystick",
          "index_key": "joy",
-         "var_decl": "int joy_{{INDEX}}_x = 0; int joy_{{INDEX}}_y = 0; // {{LABEL}} (Joystick: SUB+PUB)",
+         "var_decl": "int joy_{{INDEX}}_x = 0; int joy_{{INDEX}}_y = 0; // {{LABEL}} (Mode: {{PROP_MODE}})",
          "setup_sub": "  mqttpanel_sub(String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\");",
-         "loop_logic": "  // Example Pub (Continuous Send requires JSON string)\n  // mqttpanel_pub(String(mqtt_topic_head) + \"{{REL_TOPIC_VAL}}\", \"{\\\"x\\\":0, \\\"y\\\":0}\");",
-         "receiver_logic": "  if (topic == String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\") {\n    Serial.println(\"Joystick {{INDEX}} Data: \" + msg);\n    // TODO: Use a JSON library (like ArduinoJson) to parse msg\n    // Or manual parsing: if (msg.indexOf(\\\"up\\\") != -1) { ... }\n  }"
+         "loop_logic": "  // Example: Periodic Sync (Usually Mobile App handles state)\n  // mqttpanel_pub(String(mqtt_topic_head) + \"{{REL_TOPIC_VAL}}\", \"{\\\"x\\\":0, \\\"y\\\":0}\");",
+         "receiver_logic": "  if (topic == String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\") {\n    Serial.println(\"Joystick {{INDEX}} RX [{{PROP_MODE}}]: \" + msg);\n    // If MODE is 'Buttons': msg will be \"up\",\"down\",\"left\",\"right\" or \"none\"\n    // If MODE is 'Joystick': msg will be a JSON \"{\\\"x\\\":val, \\\"y\\\":val}\"\n    // TODO: if (msg == \"up\") { ... }\n  }"
+      },
+      "PALETTE_CTRL": {
+         "type": "palette",
+         "index_key": "pal",
+         "var_decl": "int pal_{{INDEX}}_r, pal_{{INDEX}}_g, pal_{{INDEX}}_b; // {{LABEL}} (Format: {{PROP_FORMAT}})",
+         "setup_sub": "  mqttpanel_sub(String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\");",
+         "loop_logic": "",
+         "receiver_logic": "  if (topic == String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\") {\n    Serial.println(\"Palette {{INDEX}} RX [{{PROP_FORMAT}}]: \" + msg);\n    // Format could be JSON, Hex, or Raw. \n    // If JSON (RGB): {\"r\":255, \"g\":0, \"b\":0}\n    // If Hex: \"#FF0000\"\n  }"
       }
    },
    "mappings": {
@@ -80,6 +88,7 @@
       "SLIDER": "DIMMER_CTRL",
       "SELECTOR": "SELECTOR_CTRL",
       "JOYSTICK": "JOYSTICK_CTRL",
+      "PALETTE": "PALETTE_CTRL",
       "TEXT": "TEXT_DISP",
       "LED": "LED_DISP",
       "THERMOMETER": "NUMBER_VAL"

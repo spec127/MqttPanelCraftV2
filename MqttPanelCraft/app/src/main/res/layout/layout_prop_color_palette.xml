@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Section: Interaction -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_touch_app"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+        <TextView
+            android:text="@string/properties_section_interaction"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- Controller Style -->
+    <TextView
+        android:text="@string/properties_label_controller_style"
+        android:textSize="12sp"
+        android:textColor="@color/prop_text_secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"/>
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/togglePaletteStyle"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStyleSquare"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_palette_style_square"
+            android:textSize="10sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStyleArc"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_palette_style_arc"
+            android:textSize="10sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- Color Mode -->
+    <TextView
+        android:text="@string/properties_label_color_mode"
+        android:textSize="12sp"
+        android:textColor="@color/prop_text_secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"/>
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/togglePaletteMode"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnModeFull"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_palette_mode_full"
+            android:textSize="12sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnModeMono"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_palette_mode_mono"
+            android:textSize="12sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"/>
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- Theme Color (Mono Square) -->
+    <LinearLayout
+        android:id="@+id/containerPaletteThemeColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_marginBottom="12dp">
+        <include
+            android:id="@+id/paletteThemeColor"
+            layout="@layout/layout_prop_generic_color"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"/>
+    </LinearLayout>
+
+    <!-- Control Target (Mono Arc) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/menuControlTarget"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:hint="@string/properties_label_control_target"
+        android:visibility="gone">
+        <AutoCompleteTextView
+            android:id="@+id/tvControlTarget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:textSize="12sp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Send Strategy -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/menuSendStrategy"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:hint="@string/properties_label_send_strategy">
+        <AutoCompleteTextView
+            android:id="@+id/tvSendStrategy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:textSize="12sp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Interval (Continuous) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/containerPaletteInterval"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/prop_label_interval"
+        app:helperText="@string/prop_helper_interval"
+        app:helperTextEnabled="true"
+        android:layout_marginBottom="12dp"
+        android:visibility="gone"
+        style="@style/Widget.App.TextInputLayout.Properties">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPaletteInterval"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textSize="14sp"
+            android:textColor="@color/prop_text_primary"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Data Format -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/menuDataFormat"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:hint="@string/properties_label_data_format">
+        <AutoCompleteTextView
+            android:id="@+id/tvDataFormat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:textSize="12sp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Section: Appearance -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_line"
+        android:layout_marginBottom="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+        <TextView
+            android:text="@string/properties_section_appearance"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/swShowHexCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/properties_label_show_code"
+        android:textSize="14sp"
+        android:textColor="@color/prop_text_primary"
+        android:layout_marginBottom="12dp"/>
+
+</LinearLayout>

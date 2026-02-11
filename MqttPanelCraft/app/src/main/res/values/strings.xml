@@ -118,8 +118,6 @@
     <string name="component_label_button">Button</string>
     <string name="component_label_switch">Switch</string>
     <string name="component_label_slider">Slider</string>
-    <string name="component_label_input">Input</string>
-    <string name="component_label_camera">Camera</string>
     <string name="component_label_led">LED</string>
     <string name="component_label_thermometer">Thermometer</string>
     <string name="component_label_level">Level</string>
@@ -144,6 +142,27 @@
     <string name="val_joystick_style_sharp">Sharp</string>
     <string name="val_joystick_style_smooth">Smooth</string>
     <string name="val_joystick_style_arrow">Arrow</string>
+
+    <!-- Color Palette Properties -->
+    <string name="properties_label_controller_style">Controller Style</string>
+    <string name="val_palette_style_square">Square Pad</string>
+    <string name="val_palette_style_arc">Arc Ring</string>
+    <string name="properties_label_color_mode">Color Mode</string>
+    <string name="val_palette_mode_full">Full Color</string>
+    <string name="val_palette_mode_mono">Monochrome</string>
+    <string name="properties_label_control_target">Control Target</string>
+    <string name="val_palette_target_brightness">Brightness</string>
+    <string name="val_palette_target_saturation">Saturation</string>
+    <string name="properties_label_send_strategy">Send Strategy</string>
+    <string name="val_strategy_release">On Release</string>
+    <string name="val_strategy_continuous">Continuous</string>
+    <string name="properties_label_data_format">Data Format</string>
+    <string name="val_format_json_rgb">JSON (RGB)</string>
+    <string name="val_format_json_hsv">JSON (HSV)</string>
+    <string name="val_format_hex">Hex String</string>
+    <string name="val_format_raw">Raw Value (0-100)</string>
+    <string name="properties_label_show_code">Show Hex Code</string>
+    <string name="component_label_palette">Color Palette</string>
 
     <!-- MQTT & Console -->
     <string name="project_console_title">MQTT/System Logs</string>
