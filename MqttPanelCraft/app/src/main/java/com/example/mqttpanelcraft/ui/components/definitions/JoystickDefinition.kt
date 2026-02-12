@@ -20,7 +20,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 object JoystickDefinition : IComponentDefinition {
 
     override val type = "JOYSTICK"
-    override val defaultSize = Size(160, 160)
+    override val defaultSize = Size(260, 260)
     override val labelPrefix = "joystick"
     override val iconResId = R.drawable.ic_joystick
     override val group = "CONTROL"

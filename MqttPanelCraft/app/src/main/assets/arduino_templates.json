@@ -79,7 +79,7 @@
          "var_decl": "int pal_{{INDEX}}_r, pal_{{INDEX}}_g, pal_{{INDEX}}_b; // {{LABEL}} (Format: {{PROP_FORMAT}})",
          "setup_sub": "  mqttpanel_sub(String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\");",
          "loop_logic": "",
-         "receiver_logic": "  if (topic == String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\") {\n    Serial.println(\"Palette {{INDEX}} RX [{{PROP_FORMAT}}]: \" + msg);\n    // Format could be JSON, Hex, or Raw. \n    // If JSON (RGB): {\"r\":255, \"g\":0, \"b\":0}\n    // If Hex: \"#FF0000\"\n  }"
+         "receiver_logic": "  if (topic == String(mqtt_topic_head) + \"{{REL_TOPIC_SET}}\") {\n    Serial.println(\"Palette {{INDEX}} RX [{{PROP_FORMAT}}]: \" + msg);\n    // Format could be JSON or Hex.\n    // If JSON (RGB): {\"r\":255, \"g\":0, \"b\":0}\n    // If Hex: \"#FF0000\"\n  }"
       }
    },
    "mappings": {

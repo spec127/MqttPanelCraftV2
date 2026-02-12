@@ -432,7 +432,8 @@ class SidebarManager(
                                         when (def.type) {
                                                 "SELECTOR" -> Pair(dpToPx(85), dpToPx(36))
                                                 "SLIDER" -> Pair(dpToPx(76), dpToPx(36))
-                                                "JOYSTICK" -> Pair(dpToPx(42), dpToPx(42))
+                                                "JOYSTICK", "PALETTE" ->
+                                                        Pair(dpToPx(42), dpToPx(42))
                                                 "BUTTON" -> Pair(dpToPx(50), dpToPx(42))
                                                 "SWITCH" -> Pair(dpToPx(40), dpToPx(42))
                                                 "CAMERA" ->
@@ -441,12 +442,7 @@ class SidebarManager(
                                                                         .LayoutParams.MATCH_PARENT,
                                                                 dpToPx(36)
                                                         )
-                                                "INPUT" ->
-                                                        Pair(
-                                                                android.widget.FrameLayout
-                                                                        .LayoutParams.MATCH_PARENT,
-                                                                dpToPx(32)
-                                                        )
+                                                "INPUT" -> Pair(dpToPx(50), dpToPx(20))
                                                 "LED" -> Pair(dpToPx(32), dpToPx(32))
                                                 "THERMOMETER", "LEVEL" ->
                                                         Pair(dpToPx(32), dpToPx(40))
@@ -467,12 +463,13 @@ class SidebarManager(
 
                                 val previewParams =
                                         android.widget.FrameLayout.LayoutParams(pWidth, pHeight)
-                                                .apply {
-                                                        gravity =
-                                                                android.view.Gravity
-                                                                        .CENTER_HORIZONTAL or
-                                                                        android.view.Gravity.BOTTOM
-                                                }
+                                previewParams.gravity =
+                                        android.view.Gravity.CENTER_HORIZONTAL or
+                                                android.view.Gravity.BOTTOM
+
+                                if (def.type == "PALETTE") {
+                                        previewParams.setMargins(0, 0, 0, dpToPx(2))
+                                }
                                 previewView.layoutParams = previewParams
                                 previewContainer.addView(previewView)
                                 previewContainer.isClickable = false

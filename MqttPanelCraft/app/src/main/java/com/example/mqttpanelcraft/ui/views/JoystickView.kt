@@ -103,19 +103,28 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+
+        val density = resources.displayMetrics.density
+        val isSmall = h < 100 * density
+
         centerX = w / 2f
-        centerY = h / 2f
+        // Phase 40: Revert to Center (0.5f) as per user request
+        centerY = if (isSmall) h * 0.5f else h / 2f
 
         // Base radius for 4-way mode (proportional)
-        val baseRadiusProportional = (min(w, h) / 2f) * 0.8f
+        // Phase 40: Set to 0.5f (Full Height)
+        val baseRadiusProportional = if (isSmall) h * 0.5f else (min(w, h) / 2f) * 0.92f
 
         if (axes == "4-Way") {
             baseRadius = baseRadiusProportional
         } else {
             // For 2-Way, baseRadius represents the relevant axis extent
-            baseRadius = if (direction2Way == "Horizontal") (w / 2f) * 0.9f else (h / 2f) * 0.9f
+            // Phase 40: Set to 0.5f (Full Height)
+            baseRadius =
+                    if (direction2Way == "Horizontal") (w / 2f) * 0.92f
+                    else (if (isSmall) h * 0.5f else (h / 2f) * 0.92f)
         }
-        stickRadius = baseRadiusProportional * 0.4f
+        stickRadius = baseRadiusProportional * 0.45f
 
         currentX = centerX
         currentY = centerY

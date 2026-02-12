@@ -5,120 +5,161 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <!-- Section: Interaction -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="start|center_vertical"
-        android:layout_marginBottom="12dp">
-        <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_touch_app"
-            app:tint="@color/props_primary"
-            android:layout_marginEnd="6dp"/>
-        <TextView
-            android:text="@string/properties_section_interaction"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="@color/prop_text_secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-
-    <!-- Controller Style -->
+    <!-- Controller Style Section -->
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/properties_label_controller_style"
         android:textSize="12sp"
+        android:textStyle="bold"
         android:textColor="@color/prop_text_secondary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"/>
+        android:layout_marginBottom="8dp"/>
+
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/togglePaletteStyle"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_marginBottom="12dp"
-        android:gravity="center"
-        app:selectionRequired="true"
-        app:singleSelection="true">
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnStyleSquare"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:text="@string/val_palette_style_square"
-            android:textSize="10sp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"/>
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:checkedButton="@id/btnStyleArc"
+        app:singleSelection="true"
+        app:selectionRequired="true">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStyleArc"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/val_palette_style_arc"
-            android:textSize="10sp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"/>
+            android:textSize="12sp" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStyleSquare"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/val_palette_style_square"
+            android:textSize="12sp" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <!-- Color Mode -->
+    <!-- Color Mode Section -->
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/properties_label_color_mode"
         android:textSize="12sp"
+        android:textStyle="bold"
         android:textColor="@color/prop_text_secondary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"/>
+        android:layout_marginBottom="8dp"/>
+
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/togglePaletteMode"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_marginBottom="12dp"
-        android:gravity="center"
-        app:selectionRequired="true"
-        app:singleSelection="true">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:checkedButton="@id/btnModeFull"
+        app:singleSelection="true"
+        app:selectionRequired="true">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnModeFull"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/val_palette_mode_full"
-            android:textSize="12sp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"/>
+            android:textSize="12sp" />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnModeMono"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/val_palette_mode_mono"
-            android:textSize="12sp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"/>
+            android:textSize="12sp" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <!-- Theme Color (Mono Square) -->
+    <!-- Hue Slider (Full color only) -->
+    <LinearLayout
+        android:id="@+id/containerPaletteHue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/properties_label_hue_selection"
+            android:textSize="12sp"
+            android:textColor="@color/prop_text_secondary"/>
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sliderPaletteHue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="0"
+            android:valueTo="360"
+            android:stepSize="1"/>
+    </LinearLayout>
+
+    <!-- Brightness Slider (Legacy, usually hidden now) -->
+    <LinearLayout
+        android:id="@+id/containerPaletteValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/properties_label_brightness"
+            android:textSize="12sp"
+            android:textColor="@color/prop_text_secondary"/>
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sliderPaletteValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="0"
+            android:valueTo="100"
+            android:value="100"
+            android:stepSize="1"/>
+    </LinearLayout>
+
+    <!-- Theme Color Swatches (Actually hidden/removed from prop panel now) -->
     <LinearLayout
         android:id="@+id/containerPaletteThemeColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:layout_marginBottom="12dp">
-        <include
-            android:id="@+id/paletteThemeColor"
-            layout="@layout/layout_prop_generic_color"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/properties_label_theme_color"
+            android:textSize="12sp"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_marginBottom="8dp"/>
+        <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="48dp"/>
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/layoutPaletteSwatches"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <!-- Swatches added programmatically -->
+                <ImageButton
+                    android:id="@+id/btnColorCustom"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_add"
+                    app:tint="@color/prop_text_secondary"/>
+            </LinearLayout>
+        </HorizontalScrollView>
     </LinearLayout>
 
-    <!-- Control Target (Mono Arc) -->
+    <!-- Control Target (Brightness vs Saturation) -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/menuControlTarget"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -126,7 +167,11 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:hint="@string/properties_label_control_target"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:boxCornerRadiusTopStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusBottomEnd="8dp">
         <AutoCompleteTextView
             android:id="@+id/tvControlTarget"
             android:layout_width="match_parent"
@@ -135,23 +180,58 @@
             android:textSize="12sp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Send Strategy -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/menuSendStrategy"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+    <!-- Send Strategy and Data Format Row -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:hint="@string/properties_label_send_strategy">
-        <AutoCompleteTextView
-            android:id="@+id/tvSendStrategy"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="none"
-            android:textSize="12sp"/>
-    </com.google.android.material.textfield.TextInputLayout>
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
 
-    <!-- Interval (Continuous) -->
+        <!-- Send Strategy (4) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/menuSendStrategy"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:hint="@string/properties_label_send_strategy"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp">
+            <AutoCompleteTextView
+                android:id="@+id/tvSendStrategy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textSize="11sp"
+                android:padding="12dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Data Format (6) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/menuDataFormat"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_weight="6"
+            android:layout_height="wrap_content"
+            android:hint="@string/properties_label_data_format"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp">
+            <AutoCompleteTextView
+                android:id="@+id/tvDataFormat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textSize="11sp"
+                android:padding="12dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <!-- Interval -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/containerPaletteInterval"
         android:layout_width="match_parent"
@@ -161,7 +241,11 @@
         app:helperTextEnabled="true"
         android:layout_marginBottom="12dp"
         android:visibility="gone"
-        style="@style/Widget.App.TextInputLayout.Properties">
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxCornerRadiusTopStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusBottomEnd="8dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPaletteInterval"
             android:layout_width="match_parent"
@@ -171,57 +255,159 @@
             android:textColor="@color/prop_text_primary"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Data Format -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/menuDataFormat"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="match_parent"
+    <!-- Appearance Section -->
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:hint="@string/properties_label_data_format">
-        <AutoCompleteTextView
-            android:id="@+id/tvDataFormat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="none"
-            android:textSize="12sp"/>
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Section: Appearance -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider_line"
-        android:layout_marginBottom="16dp" />
+        android:text="@string/prop_label_appearance"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/prop_text_secondary"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"/>
 
     <LinearLayout
+        android:id="@+id/itemShowHex"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="start|center_vertical"
-        android:layout_marginBottom="12dp">
+        android:padding="12dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/properties_label_show_code"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="顯示顏色十六進位代碼"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="11sp"/>
+        </LinearLayout>
         <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_palette"
-            app:tint="@color/props_primary"
-            android:layout_marginEnd="6dp"/>
-        <TextView
-            android:text="@string/properties_section_appearance"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="@color/prop_text_secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:id="@+id/checkShowHex"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_check_circle_premium"
+            android:visibility="visible"/>
     </LinearLayout>
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/swShowHexCode"
+    <LinearLayout
+        android:id="@+id/itemShowHue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/properties_label_show_code"
-        android:textSize="14sp"
-        android:textColor="@color/prop_text_primary"
-        android:layout_marginBottom="12dp"/>
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/properties_label_show_hue"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="顯示色調角度 (0-359°)"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="11sp"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/checkShowHue"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_check_circle_premium"
+            android:visibility="visible"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/itemShowSaturation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/properties_label_show_saturation"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="顯示顏色飽和度百分比"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="11sp"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/checkShowSaturation"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_check_circle_premium"
+            android:visibility="visible"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/itemShowBrightness"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/properties_label_show_brightness"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="顯示顏色亮度百分比"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="11sp"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/checkShowBrightness"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_check_circle_premium"
+            android:visibility="visible"/>
+    </LinearLayout>
 
 </LinearLayout>

@@ -139,23 +139,27 @@
 
     <!-- Color Palette Properties -->
     <string name="properties_label_controller_style">控制器樣式</string>
-    <string name="val_palette_style_square">方形面板 (Square)</string>
-    <string name="val_palette_style_arc">環形色輪 (Arc)</string>
+    <string name="val_palette_style_square">方形面板</string>
+    <string name="val_palette_style_arc">環形色輪</string>
     <string name="properties_label_color_mode">色彩模式</string>
-    <string name="val_palette_mode_full">全彩 (Full Color)</string>
-    <string name="val_palette_mode_mono">單色 (Monochrome)</string>
+    <string name="val_palette_mode_full">全彩模式</string>
+    <string name="val_palette_mode_mono">單色模式</string>
     <string name="properties_label_control_target">控制目標</string>
     <string name="val_palette_target_brightness">亮度 (Brightness)</string>
     <string name="val_palette_target_saturation">飽和度 (Saturation)</string>
     <string name="properties_label_send_strategy">發送時機</string>
-    <string name="val_strategy_release">鬆手發送 (On Release)</string>
-    <string name="val_strategy_continuous">連續發送 (Continuous)</string>
+    <string name="val_strategy_release">鬆手發送</string>
+    <string name="val_strategy_continuous">連續發送</string>
     <string name="properties_label_data_format">資料格式</string>
     <string name="val_format_json_rgb">JSON (RGB)</string>
     <string name="val_format_json_hsv">JSON (HSV)</string>
     <string name="val_format_hex">Hex 字串 (#RRGGBB)</string>
-    <string name="val_format_raw">數值 (0-100)</string>
     <string name="properties_label_show_code">顯示色碼</string>
+    <string name="properties_label_show_hue">顯示色相</string>
+    <string name="properties_label_show_saturation">顯示飽和度</string>
+    <string name="properties_label_show_brightness">顯示亮度</string>
+    <string name="properties_label_hue">基礎色相 (Hue)</string>
+    <string name="properties_label_brightness">亮度 (Brightness)</string>
     <string name="component_label_palette">調色盤</string>
 
     <!-- MQTT & Console -->
@@ -260,6 +264,16 @@
     <string name="val_shape_circle_style">圓形</string>
     <string name="val_style_rounded">矩形</string>
     <string name="val_style_segmented">膠囊</string>
+
+    <!-- Text Input Styles -->
+    <string name="val_style_text_capsule">膠囊</string>
+    <string name="val_style_text_modular">模組</string>
+    <string name="val_style_text_infinity">無極</string>
+    <string name="prop_label_clear_on_send">發送後清空</string>
+    <string name="prop_label_enter_as_send">換行鍵發送</string>
+    <string name="prop_desc_clear_on_send">發送訊息後自動清空輸入框。</string>
+    <string name="prop_desc_enter_as_send">按下鍵盤 Enter 鍵時直接發送。</string>
+    <string name="component_label_text_input">文字輸入</string>
     
     <string name="val_mode_tap">點擊切換</string>
     <string name="val_mode_hold">長按觸發</string>

@@ -9,7 +9,6 @@ object ComponentDefinitionRegistry {
     init {
         register(ButtonDefinition)
         register(SwitchDefinition)
-        register(LedDefinition)
         register(TextDefinition)
         register(SliderDefinition)
         register(SelectorDefinition)
@@ -19,6 +18,7 @@ object ComponentDefinitionRegistry {
         register(LineChartDefinition)
         register(JoystickDefinition)
         register(ColorPaletteDefinition)
+        register(TextInputDefinition)
     }
 
     fun register(def: IComponentDefinition) {

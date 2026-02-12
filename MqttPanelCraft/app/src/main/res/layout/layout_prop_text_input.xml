@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- SECTION: INTERACTION -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_touch_app"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+            
+        <TextView
+            android:text="@string/properties_section_interaction"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- Clear on Send Toggle -->
+    <LinearLayout
+        android:id="@+id/itemClearOnSend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prop_label_clear_on_send"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prop_desc_clear_on_send"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="11sp"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/checkClearOnSend"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_check_circle_premium"
+            android:visibility="visible"/>
+    </LinearLayout>
+
+    <!-- Enter as Send Toggle -->
+    <LinearLayout
+        android:id="@+id/itemEnterAsSend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prop_label_enter_as_send"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prop_desc_enter_as_send"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="11sp"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/checkEnterAsSend"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_check_circle_premium"
+            android:visibility="visible"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_line"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- SECTION: APPEARANCE -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="4dp">
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+            
+        <TextView
+            android:text="@string/properties_section_appearance"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:gravity="start|center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- Style & Color Row (4:6) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <!-- Style Selector -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.4"
+            android:layout_height="wrap_content" 
+            android:hint="@string/prop_hint_style"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusBottomEnd="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            
+            <AutoCompleteTextView
+                 android:id="@+id/spPropStyle"
+                 android:layout_width="match_parent"
+                 android:layout_height="52dp"
+                 android:inputType="none"
+                 android:textSize="13sp"
+                 android:maxLines="1"
+                 app:autoSizeTextType="uniform"
+                 app:autoSizeMinTextSize="10sp"
+                 app:autoSizeMaxTextSize="14sp"
+                 android:ellipsize="end"
+                 android:textColor="@color/prop_text_primary"
+                 android:gravity="start|center_vertical"
+                 android:paddingStart="16dp"
+                 android:paddingEnd="12dp"
+                 android:popupBackground="@drawable/bg_popup_rounded"
+                 android:dropDownWidth="180dp"
+                 android:dropDownVerticalOffset="4dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+
+        <!-- Color Picker (Unified) -->
+        <include
+            android:id="@+id/containerTextInputColor"
+            layout="@layout/layout_prop_generic_color"
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
+            android:layout_height="52dp" />
+    </LinearLayout>
+
+</LinearLayout>

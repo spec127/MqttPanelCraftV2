@@ -160,8 +160,16 @@
     <string name="val_format_json_rgb">JSON (RGB)</string>
     <string name="val_format_json_hsv">JSON (HSV)</string>
     <string name="val_format_hex">Hex String</string>
-    <string name="val_format_raw">Raw Value (0-100)</string>
     <string name="properties_label_show_code">Show Hex Code</string>
+    <string name="properties_label_show_hue">Show Hue</string>
+    <string name="properties_label_show_saturation">Show Saturation</string>
+    <string name="properties_label_show_brightness">Show Brightness</string>
+    <string name="properties_label_hue">Hue Selection</string>
+    <string name="properties_label_hue_selection">Hue Selection</string>
+    <string name="properties_label_theme_color">Theme Color</string>
+    <string name="properties_label_brightness">Brightness</string>
+    <string name="prop_label_appearance">Appearance</string>
+    <string name="properties_label_show_hex">Show Hex Code</string>
     <string name="component_label_palette">Color Palette</string>
 
     <!-- MQTT & Console -->
@@ -268,7 +276,17 @@
 
     <string name="val_shape_circle_style">Circles</string>
     <string name="val_style_rounded">Rects</string>
-    <string name="val_style_segmented">Capsule</string>
+    <string name="val_style_segmented">膠囊</string>
+
+    <!-- Text Input Styles -->
+    <string name="val_style_text_capsule">Capsule</string>
+    <string name="val_style_text_modular">Modular</string>
+    <string name="val_style_text_infinity">Infinity</string>
+    <string name="prop_label_clear_on_send">Clear on Send</string>
+    <string name="prop_label_enter_as_send">Enter as Send</string>
+    <string name="prop_desc_clear_on_send">Clear text field after sending.</string>
+    <string name="prop_desc_enter_as_send">Send message when Enter key is pressed.</string>
+    <string name="component_label_text_input">Text Input</string>
     
     <string name="val_mode_tap">Tap</string>
     <string name="val_mode_hold">Hold</string>
