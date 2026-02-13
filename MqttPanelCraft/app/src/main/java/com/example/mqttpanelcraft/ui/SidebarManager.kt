@@ -301,7 +301,14 @@ class SidebarManager(
                         container.addView(grid)
 
                         // Accordion Logic
+                        var isAccordionAnimating = false
                         fun updateCategoryState(targetIndex: Int) {
+                                // Prevent re-triggering if animating OR if the target is already open
+                                if (isAccordionAnimating) return
+                                if (categoryGrids[targetIndex].visibility == View.VISIBLE) return
+
+                                isAccordionAnimating = true
+
                                 androidx.transition.TransitionManager.beginDelayedTransition(
                                         container
                                 )
@@ -315,6 +322,7 @@ class SidebarManager(
                                                 .setDuration(200)
                                                 .start()
                                 }
+                                container.postDelayed({ isAccordionAnimating = false }, 500)
                         }
 
                         val currentIndex = categoryHeaders.size

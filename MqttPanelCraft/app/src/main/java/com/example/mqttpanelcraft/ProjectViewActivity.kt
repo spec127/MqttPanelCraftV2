@@ -229,37 +229,41 @@ class ProjectViewActivity : BaseActivity() {
                         guideOverlay,
                         peekHeightPx,
                         object : CanvasInteractionManager.InteractionCallbacks {
+                            override fun onInteractionStarted() {
+                                if (isEditMode) {
+                                    val sheet = findViewById<View>(R.id.bottomSheet)
+                                    val behavior =
+                                            com.google.android.material.bottomsheet
+                                                    .BottomSheetBehavior.from(sheet)
+
+                                    // Collapse Sheet on Drag/Resize Start
+                                    if (behavior.state !=
+                                                    com.google.android.material.bottomsheet
+                                                            .BottomSheetBehavior.STATE_COLLAPSED
+                                    ) {
+                                        behavior.state =
+                                                com.google.android.material.bottomsheet
+                                                        .BottomSheetBehavior.STATE_COLLAPSED
+                                    }
+                                }
+                            }
+
                             override fun onComponentSelected(id: Int) {
                                 if (isEditMode) {
                                     if (selectedComponentId != id) {
                                         selectedComponentId = id
-                                        val comp = viewModel.components.value?.find { it.id == id }
-                                        val view = renderer.getView(id)
-                                        if (comp != null && view != null) {
-                                            // Selection Only: Bind Properties but force collapse
-                                            val sheet = findViewById<View>(R.id.bottomSheet)
-                                            val behavior =
-                                                    com.google.android.material.bottomsheet
-                                                            .BottomSheetBehavior.from(sheet)
-                                            behavior.state =
-                                                    com.google.android.material.bottomsheet
-                                                            .BottomSheetBehavior.STATE_COLLAPSED
-                                            propertiesManager.showProperties(
-                                                    view,
-                                                    comp,
-                                                    autoExpand = false
-                                            )
-                                        }
-                                        // Render Selection Border
-                                        viewModel.components.value?.let {
-                                            renderer.render(it, isEditMode, selectedComponentId)
-                                        }
+                                        // Just select, don't force sheet state here (Drag selection
+                                        // handles it via onInteractionStarted)
 
                                         // Update UI Manager
                                         projectUIManager.updateModeUI(
                                                 isEditMode,
                                                 selectedComponentId
                                         )
+                                        // Render Selection Border
+                                        viewModel.components.value?.let {
+                                            renderer.render(it, isEditMode, selectedComponentId)
+                                        }
                                         projectUIManager.updateCanvasOcclusion()
                                     }
                                 }
@@ -273,36 +277,32 @@ class ProjectViewActivity : BaseActivity() {
                                                     .BottomSheetBehavior.from(sheet)
 
                                     if (id == -1) {
-                                        // Background Click -> Deselect & Collapse (Don't Hide)
+                                        // Background Click -> Deselect & Collapse
                                         selectedComponentId = null
                                         behavior.state =
                                                 com.google.android.material.bottomsheet
                                                         .BottomSheetBehavior.STATE_COLLAPSED
-                                        // Clear visible properties or set "No Selection" state
                                         propertiesManager.showTitleOnly()
                                     } else {
-                                        // Component Logic:
-                                        // 1. If ALREADY selected -> EXPAND (Second Click)
-                                        // 2. If NEW selection -> SELECT (First Click)
+                                        // Component Click -> ALWAYS Select & Expand (One-Click)
 
-                                        if (selectedComponentId == id) {
-                                            // Second Click: Expand
-                                            val comp =
-                                                    viewModel.components.value?.find { it.id == id }
-                                            val view = renderer.getView(id)
-                                            if (comp != null && view != null) {
-                                                propertiesManager.showProperties(
-                                                        view,
-                                                        comp,
-                                                        autoExpand = true
-                                                )
-                                            }
-                                        } else {
-                                            // First Click: Select Only
+                                        // Ensure selection state
+                                        if (selectedComponentId != id) {
                                             onComponentSelected(id)
                                         }
+
+                                        val comp = viewModel.components.value?.find { it.id == id }
+                                        val view = renderer.getView(id)
+                                        if (comp != null && view != null) {
+                                            propertiesManager.showProperties(
+                                                    view,
+                                                    comp,
+                                                    autoExpand = true // Force Expand immediately
+                                            )
+                                        }
                                     }
-                                    // Trigger Re-render to update Selection Border
+
+                                    // Trigger Re-render
                                     viewModel.components.value?.let {
                                         renderer.render(it, isEditMode, selectedComponentId)
                                     }
@@ -370,8 +370,10 @@ class ProjectViewActivity : BaseActivity() {
                                         .show()
                             }
 
-                            override fun onDeleteZoneHover(isHovered: Boolean) {
-                                projectUIManager.setDeleteZoneHover(isHovered)
+                            override fun onDeleteZoneState(
+                                    state: CanvasInteractionManager.DeleteState
+                            ) {
+                                projectUIManager.setDeleteZoneState(state)
                             }
 
                             override fun onNewComponent(type: String, x: Float, y: Float) {
@@ -448,13 +450,27 @@ class ProjectViewActivity : BaseActivity() {
                 }
         )
 
-        findViewById<View>(R.id.rootCoordinator)?.setOnDragListener { _, event ->
-            if (event.action == android.view.DragEvent.ACTION_DROP) {
-                true
-            } else {
-                true
-            }
-        }
+        // Drag & Drop Listener for New Components
+        val dragListener =
+                android.view.View.OnDragListener { v, event ->
+                    when (event.action) {
+                        android.view.DragEvent.ACTION_DRAG_STARTED -> true
+                        android.view.DragEvent.ACTION_DROP -> {
+                            val clipData = event.clipData
+                            if (clipData != null && clipData.itemCount > 0) {
+                                val type = clipData.getItemAt(0).text.toString()
+                                // Coordinates are local to the view (editorCanvas)
+                                interactionManager.callbacks.onNewComponent(type, event.x, event.y)
+                                true
+                            } else {
+                                false
+                            }
+                        }
+                        else -> true
+                    }
+                }
+        editorCanvas.setOnDragListener(dragListener)
+        findViewById<View>(R.id.rootCoordinator)?.setOnDragListener(null) // Clean up root listener
 
         val header = findViewById<View>(R.id.bottomSheetHeader)
         header.setOnClickListener {
@@ -640,7 +656,7 @@ class ProjectViewActivity : BaseActivity() {
                         },
                         { id -> // On Clone
                             viewModel.components.value?.find { it.id == id }?.let { source ->
-                                // 1. Naming Logic
+                                // 1. Naming Logic (Label)
                                 val name = source.label
                                 val regex = "(.*)_copy(\\d*)$".toRegex()
                                 val match = regex.find(name)
@@ -655,13 +671,29 @@ class ProjectViewActivity : BaseActivity() {
                                             "${name}_copy"
                                         }
 
-                                // 2. Add Component
+                                // 2. Naming Logic (Topic) - Same Pattern
+                                val topic = source.topicConfig
+                                val matchTopic = regex.find(topic)
+                                val newTopic =
+                                        if (matchTopic != null) {
+                                            val base = matchTopic.groupValues[1]
+                                            val numStr = matchTopic.groupValues[2]
+                                            val num =
+                                                    if (numStr.isEmpty()) 2 else numStr.toInt() + 1
+                                            "${base}_copy$num"
+                                        } else {
+                                            "${topic}_copy"
+                                        }
+
+                                // 3. Add Component
                                 val newComp =
                                         viewModel.addComponent(
                                                 source.copy(
                                                         x = source.x + 40f,
                                                         y = source.y + 40f,
-                                                        label = newLabel
+                                                        label = newLabel,
+                                                        topicConfig = newTopic,
+                                                        props = source.props.toMutableMap()
                                                 )
                                         )
 

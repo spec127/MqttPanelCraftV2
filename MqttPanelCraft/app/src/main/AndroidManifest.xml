@@ -35,11 +35,13 @@
 
         <activity
             android:name=".LoginActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <activity
             android:name=".DashboardActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -49,7 +51,8 @@
         <activity
             android:name=".ProjectViewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:theme="@style/Theme.Helloworld" />
+            android:theme="@style/Theme.Helloworld"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
             
         <activity
             android:name=".AboutActivity"
@@ -62,11 +65,13 @@
             
         <activity
             android:name=".SetupActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
         <activity
             android:name=".RegisterActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
 
 
 

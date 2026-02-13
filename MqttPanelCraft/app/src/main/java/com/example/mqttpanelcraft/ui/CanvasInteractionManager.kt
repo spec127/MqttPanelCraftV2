@@ -12,6 +12,65 @@ class CanvasInteractionManager(
         val callbacks: InteractionCallbacks
 ) {
 
+    private var isEditMode: () -> Boolean = { false }
+    private var isGridSnapEnabled: () -> Boolean = { true }
+    private var isBottomSheetExpanded: () -> Boolean = { false }
+
+    fun setup(
+            isEditMode: () -> Boolean,
+            isGridEnabled: () -> Boolean,
+            isBottomSheetExpanded: () -> Boolean
+    ) {
+        this.isEditMode = isEditMode
+        this.isGridSnapEnabled = isGridEnabled
+        this.isBottomSheetExpanded = isBottomSheetExpanded
+    }
+
+    private enum class Mode {
+        IDLE,
+        DRAGGING,
+        RESIZING
+    }
+
+    private var currentMode = Mode.IDLE
+    private var activeView: View? = null
+
+    // Drag/Resize State
+    private var downX = 0f
+    private var downY = 0f
+    private var isDragDetected = false
+    private var hasTriggeredDragSelection = false
+    private var isDeleteHovered = false
+
+    private var initX = 0f
+    private var initY = 0f
+    private var initW = 0
+    private var initH = 0
+
+    // Configuration
+    private val density = canvasCanvas.context.resources.displayMetrics.density
+    private val DRAG_THRESHOLD = 8 * density
+    private val gridUnitPx = (10 * density).toInt()
+    private val RESIZE_STEP_DP = 10
+    private var bottomInset = bottomSheetPeekHeight
+
+    fun updateBottomInset(inset: Int) {
+        bottomInset = inset
+    }
+
+    // Dynamic Offset State
+    private var touchOffsetX = 0f
+    private var touchOffsetY = 0f
+    private var resizeStartX = 0f
+    private var resizeStartY = 0f
+    private var initialCanvasY = 0f
+
+    enum class DeleteState {
+        NONE,
+        WARNING,
+        ACTIVE
+    }
+
     interface InteractionCallbacks {
         fun onComponentClicked(id: Int)
         fun onComponentSelected(id: Int)
@@ -20,104 +79,14 @@ class CanvasInteractionManager(
         fun onComponentResizing(id: Int, newW: Int, newH: Int)
         fun onComponentDeleted(id: Int)
         fun onNewComponent(type: String, x: Float, y: Float)
-        fun onDeleteZoneHover(isHovered: Boolean)
+        fun onDeleteZoneState(state: DeleteState) // UPDATED
+        fun onInteractionStarted()
     }
 
-    private val density = canvasCanvas.context.resources.displayMetrics.density
-    private var bottomInset: Int = 0
+    // ... (Keep existing properties) ...
 
-    fun updateBottomInset(inset: Int) {
-        this.bottomInset = inset
-    }
-    private var isDeleteHovered = false
-
-    companion object {
-        const val GRID_UNIT_DP = 10
-        const val RESIZE_STEP_DP = 10
-        const val DRAG_THRESHOLD = 10f
-    }
-    private val gridUnitPx = (GRID_UNIT_DP * density).toInt().coerceAtLeast(10)
-    private val resizeStepPx = (RESIZE_STEP_DP * density).toInt().coerceAtLeast(10)
-
-    private enum class Mode {
-        IDLE,
-        DRAGGING,
-        RESIZING
-    }
-    private var currentMode = Mode.IDLE
-    private var activeView: View? = null
-    private var downX = 0f
-    private var downY = 0f
-    private var initX = 0f
-    private var initY = 0f
-    private var initW = 0
-    private var initH = 0
-    private var isDragDetected = false
-    private var hasTriggeredDragSelection = false
-
-    private var isGridSnapEnabled: () -> Boolean = { true }
-    private var isEditMode: () -> Boolean = { false }
-    private var isBottomSheetExpanded: () -> Boolean = { false }
-
-    fun setup(
-            isEditMode: () -> Boolean,
-            isGridEnabled: () -> Boolean,
-            isBottomSheetExpanded: () -> Boolean
-    ) {
-        this.isGridSnapEnabled = isGridEnabled
-        this.isEditMode = isEditMode
-        this.isBottomSheetExpanded = isBottomSheetExpanded
-
-        canvasCanvas.setOnTouchListener { _, event ->
-            // Allow events in Run Mode (for background clicks), filter inside handleTouch
-            handleTouch(event)
-        }
-
-        canvasCanvas.setOnDragListener { _, event ->
-            if (!isEditMode()) return@setOnDragListener false
-            when (event.action) {
-                android.view.DragEvent.ACTION_DRAG_ENTERED -> {
-                    // Start in IDLE state, will update in LOCATION
-                    isDeleteHovered = false
-                }
-                android.view.DragEvent.ACTION_DRAG_LOCATION -> {
-                    val y = event.y
-                    // FIX: Use only dynamic bottomInset (Current Sheet Top)
-                    val limitY = (canvasCanvas.height - bottomInset).toFloat()
-
-                    val inZone = y > limitY
-                    if (inZone != isDeleteHovered) {
-                        isDeleteHovered = inZone
-                        callbacks.onDeleteZoneHover(inZone)
-                    }
-                }
-                android.view.DragEvent.ACTION_DRAG_ENDED -> {
-                    isDeleteHovered = false
-                    callbacks.onDeleteZoneHover(false)
-                }
-                android.view.DragEvent.ACTION_DROP -> {
-                    // Check if dropped in Delete Zone
-                    val y = event.y
-                    // FIX: paddingBottom is static XML padding (100dp), bottomInset is dynamic
-                    // overlap (100dp).
-                    // We only want the dynamic overlap (Physical Sheet Top).
-                    val effectiveBottomLimit = canvasCanvas.height - bottomInset
-
-                    if (y > effectiveBottomLimit) {
-                        // Dropped in Delete Zone - Cancel Creation
-                        callbacks.onDeleteZoneHover(false)
-                        // Trigger "Deleted" feedback even for new components
-                        callbacks.onComponentDeleted(-1)
-                    } else if (event.clipData != null && event.clipData.itemCount > 0) {
-                        val type = event.clipData.getItemAt(0).text.toString()
-                        callbacks.onNewComponent(type, event.x, event.y)
-                    }
-                }
-            }
-
-            true
-        }
-    }
+    // State Tracking
+    private var currentDeleteState = DeleteState.NONE
 
     fun handleTouch(event: MotionEvent): Boolean {
         val x = event.x
@@ -131,18 +100,22 @@ class CanvasInteractionManager(
                 downY = rawY
                 isDragDetected = false
                 hasTriggeredDragSelection = false
+                currentDeleteState = DeleteState.NONE
 
                 // Only allow Drag/Resize in Edit Mode
                 if (isEditMode()) {
-                    // Removed "isBottomSheetExpanded" lock to allow Drag/Resize while properties
-                    // are open.
-
                     val handle = findResizeHandleAt(x, y)
                     if (handle != null) {
                         currentMode = Mode.RESIZING
                         activeView = handle
                         initW = activeView!!.width
                         initH = activeView!!.height
+                        resizeStartX = rawX
+                        resizeStartY = rawY
+
+                        // Notify Interaction Start IMMEDIATELY (Collapses Sheet)
+                        callbacks.onInteractionStarted()
+
                         canvasCanvas.requestDisallowInterceptTouchEvent(true)
                         return true
                     }
@@ -151,8 +124,24 @@ class CanvasInteractionManager(
                     if (component != null) {
                         currentMode = Mode.DRAGGING
                         activeView = component
+
+                        // Capture Initial State
                         initX = component.x
                         initY = component.y
+
+                        // Dynamic Offset Calculation (Screen Space)
+                        val canvasLoc = IntArray(2)
+                        canvasCanvas.getLocationOnScreen(canvasLoc)
+                        initialCanvasY = canvasLoc[1].toFloat()
+
+                        // Offset = Finger - (CanvasScreen + ComponentLocal)
+                        // Result: Where is the finger relative to the component's Top-Left?
+                        val compScreenX = canvasLoc[0] + initX
+                        val compScreenY = canvasLoc[1] + initY
+
+                        touchOffsetX = rawX - compScreenX
+                        touchOffsetY = rawY - compScreenY
+
                         canvasCanvas.requestDisallowInterceptTouchEvent(true)
                         return true
                     }
@@ -169,59 +158,73 @@ class CanvasInteractionManager(
                                 (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD)
                 ) {
                     isDragDetected = true
-                    // NEW: Trigger selection immediately on drag start
+                    // Trigger selection immediately on drag start
                     if (!hasTriggeredDragSelection && activeView != null) {
                         callbacks.onComponentSelected(activeView!!.id)
                         hasTriggeredDragSelection = true
+
+                        // Notify Interaction Start (Late Trigger for Drag)
+                        if (currentMode == Mode.DRAGGING) {
+                            callbacks.onInteractionStarted()
+                        }
                     }
                 }
 
                 if (currentMode == Mode.DRAGGING && activeView != null) {
-                    var newX = snap(initX + dx)
+                    // DYNAMIC MAPPING LOGIC
+                    val canvasLoc = IntArray(2)
+                    canvasCanvas.getLocationOnScreen(canvasLoc)
+                    val currentCanvasScreenX = canvasLoc[0].toFloat()
+                    val currentCanvasScreenY = canvasLoc[1].toFloat()
 
-                    val rawTargetY = initY + dy
-                    val nominalY = snap(rawTargetY)
+                    val targetX = rawX - currentCanvasScreenX - touchOffsetX
+                    val targetY = rawY - currentCanvasScreenY - touchOffsetY
 
+                    var newX = snap(targetX)
+                    val nominalY = snap(targetY)
+
+                    // Resistance & Delete Logic
                     val canvasH = canvasCanvas.height
                     val canvasW = canvasCanvas.width
                     val compH = activeView!!.height
                     val compW = activeView!!.width
-
-                    // Resistance Logic
-                    // safeLimitY: The lowest point the component bottom can go before hitting the
-                    // visual top of the sheet
                     val safeLimitY = (canvasH - bottomInset - compH).toFloat()
 
                     var newY = nominalY
+                    var nextState = DeleteState.NONE
+
+                    val screenH = canvasCanvas.context.resources.displayMetrics.heightPixels
+                    val fingerInDeleteZone = rawY > (screenH - bottomInset)
 
                     if (nominalY > safeLimitY) {
-                        // Check if Bottom Sheet is Expanded (Hard Clamp)
+                        // OVERSHOOT Logic
                         if (isBottomSheetExpanded()) {
                             newY = safeLimitY
                         } else {
-                            // Apply Resistance
+                            // Apply Heavy Resistance
                             val excess = nominalY - safeLimitY
-                            val resistedExcess = excess * 0.15f
+                            val resistedExcess = excess * 0.15f // Heavy resistance
                             newY = safeLimitY + resistedExcess
                         }
                     }
 
-                    // Check Delete Zone (Finger vs Sheet Top)
-                    val deleteTriggerY = (canvasH - bottomInset).toFloat()
-
-                    // ONLY Check Delete if Sheet is NOT Open
-                    if (!isBottomSheetExpanded() && y > deleteTriggerY) {
-                        if (!isDeleteHovered) {
-                            isDeleteHovered = true
-                            callbacks.onDeleteZoneHover(true)
-                            activeView?.alpha = 0.5f
-                        }
+                    // Delete State Logic
+                    if (isBottomSheetExpanded()) {
+                        nextState = DeleteState.NONE
                     } else {
-                        if (isDeleteHovered) {
-                            isDeleteHovered = false
-                            callbacks.onDeleteZoneHover(false)
+                        if (fingerInDeleteZone) {
+                            nextState = DeleteState.ACTIVE // Red Zone
+                            activeView?.alpha = 0.5f // Fade out
+                        } else {
+                            nextState = DeleteState.WARNING // Gray Zone
                             activeView?.alpha = 1.0f
                         }
+                    }
+
+                    // State Change
+                    if (currentDeleteState != nextState) {
+                        currentDeleteState = nextState
+                        callbacks.onDeleteZoneState(nextState)
                     }
 
                     // Clamp X
@@ -234,14 +237,12 @@ class CanvasInteractionManager(
                     activeView!!.x = newX
                     activeView!!.y = newY
 
-                    // Update Label
                     findLabelFor(activeView!!)?.let {
                         it.x = newX
                         it.y = newY + activeView!!.height + 4
                     }
 
-                    // Only align if NOT in delete zone
-                    if (!isDeleteHovered) {
+                    if (currentDeleteState == DeleteState.NONE) {
                         checkAlignment(activeView!!, compW, compH)
                     } else {
                         guideOverlay.clear()
@@ -250,10 +251,14 @@ class CanvasInteractionManager(
                 }
 
                 if (currentMode == Mode.RESIZING && activeView != null) {
-                    val targetWDp = (initW + dx) / density
-                    val targetHDp = (initH + dy) / density
+                    // ... (Resize logic remains same) ...
+                    val dxResize = rawX - resizeStartX
+                    val dyResize = rawY - resizeStartY
 
-                    val stepDp = RESIZE_STEP_DP.toFloat() // 10f
+                    val targetWDp = (initW + dxResize) / density
+                    val targetHDp = (initH + dyResize) / density
+
+                    val stepDp = RESIZE_STEP_DP.toFloat()
 
                     val newWDp =
                             if (isGridSnapEnabled()) kotlin.math.round(targetWDp / stepDp) * stepDp
@@ -266,38 +271,13 @@ class CanvasInteractionManager(
                     var newH = kotlin.math.round(newHDp * density).toInt().coerceAtLeast(gridUnitPx)
 
                     // Aspect Ratio Locking
-                    val compId = activeView!!.id
-                    // Note: In this project, IDs are managed by ProjectUIManager and Renderer.
-                    // We need the data once more. We assume Renderer has a way to get it.
-                    // Since Renderer is not easily accessible here as a singleton, we check
-                    // definition by ID if possible.
-                    // Wait, I can't easily get ComponentData here. I'll use a tag or check if view
-                    // ID matches renderer cache.
-                    // Actually, I'll pass the data or definition if possible, but let's look at how
-                    // activeView is used.
-
-                    // FALLBACK: If we can't find definition easily, we check if it's a JOYSTICK.
-                    // Better: We added IComponentDefinition, let's use ComponentDefinitionRegistry.
                     val tag = activeView!!.tag?.toString() ?: ""
-                    val def =
-                            com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry
-                                    .get(tag)
 
-                    // We need to know if it's 2-way or 4-way.
-                    // Let's assume the view itself has the property if it's a JoystickView.
                     val finalView = activeView!!.findViewWithTag<View>("target")
                     if (finalView is com.example.mqttpanelcraft.ui.views.JoystickView) {
                         if (finalView.axes == "4-Way") {
-                            // Maintain aspect ratio (1:1 for Joystick)
-                            if (dx > dy) {
-                                newH = newW
-                            } else {
-                                newW = newH
-                            }
+                            if (dxResize > dyResize) newH = newW else newW = newH
                         }
-                    } else if (def != null) {
-                        // Generic check if possible, but we don't have ComponentData here.
-                        // For now, Joystick is the only one with dynamic lock.
                     }
 
                     val params = activeView!!.layoutParams
@@ -309,10 +289,7 @@ class CanvasInteractionManager(
                     val label = findLabelFor(activeView!!)
                     label?.let { it.y = activeView!!.y + newH + 4 }
 
-                    // Real-time alignment using calculated size, not current view size
                     checkAlignment(activeView!!, newW, newH)
-
-                    // Real-time UI update
                     callbacks.onComponentResizing(activeView!!.id, newW, newH)
                     return true
                 }
@@ -321,18 +298,23 @@ class CanvasInteractionManager(
                 guideOverlay.clear()
 
                 if (currentMode == Mode.DRAGGING && activeView != null) {
-                    if (isDeleteHovered) {
+                    val canvasH = canvasCanvas.height
+                    val compH = activeView!!.height
+                    val safeLimitY = (canvasH - bottomInset - compH).toFloat()
+
+                    if (currentDeleteState == DeleteState.ACTIVE) {
                         callbacks.onComponentDeleted(activeView!!.id)
-                        isDeleteHovered = false
-                        callbacks.onDeleteZoneHover(false)
+                        currentDeleteState = DeleteState.NONE
+                        callbacks.onDeleteZoneState(DeleteState.NONE)
                     } else if (isDragDetected) {
-                        // Elastic Snap-Back Logic
-                        val canvasH = canvasCanvas.height
-                        val compH = activeView!!.height
-                        val safeLimitY = (canvasH - bottomInset - compH).toFloat()
+                        // Ensure state is reset if we didn't delete
+                        if (currentDeleteState != DeleteState.NONE) {
+                            currentDeleteState = DeleteState.NONE
+                            callbacks.onDeleteZoneState(DeleteState.NONE)
+                        }
 
                         if (activeView!!.y > safeLimitY && !isBottomSheetExpanded()) {
-                            // Bounce back effect
+                            // Snap Back
                             activeView!!
                                     .animate()
                                     .y(safeLimitY)
@@ -342,15 +324,12 @@ class CanvasInteractionManager(
                                     )
                                     .start()
 
-                            // Update label visually to match animation end
                             findLabelFor(activeView!!)?.let {
                                 it.animate().y(safeLimitY + compH + 4).setDuration(300).start()
                             }
-
-                            // Save the CLAMPED position
                             callbacks.onComponentMoved(activeView!!.id, activeView!!.x, safeLimitY)
+                            callbacks.onDeleteZoneState(DeleteState.NONE) // Ensure reset
                         } else {
-                            // Normal Save
                             callbacks.onComponentMoved(
                                     activeView!!.id,
                                     activeView!!.x,
@@ -370,7 +349,6 @@ class CanvasInteractionManager(
                         )
                     }
                 } else if (activeView != null) {
-                    // IDLE mode (Locked) -> Handle Click
                     callbacks.onComponentClicked(activeView!!.id)
                 }
 
