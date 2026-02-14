@@ -48,13 +48,14 @@
 
                 <!-- Status Dot (Center Independent) -->
                 <!-- translationX="-35dp" compensates for Toolbar Navigation Icon offset (approx 56dp/2) -->
-                <View
+                <ImageView
                     android:id="@+id/viewStatusDot"
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_centerInParent="true"
                     android:translationX="-35dp"
-                    android:background="@drawable/shape_circle_green" />
+                    android:src="@drawable/ic_link_off"
+                    app:tint="@color/prop_text_secondary" />
 
                 <!-- Right Side Buttons -->
                 <LinearLayout

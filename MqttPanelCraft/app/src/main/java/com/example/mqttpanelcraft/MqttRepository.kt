@@ -2,15 +2,15 @@ package com.example.mqttpanelcraft
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import org.eclipse.paho.client.mqttv3.MqttClient
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
+import org.eclipse.paho.client.mqttv3.MqttClient
 
 object MqttRepository {
     var mqttClient: MqttClient? = null
     var account: String = ""
     var project: String = ""
-    
+
     // Log history (Text only)
     private val _logHistory = Collections.synchronizedList(mutableListOf<String>())
     private val _logs = MutableLiveData<List<String>>()
@@ -46,7 +46,8 @@ object MqttRepository {
 
     data class RawMessage(val topic: String, val payload: String)
     // private val _messageReceived = SingleLiveEvent<RawMessage>() // Removed unused/unresolved
-    // Let's stick to MutableLiveData for simplicity, but beware of multiple observers if not handled carefully.
+    // Let's stick to MutableLiveData for simplicity, but beware of multiple observers if not
+    // handled carefully.
     // Ideally use a SharedFlow but sticking to LiveData as per existing code style.
     private val _latestMessage = MutableLiveData<RawMessage>()
     val latestMessage: LiveData<RawMessage> = _latestMessage
@@ -76,12 +77,14 @@ object MqttRepository {
 
     fun processMessage(topic: String?, payload: String, timestamp: String) {
         if (topic == null) return
-        
+
         // Notify Listeners (Direct Call - Background Thread)
         for (listener in listeners) {
             try {
                 listener.onMessageReceived(topic, payload)
-            } catch (e: Exception) { e.printStackTrace() }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
         _latestMessage.postValue(RawMessage(topic, payload))
@@ -107,9 +110,9 @@ object MqttRepository {
                     displayTopic = "${parts[2]}/${parts[3]}/${parts[4]}"
                 }
             } else if (parts.size >= 2) {
-                 // Fallback for partial topics
-                 val msgProjectId = parts[1]
-                 if (msgProjectId != activeProjectId) shouldLog = false
+                // Fallback for partial topics
+                val msgProjectId = parts[1]
+                if (msgProjectId != activeProjectId) shouldLog = false
             }
         }
 
@@ -128,13 +131,16 @@ object MqttRepository {
                 }
 
                 val type = parts[2]
-                
+
                 when (type) {
                     "text" -> {
                         _displayItem.postValue(LogItem.Text(payload, timestamp))
                     }
                     "led" -> {
-                        val isOn = payload.contains("1") || payload.contains("true") || payload.equals("ON", true)
+                        val isOn =
+                                payload.contains("1") ||
+                                        payload.contains("true") ||
+                                        payload.equals("ON", true)
                         _displayItem.postValue(LogItem.Led(isOn, timestamp))
                     }
                     "image" -> {
@@ -157,7 +163,7 @@ object MqttRepository {
                                 }
                                 val fullBase64 = sb.toString()
                                 _displayItem.postValue(LogItem.Image(fullBase64, timestamp))
-                                
+
                                 // Clean up
                                 imageBuffer.remove(topic)
                                 imageTotals.remove(topic)
@@ -171,13 +177,14 @@ object MqttRepository {
             }
         } catch (e: Exception) {
             // Only log errors for active project or general errors
-             if (shouldLog) {
+            if (shouldLog) {
                 addLog("Error processing message: ${e.message}", timestamp)
-             }
+            }
         }
     }
     // Connection Status
-    private val _connectionStatus = MutableLiveData<Int>(0) // 0:Connecting/Gray, 1:Connected/Green, 2:Failed/Red
+    private val _connectionStatus =
+            MutableLiveData<Int>(0) // 0:Connecting/Gray, 1:Connected/Green, 2:Failed/Red
     val connectionStatus: LiveData<Int> = _connectionStatus
 
     fun setStatus(status: Int) {

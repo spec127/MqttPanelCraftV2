@@ -225,16 +225,10 @@ object SelectorDefinition : IComponentDefinition {
                         container.paddingBottom
         if (wSize <= 0 || hSize <= 0) return
 
-        // 1. Side Padding for Capsule if Circle
-        if (isCircle && !isVertical) {
-            val sideMargin = hSize / 2
-            container.setPadding(
-                    sideMargin,
-                    container.paddingTop,
-                    sideMargin,
-                    container.paddingBottom
-            )
-        }
+        // 1. Side Padding for Capsule if Circle - REMOVED per Phase 51
+        // if (isCircle && !isVertical) {
+        //    tl.setPadding(sideMargin, container.paddingTop, sideMargin, container.paddingBottom)
+        // }
 
         val availableW = container.width - container.paddingLeft - container.paddingRight
         val availableH = container.height - container.paddingTop - container.paddingBottom
@@ -684,6 +678,8 @@ object SelectorDefinition : IComponentDefinition {
                         }
                     } else {
                         seg.type = "text"
+                        // V51: Revert to default label S* when switching back to text
+                        seg.label = "S${index + 1}"
                     }
                     updateRefIcon()
                     save()

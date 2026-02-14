@@ -12,20 +12,20 @@ import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
-import com.example.mqttpanelcraft.ui.views.TextInputView
+import com.example.mqttpanelcraft.ui.views.InputBoxView
 
-object TextInputDefinition : IComponentDefinition {
+object InputBoxDefinition : IComponentDefinition {
 
-    override val type = "TEXT_INPUT"
+    override val type = "INPUTBOX"
     override val defaultSize = Size(200, 60)
-    override val labelPrefix = "input"
+    override val labelPrefix = "inputbox"
     override val iconResId = R.drawable.ic_edit // Generic edit icon
     override val group = "CONTROL"
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
         val inputView =
-                TextInputView(context).apply {
+                InputBoxView(context).apply {
                     tag = "target"
                     layoutParams =
                             FrameLayout.LayoutParams(
@@ -38,7 +38,7 @@ object TextInputDefinition : IComponentDefinition {
     }
 
     override fun onUpdateView(view: View, data: ComponentData) {
-        val inputView = view.findViewWithTag<TextInputView>("target") ?: return
+        val inputView = view.findViewWithTag<InputBoxView>("target") ?: return
 
         inputView.style = data.props["style"] ?: "Capsule"
 
@@ -53,7 +53,7 @@ object TextInputDefinition : IComponentDefinition {
         inputView.enterAsSend = (data.props["enter_as_send"] ?: "false") == "true"
     }
 
-    override val propertiesLayoutId = R.layout.layout_prop_text_input
+    override val propertiesLayoutId = R.layout.layout_prop_input_box
 
     override fun bindPropertiesPanel(
             panelView: View,
@@ -66,9 +66,9 @@ object TextInputDefinition : IComponentDefinition {
         val spStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spPropStyle)
         val styles =
                 listOf(
-                        context.getString(R.string.val_style_text_capsule) to "Capsule",
-                        context.getString(R.string.val_style_text_modular) to "Modular",
-                        context.getString(R.string.val_style_text_infinity) to "Infinity"
+                        context.getString(R.string.val_style_input_box_capsule) to "Capsule",
+                        context.getString(R.string.val_style_input_box_modular) to "Modular",
+                        context.getString(R.string.val_style_input_box_infinity) to "Infinity"
                 )
         // Map internal value to display string
         val currentStyle = data.props["style"] ?: "Capsule"
@@ -164,7 +164,7 @@ object TextInputDefinition : IComponentDefinition {
             sendMqtt: (topic: String, payload: String) -> Unit,
             onUpdateProp: (key: String, value: String) -> Unit
     ) {
-        val inputView = view.findViewWithTag<TextInputView>("target") ?: return
+        val inputView = view.findViewWithTag<InputBoxView>("target") ?: return
 
         inputView.onSend = { text ->
             if (data.topicConfig.isNotEmpty()) {
@@ -179,7 +179,7 @@ object TextInputDefinition : IComponentDefinition {
             payload: String,
             onUpdateProp: (key: String, value: String) -> Unit
     ) {
-        // Text Input generally sends, but could potentially receive updates to its text?
+        // Input Box generally sends, but could potentially receive updates to its text?
         // For now, let's keep it strictly as an input control.
         // If we wanted it to be bi-directional, we'd update the EditText here.
     }

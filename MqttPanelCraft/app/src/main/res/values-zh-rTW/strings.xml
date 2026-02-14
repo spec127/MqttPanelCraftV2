@@ -132,9 +132,10 @@
     <string name="project_console_title">MQTT/系統日誌</string>
     <string name="project_hint_payload">訊息 (Payload)</string>
     <string name="project_log_mqtt_status">MQTT 狀態: %1$s</string>
+    <string name="msg_invalid_topic">字元不合法！請使用 (a-z, A-Z, 0-9, _)</string>
 
     <!-- Common Messages & Dialogs -->
-    <string name="msg_limit_reached">免費版限制為 3 個專案。</string>
+    <string name="msg_limit_reached">免費版限制為 1 個專案。</string>
     <string name="title_limit_reached">達到限制</string>
     <string name="dialog_btn_upgrade">升級</string>
     <string name="dialog_language_title">選擇語言</string>

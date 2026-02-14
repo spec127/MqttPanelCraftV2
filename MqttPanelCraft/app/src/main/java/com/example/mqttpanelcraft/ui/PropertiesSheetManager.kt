@@ -115,7 +115,8 @@ class PropertiesSheetManager(
                         val valid = input.matches(Regex("^[a-zA-Z0-9_]*$"))
 
                         if (!valid) {
-                            etTopicName.error = "Invalid characters! Use (a-z, 0-9, _)"
+                            etTopicName.error =
+                                    propertyContainer.context.getString(R.string.msg_invalid_topic)
                         } else {
                             etTopicName.error = null
                         }
@@ -300,6 +301,7 @@ class PropertiesSheetManager(
         etPropWidth?.setText("")
         etPropHeight?.setText("")
         etTopicName?.setText("")
+        etTopicName?.hint = ""
         tvTopicPrefix?.text = ""
         tvTopicSuffix?.text = ""
         etPropGenericPayload?.setText("")

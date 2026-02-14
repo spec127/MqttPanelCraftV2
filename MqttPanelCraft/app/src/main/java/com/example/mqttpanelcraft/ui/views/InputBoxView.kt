@@ -15,7 +15,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import com.example.mqttpanelcraft.R
 
-class TextInputView(context: Context) : FrameLayout(context) {
+class InputBoxView(context: Context) : FrameLayout(context) {
 
     var style: String = "Capsule" // Capsule, Modular, Infinity
         set(value) {
@@ -65,8 +65,8 @@ class TextInputView(context: Context) : FrameLayout(context) {
         inputField.textSize = 14f
         inputField.hint = "Enter text..."
         inputField.maxLines = 1
-        inputField.inputType = EditorInfo.TYPE_CLASS_TEXT
-        inputField.imeOptions = EditorInfo.IME_ACTION_SEND
+        inputField.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES
+        inputField.imeOptions = EditorInfo.IME_ACTION_NONE
 
         inputField.setOnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -138,7 +138,14 @@ class TextInputView(context: Context) : FrameLayout(context) {
         inputField.isCursorVisible = true
         removeCallbacks(cursorRunnable)
 
+        val w = width
         val h = height
+
+        // V53.2: Scaling text size based on height
+        // Base: 60dp height -> 14sp text
+        // Scale factor roughly 0.233
+        val calculatedSp = (h / density) * 0.24f
+        inputField.textSize = calculatedSp.coerceAtLeast(10f).coerceAtMost(48f)
 
         when (style) {
             "Capsule" -> {
@@ -175,9 +182,8 @@ class TextInputView(context: Context) : FrameLayout(context) {
                 // Input: Bracketed area
                 // Button is full height square-ish
                 val btnSize = h
-                // Alternatively, keep it square based on height? Yes.
-
-                val spacing = (8 * density).toInt()
+                // V53: Spacing is 1/4 of button width
+                val spacing = btnSize / 4
 
                 val lpInput =
                         FrameLayout.LayoutParams(
@@ -347,8 +353,10 @@ class TextInputView(context: Context) : FrameLayout(context) {
             }
             "Modular" -> {
                 // Input Area: Corner Brackets
-                val btnWidth = (48 * density) + (8 * density)
-                val inputW = w - btnWidth
+                val btnWidth = sendButton.width.toFloat()
+                val btnSize = h // Logic from updateLayout
+                val spacing = btnSize / 4
+                val inputW = w - btnSize - spacing
 
                 // Fill (Optional: very subtle)
                 bgRect.set(0f, 0f, inputW, h)
@@ -366,6 +374,7 @@ class TextInputView(context: Context) : FrameLayout(context) {
 
                 val cornerLen = 8f * density
 
+                // --- Input Brackets ---
                 // Top-Left
                 canvas.drawLine(0f, 0f, cornerLen, 0f, paint)
                 canvas.drawLine(0f, 0f, 0f, cornerLen, paint)
@@ -381,6 +390,24 @@ class TextInputView(context: Context) : FrameLayout(context) {
                 // Bottom-Right of input
                 canvas.drawLine(inputW, h, inputW - cornerLen, h, paint)
                 canvas.drawLine(inputW, h, inputW, h - cornerLen, paint)
+
+                // --- V53: Send Button Brackets ---
+                val btnX = w - btnSize
+                // Top-Left of button
+                canvas.drawLine(btnX, 0f, btnX + cornerLen, 0f, paint)
+                canvas.drawLine(btnX, 0f, btnX, cornerLen, paint)
+
+                // Top-Right of button
+                canvas.drawLine(w, 0f, w - cornerLen, 0f, paint)
+                canvas.drawLine(w, 0f, w, cornerLen, paint)
+
+                // Bottom-Left of button
+                canvas.drawLine(btnX, h, btnX + cornerLen, h, paint)
+                canvas.drawLine(btnX, h, btnX, h - cornerLen, paint)
+
+                // Bottom-Right of button
+                canvas.drawLine(w, h, w - cornerLen, h, paint)
+                canvas.drawLine(w, h, w, h - cornerLen, paint)
             }
             "Infinity" -> {
                 // Bottom Line: Gradient or Solid? Solid theme color.

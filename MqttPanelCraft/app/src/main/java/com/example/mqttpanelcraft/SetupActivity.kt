@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.MotionEvent
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
@@ -61,6 +62,7 @@ class SetupActivity : BaseActivity() {
     private lateinit var cardWebview: LinearLayout
     private lateinit var ivWebview: ImageView
     private lateinit var tvWebview: TextView
+    private lateinit var containerProjectType: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -218,6 +220,9 @@ class SetupActivity : BaseActivity() {
         // etName is already set above
         // etBroker is already set above
         selectType(project.type)
+
+        // Lock Project Type: Hide UI
+        containerProjectType.visibility = View.GONE
 
         // Load Orientation
         setOrientationUI(project.orientation)
@@ -397,6 +402,7 @@ class SetupActivity : BaseActivity() {
         cardWebview = findViewById(R.id.cardWebview)
         ivWebview = findViewById(R.id.ivWebview)
         tvWebview = findViewById(R.id.tvWebview)
+        containerProjectType = findViewById(R.id.containerProjectType)
 
         // Theme Selection
         cardHome.setOnClickListener { selectType(ProjectType.HOME) }

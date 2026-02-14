@@ -86,6 +86,12 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         connectionJob = null
         mqttStatus.postValue(MqttStatus.IDLE)
 
+        // v44.3: Reset Global MqttRepository state to prevent stall status leakage
+        com.example.mqttpanelcraft.MqttRepository.setStatus(
+                com.example.mqttpanelcraft.MqttStatus.CONNECTING
+        )
+        com.example.mqttpanelcraft.MqttRepository.activeProjectId = projectId
+
         _currentProjectId.value = projectId
     }
 

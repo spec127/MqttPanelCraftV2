@@ -20,16 +20,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     var joystickMode: String = "Joystick" // Joystick, Buttons
         set(value) {
             field = value
+            updateGeometry()
             invalidate()
         }
     var axes: String = "4-Way" // 2-Way, 4-Way
         set(value) {
             field = value
+            updateGeometry()
             invalidate()
         }
     var direction2Way: String = "Horizontal" // Horizontal, Vertical
         set(value) {
             field = value
+            updateGeometry()
             invalidate()
         }
     var interval: Long = 100L
@@ -44,6 +47,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     var visualStyle: String = "Neon" // Neon, Arrow, Industrial, Beveled
         set(value) {
             field = value
+            updateGeometry()
             invalidate()
         }
 
@@ -103,26 +107,31 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+        updateGeometry()
+    }
+
+    private fun updateGeometry() {
+        val w = width
+        val h = height
+        if (w <= 0 || h <= 0) return
 
         val density = resources.displayMetrics.density
         val isSmall = h < 100 * density
 
         centerX = w / 2f
-        // Phase 40: Revert to Center (0.5f) as per user request
         centerY = if (isSmall) h * 0.5f else h / 2f
 
         // Base radius for 4-way mode (proportional)
-        // Phase 40: Set to 0.5f (Full Height)
-        val baseRadiusProportional = if (isSmall) h * 0.5f else (min(w, h) / 2f) * 0.92f
+        // V52: Reduced to 0.75f to keep follower arrows inside bounds
+        val baseRadiusProportional = if (isSmall) h * 0.4f else (min(w, h) / 2f) * 0.75f
 
         if (axes == "4-Way") {
             baseRadius = baseRadiusProportional
         } else {
             // For 2-Way, baseRadius represents the relevant axis extent
-            // Phase 40: Set to 0.5f (Full Height)
             baseRadius =
-                    if (direction2Way == "Horizontal") (w / 2f) * 0.92f
-                    else (if (isSmall) h * 0.5f else (h / 2f) * 0.92f)
+                    if (direction2Way == "Horizontal") (w / 2f) * 0.75f
+                    else (if (isSmall) h * 0.4f else (h / 2f) * 0.75f)
         }
         stickRadius = baseRadiusProportional * 0.45f
 
@@ -134,6 +143,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         super.onDraw(canvas)
 
         val density = resources.displayMetrics.density
+        // V52: Reset paint states to prevent leakage
+        basePaint.shader = null
+        basePaint.clearShadowLayer()
+        basePaint.style = Paint.Style.FILL // Default for base
+        rimPaint.clearShadowLayer()
+        rimPaint.shader = null
+        rimPaint.style = Paint.Style.STROKE // Default for rim
+
         val isDarkMode =
                 (resources.configuration.uiMode and
                         android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
@@ -364,10 +381,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private fun drawNeonBase(canvas: Canvas, density: Float, isDarkMode: Boolean) {
         val is2Way = axes == "2-Way"
 
-        // Body Colors (Adaptive)
-        val color1 = if (isDarkMode) "#333333" else "#CCCCCC" // Target: Out深 (Original color3)
-        val color2 = if (isDarkMode) "#1A1A1A" else "#E0E0E0"
-        val color3 = if (isDarkMode) "#000000" else "#F0F0F0" // Target: In淺 (Original color1)
+        // V52: Theme-aware adaptive colors (Sharp/Neon style)
+        val color1 = ColorUtils.blendARGB(color, if (isDarkMode) Color.BLACK else Color.WHITE, 0.6f)
+        val color2 = ColorUtils.blendARGB(color, if (isDarkMode) Color.BLACK else Color.WHITE, 0.8f)
+        val color3 = ColorUtils.blendARGB(color, if (isDarkMode) Color.BLACK else Color.WHITE, 0.9f)
 
         if (!is2Way) {
             // 4-Way: Tinted thin shadow - restored
@@ -389,11 +406,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                             centerX,
                             centerY,
                             baseRadius,
-                            intArrayOf(
-                                    Color.parseColor(color1),
-                                    Color.parseColor(color2),
-                                    Color.parseColor(color3)
-                            ),
+                            intArrayOf(color1, color2, color3),
                             floatArrayOf(0.7f, 0.9f, 1.0f),
                             Shader.TileMode.CLAMP
                     )
@@ -439,11 +452,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                             centerX,
                             centerY,
                             baseRadius,
-                            intArrayOf(
-                                    Color.parseColor(color1),
-                                    Color.parseColor(color2),
-                                    Color.parseColor(color3)
-                            ),
+                            intArrayOf(color1, color2, color3),
                             floatArrayOf(0.7f, 0.9f, 1.0f),
                             Shader.TileMode.CLAMP
                     )

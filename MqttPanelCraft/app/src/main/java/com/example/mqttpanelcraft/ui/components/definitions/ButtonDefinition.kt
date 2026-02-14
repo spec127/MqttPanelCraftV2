@@ -19,7 +19,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -123,7 +122,7 @@ object ButtonDefinition : IComponentDefinition {
         val targetH = dim * 0.6f
 
         // Helper for text size
-        fun safeTextSize(px: Float): Float = (px / density).coerceIn(8f, 60f)
+        fun safeTextSize(px: Float): Float = (px / density).coerceIn(4f, 60f)
 
         button.text = ""
         button.setCompoundDrawables(null, null, null, null)
@@ -140,7 +139,7 @@ object ButtonDefinition : IComponentDefinition {
                 iconView.imageTintList = ColorStateList.valueOf(contentColor)
 
                 // Icon Only: scaled to targetH
-                val size = targetH.toInt().coerceAtLeast((16 * density).toInt())
+                val size = targetH.toInt().coerceAtLeast((8 * density).toInt())
                 iconView.layoutParams =
                         (iconView.layoutParams as FrameLayout.LayoutParams).apply {
                             width = size
@@ -151,7 +150,7 @@ object ButtonDefinition : IComponentDefinition {
             "text_icon" -> {
                 button.text = data.props["text"] ?: "button1"
                 // Stacked: Icon top (60%), Text bottom (40%) of targetH
-                val iconSize = (targetH * 0.6f).toInt().coerceAtLeast((12 * density).toInt())
+                val iconSize = (targetH * 0.6f).toInt().coerceAtLeast((8 * density).toInt())
                 val textSizePx = targetH * 0.25f
                 val padding = (targetH * 0.02f).toInt().coerceAtLeast((1 * density).toInt())
 
@@ -413,9 +412,11 @@ object ButtonDefinition : IComponentDefinition {
             }
         }
 
-        // Release Payload (Standard/Hold Mode)
-        val etRelease = panelView.findViewById<EditText>(R.id.etPropPayloadRelease)
-        etRelease?.setText(data.props["payload_release"] ?: "OFF")
+        // Release Payload (Standard/Hold Mode) - NOW WITH DROPDOWN
+        val etRelease = panelView.findViewById<AutoCompleteTextView>(R.id.etPropPayloadRelease)
+        etRelease?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, payloadOptions))
+        etRelease?.setText(data.props["payload_release"] ?: "OFF", false)
+
         etRelease?.addTextChangedListener(
                 object : TextWatcher {
                     override fun afterTextChanged(s: Editable?) {
@@ -425,10 +426,16 @@ object ButtonDefinition : IComponentDefinition {
                     override fun onTextChanged(i: CharSequence?, s: Int, b: Int, c: Int) {}
                 }
         )
+        etRelease?.setOnItemClickListener { _, _, _, _ ->
+            onUpdate("payload_release", etRelease.text.toString())
+        }
 
-        // Release Payload (Timer Mode Reference)
-        val etReleaseRef = panelView.findViewById<EditText>(R.id.etPropPayloadReleaseRef)
-        etReleaseRef?.setText(data.props["payload_release"] ?: "OFF")
+        // Release Payload (Timer Mode Reference) - NOW WITH DROPDOWN
+        val etReleaseRef =
+                panelView.findViewById<AutoCompleteTextView>(R.id.etPropPayloadReleaseRef)
+        etReleaseRef?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, payloadOptions))
+        etReleaseRef?.setText(data.props["payload_release"] ?: "OFF", false)
+
         etReleaseRef?.addTextChangedListener(
                 object : TextWatcher {
                     override fun afterTextChanged(s: Editable?) {
@@ -438,6 +445,9 @@ object ButtonDefinition : IComponentDefinition {
                     override fun onTextChanged(i: CharSequence?, s: Int, b: Int, c: Int) {}
                 }
         )
+        etReleaseRef?.setOnItemClickListener { _, _, _, _ ->
+            onUpdate("payload_release", etReleaseRef.text.toString())
+        }
 
         // Timer Duration
         val etTimer = panelView.findViewById<EditText>(R.id.etPropTimer)
@@ -517,7 +527,7 @@ object ButtonDefinition : IComponentDefinition {
         iconMap.forEach { (id, key) ->
             panelView.findViewById<View>(id)?.setOnClickListener {
                 onUpdate("icon", key)
-                Toast.makeText(context, "Selected: $key", Toast.LENGTH_SHORT).show()
+                // Toast removed per user request
                 // Simple visual feedback (optional but good)
                 // For now just update data
             }
@@ -538,25 +548,49 @@ object ButtonDefinition : IComponentDefinition {
         val releasePayload = data.props["payload_release"] ?: "OFF"
         val timerMs = (data.props["timer_ms"] ?: "1000").toLongOrNull() ?: 1000L
 
+        var isTimerActive = false
+
         button.setOnTouchListener { v, event ->
+            if (isTimerActive && mode == "timer") return@setOnTouchListener true
+
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
+                    v.isPressed = true
                     v.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).start()
                     if (mode == "hold" || mode == "timer") {
                         sendMqtt(data.topicConfig, mainPayload)
                     }
                     if (mode == "timer") {
-                        v.postDelayed({ sendMqtt(data.topicConfig, releasePayload) }, timerMs)
+                        isTimerActive = true
+                        v.postDelayed(
+                                {
+                                    sendMqtt(data.topicConfig, releasePayload)
+                                    v.animate()
+                                            .scaleX(1.0f)
+                                            .scaleY(1.0f)
+                                            .setDuration(100)
+                                            .withEndAction {
+                                                isTimerActive = false
+                                                v.isPressed = false
+                                            }
+                                            .start()
+                                },
+                                timerMs
+                        )
                     }
+                    return@setOnTouchListener true
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
+                    if (mode != "timer") {
+                        v.isPressed = false
+                        v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
+                    }
                     if (event.action == MotionEvent.ACTION_UP) {
                         when (mode) {
                             "tap" -> sendMqtt(data.topicConfig, mainPayload)
-                            "hold" -> sendMqtt(data.topicConfig, releasePayload)
                         }
                     }
+                    return@setOnTouchListener true
                 }
             }
             false

@@ -142,9 +142,10 @@
     <string name="msg_mqtt_connected">Connected</string>
     <string name="msg_mqtt_disconnected">Disconnected</string>
     <string name="project_log_mqtt_status">MQTT Status: %1$s</string>
+    <string name="msg_invalid_topic">Invalid characters! Use (a-z, A-Z, 0-9, _)</string>
 
     <!-- Common Messages & Dialogs -->
-    <string name="msg_limit_reached">Free version is limited to 3 projects.</string>
+    <string name="msg_limit_reached">Free version is limited to 1 projects.</string>
     <string name="title_limit_reached">Limit Reached</string>
     <string name="dialog_btn_upgrade">Upgrade</string>
     <string name="dialog_language_title">Select Language</string>
@@ -213,10 +214,10 @@
     <string name="val_style_rounded">Rects</string>
     <string name="val_style_segmented">膠囊</string>
 
-    <!-- Text Input Styles -->
-    <string name="val_style_text_capsule">Capsule</string>
-    <string name="val_style_text_modular">Modular</string>
-    <string name="val_style_text_infinity">Infinity</string>
+    <!-- Input Box Styles -->
+    <string name="val_style_input_box_capsule">圓滑 Capsule</string>
+    <string name="val_style_input_box_modular">模組 Modular</string>
+    <string name="val_style_input_box_infinity">無邊 Infinity</string>
     <string name="prop_label_clear_on_send">Clear on Send</string>
     <string name="prop_label_enter_as_send">Enter as Send</string>
     <string name="prop_desc_clear_on_send">Clear text field after sending.</string>
@@ -242,7 +243,7 @@
     <string name="project_msg_file_save_failed">Save failed</string>
     <string name="project_msg_file_saved">Saved</string>
     <string name="project_msg_id_copied">ID copied</string>
-    <string name="project_msg_init_error">Init error</string>
+    <string name="project_msg_init_error">Init error: %1$s</string>
     <string name="project_msg_mqtt_failed">MQTT failed</string>
     <string name="project_msg_mqtt_retrying">Retrying MQTT...</string>
     <string name="project_msg_select_component">Select a component</string>

@@ -37,38 +37,35 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:layout_gravity="center"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp">
+                android:layout_gravity="center">
 
-                <!-- Center LED (Fixed) -->
-                <View
-                    android:id="@+id/indicatorMqttStatus"
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:layout_centerInParent="true"
-                    android:background="@drawable/shape_circle_grey" />
-
-                <!-- Title (Left of LED) -->
+                <!-- Title (Left aligned, avoids center) -->
                 <TextView
                     android:id="@+id/tvToolbarTitle"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toStartOf="@id/indicatorMqttStatus"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginEnd="8dp"
+                    android:layout_toStartOf="@+id/indicatorMqttStatus"
                     android:paddingStart="52dp"
+                    android:paddingEnd="8dp"
                     android:text="Project Title"
                     android:textColor="@color/toolbar_text"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:maxLines="1"
-                    android:ellipsize="end"
-                    app:autoSizeTextType="uniform"
-                    app:autoSizeMinTextSize="12sp"
-                    app:autoSizeMaxTextSize="20sp"
-                    app:autoSizeStepGranularity="2sp"/>
+                    android:ellipsize="end"/>
+
+                <!-- Connection Icon (Strictly Centered In Parent) -->
+                <ImageView
+                    android:id="@+id/indicatorMqttStatus"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_link_off"
+                    android:elevation="10dp"
+                    app:tint="@color/prop_text_secondary"
+                    android:visibility="visible" />
 
             </RelativeLayout>
 
@@ -595,7 +592,7 @@
                                             android:layout_width="0dp"
                                             android:layout_height="wrap_content"
                                             android:background="@null"
-                                            android:hint="name"
+                                            android:hint=""
                                             android:inputType="textNoSuggestions|textVisiblePassword"
                                             android:paddingStart="2dp"
                                             android:paddingEnd="4dp"
