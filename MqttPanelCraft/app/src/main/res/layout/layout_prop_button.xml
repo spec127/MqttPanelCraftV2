@@ -196,7 +196,6 @@
 
     <!-- Trigger Mode Description (Moved Below) -->
     <TextView
-        android:id="@+id/tvPropTriggerDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="12sp"

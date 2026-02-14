@@ -36,7 +36,6 @@
 
             <!-- Email -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilRegEmail"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -44,7 +43,6 @@
                 android:hint="Email">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etRegEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress" />
@@ -52,7 +50,6 @@
 
             <!-- Account Name -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilAccountName"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -60,7 +57,6 @@
                 android:hint="Account Name">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etAccountName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPersonName" />
@@ -68,7 +64,6 @@
 
             <!-- Password -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilRegPassword"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -76,7 +71,6 @@
                 android:hint="Password">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etRegPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword" />
@@ -84,7 +78,6 @@
             
              <!-- Confirm Password -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilConfirmPassword"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -92,7 +85,6 @@
                 android:hint="Confirm Password">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etConfirmPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword" />
@@ -107,7 +99,6 @@
                 android:gravity="center_vertical">
                 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilVerifyCode"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

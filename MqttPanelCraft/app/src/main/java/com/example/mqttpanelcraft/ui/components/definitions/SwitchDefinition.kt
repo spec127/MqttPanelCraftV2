@@ -293,17 +293,7 @@ object SwitchDefinition : IComponentDefinition {
         val context = panelView.context
 
         // 0. Topic Config (Shared)
-        val etTopic = panelView.rootView.findViewById<EditText>(R.id.etPropTopicConfig)
-        etTopic?.setText(data.topicConfig)
-        etTopic?.addTextChangedListener(
-                object : android.text.TextWatcher {
-                    override fun afterTextChanged(s: android.text.Editable?) {
-                        data.topicConfig = s.toString()
-                    }
-                    override fun beforeTextChanged(i: CharSequence?, s: Int, c: Int, a: Int) {}
-                    override fun onTextChanged(i: CharSequence?, s: Int, b: Int, c: Int) {}
-                }
-        )
+        // 0. Topic Config (Shared) - Handled by PropertiesSheetManager
 
         val toggleMode = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleMode)
         val mode = resolveMode(data)

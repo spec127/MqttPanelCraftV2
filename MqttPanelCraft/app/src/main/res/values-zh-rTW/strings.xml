@@ -3,8 +3,6 @@
     <string name="app_name">MqttPanelCraft</string>
     <string name="mqttpanelcraft">MqttPanelCraft</string>
     <string name="app_logo">應用圖示</string>
-    <string name="nav_header_app_title">我的專案</string>
-    <string name="nav_header_email_placeholder">user@example.com</string>
 
     <!-- Version & About -->
     <string name="about">關於</string>
@@ -14,7 +12,6 @@
     <string name="privacy_policy">隱私權政策</string>
     <string name="error_privacy_load">載入隱私權政策出錯。</string>
     <string name="open_source_licenses">開源許可證</string>
-    <string name="title_open_source_licenses">開源許可證</string>
     <string name="contact_support">聯繫我們</string>
     <string name="msg_feature_disabled">功能暫時停用</string>
 
@@ -22,13 +19,11 @@
     <string name="drawer_item_about">關於</string>
     <string name="drawer_item_dark_mode">深色模式</string>
     <string name="drawer_item_disable_ads">停用廣告</string>
-    <string name="drawer_item_ads">廣告</string>
     <string name="drawer_item_language">語言</string>
     <string name="lang_system_default">系統預設</string>
     <string name="action_edit">編輯</string>
 
     <!-- Dashboard -->
-    <string name="dashboard_toolbar_title">我的專案</string>
     <string name="dashboard_settings_title">排序 / 設定</string>
     <string name="dashboard_sort_label">排序方式</string>
     <string name="dashboard_sort_name_asc">名稱 (A-Z)</string>
@@ -41,21 +36,15 @@
     <string name="dashboard_msg_opening_project">正在開啟 %s...</string>
     
     <!-- Setup Activity -->
-    <string name="setup_title_create">專案設定</string>
     <string name="setup_title_new">建立新專案</string>
     <string name="setup_title_edit">編輯專案</string>
     <string name="setup_label_name">專案名稱</string>
-    <string name="setup_hint_name">我的智慧家居</string>
     <string name="setup_label_broker">MQTT 代理伺服器 (Broker)</string>
     <string name="setup_label_port">連接埠 (Port)</string>
-    <string name="setup_hint_broker_url">wss://broker.emqx.io:8083</string>
-    <string name="setup_label_theme">主題 / 類型</string>
     <string name="setup_btn_test">測試連線</string>
     <string name="setup_btn_save_start">建立專案</string>
     <string name="setup_btn_update_start">更新並開始</string>
     <string name="setup_btn_update_only">更新專案</string>
-    <string name="setup_theme_panel">控制面板</string>
-    <string name="setup_theme_webview">網頁模式 (Webview)</string>
     <string name="setup_desc_panel">標準模式。通過拖放組件直觀地構建您的儀表板。</string>
     <string name="setup_desc_webview">高級模式。使用 HTML、CSS 和 JavaScript 設計完全自定義的介面。</string>
     <string name="setup_error_name_required">必須填寫名稱</string>
@@ -69,25 +58,15 @@
     <string name="auto">自動轉向</string>
     <string name="portrait">直式</string>
     <string name="landscape">橫式</string>
-    <string name="webview">網頁模式</string>
     <string name="import_json">匯入 JSON</string>
     <string name="export_json">匯出 JSON</string>
     <string name="hint_paste_json">在此貼上 JSON...</string>
 
     <!-- Project Editor & Sidebar -->
-    <string name="project_view_title">專案編輯器</string>
-    <string name="project_sidebar_title_components">組件庫</string>
     <string name="project_sidebar_category_display">多媒體組件</string>
-    <string name="project_sidebar_title_properties">屬性</string>
     <string name="project_cat_control">控制組件</string>
     <string name="project_cat_sensor">感測器組件</string>
-    <string name="project_prop_helper">選取組件進行編輯</string>
-    <string name="project_sidebar_btn_more">更多</string>
-    <string name="project_sidebar_btn_collapse">收起</string>
-    
-    <string name="project_lock_portrait">鎖定直向</string>
-    <string name="project_lock_landscape">鎖定橫向</string>
-    <string name="project_lock_auto">自動轉向</string>
+
     <string name="project_btn_exit_app">退出應用</string>
     <string name="project_id">專案 ID</string>
     <string name="project_hint_search">搜尋組件...</string>
@@ -109,17 +88,6 @@
     <string name="copy_code">複製程式碼</string>
 
     <!-- Component Labels -->
-    <string name="component_label_button">按鈕</string>
-    <string name="component_label_switch">開關</string>
-    <string name="component_label_slider">滑桿</string>
-    <string name="component_label_led">LED</string>
-    <string name="component_label_thermometer">溫度計</string>
-    <string name="component_label_level">水平儀</string>
-    <string name="component_label_text">文字顯示</string>
-    <string name="component_label_image">圖片</string>
-    <string name="component_label_chart">圖表</string>
-    <string name="component_label_selector">選擇器</string>
-    <string name="component_label_joystick">搖桿</string>
 
     <!-- Joystick Properties -->
     <string name="properties_label_joystick_mode">搖桿模式</string>
@@ -158,20 +126,12 @@
     <string name="properties_label_show_hue">顯示色相</string>
     <string name="properties_label_show_saturation">顯示飽和度</string>
     <string name="properties_label_show_brightness">顯示亮度</string>
-    <string name="properties_label_hue">基礎色相 (Hue)</string>
     <string name="properties_label_brightness">亮度 (Brightness)</string>
-    <string name="component_label_palette">調色盤</string>
 
     <!-- MQTT & Console -->
     <string name="project_console_title">MQTT/系統日誌</string>
-    <string name="project_hint_topic">主題 (Topic)</string>
     <string name="project_hint_payload">訊息 (Payload)</string>
-    <string name="project_btn_send">發送</string>
-    <string name="msg_mqtt_failed">連線失敗，請檢查 Broker 設定</string>
-    <string name="msg_mqtt_retry">正在重新連線...</string>
     <string name="project_log_mqtt_status">MQTT 狀態: %1$s</string>
-    <string name="project_msg_logs_copied">日誌已複製</string>
-    <string name="project_dialog_title_debug_logs">偵錯日誌</string>
 
     <!-- Common Messages & Dialogs -->
     <string name="msg_limit_reached">免費版限制為 3 個專案。</string>
@@ -183,9 +143,7 @@
     <string name="dialog_change_id_title">修改專案 ID</string>
     <string name="dialog_import_title">匯入配置</string>
     <string name="dialog_export_title">匯出配置</string>
-    <string name="common_msg_network_error">網路錯誤</string>
     <string name="common_msg_copied_clipboard">已複製到剪貼簿</string>
-    <string name="project_dialog_title_bottom_sheet">連線狀態</string>
     <string name="dialog_change_id_msg">在下方輸入新的專案 ID。</string>
     
     <!-- Common Buttons & Actions -->
@@ -196,7 +154,6 @@
     <string name="common_btn_save">儲存檔案</string>
     <string name="common_btn_gen_id">產生新 ID</string>
     <string name="arduino_code_export">匯出 Arduino 程式碼</string>
-    <string name="btn_copy_topic_only">複製主題</string>
     <string name="common_btn_load_file">載入檔案</string>
     <string name="common_btn_load_text">載入本文</string>
 
@@ -208,53 +165,33 @@
     <string name="properties_label_topic">MQTT 主題</string>
     <string name="properties_label_width">寬度</string>
     <string name="properties_label_height">高度</string>
-    <string name="properties_label_color">強調顏色</string>
     <string name="properties_btn_clone">複製元件</string>
     
     <!-- Slider Properties -->
-    <string name="properties_section_range">數值範圍</string>
     <string name="prop_label_min">最小值</string>
     <string name="prop_label_max">最大值</string>
     <string name="prop_label_step">間距</string>
-    <string name="prop_label_send_mode">發送模式</string>
     <string name="prop_val_on_release">放開時發送</string>
     <string name="prop_val_continuous">連續發送</string>
     <string name="prop_label_interval">傳送間隔 (ms)</string>
     <string name="prop_helper_interval">最小值 50ms</string>
     <string name="prop_label_orientation">顯示方向</string>
-    <string name="prop_label_track_style">軌道樣式</string>
-    <string name="prop_label_thumb_style">滑塊樣式</string>
     <string name="prop_label_feedback">提示</string>
-    <string name="prop_label_center_content">中心內容</string>
-    
+
     <string name="val_orient_horizontal">水平</string>
     <string name="val_orient_vertical">垂直</string>
-    <string name="val_orient_semi_circle">半圓弧</string>
-    <string name="val_orient_full_circle">圓形</string>
-    <string name="val_track_thin">經典細線</string>
-    <string name="val_track_thick">粗管樣式</string>
-    <string name="val_thumb_glow">圓形發光</string>
-    <string name="val_thumb_led">方形 LED</string>
     <string name="val_slider_style_classic">經典</string>
     <string name="val_slider_style_capsule">膠囊</string>
-    <string name="val_slider_style_arc">弧形</string>
-    <string name="val_slider_style_ring">環形</string>
     <string name="val_shape_square">方形</string>
     <string name="val_shape_circle">圓形</string>
     <string name="val_feedback_none">無</string>
     <string name="val_feedback_ticks">"刻度線 "</string>
     <string name="val_feedback_bubble">數值氣泡</string>
     <string name="val_feedback_both">刻度 + 氣泡</string>
-    <string name="val_center_none">無顯示</string>
-    <string name="val_center_value">顯示即時值</string>
-    <string name="val_center_icon">顯示圖示</string>
-    
+
     <!-- Component Specific Properties -->
     <string name="prop_label_messages_lr">訊息數值 (左 / 右)</string>
     <string name="prop_label_messages_lcr">訊息數值 (左 / 中 / 右)</string>
-    <string name="prop_label_left">左</string>
-    <string name="prop_label_center">中</string>
-    <string name="prop_label_right">右</string>
     <string name="prop_hint_style">樣式風格</string>
     <string name="prop_hint_shape">形狀樣式</string>
     
@@ -273,37 +210,20 @@
     <string name="prop_label_enter_as_send">換行鍵發送</string>
     <string name="prop_desc_clear_on_send">發送訊息後自動清空輸入框。</string>
     <string name="prop_desc_enter_as_send">按下鍵盤 Enter 鍵時直接發送。</string>
-    <string name="component_label_text_input">文字輸入</string>
-    
+
     <string name="val_mode_tap">點擊切換</string>
     <string name="val_mode_hold">長按觸發</string>
     <string name="val_mode_timer">定時模式</string>
     <string name="properties_unit_ms">毫秒</string>
     
     <string name="desc_mode_tap">點擊時發送指令。</string>
-    <string name="desc_mode_hold">按下時發送指令，放開時發送重置值。</string>
-    <string name="desc_mode_timer">按下時發送指令，設定時間後自動重置。</string>
 
     <string name="properties_switch_mode_standard">標準</string>
     <string name="properties_switch_mode_tri_state">三段</string>
     
     <!-- Icons & Helper Descriptions -->
-    <string name="icon_none">無圖示</string>
-    <string name="icon_power">電源</string>
-    <string name="icon_lighting">燈光</string>
-    <string name="icon_fan">風扇</string>
-    <string name="icon_play">播放</string>
-    <string name="icon_tune">調諧</string>
-    <string name="icon_energy">能源</string>
-    <string name="icon_desc_delete">刪除</string>
-    <string name="icon_desc_edit">編輯</string>
-    <string name="icon_desc_info">資訊</string>
-    <string name="icon_desc_plus">新增</string>
-    <string name="icon_desc_send">發送</string>
-    
+
     <!-- Messages & Status -->
-    <string name="project_component_gauge">儀表</string>
-    <string name="project_component_text">文字</string>
     <string name="project_msg_add_component">組件已新增</string>
     <string name="project_msg_component_deleted">組件已刪除</string>
     <string name="project_msg_components_loaded">組件載入完成</string>
@@ -315,8 +235,5 @@
     <string name="project_msg_mqtt_failed">MQTT 失敗</string>
     <string name="project_msg_mqtt_retrying">正在嘗試重新連線...</string>
     <string name="project_msg_select_component">請選擇組件</string>
-    <string name="project_msg_topic_copied">主題已複製</string>
-    <string name="project_prop_label">標籤文字</string>
-    <string name="project_prop_topic">主題</string>
 
 </resources>

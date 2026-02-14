@@ -182,7 +182,6 @@
 
         <!-- Color Picker (Unified) -->
         <include
-            android:id="@+id/containerTextInputColor"
             layout="@layout/layout_prop_generic_color"
             android:layout_width="0dp"
             android:layout_weight="0.6"

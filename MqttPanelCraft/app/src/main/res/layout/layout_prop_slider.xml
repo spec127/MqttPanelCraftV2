@@ -208,7 +208,6 @@
 
             <!-- GROUP 1: NORMAL STYLE (Classic / Capsule) -->
             <LinearLayout
-                android:id="@+id/containerNormalStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"

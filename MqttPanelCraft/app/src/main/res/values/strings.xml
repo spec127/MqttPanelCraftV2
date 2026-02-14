@@ -3,8 +3,6 @@
     <string name="app_name">MqttPanelCraft</string>
     <string name="mqttpanelcraft">MqttPanelCraft</string>
     <string name="app_logo">App Logo</string>
-    <string name="nav_header_app_title">My Projects</string>
-    <string name="nav_header_email_placeholder">user@example.com</string>
 
     <!-- Version & About -->
     <string name="about">About</string>
@@ -14,7 +12,6 @@
     <string name="privacy_policy">Privacy Policy</string>
     <string name="error_privacy_load">Error loading privacy policy.</string>
     <string name="open_source_licenses">Open Source Licenses</string>
-    <string name="title_open_source_licenses">Open Source Licenses</string>
     <string name="contact_support">Contact us</string>
     <string name="msg_feature_disabled">Feature temporarily disabled</string>
 
@@ -22,14 +19,12 @@
     <string name="drawer_item_about">About</string>
     <string name="drawer_item_dark_mode">Dark Mode</string>
     <string name="drawer_item_disable_ads">Disable Ads</string>
-    <string name="drawer_item_ads">Ads</string>
     <string name="drawer_item_language">Language</string>
     <string name="lang_system_default">System Default</string>
     <string name="dashboard_btn_exit">Exit</string>
     <string name="action_edit">Edit</string>
 
     <!-- Dashboard -->
-    <string name="dashboard_toolbar_title">My Projects</string>
     <string name="dashboard_settings_title">Sort / Settings</string>
     <string name="dashboard_sort_label">Sort By</string>
     <string name="dashboard_sort_name_asc">Name (A-Z)</string>
@@ -44,22 +39,15 @@
     <string name="dashboard_msg_opening_project">Opening %s...</string>
     
     <!-- Setup Activity -->
-    <string name="setup_title_create">Project Setup</string>
     <string name="setup_title_new">Create Project</string>
     <string name="setup_title_edit">Edit Project</string>
     <string name="setup_label_name">Project Name</string>
-    <string name="setup_hint_name">My Smart Home</string>
     <string name="setup_label_broker">MQTT Broker</string>
     <string name="setup_label_port">Port</string>
-    <string name="setup_hint_broker_url">wss://broker.emqx.io:8083</string>
-    <string name="setup_label_theme">Theme / Type</string>
     <string name="setup_btn_test">Test Connect</string>
     <string name="setup_btn_save_start">Create Project</string>
     <string name="setup_btn_update_start">Update &amp; Start</string>
     <string name="setup_btn_update_only">Update Project</string>
-    <string name="setup_theme_panel">Panel</string>
-    <string name="setup_theme_factory">Factory</string>
-    <string name="setup_theme_webview">Webview</string>
     <string name="setup_desc_panel">Standard Mode. Intuitively build your dashboard by dragging and dropping components.</string>
     <string name="setup_desc_webview">Advanced Mode. Design fully custom interfaces using HTML, CSS, and JavaScript.</string>
     <string name="setup_error_name_required">Name is required</string>
@@ -73,25 +61,15 @@
     <string name="auto">Auto</string>
     <string name="portrait">Portrait</string>
     <string name="landscape">Landscape</string>
-    <string name="webview">Webview</string>
     <string name="import_json">Import JSON</string>
     <string name="export_json">Export JSON</string>
     <string name="hint_paste_json">Paste JSON here...</string>
 
     <!-- Project Editor & Sidebar -->
-    <string name="project_view_title">Project Editor</string>
-    <string name="project_sidebar_title_components">Components</string>
     <string name="project_sidebar_category_display">Display</string>
-    <string name="project_sidebar_title_properties">Properties</string>
     <string name="project_cat_control">Control</string>
     <string name="project_cat_sensor">Sensor</string>
-    <string name="project_prop_helper">Select a component to edit</string>
-    <string name="project_sidebar_btn_more">More</string>
-    <string name="project_sidebar_btn_collapse">Collapse</string>
-    
-    <string name="project_lock_portrait">Lock Portrait</string>
-    <string name="project_lock_landscape">Lock Landscape</string>
-    <string name="project_lock_auto">Auto Orientation</string>
+
     <string name="project_btn_exit_app">Exit App</string>
     <string name="project_id">Project ID</string>
     <string name="project_hint_search">Search components...</string>
@@ -115,17 +93,6 @@
     <string name="copy_code">Copy Code</string>
 
     <!-- Component Labels -->
-    <string name="component_label_button">Button</string>
-    <string name="component_label_switch">Switch</string>
-    <string name="component_label_slider">Slider</string>
-    <string name="component_label_led">LED</string>
-    <string name="component_label_thermometer">Thermometer</string>
-    <string name="component_label_level">Level</string>
-    <string name="component_label_text">Text Display</string>
-    <string name="component_label_image">Image Render</string>
-    <string name="component_label_chart">Chart</string>
-    <string name="component_label_selector">Selector</string>
-    <string name="component_label_joystick">Joystick</string>
 
     <!-- Joystick Properties -->
     <string name="properties_label_joystick_mode">Joystick Mode</string>
@@ -164,26 +131,17 @@
     <string name="properties_label_show_hue">Show Hue</string>
     <string name="properties_label_show_saturation">Show Saturation</string>
     <string name="properties_label_show_brightness">Show Brightness</string>
-    <string name="properties_label_hue">Hue Selection</string>
     <string name="properties_label_hue_selection">Hue Selection</string>
     <string name="properties_label_theme_color">Theme Color</string>
     <string name="properties_label_brightness">Brightness</string>
     <string name="prop_label_appearance">Appearance</string>
-    <string name="properties_label_show_hex">Show Hex Code</string>
-    <string name="component_label_palette">Color Palette</string>
 
     <!-- MQTT & Console -->
     <string name="project_console_title">MQTT/System Logs</string>
-    <string name="project_hint_topic">Topic</string>
     <string name="project_hint_payload">Payload</string>
-    <string name="project_btn_send">SEND</string>
-    <string name="msg_mqtt_failed">Connection Failed, Check Broker</string>
-    <string name="msg_mqtt_retry">Retrying Connection...</string>
     <string name="msg_mqtt_connected">Connected</string>
     <string name="msg_mqtt_disconnected">Disconnected</string>
     <string name="project_log_mqtt_status">MQTT Status: %1$s</string>
-    <string name="project_msg_logs_copied">Logs Copied</string>
-    <string name="project_dialog_title_debug_logs">Debug Logs</string>
 
     <!-- Common Messages & Dialogs -->
     <string name="msg_limit_reached">Free version is limited to 3 projects.</string>
@@ -195,9 +153,7 @@
     <string name="dialog_change_id_title">Change Project ID</string>
     <string name="dialog_import_title">Import Configuration</string>
     <string name="dialog_export_title">Export Configuration</string>
-    <string name="common_msg_network_error">Network Error</string>
     <string name="common_msg_copied_clipboard">Copied to Clipboard</string>
-    <string name="project_dialog_title_bottom_sheet">Status Detail</string>
     <string name="dialog_change_id_msg">Enter the new project ID below.</string>
     
     <!-- Common Buttons & Actions -->
@@ -208,7 +164,6 @@
     <string name="common_btn_save">Save File</string>
     <string name="common_btn_gen_id">New ID</string>
     <string name="arduino_code_export">Export Arduino Code</string>
-    <string name="btn_copy_topic_only">Copy Topic</string>
     <string name="common_btn_load_file">Load File</string>
     <string name="common_btn_load_text">Load Text</string>
 
@@ -220,53 +175,33 @@
     <string name="properties_label_topic">MQTT Topic</string>
     <string name="properties_label_width">Width</string>
     <string name="properties_label_height">Height</string>
-    <string name="properties_label_color">Accent Color</string>
     <string name="properties_btn_clone">Clone</string>
 
     <!-- Slider Properties -->
-    <string name="properties_section_range">Value Range</string>
     <string name="prop_label_min">Min</string>
     <string name="prop_label_max">Max</string>
     <string name="prop_label_step">Interval</string>
-    <string name="prop_label_send_mode">Send Mode</string>
     <string name="prop_val_on_release">On Release</string>
     <string name="prop_val_continuous">Continuous</string>
     <string name="prop_label_interval">Send Interval (ms)</string>
     <string name="prop_helper_interval">Minimum 50ms</string>
     <string name="prop_label_orientation">Orientation</string>
-    <string name="prop_label_track_style">Track Style</string>
-    <string name="prop_label_thumb_style">Thumb Style</string>
     <string name="prop_label_feedback">Hint</string>
-    <string name="prop_label_center_content">Center Content</string>
 
     <string name="val_orient_horizontal">水平</string>
     <string name="val_orient_vertical">垂直</string>
-    <string name="val_orient_semi_circle">半圓</string>
-    <string name="val_orient_full_circle">全圓</string>
-    <string name="val_track_thin">Classic Thin</string>
-    <string name="val_track_thick">Thick Tube</string>
-    <string name="val_thumb_glow">Circle Glow</string>
-    <string name="val_thumb_led">Square LED</string>
     <string name="val_slider_style_classic">Classic</string>
     <string name="val_slider_style_capsule">Capsule</string>
-    <string name="val_slider_style_arc">Arc</string>
-    <string name="val_slider_style_ring">Ring</string>
     <string name="val_shape_square">Square</string>
     <string name="val_shape_circle">Circle</string>
     <string name="val_feedback_none">None</string>
     <string name="val_feedback_ticks">Ticks</string>
     <string name="val_feedback_bubble">Bubble</string>
     <string name="val_feedback_both">Ticks + Bubble</string>
-    <string name="val_center_none">None</string>
-    <string name="val_center_value">Real-time Value</string>
-    <string name="val_center_icon">Icon</string>
-    
+
     <!-- Component Specific Properties -->
     <string name="prop_label_messages_lr">Messages (L / R)</string>
     <string name="prop_label_messages_lcr">Messages (L / C / R)</string>
-    <string name="prop_label_left">L</string>
-    <string name="prop_label_center">C</string>
-    <string name="prop_label_right">R</string>
     <string name="prop_hint_style">Style</string>
     <string name="prop_hint_shape">Shape</string>
     
@@ -286,37 +221,20 @@
     <string name="prop_label_enter_as_send">Enter as Send</string>
     <string name="prop_desc_clear_on_send">Clear text field after sending.</string>
     <string name="prop_desc_enter_as_send">Send message when Enter key is pressed.</string>
-    <string name="component_label_text_input">Text Input</string>
-    
+
     <string name="val_mode_tap">Tap</string>
     <string name="val_mode_hold">Hold</string>
     <string name="val_mode_timer">Timer</string>
     <string name="properties_unit_ms">ms</string>
     
     <string name="desc_mode_tap">Sends command on click.</string>
-    <string name="desc_mode_hold">Sends on press, reset on release.</string>
-    <string name="desc_mode_timer">Sends on press, auto-reset after time.</string>
-    
+
     <string name="properties_switch_mode_standard">Standard</string>
     <string name="properties_switch_mode_tri_state">Tri-State</string>
     
     <!-- Icons & Helper Descriptions -->
-    <string name="icon_none">None</string>
-    <string name="icon_power">Power</string>
-    <string name="icon_lighting">Lighting</string>
-    <string name="icon_fan">Fan</string>
-    <string name="icon_play">Play</string>
-    <string name="icon_tune">Tune</string>
-    <string name="icon_energy">Energy</string>
-    <string name="icon_desc_delete">Delete</string>
-    <string name="icon_desc_edit">Edit</string>
-    <string name="icon_desc_info">Info</string>
-    <string name="icon_desc_plus">Add</string>
-    <string name="icon_desc_send">Send</string>
-    
+
     <!-- Messages & Status -->
-    <string name="project_component_gauge">Gauge</string>
-    <string name="project_component_text">Text</string>
     <string name="project_msg_add_component">Component added</string>
     <string name="project_msg_component_deleted">Component deleted</string>
     <string name="project_msg_components_loaded">Components loaded</string>
@@ -328,9 +246,6 @@
     <string name="project_msg_mqtt_failed">MQTT failed</string>
     <string name="project_msg_mqtt_retrying">Retrying MQTT...</string>
     <string name="project_msg_select_component">Select a component</string>
-    <string name="project_msg_topic_copied">Topic copied</string>
-    <string name="project_prop_label">Label</string>
-    <string name="project_prop_topic">Topic</string>
     <string name="prop_label_label_caps">LABEL</string>
     <string name="prop_label_value_caps">VALUE</string>
 </resources>

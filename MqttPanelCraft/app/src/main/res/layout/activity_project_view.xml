@@ -131,7 +131,6 @@
 
         <!-- DRAWER CONTENT: Inner Coordinator for Canvas & BottomSheet -->
         <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/innerCoordinator"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -141,7 +140,6 @@
                 android:layout_height="match_parent">
 
                 <androidx.core.widget.NestedScrollView
-                    android:id="@+id/editorScrollView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fillViewport="true">
@@ -174,7 +172,6 @@
 
             <!-- Scrim (Dark Overlay) -->
             <View
-                android:id="@+id/bottomSheetScrim"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#7F000000"
@@ -184,7 +181,6 @@
 
             <!-- Add Button (Only in Edit Mode) -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fabAdd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
@@ -456,7 +452,6 @@
                                             android:layout_height="wrap_content">
                                             
                                             <com.google.android.material.textfield.TextInputLayout
-                                                android:id="@+id/tilPropName"
                                                 style="@style/Widget.App.TextInputLayout.Properties"
                                                 android:layout_width="match_parent"
                                                 android:layout_height="wrap_content"
@@ -657,7 +652,6 @@
 
                                     <!-- Generic Payload + Dropdown -->
                                     <LinearLayout
-                                        android:id="@+id/containerGenericPayload"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:orientation="horizontal"
@@ -721,7 +715,6 @@
 
                                     <!-- Button Properties (Hardcoded Block) -->
                                     <LinearLayout
-                                        android:id="@+id/containerButtonProps"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:orientation="vertical"
@@ -739,7 +732,6 @@
                                             app:boxStrokeColor="@color/toolbar_text"
                                             android:layout_marginBottom="8dp">
                                             <com.google.android.material.textfield.TextInputEditText
-                                                android:id="@+id/etPropPayload"
                                                 android:layout_width="match_parent"
                                                 android:layout_height="wrap_content"
                                                 android:textSize="17sp"
@@ -758,7 +750,6 @@
                                             app:boxStrokeColor="@color/primary"
                                             android:layout_marginBottom="8dp">
                                             <com.google.android.material.textfield.TextInputEditText
-                                                android:id="@+id/etPropButtonText"
                                                 android:layout_width="match_parent"
                                                 android:layout_height="wrap_content"
                                                 android:textSize="17sp"
@@ -774,7 +765,6 @@
                                             android:layout_marginBottom="8dp">
                                             
                                             <ImageView
-                                                android:id="@+id/ivPropIconPreview"
                                                 android:layout_width="40dp"
                                                 android:layout_height="40dp"
                                                 android:scaleType="fitCenter"
@@ -783,7 +773,6 @@
                                                 android:background="@drawable/bg_topic_container"/>
                                                 
                                             <Button
-                                                android:id="@+id/btnSelectIcon"
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
                                                 android:text="@string/properties_btn_select_icon"
@@ -792,7 +781,6 @@
                                                 android:layout_marginStart="12dp"/>
                                                 
                                             <Button
-                                                android:id="@+id/btnClearIcon"
                                                 android:layout_width="wrap_content"
                                                 android:layout_height="wrap_content"
                                                 android:text="@string/properties_btn_no_icon"
@@ -840,7 +828,6 @@
 
         <!-- LEFT SIDEBAR: Components (Drawer) -->
     <LinearLayout
-        android:id="@+id/sidebarContainer"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"

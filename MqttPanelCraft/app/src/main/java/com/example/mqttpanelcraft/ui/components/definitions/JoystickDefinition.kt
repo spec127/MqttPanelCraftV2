@@ -72,11 +72,8 @@ object JoystickDefinition : IComponentDefinition {
     ) {
         val context = panelView.context
 
-        // 0. Topic Config (Shared)
-        panelView.rootView.findViewById<EditText>(R.id.etPropTopicConfig)?.apply {
-            setText(data.topicConfig)
-            addTextChangedListener(TextWatcherAdapter { data.topicConfig = it })
-        }
+        // 0. Topic Config (Shared) - Handled by PropertiesSheetManager
+        // No manual binding needed here
 
         // 1. Mode
         val toggleMode = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleJoystickMode)
@@ -85,10 +82,6 @@ object JoystickDefinition : IComponentDefinition {
 
         containerInterval?.visibility = if (curMode == "Buttons") View.GONE else View.VISIBLE
         toggleMode?.check(if (curMode == "Buttons") R.id.btnModeButtons else R.id.btnModeStandard)
-
-        // Style Selector reference (for dynamic update)
-        val styleAuto =
-                panelView.findViewById<android.widget.AutoCompleteTextView>(R.id.tvJoystickStyle)
 
         toggleMode?.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {

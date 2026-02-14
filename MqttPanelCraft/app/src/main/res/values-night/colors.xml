@@ -6,30 +6,21 @@
     <color name="teal_700">#018786</color>
     <color name="black">#FFFFFF</color> <color name="white">#000000</color> <color name="primary">#D1C4E9</color>
     
-    <color name="background_color">#0F0F10</color> <color name="surface_color">#1E1E20</color>    <color name="canvas_background">#0F0F10</color>
-    
-    <color name="grid_background_color">#0F0F10</color>
-    <color name="grid_stroke_color">#1AFFFFFF</color> <color name="grid_dot_color">#334155</color> 
-    
+    <color name="background_color">#0F0F10</color> <color name="surface_color">#1E1E20</color>
+
+    <color name="grid_dot_color">#334155</color>
 
 
-    <color name="primary_deep_purple">#E040FB</color>
     <color name="vivid_blue">#40C4FF</color>
     <color name="warm_amber">#FFD740</color>
     <color name="soft_purple">#FF4081</color> 
     
     <color name="toolbar_bg">#161618</color>
     <color name="toolbar_text">#E2D9F3</color>
-    <color name="toolbar_border">#2D2D30</color>
 
-    <color name="sidebar_grey">#161618</color>
-    <color name="sidebar_background_color">#1e293b</color>
-    <color name="sidebar_card_bg">#252528</color> <color name="sidebar_text_primary">#F8FAFC</color> <color name="sidebar_header_text">#94A3B8</color> 
-    <color name="sidebar_header_background">#00000000</color>
-    
-    <color name="sidebar_text_secondary">#94A3B8</color>
-    <color name="sidebar_card_stroke">#33FFFFFF</color> <color name="sidebar_icon_tint">#D8B4FE</color> <color name="sidebar_component_stroke">#2D2D30</color>
-    <color name="sidebar_section_header">@color/sidebar_header_text</color>
+    <color name="sidebar_card_bg">#252528</color> <color name="sidebar_text_primary">#F8FAFC</color> <color name="sidebar_header_text">#94A3B8</color>
+
+    <color name="sidebar_card_stroke">#33FFFFFF</color>
 
     <color name="prop_container_bg">#1E1E20</color>
     <color name="prop_input_bg">#2A2A2D</color> <!-- Slightly lighter dark (Deep Grey) -->
@@ -41,9 +32,7 @@
     <color name="drawer_btn_bg">#00000000</color>
     <color name="drawer_btn_text">#FFFFFF</color>
     <color name="drawer_btn_icon_tint">#94A3B8</color>
-    <color name="drawer_btn_stroke">#334155</color>
-    
-    <color name="chip_background">#334155</color>
+
     <color name="status_border">#33FFFFFF</color>
 
     <!-- Fresh Icy Blue Theme (Dark Mode) -->
@@ -67,28 +56,25 @@
     <color name="setup_border_color">#80B388FF</color> <!-- Primary 50% opacity -->
     <color name="setup_accent_color">#B388FF</color> <!-- Vivid Purple -->
     <color name="setup_background_base">#0D0D0D</color> <!-- Almost Black -->
-    <color name="setup_surface_color">#1E1E1E</color> <!-- Dark Grey -->
-    <color name="setup_bottom_btn_stroke">#B388FF</color>
+    <!-- Dark Grey -->
     <color name="setup_refresh_color">#B388FF</color>
     <color name="setup_input_text_color">#FFFFFF</color>
     <color name="setup_input_container_color">#1E1E1E</color>
     <color name="setup_radio_ring">#B388FF</color>
-    <color name="setup_action_blue">#B388FF</color> <!-- Unified Primary -->
+    <!-- Unified Primary -->
     <color name="setup_header_start">#102027</color>
     <color name="setup_header_end">#121212</color>
     <color name="setup_primary_button_bg">#B388FF</color>
     <color name="setup_primary_button_text">#0D0D0D</color>
 
     <!-- Sheet Colors -->
-    <color name="sheet_border_color">#22888888</color> <!-- Subtle Gray -->
+    <!-- Subtle Gray -->
     <color name="drag_handle_tint">#64748B</color> <!-- Slate -->
     
     <!-- User Design Colors -->
     <color name="props_primary">#a573bc</color>
-    <color name="props_bg_light">#0f172a</color> <!-- Maps to dark bg in night mode -->
-    <color name="props_card_bg_light">#1e293b</color>
-    <color name="props_card_bg_dark">#0f172a</color>
-    
+    <!-- Maps to dark bg in night mode -->
+
     <!-- Dynamic Semantic Colors -->
     <color name="popup_bg_color">#2D2D30</color>
     <color name="divider_line">#1AFFFFFF</color>

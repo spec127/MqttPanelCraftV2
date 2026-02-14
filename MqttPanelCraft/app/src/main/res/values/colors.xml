@@ -7,59 +7,45 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="primary_dark_blue">#FF0D47A1</color>
     <color name="primary">#1976D2</color>
     <color name="background_color">#F0F2F5</color>
     <color name="surface_color">#FFFFFF</color>
-    <color name="grid_background_color">#F5F5F5</color>
-    <color name="grid_stroke_color">#E0E0E0</color>
-    <color name="error_red">#B00020</color>
 
     <!-- HTML Mockup Palette -->
-    <color name="primary_deep_purple">#6A1B9A</color>
     <color name="vivid_blue">#00B0FF</color>
     <color name="warm_amber">#FF9100</color>
     <color name="soft_purple">#D500F9</color>
-    <color name="sidebar_grey">#F5F5F5</color>
-    
+
     <!-- Properties Panel Colors -->
     <color name="prop_container_bg">#F3F4F6</color>
     <color name="prop_input_bg">#FFFFFF</color>
     <color name="prop_text_primary">#1F2937</color>
     <color name="prop_text_secondary">#6B7280</color>
     <color name="prop_stroke_color">#E5E7EB</color>
-    
-    <color name="canvas_background">#FFFFFF</color>
+
     <color name="grid_dot_color">#E0E0E0</color>
 
     <!-- Toolbar Colors -->
     <color name="toolbar_bg">#FFFFFF</color>
     <color name="toolbar_text">#6A1B9A</color> <!-- Deep Purple -->
-    <color name="toolbar_border">#00000000</color>
-    
+
     <!-- Sidebar Colors -->
-    <color name="sidebar_background_color">@color/sidebar_grey</color>
     <color name="sidebar_card_bg">#FFFFFF</color>
     <color name="sidebar_text_primary">#475569</color> <!-- Slate 600 -->
     <color name="sidebar_header_text">#64748B</color> <!-- Slate 500 -->
-    <color name="sidebar_header_background">#00000000</color> <!-- Transparent -->
+    <!-- Transparent -->
     
     <!-- Sidebar Missing Resources (Added to fix runtime crash) -->
-    <color name="sidebar_text_secondary">#757575</color>
     <color name="sidebar_card_stroke">#616161</color> <!-- Stronger Grey -->
-    <color name="sidebar_icon_tint">#4A148C</color> <!-- Darker Purple for contrast -->
-    <color name="sidebar_component_stroke">#616161</color>
-    <color name="sidebar_section_header">@color/sidebar_header_text</color>
-    
+    <!-- Darker Purple for contrast -->
+
     <!-- Drawer Semantic Colors -->
     <color name="drawer_background">#FFFFFF</color>
     <color name="drawer_btn_bg">#FFFFFF</color>
     <color name="drawer_btn_text">#475569</color> <!-- Slate 600 -->
     <color name="drawer_btn_icon_tint">#475569</color>
-    <color name="drawer_btn_stroke">#E2E8F0</color> <!-- Slate 200 -->
-    
-    <color name="chip_background">#F3E5F5</color>
-    
+    <!-- Slate 200 -->
+
     <color name="status_border">#33000000</color>
 
     <!-- Fresh Icy Blue Theme -->
@@ -77,31 +63,24 @@
     
     <color name="setup_border_color">#A855F7</color> <!-- Lighter Purple -->
     <color name="setup_accent_color">@color/icy_primary</color>
-    <color name="setup_bottom_btn_stroke">#475569</color>
     <color name="setup_refresh_color">@color/setup_accent_color</color>
     <color name="setup_input_text_color">@color/setup_accent_color</color>
     <color name="setup_radio_ring">@color/setup_border_color</color>
-    <color name="setup_action_blue">#0284c7</color>
-    
+
     <!-- Mappings for New Keys -->
     <color name="setup_background_base">@color/icy_background</color>
-    <color name="setup_surface_color">@android:color/transparent</color>
     <color name="setup_input_container_color">@android:color/transparent</color>
     <color name="setup_header_start">@color/icy_header_start</color>
     <color name="setup_header_end">@color/icy_header_end</color>
     <color name="setup_primary_button_text">#FFFFFF</color>
 
-    <color name="sheet_border_color">#673AB7</color> <!-- Deep Purple Frame -->
+    <!-- Deep Purple Frame -->
     <color name="drag_handle_tint">#A0B0E0</color> <!-- Blue-ish -->
 
     <!-- User Design Colors -->
     <color name="props_primary">#a573bc</color>
-    <color name="props_bg_light">#f0f9ff</color>
-    <color name="props_card_bg_light">#ffffff</color>
-    <color name="props_card_bg_dark">#1e293b</color>
-    
+
     <!-- Dynamic Semantic Colors -->
-    <color name="gray_400">#9CA3AF</color>
     <color name="popup_bg_color">#FFFFFF</color>
     <color name="divider_line">#1A000000</color>
 </resources>

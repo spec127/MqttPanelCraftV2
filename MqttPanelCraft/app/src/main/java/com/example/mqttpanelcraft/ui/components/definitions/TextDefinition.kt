@@ -1,13 +1,16 @@
 package com.example.mqttpanelcraft.ui.components.definitions
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.Size
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.example.mqttpanelcraft.R
+import com.example.mqttpanelcraft.data.ColorHistoryManager
 import com.example.mqttpanelcraft.model.ComponentData
+import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 
@@ -54,90 +57,43 @@ object TextDefinition : IComponentDefinition {
             data: ComponentData,
             onUpdate: (String, String) -> Unit
     ) {
-        val vPropColorPreview =
-                panelView.findViewById<android.widget.TextView>(R.id.vPropColorPreview)
+        val context = panelView.context
+        val colorViews =
+                listOf(R.id.vColor1, R.id.vColor2, R.id.vColor3, R.id.vColor4, R.id.vColor5).map {
+                    panelView.findViewById<View>(it)
+                }
+        fun refreshColors() {
+            val recent = ColorHistoryManager.load(context)
+            colorViews.forEachIndexed { i, v ->
+                if (i < recent.size) {
+                    val c = android.graphics.Color.parseColor(recent[i])
+                    v?.backgroundTintList = android.content.res.ColorStateList.valueOf(c)
+                    v?.setOnClickListener { onUpdate("color", recent[i]) }
+                }
+            }
+        }
+        refreshColors()
 
-        // Initial State
-        val currentColor = data.props["color"] ?: ""
-        updateColorView(vPropColorPreview, currentColor)
-
-        vPropColorPreview.setOnClickListener {
-            com.example.mqttpanelcraft.ui.ColorPickerDialog(
-                            context = panelView.context,
-                            initialColor =
-                                    if (currentColor.isEmpty()) "#FFFFFFFF" else currentColor,
-                            showAlpha = true,
-                            onColorSelected = { selectedHex ->
-                                onUpdate("color", selectedHex)
-                                updateColorView(vPropColorPreview, selectedHex)
+        panelView.findViewById<View>(R.id.btnColorCustom)?.setOnClickListener { anchor ->
+            val cur = data.props["color"] ?: "#2196F3"
+            var temp = cur
+            ColorPickerDialog(
+                            context,
+                            cur,
+                            true,
+                            {
+                                temp = it
+                                onUpdate("color", it)
+                            },
+                            {
+                                if (temp != cur) {
+                                    ColorHistoryManager.save(context, temp)
+                                    refreshColors()
+                                }
                             }
                     )
-                    .show(vPropColorPreview)
+                    .show(anchor)
         }
-    }
-
-    private fun updateColorView(view: android.widget.TextView, hex: String) {
-        try {
-            val context = view.context
-            val defaultStr = context.getString(R.string.properties_label_default)
-            if (hex.isEmpty() || hex == "Default" || hex == defaultStr) {
-                view.text = defaultStr
-                view.setTextColor(android.graphics.Color.BLACK)
-                view.setShadowLayer(0f, 0f, 0f, 0)
-
-                val bg =
-                        view.background as? android.graphics.drawable.GradientDrawable
-                                ?: android.graphics.drawable.GradientDrawable()
-                bg.setColor(android.graphics.Color.WHITE)
-                val density = context.resources.displayMetrics.density
-                bg.setStroke(
-                        (1 * density).toInt(),
-                        android.graphics.Color.LTGRAY,
-                        (5 * density).toFloat(),
-                        (3 * density).toFloat()
-                ) // Dashed border
-                bg.cornerRadius = (12 * density)
-                view.background = bg
-                return
-            }
-
-            val color =
-                    try {
-                        android.graphics.Color.parseColor(hex)
-                    } catch (e: Exception) {
-                        android.graphics.Color.LTGRAY
-                    }
-
-            // Update View Background
-            val bg =
-                    view.background as? android.graphics.drawable.GradientDrawable
-                            ?: android.graphics.drawable.GradientDrawable()
-            bg.setColor(color)
-            val density = context.resources.displayMetrics.density
-            bg.setStroke(
-                    (2 * density).toInt(),
-                    android.graphics.Color.parseColor("#808080")
-            ) // Solid border
-            bg.cornerRadius = (12 * density)
-            view.background = bg
-
-            // Update Text
-            view.text = hex
-
-            // Contrast Logic
-            val alpha = android.graphics.Color.alpha(color)
-            val luminescence =
-                    (0.299 * android.graphics.Color.red(color) +
-                            0.587 * android.graphics.Color.green(color) +
-                            0.114 * android.graphics.Color.blue(color))
-
-            val contrastColor =
-                    if (alpha < 180 || luminescence > 186) android.graphics.Color.BLACK
-                    else android.graphics.Color.WHITE
-
-            view.setTextColor(contrastColor)
-            view.setShadowLayer(0f, 0f, 0f, 0) // Ensure no shadow
-        } catch (e: Exception) {}
     }
 
     override fun attachBehavior(
