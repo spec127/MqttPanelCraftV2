@@ -85,9 +85,9 @@
             android:textColor="@color/prop_text_primary"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Axes (2-way / 4-way) -->
+    <!-- Axis Mode (Consolidated) -->
     <TextView
-        android:text="@string/properties_label_axes"
+        android:text="@string/prop_label_axis_mode"
         android:textSize="12sp"
         android:textColor="@color/prop_text_secondary"
         android:layout_width="match_parent"
@@ -95,7 +95,7 @@
         android:layout_marginBottom="6dp"/>
 
     <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/toggleJoystickAxes"
+        android:id="@+id/toggleAxisMode"
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:layout_marginBottom="12dp"
@@ -103,70 +103,206 @@
         app:selectionRequired="true"
         app:singleSelection="true">
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAxes4Way"
+            android:id="@+id/btnAxis4Way"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:text="@string/val_axes_4way"
-            android:textSize="12sp"
+            android:text="@string/val_axis_4way"
+            android:textSize="10sp"
             android:insetTop="0dp"
-            android:insetBottom="0dp"/>
+            android:insetBottom="0dp"
+            android:padding="0dp"/>
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAxes2Way"
+            android:id="@+id/btnAxis2WayH"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:text="@string/val_axes_2way"
-            android:textSize="12sp"
+            android:text="@string/val_axis_2way_h"
+            android:textSize="10sp"
             android:insetTop="0dp"
-            android:insetBottom="0dp"/>
+            android:insetBottom="0dp"
+            android:padding="0dp"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAxis2WayV"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:text="@string/val_axis_2way_v"
+            android:textSize="10sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <!-- Direction (Only if 2-way) -->
+    <!-- Range & Precision -->
+    <TextView
+        android:text="@string/prop_label_range_precision"
+        android:textSize="12sp"
+        android:textColor="@color/prop_text_secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"/>
+
     <LinearLayout
-        android:id="@+id/containerJoystickDir"
+        android:id="@+id/containerRangePrecision"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:layout_marginBottom="12dp">
+
+        <!-- Min -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:hint="@string/prop_label_min_val"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPropMin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberSigned|numberDecimal"
+                android:textSize="14sp"
+                android:textColor="@color/prop_text_primary"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Max -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:hint="@string/prop_label_max_val"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPropMax"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberSigned|numberDecimal"
+                android:textSize="14sp"
+                android:textColor="@color/prop_text_primary"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Precision -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="@string/prop_label_precision">
+            <AutoCompleteTextView
+                android:id="@+id/tvPropPrecision"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:inputType="none"
+                android:textColor="@color/prop_text_primary"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <!-- Button Messages (Hidden by default, shown in Button Mode) -->
+    <LinearLayout
+        android:id="@+id/containerButtonMessages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone">
-        <TextView
-            android:text="@string/prop_label_direction"
-            android:textSize="12sp"
-            android:textColor="@color/prop_text_secondary"
+
+        <!-- Release Message -->
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp"/>
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/toggleJoystickDir"
+            android:hint="@string/prop_label_msg_release"
+            android:layout_marginBottom="8dp"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etMsgRelease"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/prop_text_primary"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Up / Down -->
+        <LinearLayout
+            android:id="@+id/containerMsgUpDown"
             android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center"
-            app:selectionRequired="true"
-            app:singleSelection="true">
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDirHorz"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:text="@string/val_dir_horz"
-                android:textSize="12sp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"/>
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDirVert"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:hint="@string/prop_label_msg_up"
+                style="@style/Widget.App.TextInputLayout.Properties">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etMsgUp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/prop_text_primary"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:text="@string/val_dir_vert"
-                android:textSize="12sp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"/>
-        </com.google.android.material.button.MaterialButtonToggleGroup>
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:hint="@string/prop_label_msg_down"
+                style="@style/Widget.App.TextInputLayout.Properties">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etMsgDown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/prop_text_primary"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- Left / Right -->
+        <LinearLayout
+            android:id="@+id/containerMsgLeftRight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:hint="@string/prop_label_msg_left"
+                style="@style/Widget.App.TextInputLayout.Properties">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etMsgLeft"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/prop_text_primary"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:hint="@string/prop_label_msg_right"
+                style="@style/Widget.App.TextInputLayout.Properties">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etMsgRight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/prop_text_primary"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
     </LinearLayout>
 
 
@@ -212,6 +348,10 @@
             android:layout_weight="4"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusBottomEnd="20dp"
             android:hint="@string/properties_label_joystick_style">
             <AutoCompleteTextView
                 android:id="@+id/tvJoystickStyle"

@@ -51,7 +51,9 @@ object ColorPaletteDefinition : IComponentDefinition {
                 palette.showSaturation = (data.props["show_sat"] ?: "true") == "true"
                 palette.showBrightness = (data.props["show_bri"] ?: "true") == "true"
                 palette.baseHue = (data.props["hue"] ?: "0").toFloat()
-                palette.currentV = (data.props["brightness"] ?: "0").toFloat() / 100f
+                val mode = data.props["mode"] ?: "Full Color"
+                val defaultV = if (mode == "Monochrome") "0" else "100"
+                palette.currentV = (data.props["brightness"] ?: defaultV).toFloat() / 100f
                 palette.currentS = (data.props["saturation"] ?: "100").toFloat() / 100f
         }
 
@@ -364,6 +366,11 @@ object ColorPaletteDefinition : IComponentDefinition {
                                 if (isFinal) {
                                         emit(data, h, s, v, sendMqtt)
                                 }
+                        }
+                        if (isFinal) {
+                                onUpdateProp("hue", h.toString())
+                                onUpdateProp("saturation", (s * 100).toInt().toString())
+                                onUpdateProp("brightness", (v * 100).toInt().toString())
                         }
                 }
         }

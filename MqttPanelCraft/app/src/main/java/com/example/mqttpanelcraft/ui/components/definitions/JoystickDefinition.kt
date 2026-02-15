@@ -20,7 +20,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 object JoystickDefinition : IComponentDefinition {
 
     override val type = "JOYSTICK"
-    override val defaultSize = Size(260, 260)
+    override val defaultSize = Size(200, 200)
     override val labelPrefix = "joystick"
     override val iconResId = R.drawable.ic_joystick
     override val group = "CONTROL"
@@ -44,9 +44,40 @@ object JoystickDefinition : IComponentDefinition {
         val joystick = view.findViewWithTag<JoystickView>("target") ?: return
 
         joystick.joystickMode = data.props["mode"] ?: "Joystick"
-        joystick.axes = data.props["axes"] ?: "4-Way"
-        joystick.direction2Way = data.props["dir"] ?: "Horizontal"
+
+        // Consolidated Axis Mode
+        // Default to "4-Way" if not set.
+        // If legacy "axes" exists, we could map it, but for now let's just use the new property
+        // "axisMode"
+        // effectively migrating by default or user choice.
+        joystick.axisMode = data.props["axisMode"] ?: "4-Way"
+
         joystick.interval = (data.props["interval"] ?: "100").toLongOrNull() ?: 100L
+
+        // Range
+        joystick.minVal = (data.props["min"] ?: "-100").toFloatOrNull() ?: -100f
+        joystick.maxVal = (data.props["max"] ?: "100").toFloatOrNull() ?: 100f
+
+        // Messages
+        // Messages: Use defaults if not set (matches UI defaults)
+        val msgRelease = data.props["msg_release"]
+        joystick.msgRelease = if (msgRelease.isNullOrEmpty()) "stop" else msgRelease
+
+        val msgUp = data.props["msg_up"]
+        joystick.msgUp = if (msgUp.isNullOrEmpty()) "up" else msgUp
+
+        val msgDown = data.props["msg_down"]
+        joystick.msgDown = if (msgDown.isNullOrEmpty()) "down" else msgDown
+
+        val msgLeft = data.props["msg_left"]
+        joystick.msgLeft = if (msgLeft.isNullOrEmpty()) "left" else msgLeft
+
+        val msgRight = data.props["msg_right"]
+        joystick.msgRight = if (msgRight.isNullOrEmpty()) "right" else msgRight
+
+        // Scale Unit for Rounding
+        joystick.scaleUnit = (data.props["scale_unit"] ?: "1").toFloatOrNull() ?: 1f
+
         val rawStyle = data.props["style"] ?: "Neon"
         joystick.visualStyle =
                 when (rawStyle) {
@@ -72,64 +103,134 @@ object JoystickDefinition : IComponentDefinition {
     ) {
         val context = panelView.context
 
-        // 0. Topic Config (Shared) - Handled by PropertiesSheetManager
-        // No manual binding needed here
-
         // 1. Mode
         val toggleMode = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleJoystickMode)
         val containerInterval = panelView.findViewById<View>(R.id.containerJoystickInterval)
+        val containerButtonMessages = panelView.findViewById<View>(R.id.containerButtonMessages)
         val curMode = data.props["mode"] ?: "Joystick"
 
-        containerInterval?.visibility = if (curMode == "Buttons") View.GONE else View.VISIBLE
+        val updateVisibility = { mode: String ->
+            containerInterval?.visibility = if (mode == "Buttons") View.GONE else View.VISIBLE
+            containerButtonMessages?.visibility = if (mode == "Buttons") View.VISIBLE else View.GONE
+            // Hide Range/Precision in Buttons mode (Req 2)
+            val containerRange = panelView.findViewById<View>(R.id.containerRangePrecision)
+            containerRange?.visibility = if (mode == "Buttons") View.GONE else View.VISIBLE
+        }
+
+        updateVisibility(curMode)
         toggleMode?.check(if (curMode == "Buttons") R.id.btnModeButtons else R.id.btnModeStandard)
 
         toggleMode?.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 val newMode = if (checkedId == R.id.btnModeButtons) "Buttons" else "Joystick"
                 onUpdate("mode", newMode)
-                containerInterval?.visibility =
-                        if (newMode == "Buttons") View.GONE else View.VISIBLE
-
-                // Refresh style list when mode changes
+                updateVisibility(newMode)
                 updateStyleAdapter(panelView, newMode, data, onUpdate)
             }
         }
 
-        // 2. Axes
-        val toggleAxes = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleJoystickAxes)
-        val containerDir = panelView.findViewById<View>(R.id.containerJoystickDir)
-        val curAxes = data.props["axes"] ?: "4-Way"
-        toggleAxes?.check(if (curAxes == "2-Way") R.id.btnAxes2Way else R.id.btnAxes4Way)
-        containerDir?.visibility = if (curAxes == "2-Way") View.VISIBLE else View.GONE
+        // 2. Axis Mode (Consolidated)
+        val toggleAxisMode = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleAxisMode)
+        val curAxisMode = data.props["axisMode"] ?: "4-Way" // Default
 
-        toggleAxes?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+        // Visibility logic for message inputs based on axis mode
+        val containerMsgUpDown = panelView.findViewById<View>(R.id.containerMsgUpDown)
+        val containerMsgLeftRight = panelView.findViewById<View>(R.id.containerMsgLeftRight)
+
+        val updateMsgVisibility = { axes: String ->
+            containerMsgUpDown?.visibility =
+                    if (axes == "2-Way Horizontal") View.GONE else View.VISIBLE
+            containerMsgLeftRight?.visibility =
+                    if (axes == "2-Way Vertical") View.GONE else View.VISIBLE
+        }
+
+        updateMsgVisibility(curAxisMode)
+
+        when (curAxisMode) {
+            "2-Way Horizontal" -> toggleAxisMode?.check(R.id.btnAxis2WayH)
+            "2-Way Vertical" -> toggleAxisMode?.check(R.id.btnAxis2WayV)
+            else -> toggleAxisMode?.check(R.id.btnAxis4Way)
+        }
+
+        toggleAxisMode?.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
-                val newAxes = if (checkedId == R.id.btnAxes2Way) "2-Way" else "4-Way"
-                onUpdate("axes", newAxes)
-                containerDir?.visibility = if (newAxes == "2-Way") View.VISIBLE else View.GONE
+                val newAxisMode =
+                        when (checkedId) {
+                            R.id.btnAxis2WayH -> "2-Way Horizontal"
+                            R.id.btnAxis2WayV -> "2-Way Vertical"
+                            else -> "4-Way"
+                        }
+                onUpdate("axisMode", newAxisMode)
+                updateMsgVisibility(newAxisMode)
             }
         }
 
-        // 3. Direction (2-Way)
-        val toggleDir = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleJoystickDir)
-        val curDir = data.props["dir"] ?: "Horizontal"
-        toggleDir?.check(if (curDir == "Vertical") R.id.btnDirVert else R.id.btnDirHorz)
-        toggleDir?.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked) {
-                onUpdate("dir", if (checkedId == R.id.btnDirVert) "Vertical" else "Horizontal")
+        // 3. Range & Precision
+        val etPropMin = panelView.findViewById<EditText>(R.id.etPropMin)
+        val etPropMax = panelView.findViewById<EditText>(R.id.etPropMax)
+
+        etPropMin?.setText(data.props["min"] ?: "-100")
+        etPropMin?.addTextChangedListener(TextWatcherAdapter { onUpdate("min", it) })
+
+        etPropMax?.setText(data.props["max"] ?: "100")
+        etPropMax?.addTextChangedListener(TextWatcherAdapter { onUpdate("max", it) })
+
+        val tvPropPrecision =
+                panelView.findViewById<android.widget.AutoCompleteTextView>(R.id.tvPropPrecision)
+        // Scale Unit (0.1, 1, 10) - Controls output step/granularity
+        val precisionItems = listOf("0.1", "1", "10")
+        val precisionAdapter =
+                android.widget.ArrayAdapter(
+                        context,
+                        android.R.layout.simple_dropdown_item_1line,
+                        precisionItems
+                )
+        tvPropPrecision?.setAdapter(precisionAdapter)
+        tvPropPrecision?.setText(data.props["scale_unit"] ?: "1", false)
+
+        tvPropPrecision?.setOnItemClickListener { _, _, position, _ ->
+            val valueStr = precisionItems[position]
+            // Scale Unit only sets the granularity property, DOES NOT affect Min/Max range
+            onUpdate("scale_unit", valueStr)
+        }
+
+        // 4. Button Messages
+        // Improved: Pre-fill defaults so user sees what will be sent (Req: "No default values
+        // written")
+        val bindMsg = { id: Int, key: String, defVal: String ->
+            panelView.findViewById<EditText>(id)?.apply {
+                val currentVal = data.props[key]
+                val displayVal = if (currentVal.isNullOrEmpty()) defVal else currentVal
+                setText(displayVal)
+                addTextChangedListener(TextWatcherAdapter { onUpdate(key, it) })
+
+                // If it was empty/null, ensure we save the default back to props?
+                // No, only save if user modifies or we want to persist defaults.
+                // Assuming we just want to show it. But if we show it, and user doesn't touch it,
+                // and then saves, it might assume what's in the box is the value.
+                // PropertySheetManager usually reads from the inputs on save.
+                // If we setText here, and the user clicks Save (check button), the Manager reads
+                // the EditText.
+                // So this effectively sets the default.
             }
         }
 
-        // 4. Interval
+        bindMsg(R.id.etMsgRelease, "msg_release", "stop")
+        bindMsg(R.id.etMsgUp, "msg_up", "up")
+        bindMsg(R.id.etMsgDown, "msg_down", "down")
+        bindMsg(R.id.etMsgLeft, "msg_left", "left")
+        bindMsg(R.id.etMsgRight, "msg_right", "right")
+
+        // 5. Interval
         panelView.findViewById<EditText>(R.id.etPropInterval)?.apply {
             setText(data.props["interval"] ?: "100")
             addTextChangedListener(TextWatcherAdapter { onUpdate("interval", it) })
         }
 
-        // 5. Initial Style Selector setup
+        // 6. Initial Style Selector setup
         updateStyleAdapter(panelView, curMode, data, onUpdate)
 
-        // 6. Color Palette
+        // 7. Color Palette
         val colorViews =
                 listOf(R.id.vColor1, R.id.vColor2, R.id.vColor3, R.id.vColor4, R.id.vColor5).map {
                     panelView.findViewById<View>(it)

@@ -104,6 +104,19 @@
     <string name="val_joystick_style_sharp">俐落 (Sharp)</string>
     <string name="val_joystick_style_smooth">圓滑 (Smooth)</string>
     <string name="val_joystick_style_arrow">箭頭 (Arrow)</string>
+    <string name="prop_label_axis_mode">軸向模式</string>
+    <string name="val_axis_4way">4維</string>
+    <string name="val_axis_2way_h">2維橫向</string>
+    <string name="val_axis_2way_v">2維縱向</string>
+    <string name="prop_label_range_precision">數值範圍 &amp; 精度</string>
+    <string name="prop_label_min_val">下限</string>
+    <string name="prop_label_max_val">上限</string>
+    <string name="prop_label_precision">精度</string>
+    <string name="prop_label_msg_release">鬆手發送</string>
+    <string name="prop_label_msg_up">上</string>
+    <string name="prop_label_msg_down">下</string>
+    <string name="prop_label_msg_left">左</string>
+    <string name="prop_label_msg_right">右</string>
 
     <!-- Color Palette Properties -->
     <string name="properties_label_controller_style">控制器樣式</string>

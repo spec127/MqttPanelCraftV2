@@ -109,6 +109,19 @@
     <string name="val_joystick_style_sharp">Sharp</string>
     <string name="val_joystick_style_smooth">Smooth</string>
     <string name="val_joystick_style_arrow">Arrow</string>
+    <string name="prop_label_axis_mode">Axis Mode</string>
+    <string name="val_axis_4way">4-Way</string>
+    <string name="val_axis_2way_h">2-Way Horz</string>
+    <string name="val_axis_2way_v">2-Way Vert</string>
+    <string name="prop_label_range_precision">Range &amp; Precision</string>
+    <string name="prop_label_min_val">Min</string>
+    <string name="prop_label_max_val">Max</string>
+    <string name="prop_label_precision">Scale Unit</string>
+    <string name="prop_label_msg_release">Release Msg</string>
+    <string name="prop_label_msg_up">Up</string>
+    <string name="prop_label_msg_down">Down</string>
+    <string name="prop_label_msg_left">Left</string>
+    <string name="prop_label_msg_right">Right</string>
 
     <!-- Color Palette Properties -->
     <string name="properties_label_controller_style">Controller Style</string>

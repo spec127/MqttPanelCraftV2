@@ -17,6 +17,50 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         View(context, attrs, defStyleAttr) {
 
     // Properties
+    // New Properties for Phase 56
+    var axisMode: String = "4-Way" // 4-Way, 2-Way Horizontal, 2-Way Vertical
+        set(value) {
+            field =
+                    value.also {
+                        // Backward compatibility mapping
+                        when (it) {
+                            "2-Way Horizontal" -> {
+                                axes = "2-Way"
+                                direction2Way = "Horizontal"
+                            }
+                            "2-Way Vertical" -> {
+                                axes = "2-Way"
+                                direction2Way = "Vertical"
+                            }
+                            else -> {
+                                axes = "4-Way"
+                            }
+                        }
+                    }
+            updateGeometry()
+            invalidate()
+        }
+
+    // Text Paint for Value Display
+    private val textPaint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.WHITE
+                textAlign = Paint.Align.CENTER
+                textSize = 40f
+                typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            }
+
+    var minVal: Float = -100f
+    var maxVal: Float = 100f
+    var scaleUnit: Float = 1f // Step/Granularity for output (e.g. 0.1, 1, 10)
+
+    var msgRelease: String = ""
+    var msgUp: String = ""
+    var msgDown: String = ""
+    var msgLeft: String = ""
+    var msgRight: String = ""
+
+    // Existing Properties
     var joystickMode: String = "Joystick" // Joystick, Buttons
         set(value) {
             field = value
@@ -123,15 +167,16 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
         // Base radius for 4-way mode (proportional)
         // V52: Reduced to 0.75f to keep follower arrows inside bounds
-        val baseRadiusProportional = if (isSmall) h * 0.4f else (min(w, h) / 2f) * 0.75f
+        // V55: Increased to 0.9f to reduce empty space
+        val baseRadiusProportional = if (isSmall) h * 0.4f else (min(w, h) / 2f) * 0.9f
 
         if (axes == "4-Way") {
             baseRadius = baseRadiusProportional
         } else {
             // For 2-Way, baseRadius represents the relevant axis extent
             baseRadius =
-                    if (direction2Way == "Horizontal") (w / 2f) * 0.75f
-                    else (if (isSmall) h * 0.4f else (h / 2f) * 0.75f)
+                    if (direction2Way == "Horizontal") (w / 2f) * 0.9f
+                    else (if (isSmall) h * 0.4f else (h / 2f) * 0.9f)
         }
         stickRadius = baseRadiusProportional * 0.45f
 
@@ -741,8 +786,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         val pad = 4f * density
 
         // 1. Board Dimensions (Pill Shape)
-        val boardW = if (isVert) stickRadius * 2.8f else (width / 2f) * 0.9f
-        val boardH = if (isVert) (height / 2f) * 0.9f else stickRadius * 2.8f
+        // Fix: Reduce dimensions to avoid clipping with selection border (req 1)
+        val safeW = (width / 2f) * 0.85f
+        val safeH = (height / 2f) * 0.85f
+
+        val boardW = if (isVert) min(stickRadius * 2.8f, safeW) else safeW
+        val boardH = if (isVert) safeH else min(stickRadius * 2.8f, safeH)
         val rect = RectF(centerX - boardW, centerY - boardH, centerX + boardW, centerY + boardH)
         val corner = 6f * density // Small corner radius
 
@@ -895,6 +944,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 // No action needed here as we want to skip drawDpadButton for integrated 2-way
             }
         }
+
+        // Text display removed as per user request
     }
 
     private fun drawDpadButton(
@@ -1018,21 +1069,77 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     private fun emitCurrentState() {
-        val dx = (currentX - centerX) / baseRadius
-        val dy = -(currentY - centerY) / baseRadius // Invert Y for Cartesian
+        // Fix: Use the same travel limit as updateStickPosition (0.75f)
+        // to ensuring value reaches 100% at the edge.
+        val travelRadius = baseRadius * 0.75f
+        val dx = (currentX - centerX) / travelRadius
+        val dy = -(currentY - centerY) / travelRadius // Invert Y for Cartesian
 
         val payload =
                 if (joystickMode == "Joystick") {
                     val json = JSONObject()
-                    json.put("x", (dx * 100).toInt())
-                    json.put("y", (dy * 100).toInt())
+                    // Map dx/dy (-1..1) to minVal..maxVal
+                    val center = (maxVal + minVal) / 2f
+                    val range = (maxVal - minVal) / 2f
+
+                    var outXDouble = (center + (dx * range)).toDouble()
+                    var outYDouble = (center + (dy * range)).toDouble()
+
+                    // Apply Scale Unit (Rounding)
+                    if (scaleUnit > 0f) {
+                        // Calculate decimal places based on scaleUnit (e.g. 0.1 -> 1, 0.01 -> 2, 1
+                        // -> 0)
+                        val scale =
+                                if (scaleUnit < 1.0f) {
+                                    ceil(-log10(scaleUnit)).toInt()
+                                } else {
+                                    0
+                                }
+
+                        // Rounding logic: round to nearest multiple of scaleUnit first, then clean
+                        // up
+                        val unit = scaleUnit.toDouble()
+                        outXDouble = kotlin.math.round(outXDouble / unit) * unit
+                        outYDouble = kotlin.math.round(outYDouble / unit) * unit
+
+                        // Clean up floating point noise using BigDecimal with the correct scale
+                        // We add 1 to the scale to be safe, then strip trailing zeros?
+                        // Actually, if we just setScale to 'scale', it forces rounding that might
+                        // be too aggressive if scaleUnit is like 0.5?
+                        // But for 0.1, 1, 10, 'scale' works perfectly.
+                        // 0.1 -> scale 1. 1 -> scale 0.
+
+                        outXDouble =
+                                java.math.BigDecimal(outXDouble)
+                                        .setScale(scale, java.math.RoundingMode.HALF_UP)
+                                        .toDouble()
+                        outYDouble =
+                                java.math.BigDecimal(outYDouble)
+                                        .setScale(scale, java.math.RoundingMode.HALF_UP)
+                                        .toDouble()
+                    }
+
+                    // Output as Double/Float to support 0.1 scale
+                    // Using .toDouble() to ensure valid JSON number format
+                    json.put("x", outXDouble)
+                    json.put("y", outYDouble)
                     json.toString()
                 } else {
                     // Button Mode Logic
-                    calculateButtonLabel(dx, dy)
+                    val dir = calculateButtonLabel(dx, dy)
+                    when (dir) {
+                        "up" -> if (msgUp.isNotEmpty()) msgUp else "up"
+                        "down" -> if (msgDown.isNotEmpty()) msgDown else "down"
+                        "left" -> if (msgLeft.isNotEmpty()) msgLeft else "left"
+                        "right" -> if (msgRight.isNotEmpty()) msgRight else "right"
+                        "none" ->
+                                if (msgRelease.isNotEmpty()) msgRelease
+                                else "none" // Send release msg if defined
+                        else -> dir
+                    }
                 }
 
-        // Avoid duplicate emits if nothing changed (especially on UP)
+        // Avoid duplicate emits if nothing changed
         if (payload != lastEmittedPayload) {
             onJoystickChange?.invoke(payload)
             lastEmittedPayload = payload

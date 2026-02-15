@@ -241,8 +241,14 @@ class PropertiesSheetManager(
         val wDp = kotlin.math.round(wPx / density).toInt()
         val hDp = kotlin.math.round(hPx / density).toInt()
 
-        etPropWidth?.setText(wDp.toString())
-        etPropHeight?.setText(hDp.toString())
+        val wStr = wDp.toString()
+        val hStr = hDp.toString()
+        if (etPropWidth?.text?.toString() != wStr) {
+            etPropWidth?.setText(wStr)
+        }
+        if (etPropHeight?.text?.toString() != hStr) {
+            etPropHeight?.setText(hStr)
+        }
         isBinding = false
     }
 
@@ -358,12 +364,18 @@ class PropertiesSheetManager(
             // Generic Payload Logic
             if (def != null && def.group == "CONTROL") {
                 tilGenericPayload?.visibility = View.VISIBLE
-                etPropGenericPayload?.setText(data.props["payload"] ?: "")
+                val payloadVal = data.props["payload"] ?: ""
+                if (etPropGenericPayload?.text?.toString() != payloadVal) {
+                    etPropGenericPayload?.setText(payloadVal)
+                }
             } else {
                 tilGenericPayload?.visibility = View.GONE
             }
 
-            etPropName?.setText(data.label)
+            val nameVal = data.label ?: ""
+            if (etPropName?.text?.toString() != nameVal) {
+                etPropName?.setText(nameVal)
+            }
 
             // Initial Visibility Icon State
             val isLabelHidden = data.props["showLabel"] == "false"
@@ -377,8 +389,15 @@ class PropertiesSheetManager(
             val density = propertyContainer.resources.displayMetrics.density
             val wDp = kotlin.math.round(data.width / density).toInt()
             val hDp = kotlin.math.round(data.height / density).toInt()
-            etPropWidth?.setText(wDp.toString())
-            etPropHeight?.setText(hDp.toString())
+
+            val wStr = wDp.toString()
+            val hStr = hDp.toString()
+            if (etPropWidth?.text?.toString() != wStr) {
+                etPropWidth?.setText(wStr)
+            }
+            if (etPropHeight?.text?.toString() != hStr) {
+                etPropHeight?.setText(hStr)
+            }
 
             // Topic Parsing
             val topicConfig = data.topicConfig
@@ -407,11 +426,16 @@ class PropertiesSheetManager(
                 }
 
                 tvTopicPrefix?.text = prefixStr
-                etTopicName?.setText(nameStr)
+                if (etTopicName?.text?.toString() != nameStr) {
+                    etTopicName?.setText(nameStr)
+                }
                 tvTopicSuffix?.text = ""
             } else {
                 tvTopicPrefix?.text = ""
-                etTopicName?.setText(topicConfig)
+                val topicVal = data.topicConfig ?: ""
+                if (etTopicName?.text?.toString() != topicVal) {
+                    etTopicName?.setText(topicVal)
+                }
                 tvTopicSuffix?.text = ""
             }
 

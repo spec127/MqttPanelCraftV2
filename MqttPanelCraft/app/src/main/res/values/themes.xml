@@ -31,6 +31,17 @@
         <item name="hintTextColor">@color/props_primary</item>
         <item name="android:textColorHint">@color/prop_text_secondary</item>
     </style>
+
+    <style name="Widget.App.TextInputLayout.Properties.Dropdown" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="boxStrokeColor">@color/prop_input_stroke_selector</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="hintTextColor">@color/props_primary</item>
+        <item name="android:textColorHint">@color/prop_text_secondary</item>
+    </style>
     
     <style name="Widget.App.Button.Outlined.Properties" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="cornerRadius">12dp</item>
