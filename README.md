@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" alt="Icon" width="128">
+  <img src="readmefile/logo_final_512.png" alt="Icon" width="512">
 </p>
 
 <h1 align="center">MqttPanelCraft (V2)</h1>
