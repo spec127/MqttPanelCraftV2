@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="readmefile/logo_final_512.png" alt="Icon" width="512">
+  <img src="readmefile/logo_final_512.png" alt="Icon" width="100">
 </p>
 
 <h1 align="center">MqttPanelCraft (V2)</h1>
