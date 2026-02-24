@@ -22,11 +22,11 @@
 
 ## 📖 Features
 
-- 🔗 **Professional MQTT Core**: Full MQTT protocol support with custom Topic subscription and publishing, optimized for real-time IoT data transmission.
-- 🎨 **Self-Developed Graphics Engine**: Visual editor built on Android Canvas API, enabling highly flexible component configuration and intuitive layout design.
-- 🔧 **Arduino Integration Tools**: Automated Arduino example code export functionality to simplify communication setup between hardware and mobile devices.
-- 🌐 **Advanced WebView Extension**: Supports embedded custom or AI-generated HTML, offering limitless dashboard customization for power users.
-- 🎯 **Ideal for Makers & Education**: Designed for IoT students and developers to streamline the end-to-end workflow from hardware to mobile interface.
+- 🔗 **Professional MQTT Core**: Full support for the MQTT protocol, including custom topic subscription and publishing, optimized for real-time IoT data transmission.
+- 🎨 **Self-Developed Graphics Engine**: A visual editor built on the Android Canvas API, enabling highly flexible component configuration and intuitive layout design.
+- 🔧 **Arduino Integration Tools**: Provides automated Arduino sample code export, significantly simplifying communication setup between hardware and mobile devices.
+- 🌐 **Advanced WebView Extension**: Supports embedding custom or AI-generated HTML, offering virtually unlimited dashboard customization for advanced users.
+- 🎯 **Ideal for Makers & Education**: Designed for IoT students, developers, and enthusiasts, streamlining the end-to-end workflow from hardware to mobile interfaces.
 
 ## 📸 Screenshots
 
@@ -37,12 +37,12 @@
 
 ## 🛠️ Technology Stack
 
-- **Core Tech**: Kotlin (Android), C++ (Arduino code generation logic), Android Canvas API (Low-level Graphics)
-- **Architecture**: MVVM Pattern, Registry Pattern (Component Registration), Unidirectional Data Flow
-- **Connectivity**: MQTT (QoS 1), Foreground Service (Persistent connection protection)
-- **Async Processing**: Kotlin Coroutines (Dispatcher-based UI and Network I/O separation)
-- **Hybrid Development**: WebView Integration, JavaScript Bridge (Bidirectional native/web communication)
-- **Data Management**: JSON Serialization (Supports project layout and component setting Export/Import)
+- **Core Technologies**: Kotlin (Android), C++ (Arduino code generation logic), Android Canvas API (low-level graphics engine)
+- **Architecture**: MVVM pattern, Registry pattern (component registration), unidirectional data flow
+- **Connectivity**: MQTT (QoS 1), Foreground Service (persistent connection management)
+- **Asynchronous Processing**: Kotlin Coroutines (dispatcher-based separation of UI rendering and network I/O)
+- **Hybrid Development**: WebView integration, JavaScript Bridge (bidirectional communication between web and native layers)
+- **Data Management**: JSON serialization (supports export and import of project layouts and component configurations)
 
 ## 📬 Contact
 
