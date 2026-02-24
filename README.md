@@ -18,10 +18,11 @@
 
 ## 📖 功能特性
 
-- 🎨 **自定義畫布引擎**：從零開發基於 Canvas API 的引擎，支援高度客製化的物聯網控制佈局。
-- ⚡ **即時 MQTT 通訊**：優化數據交換機制，確保與設備連線的穩定度與響應速度。
-- 💡 **創意實踐與自學**：展現強大的自學能力，將創新的 UI 想法與功能需求轉化為功能完備的產品。
-- 🔌 **軟硬體整合**：透過 MQTT 協議輕鬆串接 Arduino 等硬體終端，實現完整的控制鏈結。
+- 🔗 **專業 MQTT 控制核心**：完整支援 MQTT 協議，具備自定義主題 (Topic) 訂閱與發佈功能，專為即時 IoT 數據傳輸設計。
+- 🎨 **自主研發畫布引擎**：基於 Canvas API 構建的視覺化編輯器，實現高度靈活的組件配置，將創意佈局轉化為直觀的操作介面。
+- 🔧 **Arduino 整合工具**：提供自動化 Arduino 範例程式碼匯出功能，解決硬體開發者在通訊對接上的難題。
+- 🌐 **高階 WebView 擴充**：支援嵌入自定義或 AI 生成的 HTML 原始碼，為進階使用者提供無限可能的面板客製化方案。
+- 🎯 **創客與教育首選**：專為物聯網學生、開發者及愛好者設計，簡化從硬體端到手機端 (End-to-End) 的開發流程。
 
 ## 📸 螢幕截圖
 
@@ -30,12 +31,14 @@
   <img src="./screenshots/screenshot_2.png" width="300">
 </p>
 
-## 🛠️ 技術棧
+## 🛠️ 開發技術與工具
 
-- **核心語言**：Kotlin (Android), C++, Python
-- **架構模式**：MVVM Pattern
-- **通訊協議**：MQTT, RTSP, Serial Communication
-- **自動化工具**：Shell Scripting (Termux) 提升開發與維護效率
+- **核心技術**：Kotlin (Android), C++(匯出arduino code), Android Canvas API (底層繪圖引擎)
+- **設計架構**：MVVM 模式、Registry Pattern (組件註冊機制)、單向數據流渲染
+- **通訊連線**：MQTT (QoS 1)、Foreground Service (背景通訊保護)
+- **非同步處理**：Kotlin Coroutines (利用 Dispatchers 確保 UI 渲染與網路 I/O 分離)
+- **混合開發**：WebView 整合、JavaScript Bridge (實現網頁與原生服務雙向溝通)
+- **數據管理**：JSON 序列化 (支援專案佈局與組件設定之匯出與匯入)
 
 
 ## 📬 聯絡資訊
