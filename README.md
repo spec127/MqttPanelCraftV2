@@ -45,15 +45,15 @@
     <td align="center"><img src="readmefile/library_w.jpg" width="250"/><br><b>元件庫</b></td>
     <td align="center"><img src="readmefile/button1_w.jpg" width="250"/><br><b>元件通用屬性</b></td>
     <td align="center"><img src="readmefile/button2_w.jpg" width="250"/><br><b>元件獨立屬性</b></td>
-    <td align="center"><img src="readmefile/arduino_w.jpg" width="230"/><br><b>arduino 匯出</b></td>
+    <td align="center"><img src="readmefile/arduino_w.jpg" width="250"/><br><b>程式匯出</b></td>
   </tr>
 </table>
 
 <details>
-  <summary><b>📸 View More Screenshots (dark Mode & Details)</b></summary>
+  <summary><b>📸 查看更多截圖 (暗色模式 & 其他設定)</b></summary>
   <br>
   <p align="center">
-    <b>dark Mode Theme</b><br>
+    <b>暗色模式主題</b><br>
   <img src="readmefile/panel_d.jpg" width="18%" />
   <img src="readmefile/library_d.jpg" width="18%" />
   <img src="readmefile/button1_d.jpg" width="18%" />
@@ -61,13 +61,13 @@
   <img src="readmefile/log_d.jpg" width="18%" />
   </p>
   <p align="center">
-    <b>webview mode</b><br>
+    <b>webview 模式</b><br>
     <img src="readmefile/web_w.jpg" width="19%" />
     <img src="readmefile/html_w.jpg" width="19%" />
     <img src="readmefile/api_w.jpg" width="19%" />
   </p>
   <p align="center">
-    <b>Configuration & Setup</b><br>
+    <b>其他設定</b><br>
     <img src="readmefile/left_w.jpg" width="19%" />
     <img src="readmefile/left_d.jpg" width="19%" />
     <img src="readmefile/add_w.jpg" width="19%" />
