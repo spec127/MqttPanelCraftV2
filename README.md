@@ -30,10 +30,49 @@
 
 ## 📸 螢幕截圖
 
-<p align="center">
-  <img src="./screenshots/screenshot_1.png" width="300">
-  <img src="./screenshots/screenshot_2.png" width="300">
-</p>
+<table align="center">
+  <tr>
+    <td align="center"><img src="readmefile/home_w.jpg" width="250"/><br><b>主畫面</b></td>
+    <td align="center"><img src="readmefile/home_d.jpg" width="250"/><br><b>暗色主畫面</b></td>
+    <td align="center"><img src="readmefile/log_w.jpg" width="250"/><br><b>畫布面板</b></td>
+  </tr>
+</table>
+
+
+<table align="center">
+  <tr>
+    <td align="center"><img src="readmefile/panel_w.jpg" width="250"/><br><b>畫布主畫面</b></td>
+    <td align="center"><img src="readmefile/library_w.jpg" width="250"/><br><b>元件庫</b></td>
+    <td align="center"><img src="readmefile/button1_w.jpg" width="250"/><br><b>元件通用屬性</b></td>
+    <td align="center"><img src="readmefile/button2_w.jpg" width="250"/><br><b>元件獨立屬性</b></td>
+    <td align="center"><img src="readmefile/arduino_w.jpg" width="230"/><br><b>arduino 匯出</b></td>
+  </tr>
+</table>
+
+<details>
+  <summary><b>📸 View More Screenshots (dark Mode & Details)</b></summary>
+  <br>
+  <p align="center">
+    <b>dark Mode Theme</b><br>
+  <img src="readmefile/panel_d.jpg" width="18%" />
+  <img src="readmefile/library_d.jpg" width="18%" />
+  <img src="readmefile/button1_d.jpg" width="18%" />
+  <img src="readmefile/button2_d.jpg" width="18%" />
+  <img src="readmefile/log_d.jpg" width="18%" />
+  </p>
+  <p align="center">
+    <b>webview mode</b><br>
+    <img src="readmefile/web_w.jpg" width="19%" />
+    <img src="readmefile/html_w.jpg" width="19%" />
+    <img src="readmefile/api_w.jpg" width="19%" />
+  </p>
+  <p align="center">
+    <b>Configuration & Setup</b><br>
+    <img src="readmefile/left_w.jpg" width="19%" />
+    <img src="readmefile/left_d.jpg" width="19%" />
+    <img src="readmefile/add_w.jpg" width="19%" />
+  </p>
+</details>
 
 ## 🛠️ 開發技術與工具
 
@@ -47,7 +86,7 @@
 ## 📬 聯絡資訊
 
 - **GitHub**: [spec127](https://github.com/spec127)
-- **LinkedIn**: [您的 LinkedIn 連結]
+- **mail**: jinabk9112@gmail.com | 
 
 ---
 
