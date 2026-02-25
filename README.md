@@ -61,7 +61,7 @@
   <img src="readmefile/log_d.jpg" width="18%" />
   </p>
   <p align="center">
-    <b>webview 模式</b><br>
+    <b>Webview 模式</b><br>
     <img src="readmefile/web_w.jpg" width="19%" />
     <img src="readmefile/html_w.jpg" width="19%" />
     <img src="readmefile/api_w.jpg" width="19%" />
@@ -86,7 +86,7 @@
 ## 📬 聯絡資訊
 
 - **GitHub**: [spec127](https://github.com/spec127)
-- **mail**: jinabk9112@gmail.com | 
+- **mail**: jinabk9112@gmail.com | vdod5404@gmail.com
 
 ---
 
