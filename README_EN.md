@@ -41,11 +41,11 @@
 
 <table align="center">
   <tr>
-    <td align="center"><img src="readmefile/panel_w.jpg" width="250"/><br><b>Canvas Main Screen</b></td>
-    <td align="center"><img src="readmefile/library_w.jpg" width="250"/><br><b>Component Library</b></td>
-    <td align="center"><img src="readmefile/button1_w.jpg" width="250"/><br><b>General Properties</b></td>
-    <td align="center"><img src="readmefile/button2_w.jpg" width="250"/><br><b>Specific Properties</b></td>
-    <td align="center"><img src="readmefile/arduino_w.jpg" width="250"/><br><b>Code Export</b></td>
+    <td align="center"><img src="readmefile/panel_w.jpg" width="180"/><br><b>Canvas Main Screen</b></td>
+    <td align="center"><img src="readmefile/library_w.jpg" width="180"/><br><b>Component Library</b></td>
+    <td align="center"><img src="readmefile/button1_w.jpg" width="180"/><br><b>General Properties</b></td>
+    <td align="center"><img src="readmefile/button2_w.jpg" width="180"/><br><b>Specific Properties</b></td>
+    <td align="center"><img src="readmefile/arduino_w.jpg" width="180"/><br><b>Code Export</b></td>
   </tr>
 </table>
 
