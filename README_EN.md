@@ -32,20 +32,20 @@
 
 <table align="center">
   <tr>
-    <td align="center"><img src="readmefile/home_w.jpg" width="250"/><br><b>主畫面</b></td>
-    <td align="center"><img src="readmefile/home_d.jpg" width="250"/><br><b>暗色主畫面</b></td>
-    <td align="center"><img src="readmefile/log_w.jpg" width="250"/><br><b>畫布面板</b></td>
+    <td align="center"><img src="readmefile/home_w.jpg" width="250"/><br><b>Home Screen</b></td>
+    <td align="center"><img src="readmefile/home_d.jpg" width="250"/><br><b>Dark Mode Home Screen</b></td>
+    <td align="center"><img src="readmefile/log_w.jpg" width="250"/><br><b>Canvas Panel</b></td>
   </tr>
 </table>
 
 
 <table align="center">
   <tr>
-    <td align="center"><img src="readmefile/panel_w.jpg" width="250"/><br><b>畫布主畫面</b></td>
-    <td align="center"><img src="readmefile/library_w.jpg" width="250"/><br><b>元件庫</b></td>
-    <td align="center"><img src="readmefile/button1_w.jpg" width="250"/><br><b>元件通用屬性</b></td>
-    <td align="center"><img src="readmefile/button2_w.jpg" width="250"/><br><b>元件獨立屬性</b></td>
-    <td align="center"><img src="readmefile/arduino_w.jpg" width="250"/><br><b>程式匯出</b></td>
+    <td align="center"><img src="readmefile/panel_w.jpg" width="250"/><br><b>Canvas Main Screen</b></td>
+    <td align="center"><img src="readmefile/library_w.jpg" width="250"/><br><b>Component Library</b></td>
+    <td align="center"><img src="readmefile/button1_w.jpg" width="250"/><br><b>General Component Properties</b></td>
+    <td align="center"><img src="readmefile/button2_w.jpg" width="250"/><br><b>Specific Component Properties</b></td>
+    <td align="center"><img src="readmefile/arduino_w.jpg" width="250"/><br><b>Code Export</b></td>
   </tr>
 </table>
 
