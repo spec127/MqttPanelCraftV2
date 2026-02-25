@@ -41,10 +41,10 @@
 
 <table align="center">
   <tr>
-    <td align="center"><img src="readmefile/panel_w.jpg" width="180"/><br><b>畫布主畫面</b></td>
-    <td align="center"><img src="readmefile/library_w.jpg" width="180"/><br><b>元件庫</b></td>
-    <td align="center"><img src="readmefile/button1_w.jpg" width="180"/><br><b>元件通用屬性</b></td>
-    <td align="center"><img src="readmefile/button2_w.jpg" width="180"/><br><b>元件獨立屬性</b></td>
+    <td align="center"><img src="readmefile/panel_w.jpg" width="180"/><br><b>a畫布主畫面</b></td>
+    <td align="center"><img src="readmefile/library_w.jpg" width="180"/><br><b>a元件庫</b></td>
+    <td align="center"><img src="readmefile/button1_w.jpg" width="180"/><br><b>a元件通用屬性</b></td>
+    <td align="center"><img src="readmefile/button2_w.jpg" width="180"/><br><b>a元件獨立屬性</b></td>
     <td align="center"><img src="readmefile/arduino_w.jpg" width="180"/><br><b>Arduino code匯出</b></td>
   </tr>
 </table>
