@@ -6,7 +6,7 @@
   <img src="readmefile/logo_final_512.png" alt="Icon" width="100">
 </p>
 
-<h1 align="center">MqttPanelCraft (V2)</h1>
+<h1 align="center">MqttPanelCraft (developing)</h1>
 
 <p align="center">
   <a href="https://developer.android.com"><img src="https://img.shields.io/badge/Platform-Android-green.svg" alt="Platform"></a>
