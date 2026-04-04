@@ -1,0 +1,1090 @@
+
+  04-03 15:56:08.759 W/PackageSettings(  682): Missing permission state f
+or package com.android.egg on user 0
+  04-03 15:56:08.759 W/PackageSettings(  682): Missing permission state f
+or package com.android.backupconfirm on user 0
+> 04-03 15:56:08.759 W/PackageSettings(  682): Missing permission state f
+or package com.example.mqttpanelcraft on user 0
+  04-03 15:56:08.759 W/PackageSettings(  682): Missing permission state f
+or package com.android.systemui.auto_generated_rro_vendor__ on user 0
+  04-03 15:56:08.759 W/PackageSettings(  682): Missing permission state f
+or package com.google.android.deskclock on user 0
+  04-03 16:02:13.554 E/Finsky  ( 5115): [72] ItemStore: getItems RPC fail
+ed for item com.google.android.marvin.talkbackoverlay
+  04-03 16:02:13.554 E/Finsky  ( 5115): [72] ItemStore: getItems RPC fail
+ed for item com.android.internal.emulation.pixel_8a
+> 04-03 16:02:13.554 E/Finsky  ( 5115): [72] ItemStore: getItems RPC fail
+ed for item com.example.mqttpanelcraft
+  04-03 16:02:13.554 E/Finsky  ( 5115): [72] ItemStore: getItems RPC fail
+ed for item com.android.devicelock
+  04-03 16:02:13.557 E/Finsky  ( 5115): [74] ItemStore: getItems RPC fail
+ed for item com.android.internal.emulation.pixel_6_pro
+  04-03 16:02:59.554 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:02:59.749 W/Looper  (  682): Slow dispatch took 190ms android.
+ui app=system_server main=false group=TOP_APP h=com.android.server.am.Act
+ivityManagerService$UiHandler c=com.android.server.am.UidObserverControll
+er$$ExternalSyntheticLambda0@3d44764 m=0
+> 04-03 16:02:59.765 W/.mqttpanelcraft( 7251): Unexpected CPU variant for
+ x86: x86_64.
+> 04-03 16:02:59.765 W/.mqttpanelcraft( 7251): Known variants: atom, sand
+ybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves
+, tremont, kabylake, alderlake, default
+  04-03 16:02:59.879 W/HWUI    ( 1068): Image decoding logging dropped!
+  04-03 16:02:59.970 W/HWUI    ( 1068): Image decoding logging dropped!
+  04-03 16:03:05.053 W/HWUI    ( 1068): Image decoding logging dropped!
+  04-03 16:03:05.085 W/ResourcesCompat( 7251): Failed to inflate ColorSta
+teList, leaving it to the framework
+> 04-03 16:03:05.085 W/ResourcesCompat( 7251): java.lang.UnsupportedOpera
+tionException: Failed to resolve attribute at index 0: TypedValue{t=0x2/d
+=0x7f0300f4 a=-1}, theme={InheritanceMap=[id=0x7f110291com.example.mqttpa
+nelcraft:style/ThemeOverlay.Material3.Button.TextButton], Themes=[com.exa
+mple.mqttpanelcraft:style/ThemeOverlay.Material3.Button.TextButton, force
+d, com.example.mqttpanelcraft:style/Theme.Helloworld, forced, com.example
+.mqttpanelcraft:style/Theme.AppCompat.Empty, forced, android:style/Theme.
+DeviceDefault.Light.DarkActionBar, forced]}
+  04-03 16:03:05.085 W/ResourcesCompat( 7251): 	at android.content.res.Ty
+pedArray.getColor(TypedArray.java:536)
+  04-03 16:03:05.085 W/ResourcesCompat( 7251): 	at androidx.core.content.
+res.ColorStateListInflaterCompat.inflate(ColorStateListInflaterCompat.jav
+a:160)
+  04-03 16:03:05.085 W/ResourcesCompat( 7251): 	at android.view.LayoutInf
+later.inflate(LayoutInflater.java:571)
+  04-03 16:03:05.085 W/ResourcesCompat( 7251): 	at android.view.LayoutInf
+later.inflate(LayoutInflater.java:462)
+> 04-03 16:03:05.085 W/ResourcesCompat( 7251): 	at com.example.mqttpanelc
+raft.databinding.ActivityDashboardBinding.inflate(ActivityDashboardBindin
+g.java:141)
+> 04-03 16:03:05.085 W/ResourcesCompat( 7251): 	at com.example.mqttpanelc
+raft.databinding.ActivityDashboardBinding.inflate(ActivityDashboardBindin
+g.java:135)
+> 04-03 16:03:05.085 W/ResourcesCompat( 7251): 	at com.example.mqttpanelc
+raft.DashboardActivity.onCreate(DashboardActivity.kt:37)
+  04-03 16:03:05.085 W/ResourcesCompat( 7251): 	at android.app.Activity.p
+erformCreate(Activity.java:9155)
+  04-03 16:03:05.085 W/ResourcesCompat( 7251): 	at android.app.Activity.p
+erformCreate(Activity.java:9133)
+  04-03 16:03:06.945 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:03:06.989 E/SurfaceFlinger(  530): Out of order buffers detect
+ed for RequestedLayerState{com.google.android.apps.nexuslauncher/com.goog
+le.android.apps.nexuslauncher.NexusLauncherActivity#255 parentId=239} pro
+ducedId=5 frameNumber=152 -> producedId=5 frameNumber=3
+> 04-03 16:03:06.989 W/ActivityTaskManager(  682): Activity top resumed s
+tate loss timeout for ActivityRecord{144098079 u0 com.example.mqttpanelcr
+aft/.DashboardActivity t7}
+  04-03 16:03:07.004 E/SurfaceFlinger(  530): Out of order buffers detect
+ed for RequestedLayerState{com.google.android.apps.nexuslauncher/com.goog
+le.android.apps.nexuslauncher.NexusLauncherActivity#255 parentId=239} pro
+ducedId=5 frameNumber=152 -> producedId=5 frameNumber=4
+  04-03 16:03:07.088 E/SurfaceFlinger(  530): Out of order buffers detect
+ed for RequestedLayerState{com.google.android.apps.nexuslauncher/com.goog
+le.android.apps.nexuslauncher.NexusLauncherActivity#255 parentId=239} pro
+ducedId=5 frameNumber=152 -> producedId=5 frameNumber=5
+  04-03 16:03:08.296 W/PersonalSafety( 6602): Debug page in internal sett
+ing true, true, false  [CONTEXT service_id=310 ]
+  04-03 16:03:08.354 E/GmsCoreLogger( 7050): Missing account for FACET_US
+AGE_GAIA_UNSAMPLED [CONTEXT service_id=299 ]
+> 04-03 16:03:08.375 W/.mqttpanelcraft( 7251): Failed to find entry 'clas
+ses.dex': Entry not found
+  04-03 16:03:08.423 E/AbstractGmsTracer( 7050): Traced class shouldn't b
+e obfuscated: cnuy [CONTEXT service_id=259 ]
+  04-03 16:03:08.443 W/NearbyPresence( 7050): TidepoolIdentityProvider: M
+ain Tidepool status toggle not enabled! Returned empty local credentials.
+ [CONTEXT service_id=317 ]
+  04-03 16:03:10.054 W/OptProp (  682): Cannot read opt property android.
+window.PROPERTY_COMPAT_ALLOW_USER_ASPECT_RATIO_OVERRIDE
+  04-03 16:03:10.055 W/OptProp (  682): Cannot read opt property android.
+window.PROPERTY_COMPAT_ALLOW_MIN_ASPECT_RATIO_OVERRIDE
+> 04-03 16:03:10.063 W/.mqttpanelcraft( 7251): Suspending all threads too
+k: 21.299ms
+  04-03 16:03:10.090 W/.gms.persistent( 7050): Suspending all threads too
+k: 16.943ms
+  04-03 16:03:10.101 W/OptProp (  682): Cannot read opt property android.
+window.PROPERTY_COMPAT_ALLOW_RESIZEABLE_ACTIVITY_OVERRIDES
+  04-03 16:03:14.950 W/ContentProviderHelper(  682): Slow operation: 100m
+s so far, now at getContentProviderImpl: done!
+  04-03 16:03:15.165 W/Looper  (  682): Slow dispatch took 172ms main app
+=system_server main=true group=FOREGROUND h=android.app.ActivityThread$H 
+c=android.app.LoadedApk$ReceiverDispatcher$Args$$ExternalSyntheticLambda0
+@ce614f2 m=0
+> 04-03 16:03:15.437 W/.mqttpanelcraft( 7251): Suspending all threads too
+k: 50.823ms
+  04-03 16:03:15.544 W/rkstack.process( 1014): Suspending all threads too
+k: 127.052ms
+  04-03 16:03:15.568 W/Looper  (  682): Drained
+> 04-03 16:03:15.594 W/.mqttpanelcraft( 7251): Verification of void andro
+idx.concurrent.futures.AbstractResolvableFuture.<clinit>() took 217.603ms
+ (505.51 bytecodes/s) (0B arena alloc)
+  04-03 16:03:15.723 E/adservices.measurement( 7410): Consent notificatio
+n has not been displayed.
+  04-03 16:03:15.782 W/adservices( 7410): Skip logging because Cobalt is 
+disabled.
+  04-03 16:03:15.782 W/adservices( 7410): Skip logging because Cobalt log
+ger is null
+> 04-03 16:03:15.866 W/.mqttpanelcraft( 7251): Suspending all threads too
+k: 18.406ms
+  04-03 16:03:15.882 E/SettingsProtoDataStore( 7050): Failed to get local
+ settings. [CONTEXT service_id=177 ]
+  04-03 16:03:15.882 E/SettingsProtoDataStore( 7050): java.util.concurren
+t.TimeoutException: Waited 100 milliseconds (plus 13 milliseconds, 936500
+ nanoseconds delay) for fogk@a506478[status=PENDING, info=[delegate=[fodz
+@fa78751[status=PENDING, setFuture=[fogk@f357bb6[status=PENDING, info=[de
+legate=[fogk@a3b50b7[status=PENDING, info=[delegate=[foia@2635024[status=
+PENDING, info=[task=[running=[NOT STARTED YET], propagating=[evya@68c478d
+]]]]]]]]]]]]]]]
+  04-03 16:03:18.232 W/PackageConfigPersister(  682): App-specific config
+uration not found for packageName: com.android.settings and userId: 0
+  04-03 16:03:18.233 W/OptProp (  682): Cannot read opt property android.
+window.PROPERTY_COMPAT_ALLOW_ORIENTATION_OVERRIDE
+> 04-03 16:03:18.246 W/.mqttpanelcraft( 7251): Suspending all threads too
+k: 5.725ms
+  04-03 16:03:18.355 W/AS.PlaybackActivityMon(  682): No piid assigned fo
+r invalid/internal port id 15
+  04-03 16:03:18.626 W/Settings( 7092): Setting airplane_mode_on has move
+d from android.provider.Settings.System to android.provider.Settings.Glob
+al, returning read-only value.
+  04-03 16:03:23.057 W/ExtensionWrapper( 1298): ExtensionWrapper.setExten
+sionViewVisibility():801 interface koa is not activate
+  04-03 16:03:23.078 W/InputDispatcher(  682): Dispatching key to e63aed8
+ com.google.android.settings.intelligence/com.google.android.settings.int
+elligence.modules.search.SearchActivity even though there are other unpro
+cessed events
+> 04-03 16:03:23.382 W/.mqttpanelcraft( 7251): Suspending all threads too
+k: 5.310ms
+  04-03 16:03:23.425 W/ChimeraUtils( 7050): Module com.google.android.gms
+.location_base missing resource location_module_display_name(0)
+  04-03 16:03:23.453 W/NotificationCenter( 1298): NotificationCenter$Noti
+ficationQueue.notifyPendingNotificationsOnExecutor():877 Heavy notify wor
+k detected on UI thread: [kig->ilu, kig->ilu, kig->lux, kig->fro, kig->il
+u, kig->khc, kig->gkl, kig->khg, kig->ilu, kig->imt, kig->ilu, kig->ilu, 
+kig->jnx, kig->ilu, kig->ilu, kig->fef, kig->ilu, kig->ilu, kig->jvb, kig
+->ijm, kig->ilu, kig->fcb, kig->ilu, kig->ilu, ilp->erl] takes 51ms
+  04-03 16:03:25.164 W/ActivityManager(  682): Scheduling restart of cras
+hed service com.google.android.adservices.api/com.android.adservices.meas
+urement.MeasurementService in 30000ms for connection
+  04-03 16:03:25.214 W/ctxmgr  ( 7050): [WorkManager] Long workInfo: pkg=
+com.google.android.gms, lbl=EvaluateFences, start=2026-04-03 16:03:24.036
++0000, stop=2026-04-03 16:03:25.213+0000, durtn=1177ms [CONTEXT service_i
+d=47 ]
+> 04-03 16:03:25.232 W/ActivityManager(  682): Scheduling restart of cras
+hed service com.example.mqttpanelcraft/org.chromium.content.app.Sandboxed
+ProcessService0:0 in 30000ms for connection
+  04-03 16:03:25.256 E/NearbyDiscovery( 7050): Timed out getting SPOT rep
+orting status [CONTEXT service_id=265 ]
+  04-03 16:03:25.311 E/.gms.persistent( 7050): hiddenapi: Accessing hidde
+n method Landroid/net/ConnectivityManager;->isNetworkSupported(I)Z (runti
+me_flags=0, domain=platform, api=max-target-p) from Latmk; (domain=app) u
+sing reflection: denied
+  04-03 16:03:42.604 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:03:42.789 W/dumpsys ( 7844): Thread Pool max thread count is 0
+. Cannot cache binder as linkToDeath cannot be implemented. serviceName: 
+package
+> 04-03 16:03:43.084 W/PackageConfigPersister(  682): App-specific config
+uration not found for packageName: com.example.mqttpanelcraft and userId:
+ 0
+  04-03 16:03:43.202 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:03:43.208 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:03:46.778 W/OptProp (  682): Cannot read opt property android.
+window.PROPERTY_COMPAT_ALLOW_IGNORING_ORIENTATION_REQUEST_WHEN_LOOP_DETEC
+TED
+  04-03 16:03:46.789 W/BottomSheetBehavior( 7251): Cannot set state: 5
+> 04-03 16:03:47.753 W/NotificationService(  682): Toast already killed. 
+pkg=com.example.mqttpanelcraft token=android.os.BinderProxy@28011c8
+  04-03 16:03:47.781 W/ForegroundServiceTypeLoggerModule(  682): Foregrou
+nd service start for UID: 10217 does not have any types
+  04-03 16:03:47.884 E/TaskPersister(  682): File error accessing recents
+ directory (directory doesn't exist?).
+  04-03 16:03:47.993 W/NotificationCenter( 1298): NotificationCenter$Noti
+ficationQueue.notifyPendingNotificationsOnExecutor():877 Heavy notify wor
+k detected on UI thread: [kig->ilu, kig->ilu, kig->lux, kig->fro, kig->il
+u, kig->khc, kig->gkl, kig->khg, kig->ilu, kig->imt, kig->ilu, kig->ilu, 
+kig->jnx, kig->ilu, kig->ilu, kig->fef, kig->ilu, kig->ilu, kig->jvb, kig
+->ijm, kig->ilu, kig->fcb, kig->ilu, kig->ilu] takes 25ms
+> 04-03 16:03:48.033 W/PackageConfigPersister(  682): App-specific config
+uration not found for packageName: com.example.mqttpanelcraft and userId:
+ 0
+  04-03 16:03:48.293 W/.gms.persistent( 7050): Missing inline cache for g
+lym atjp.k(android.content.Context, boolean, int, java.lang.Integer, atjw
+, fkab)
+  04-03 16:03:48.293 W/.gms.persistent( 7050): Missing inline cache for g
+lym atjp.k(android.content.Context, boolean, int, java.lang.Integer, atjw
+, fkab)
+  04-03 16:03:48.299 W/.gms.persistent( 7050): Missing inline cache for g
+lym atjp.k(android.content.Context, boolean, int, java.lang.Integer, atjw
+, fkab)
+  04-03 16:03:48.299 W/.gms.persistent( 7050): Missing inline cache for g
+lym atjp.k(android.content.Context, boolean, int, java.lang.Integer, atjw
+, fkab)
+> 04-03 16:03:49.071 W/PackageConfigPersister(  682): App-specific config
+uration not found for packageName: com.example.mqttpanelcraft and userId:
+ 0
+  04-03 16:03:49.163 W/HWUI    ( 7251): Image decoding logging dropped!
+  04-03 16:03:49.182 W/AS.PlaybackActivityMon(  682): No piid assigned fo
+r invalid/internal port id 15
+  04-03 16:03:50.244 W/HWUI    ( 7251): Image decoding logging dropped!
+  04-03 16:03:50.529 W/System.err( 7251): java.lang.ClassCastException: a
+ndroid.widget.LinearLayout cannot be cast to android.widget.FrameLayout
+> 04-03 16:03:50.539 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.components.prop.CommonPropBinder.bindColorPalette(CommonPropBinder.kt:
+34)
+> 04-03 16:03:50.539 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.components.prop.CommonPropBinder.bindColorPalette$default(CommonPropBi
+nder.kt:26)
+> 04-03 16:03:50.539 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.components.definitions.LedDefinition.bindPropertiesPanel(LedDefinition
+.kt:216)
+> 04-03 16:03:50.539 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.PropertiesSheetManager.showProperties(PropertiesSheetManager.kt:338)
+> 04-03 16:03:50.539 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ProjectViewActivity$initializeArchitecture$3.onComponentClicked(ProjectVi
+ewActivity.kt:292)
+> 04-03 16:03:50.539 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.CanvasInteractionManager.handleTouch(CanvasInteractionManager.kt:340)
+> 04-03 16:03:50.539 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.ProjectUIManager.updateModeUI$lambda$6(ProjectUIManager.kt:204)
+> 04-03 16:03:50.539 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.ProjectUIManager.$r8$lambda$IQeLeOUngvWVlP3ekE-Dg-Ob8ZQ(Unknown Source
+:0)
+> 04-03 16:03:50.539 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.ProjectUIManager$$ExternalSyntheticLambda0.onTouch(D8$$SyntheticClass:
+0)
+  04-03 16:03:50.539 W/System.err( 7251): 	at android.view.View.performOn
+TouchCallback(View.java:16635)
+  04-03 16:03:50.539 W/System.err( 7251): 	at android.view.View.dispatchT
+ouchEvent(View.java:16598)
+  04-03 16:03:50.541 W/System.err( 7251): 	at com.android.internal.policy
+.PhoneWindow.superDispatchTouchEvent(PhoneWindow.java:2021)
+  04-03 16:03:50.541 W/System.err( 7251): 	at android.app.Activity.dispat
+chTouchEvent(Activity.java:4604)
+> 04-03 16:03:50.541 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ProjectViewActivity.dispatchTouchEvent(ProjectViewActivity.kt:921)
+  04-03 16:03:50.541 W/System.err( 7251): 	at androidx.appcompat.view.Win
+dowCallbackWrapper.dispatchTouchEvent(WindowCallbackWrapper.java:70)
+  04-03 16:03:50.541 W/System.err( 7251): 	at com.android.internal.policy
+.DecorView.dispatchTouchEvent(DecorView.java:433)
+  04-03 16:03:57.182 W/AS.PlaybackActivityMon(  682): No piid assigned fo
+r invalid/internal port id 15
+  04-03 16:03:58.425 W/AS.PlaybackActivityMon(  682): No piid assigned fo
+r invalid/internal port id 15
+> 04-03 16:03:58.764 W/NotificationService(  682): Toast already killed. 
+pkg=com.example.mqttpanelcraft token=android.os.BinderProxy@ae9db9b
+  04-03 16:04:00.019 W/WindowManager(  682): Unexpected ACTION_DOWN in dr
+ag layer
+  04-03 16:04:00.500 W/NotificationCenter( 1298): NotificationCenter.unre
+gisterListener():480 Listener guw@2dd612 was not registered for notificat
+ion class luj
+  04-03 16:04:00.629 W/System.err( 7251): java.lang.ClassCastException: a
+ndroid.widget.LinearLayout cannot be cast to android.widget.FrameLayout
+> 04-03 16:04:00.629 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.components.prop.CommonPropBinder.bindColorPalette(CommonPropBinder.kt:
+34)
+> 04-03 16:04:00.629 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.components.prop.CommonPropBinder.bindColorPalette$default(CommonPropBi
+nder.kt:26)
+> 04-03 16:04:00.629 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.components.definitions.LedDefinition.bindPropertiesPanel(LedDefinition
+.kt:216)
+> 04-03 16:04:00.629 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.PropertiesSheetManager.showProperties(PropertiesSheetManager.kt:338)
+> 04-03 16:04:00.629 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ProjectViewActivity$initializeArchitecture$3.onNewComponent(ProjectViewAc
+tivity.kt:412)
+> 04-03 16:04:00.629 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ProjectViewActivity.initializeArchitecture$lambda$9(ProjectViewActivity.k
+t:458)
+> 04-03 16:04:00.629 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ProjectViewActivity.$r8$lambda$6aCMcQl87GY4zQ9CkqvRJyuof3Q(Unknown Source
+:0)
+> 04-03 16:04:00.629 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ProjectViewActivity$$ExternalSyntheticLambda3.onDrag(D8$$SyntheticClass:0
+)
+  04-03 16:04:00.629 W/System.err( 7251): 	at android.view.View.callDragE
+ventHandler(View.java:29751)
+  04-03 16:04:00.629 W/System.err( 7251): 	at android.view.View.dispatchD
+ragEvent(View.java:29742)
+  04-03 16:04:04.186 W/TapAndPay( 7050): 	at java.lang.Thread.run(Thread.
+java:1119)
+  04-03 16:04:06.846 W/System.err( 7251): java.lang.ClassCastException: a
+ndroid.widget.LinearLayout cannot be cast to android.widget.FrameLayout
+> 04-03 16:04:06.846 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.components.prop.CommonPropBinder.bindColorPalette(CommonPropBinder.kt:
+34)
+> 04-03 16:04:06.846 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.components.prop.CommonPropBinder.bindColorPalette$default(CommonPropBi
+nder.kt:26)
+> 04-03 16:04:06.846 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.components.definitions.LedDefinition.bindPropertiesPanel(LedDefinition
+.kt:216)
+> 04-03 16:04:06.846 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.PropertiesSheetManager.showProperties(PropertiesSheetManager.kt:338)
+> 04-03 16:04:06.846 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ProjectViewActivity$initializeArchitecture$3.onComponentClicked(ProjectVi
+ewActivity.kt:292)
+> 04-03 16:04:06.846 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.CanvasInteractionManager.handleTouch(CanvasInteractionManager.kt:340)
+> 04-03 16:04:06.846 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.ProjectUIManager.updateModeUI$lambda$6(ProjectUIManager.kt:204)
+> 04-03 16:04:06.846 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.ProjectUIManager.$r8$lambda$IQeLeOUngvWVlP3ekE-Dg-Ob8ZQ(Unknown Source
+:0)
+> 04-03 16:04:06.846 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ui.ProjectUIManager$$ExternalSyntheticLambda0.onTouch(D8$$SyntheticClass:
+0)
+  04-03 16:04:06.846 W/System.err( 7251): 	at android.view.View.performOn
+TouchCallback(View.java:16635)
+  04-03 16:04:06.846 W/System.err( 7251): 	at android.view.View.dispatchT
+ouchEvent(View.java:16598)
+  04-03 16:04:06.848 W/System.err( 7251): 	at com.android.internal.policy
+.PhoneWindow.superDispatchTouchEvent(PhoneWindow.java:2021)
+  04-03 16:04:06.848 W/System.err( 7251): 	at android.app.Activity.dispat
+chTouchEvent(Activity.java:4604)
+> 04-03 16:04:06.848 W/System.err( 7251): 	at com.example.mqttpanelcraft.
+ProjectViewActivity.dispatchTouchEvent(ProjectViewActivity.kt:921)
+  04-03 16:04:06.848 W/System.err( 7251): 	at androidx.appcompat.view.Win
+dowCallbackWrapper.dispatchTouchEvent(WindowCallbackWrapper.java:70)
+  04-03 16:04:06.848 W/System.err( 7251): 	at com.android.internal.policy
+.DecorView.dispatchTouchEvent(DecorView.java:433)
+  04-03 16:04:52.243 W/BugleRcsEngine( 1459): Unable to send diagnostic l
+og [CONTEXT thread_id=70 ]
+  04-03 16:04:52.332 E/ActivityManager(  682): Unable to freeze binder fo
+r 7352: -11
+> 04-03 16:04:52.374 W/ActivityManager(  682): Scheduling restart of cras
+hed service com.example.mqttpanelcraft/.service.MqttService in 20000ms fo
+r start-requested
+  04-03 16:04:52.406 W/DynamiteModule( 6296): Local module descriptor cla
+ss for com.google.android.gms.vision.dynamite.ocr not found.
+  04-03 16:04:52.410 W/ProviderHelper( 6296): Unknown dynamite feature vi
+sion.dynamite.ocr
+> 04-03 16:04:52.418 W/ActivityTaskManager(  682): Force removing Activit
+yRecord{41943476 u0 com.example.mqttpanelcraft/.ProjectViewActivity t7 f}
+}: app died, no saved state
+> 04-03 16:04:52.517 W/InputDispatcher(  682): channel '2fa28b com.exampl
+e.mqttpanelcraft/com.example.mqttpanelcraft.ProjectViewActivity' ~ Consum
+er closed input channel or an error occurred.  events=0x9
+> 04-03 16:04:52.517 E/InputDispatcher(  682): channel '2fa28b com.exampl
+e.mqttpanelcraft/com.example.mqttpanelcraft.ProjectViewActivity' ~ Channe
+l is unrecoverably broken and will be disposed!
+> 04-03 16:04:52.552 W/ActivityTaskManager(  682): Force removing Activit
+yRecord{144098079 u0 com.example.mqttpanelcraft/.DashboardActivity t7 f}}
+: app died, no saved state
+  04-03 16:04:52.617 W/ding:background( 5174): Suspending all threads too
+k: 17.327ms
+> 04-03 16:04:52.643 W/UsageStatsService(  682): Unexpected activity even
+t reported! (com.example.mqttpanelcraft/com.example.mqttpanelcraft.Dashbo
+ardActivity event : 23 instanceId : 45138997)
+  04-03 16:04:52.727 W/dumpsys ( 8327): Thread Pool max thread count is 0
+. Cannot cache binder as linkToDeath cannot be implemented. serviceName: 
+package
+  04-03 16:04:52.763 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:04:53.241 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:04:53.317 W/ActivityManager(  682): setHasOverlayUi called on 
+unknown pid: 7251
+> 04-03 16:04:53.340 W/ActivityManager(  682): Rescheduling restart of cr
+ashed service com.example.mqttpanelcraft/.service.MqttService in 29034ms 
+for mem-pressure-event
+  04-03 16:04:53.576 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:04:53.576 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:04:54.913 E/IPCThreadState(  682): Binder transaction failure.
+ id: 696747, BR_*: 29189, error: -22 (Invalid argument)
+  04-03 16:04:54.914 W/ActivityManager(  682): pid 682 system sent binder
+ code 7 with flags 1 to frozen apps and got error -32
+> 04-03 16:04:54.951 W/WindowManager(  682): Exception thrown during disp
+atchAppVisibility Window{2fa28b u0 com.example.mqttpanelcraft/com.example
+.mqttpanelcraft.ProjectViewActivity EXITING}
+  04-03 16:04:54.951 W/WindowManager(  682): android.os.DeadObjectExcepti
+on
+  04-03 16:04:54.951 W/WindowManager(  682): 	at android.os.BinderProxy.t
+ransactNative(Native Method)
+  04-03 16:04:55.120 W/AllAppsList( 1068): updatePackage: no Activities m
+atched updated package, removing any AppInfo with package=com.google.andr
+oid.webview, user=UserHandle{0}
+  04-03 16:04:55.129 W/Looper  (  682): Slow dispatch took 296ms main app
+=system_server main=true group=FOREGROUND h=android.app.ActivityThread$H 
+c=android.app.LoadedApk$ReceiverDispatcher$Args$$ExternalSyntheticLambda0
+@2d65c78 m=0
+> 04-03 16:04:55.182 W/ActivityManager(  682): Rescheduling restart of cr
+ashed service com.example.mqttpanelcraft/.service.MqttService in 17192ms 
+for mem-pressure-event
+  04-03 16:04:55.256 W/AppOpService(  682): Ignored setUidMode call for r
+untime permission app op: uid = 1001, code = READ_SMS, mode = allow, call
+ingUid = 1001, oldMode = allow
+  04-03 16:04:55.262 W/AppOpService(  682): Ignored setUidMode call for r
+untime permission app op: uid = 1001, code = RECEIVE_SMS, mode = allow, c
+allingUid = 1001, oldMode = allow
+  04-03 16:04:59.918 W/Finsky  ( 8085): [99] Frosting: Failed to get Fros
+ting Creation Time for com.android.apex.cts.shim. Error: com.android.apex
+.cts.shim
+  04-03 16:04:59.957 W/Finsky  ( 8085): [99] Frosting: Failed to get Fros
+ting Creation Time for com.android.hardware.thermal. Error: com.android.h
+ardware.thermal
+> 04-03 16:05:00.011 W/ActivityManager(  682): Rescheduling restart of cr
+ashed service com.example.mqttpanelcraft/.service.MqttService in 0ms for 
+mem-pressure-event
+> 04-03 16:05:00.296 W/.mqttpanelcraft( 8421): Unexpected CPU variant for
+ x86: x86_64.
+> 04-03 16:05:00.296 W/.mqttpanelcraft( 8421): Known variants: atom, sand
+ybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves
+, tremont, kabylake, alderlake, default
+  04-03 16:05:00.660 W/ActivityManager(  682): Slow operation: 67ms so fa
+r, now at startProcess: returned from zygote!
+  04-03 16:05:00.700 W/ActivityManager(  682): Slow operation: 107ms so f
+ar, now at startProcess: done updating battery stats
+  04-03 16:06:06.248 E/Finsky  ( 8085): [101] ItemStore: getItems RPC fai
+led for item com.android.providers.downloads.ui
+  04-03 16:06:06.248 E/Finsky  ( 8085): [101] ItemStore: getItems RPC fai
+led for item com.android.egg
+> 04-03 16:06:06.248 E/Finsky  ( 8085): [101] ItemStore: getItems RPC fai
+led for item com.example.mqttpanelcraft
+  04-03 16:06:06.248 E/Finsky  ( 8085): [101] ItemStore: getItems RPC fai
+led for item com.android.dreams.basic
+  04-03 16:06:06.248 E/Finsky  ( 8085): [101] ItemStore: getItems RPC fai
+led for item com.android.systemui.emulation.pixel_3_xl
+  04-03 16:09:55.318 W/dex2oat64( 8794): Compilation of void cuhe.run() t
+ook 198.610ms
+  04-03 16:09:55.658 W/dex2oat64( 8794): Compilation of void cukv.f(andro
+id.content.Context) took 124.975ms
+> 04-03 16:09:55.845 E/AppOps  (  682): Operation not started: uid=10217 
+pkg=com.example.mqttpanelcraft(null) op=START_FOREGROUND
+  04-03 16:09:55.860 W/ForegroundServiceTypeLoggerModule(  682): FGS stop
+ call for: 10217 has no types!
+  04-03 16:09:55.878 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:11:00.047 E/lowmemorykiller(  220): process_mrelease 8604 fail
+ed: No such process
+  04-03 16:11:00.151 E/lowmemorykiller(  220): process_mrelease 6482 fail
+ed: No such process
+> 04-03 16:11:00.188 W/.mqttpanelcraft( 9135): Unexpected CPU variant for
+ x86: x86_64.
+> 04-03 16:11:00.188 W/.mqttpanelcraft( 9135): Known variants: atom, sand
+ybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves
+, tremont, kabylake, alderlake, default
+  04-03 16:11:00.218 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:11:00.219 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:11:01.951 E/ashmem  ( 9135): Pinning is deprecated since Andro
+id Q. Please use trim or other methods.
+  04-03 16:11:02.392 W/OptProp (  682): Cannot read opt property android.
+window.PROPERTY_COMPAT_ENABLE_FAKE_FOCUS
+> 04-03 16:11:03.486 W/.mqttpanelcraft( 9135): Verification of void andro
+idx.activity.OnBackPressedCallback.<init>(boolean) took 955.905ms (13.60 
+bytecodes/s) (0B arena alloc)
+  04-03 16:11:03.515 W/HWUI    ( 9135): Failed to choose config with EGL_
+SWAP_BEHAVIOR_PRESERVED, retrying without...
+  04-03 16:11:03.516 W/HWUI    ( 9135): Failed to initialize 101010-2 for
+mat, error = EGL_SUCCESS
+  04-03 16:11:04.364 W/dumpsys ( 9156): Thread Pool max thread count is 0
+. Cannot cache binder as linkToDeath cannot be implemented. serviceName: 
+package
+  04-03 16:11:04.457 W/ResourcesCompat( 9135): Failed to inflate ColorSta
+teList, leaving it to the framework
+> 04-03 16:11:04.457 W/ResourcesCompat( 9135): java.lang.UnsupportedOpera
+tionException: Failed to resolve attribute at index 0: TypedValue{t=0x2/d
+=0x7f0300f4 a=-1}, theme={InheritanceMap=[id=0x7f110291com.example.mqttpa
+nelcraft:style/ThemeOverlay.Material3.Button.TextButton], Themes=[com.exa
+mple.mqttpanelcraft:style/ThemeOverlay.Material3.Button.TextButton, force
+d, com.example.mqttpanelcraft:style/Theme.Helloworld, forced, com.example
+.mqttpanelcraft:style/Theme.AppCompat.Empty, forced, android:style/Theme.
+DeviceDefault.Light.DarkActionBar, forced]}
+  04-03 16:11:04.457 W/ResourcesCompat( 9135): 	at android.content.res.Ty
+pedArray.getColor(TypedArray.java:536)
+  04-03 16:11:04.457 W/ResourcesCompat( 9135): 	at androidx.core.content.
+res.ColorStateListInflaterCompat.inflate(ColorStateListInflaterCompat.jav
+a:160)
+  04-03 16:11:04.457 W/ResourcesCompat( 9135): 	at android.view.LayoutInf
+later.inflate(LayoutInflater.java:571)
+  04-03 16:11:04.457 W/ResourcesCompat( 9135): 	at android.view.LayoutInf
+later.inflate(LayoutInflater.java:462)
+> 04-03 16:11:04.457 W/ResourcesCompat( 9135): 	at com.example.mqttpanelc
+raft.databinding.ActivityDashboardBinding.inflate(ActivityDashboardBindin
+g.java:141)
+> 04-03 16:11:04.457 W/ResourcesCompat( 9135): 	at com.example.mqttpanelc
+raft.databinding.ActivityDashboardBinding.inflate(ActivityDashboardBindin
+g.java:135)
+> 04-03 16:11:04.457 W/ResourcesCompat( 9135): 	at com.example.mqttpanelc
+raft.DashboardActivity.onCreate(DashboardActivity.kt:37)
+  04-03 16:11:04.457 W/ResourcesCompat( 9135): 	at android.app.Activity.p
+erformCreate(Activity.java:9155)
+  04-03 16:11:04.457 W/ResourcesCompat( 9135): 	at android.app.Activity.p
+erformCreate(Activity.java:9133)
+  04-03 16:11:04.458 W/ResourcesCompat( 9135): 	at com.android.internal.o
+s.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:593)
+  04-03 16:11:04.458 W/ResourcesCompat( 9135): 	at com.android.internal.o
+s.ZygoteInit.main(ZygoteInit.java:932)
+> 04-03 16:11:05.671 W/.mqttpanelcraft( 9135): Loading /data/app/~~6gdoxh
+MEmYmMQ_4Mb-8YwQ==/com.google.android.webview-OM0nzM0iz54aNPEU9ezrUw==/oa
+t/x86_64/base.odex non-executable as it requires an image which we failed
+ to load
+  04-03 16:11:06.169 E/chromium( 9135): [0403/161106.122552:ERROR:android
+_webview/browser/variations/variations_seed_loader.cc:39] Seed missing si
+gnature.
+  04-03 16:11:06.397 W/ocessService0:0( 9183): Unexpected CPU variant for
+ x86: x86_64.
+  04-03 16:11:12.586 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:11:12.592 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+> 04-03 16:11:12.650 W/ProcessStats(  682): Tracking association SourceSt
+ate{129542c com.example.mqttpanelcraft/10217 BTop #6262} whose proc state
+ 2 is better than process ProcessState{13bd41d com.google.android.gms/101
+48 pkg=com.google.android.gms} proc state 15 (4 skipped)
+  04-03 16:11:13.010 W/Looper  (  682): Slow dispatch took 239ms android.
+fg app=system_server main=false group=FOREGROUND h=android.os.Handler c=c
+om.android.server.location.injector.SystemAppForegroundHelper$$ExternalSy
+ntheticLambda1@1bffcc4 m=0
+  04-03 16:11:13.010 W/Looper  (  682): Slow delivery took 361ms android.
+fg app=system_server main=false group=FOREGROUND h=android.os.Handler c=c
+om.android.server.power.hint.HintManagerService$MyUidObserver$$ExternalSy
+ntheticLambda0@15a87ad m=0
+  04-03 16:11:14.170 W/Looper  (  682): Slow dispatch took 198ms main app
+=system_server main=true group=FOREGROUND h=com.android.server.pm.Snapsho
+tStatistics$1 c=null m=0
+  04-03 16:11:14.624 W/dumpsys ( 9241): Thread Pool max thread count is 0
+. Cannot cache binder as linkToDeath cannot be implemented. serviceName: 
+package
+> 04-03 16:11:15.129 W/.mqttpanelcraft( 9135): Suspending all threads too
+k: 633.856ms
+  04-03 16:11:15.156 W/Looper  (  682): Drained
+  04-03 16:11:15.535 W/WindowOnBackDispatcher( 1068): sendCancelIfRunning
+: isInProgress=false callback=com.android.launcher3.uioverrides.Quickstep
+Launcher$3@dc84463
+  04-03 16:11:19.515 E/Transition(  682): #46 readiness timeout, used=tru
+e deferReadyDepth=1 group={}
+  04-03 16:11:19.521 W/Looper  (  682): Drained
+> 04-03 16:11:19.883 W/.mqttpanelcraft( 9135): Verification of boolean an
+droidx.concurrent.futures.AbstractResolvableFuture$SafeAtomicHelper.casWa
+iters(androidx.concurrent.futures.AbstractResolvableFuture, androidx.conc
+urrent.futures.AbstractResolvableFuture$Waiter, androidx.concurrent.futur
+es.AbstractResolvableFuture$Waiter) took 306.898ms (22.81 bytecodes/s) (0
+B arena alloc)
+  04-03 16:11:20.325 W/Looper  (  682): Slow dispatch took 122ms android.
+ui app=system_server main=false group=TOP_APP h=com.android.server.am.Act
+ivityManagerService$UiHandler c=com.android.server.am.UidObserverControll
+er$$ExternalSyntheticLambda0@3d44764 m=0
+  04-03 16:11:20.331 W/ActivityManager(  682): Slow operation: 256ms so f
+ar, now at finishAttachApplicationInner: after mServices.attachApplicatio
+nLocked
+  04-03 16:11:26.662 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:11:26.666 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+> 04-03 16:11:26.682 W/.mqttpanelcraft( 9135): Verification of java.util.
+ArrayList androidx.constraintlayout.solver.widgets.ConstraintWidgetContai
+ner.getHorizontalGuidelines() took 107.092ms (392.19 bytecodes/s) (0B are
+na alloc)
+  04-03 16:11:26.739 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+> 04-03 16:11:26.740 W/ProcessStats(  682): Tracking association SourceSt
+ate{129542c com.example.mqttpanelcraft/10217 BTop #6278} whose proc state
+ 2 is better than process ProcessState{13bd41d com.google.android.gms/101
+48 pkg=com.google.android.gms} proc state 15 (15 skipped)
+> 04-03 16:11:26.884 W/.mqttpanelcraft( 9135): Verification of void andro
+idx.constraintlayout.solver.widgets.analyzer.VerticalWidgetRun.update(and
+roidx.constraintlayout.solver.widgets.analyzer.Dependency) took 149.258ms
+ (3510.69 bytecodes/s) (0B arena alloc)
+> 04-03 16:11:27.004 W/.mqttpanelcraft( 9135): Verification of void andro
+idx.constraintlayout.solver.widgets.analyzer.DependencyGraph.buildGraph(j
+ava.util.ArrayList) took 106.343ms (1927.72 bytecodes/s) (0B arena alloc)
+  04-03 16:11:27.073 W/Looper  (  682): Slow dispatch took 216ms android.
+ui app=system_server main=false group=TOP_APP h=com.android.server.am.Act
+ivityManagerService$UiHandler c=null m=31
+  04-03 16:11:27.100 W/Looper  (  682): Slow delivery took 333ms android.
+ui app=system_server main=false group=TOP_APP h=com.android.server.am.Act
+ivityManagerService$UiHandler c=com.android.server.am.UidObserverControll
+er$$ExternalSyntheticLambda0@3d44764 m=0
+  04-03 16:11:27.703 W/System  ( 1068): A resource failed to call release
+. 
+> 04-03 16:11:28.423 W/.mqttpanelcraft( 9135): Verification of void andro
+idx.appcompat.widget.LinearLayoutCompat.onDraw(android.graphics.Canvas) t
+ook 159.496ms (112.86 bytecodes/s) (0B arena alloc)
+  04-03 16:11:28.424 W/BLASTSyncEngine(  682): Sync group 47 timeout
+  04-03 16:11:28.434 W/Looper  (  682): Drained
+  04-03 16:11:33.644 W/NotificationCenter( 1298): NotificationCenter$Noti
+ficationQueue.notifyPendingNotificationsOnExecutor():877 Heavy notify wor
+k detected on UI thread: [kig->ilu, kig->ilu, kig->lux, kig->fro, kig->il
+u, kig->khc, kig->gkl, kig->khg, kig->ilu, kig->imt, kig->ilu, kig->ilu, 
+kig->jnx, kig->ilu, kig->ilu, kig->fef, kig->ilu, kig->ilu, kig->jvb, kig
+->ijm, kig->ilu, kig->fcb, kig->ilu, kig->ilu] takes 107ms
+  04-03 16:11:34.126 W/NotificationCenter( 1298): NotificationCenter$Noti
+ficationQueue.notifyPendingNotificationsOnExecutor():877 Heavy notify wor
+k detected on UI thread: [kig->ilu, kig->ilu, kig->lux, kig->fro, kig->il
+u, kig->khc, kig->gkl, kig->khg, kig->ilu, kig->imt, kig->ilu, kig->ilu, 
+kig->jnx, kig->ilu, kig->ilu, kig->fef, kig->ilu, kig->ilu, kig->jvb, kig
+->ijm, kig->ilu, kig->fcb, kig->ilu, kig->ilu] takes 100ms
+> 04-03 16:11:34.226 W/PackageConfigPersister(  682): App-specific config
+uration not found for packageName: com.example.mqttpanelcraft and userId:
+ 0
+  04-03 16:11:34.250 W/NotificationCenter( 1298): NotificationCenter$Noti
+ficationQueue.notifyPendingNotificationsOnExecutor():877 Heavy notify wor
+k detected on UI thread: [kig->jjs] takes 124ms
+> 04-03 16:11:38.480 W/ProcessStats(  682): Tracking association SourceSt
+ate{129542c com.example.mqttpanelcraft/10217 BTop #6296} whose proc state
+ 2 is better than process ProcessState{13bd41d com.google.android.gms/101
+48 pkg=com.google.android.gms} proc state 15 (23 skipped)
+  04-03 16:11:38.709 W/System  (  682): A resource failed to call release
+. 
+  04-03 16:11:42.840 W/JobService( 5174): onNetworkChanged() not implemen
+ted in com.google.android.finsky.scheduler.process.backgroundimpl.Phonesk
+yJobServiceBackground. Must override in a subclass.
+  04-03 16:11:46.416 W/dumpsys ( 9291): Thread Pool max thread count is 0
+. Cannot cache binder as linkToDeath cannot be implemented. serviceName: 
+package
+> 04-03 16:11:49.575 W/ProcessStats(  682): Tracking association SourceSt
+ate{129542c com.example.mqttpanelcraft/10217 BTop #6300} whose proc state
+ 2 is better than process ProcessState{13bd41d com.google.android.gms/101
+48 pkg=com.google.android.gms} proc state 15 (7 skipped)
+  04-03 16:11:53.592 W/dumpsys ( 9298): Thread Pool max thread count is 0
+. Cannot cache binder as linkToDeath cannot be implemented. serviceName: 
+package
+  04-03 16:11:53.841 E/GnssPsdsDownloader(  682): No Long-Term PSDS serve
+rs were specified in the GnssConfiguration
+  04-03 16:12:06.985 W/OptProp (  682): Cannot read opt property android.
+window.PROPERTY_COMPAT_ALLOW_ORIENTATION_OVERRIDE
+  04-03 16:12:07.167 W/OptProp (  682): Cannot read opt property android.
+window.PROPERTY_COMPAT_ENABLE_FAKE_FOCUS
+> 04-03 16:12:07.235 W/ProcessStats(  682): Tracking association SourceSt
+ate{129542c com.example.mqttpanelcraft/10217 BTop #6306} whose proc state
+ 2 is better than process ProcessState{13bd41d com.google.android.gms/101
+48 pkg=com.google.android.gms} proc state 15 (1 skipped)
+  04-03 16:12:07.265 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:12:07.268 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:12:08.895 W/OptProp (  682): Cannot read opt property android.
+window.PROPERTY_COMPAT_ALLOW_IGNORING_ORIENTATION_REQUEST_WHEN_LOOP_DETEC
+TED
+  04-03 16:12:08.905 W/BottomSheetBehavior( 9135): Cannot set state: 5
+> 04-03 16:12:09.473 W/NotificationService(  682): Toast already killed. 
+pkg=com.example.mqttpanelcraft token=android.os.BinderProxy@2d0c1ce
+  04-03 16:12:09.823 W/ForegroundServiceTypeLoggerModule(  682): Foregrou
+nd service start for UID: 10217 does not have any types
+  04-03 16:12:10.013 W/NotificationCenter( 1298): NotificationCenter$Noti
+ficationQueue.notifyPendingNotificationsOnExecutor():877 Heavy notify wor
+k detected on UI thread: [kig->ilu, kig->ilu, kig->lux, kig->fro, kig->il
+u, kig->khc, kig->gkl, kig->khg, kig->ilu, kig->imt, kig->ilu, kig->ilu, 
+kig->jnx, kig->ilu, kig->ilu, kig->fef, kig->ilu, kig->ilu, kig->jvb, kig
+->ijm, kig->ilu, kig->fcb, kig->ilu, kig->ilu] takes 36ms
+  04-03 16:12:10.072 E/TaskPersister(  682): File error accessing recents
+ directory (directory doesn't exist?).
+> 04-03 16:12:10.075 W/PackageConfigPersister(  682): App-specific config
+uration not found for packageName: com.example.mqttpanelcraft and userId:
+ 0
+  04-03 16:12:10.076 W/NotificationCenter( 1298): NotificationCenter$Noti
+ficationQueue.notifyPendingNotificationsOnExecutor():877 Heavy notify wor
+k detected on UI thread: [kig->jjs] takes 24ms
+  04-03 16:12:13.058 W/dumpsys ( 9338): Thread Pool max thread count is 0
+. Cannot cache binder as linkToDeath cannot be implemented. serviceName: 
+package
+  04-03 16:12:15.839 W/System  (  925): A resource failed to call release
+. 
+  04-03 16:12:16.285 W/AS.PlaybackActivityMon(  682): No piid assigned fo
+r invalid/internal port id 15
+> 04-03 16:12:17.831 W/NotificationService(  682): Toast already killed. 
+pkg=com.example.mqttpanelcraft token=android.os.BinderProxy@585a12
+  04-03 16:12:18.405 W/AS.PlaybackActivityMon(  682): No piid assigned fo
+r invalid/internal port id 15
+  04-03 16:12:20.280 W/WindowManager(  682): Unexpected ACTION_DOWN in dr
+ag layer
+  04-03 16:12:20.841 W/ndroid.systemui(  925): Suspending all threads too
+k: 23.647ms
+  04-03 16:12:21.316 W/System.err( 9135): java.lang.ClassCastException: a
+ndroid.widget.LinearLayout cannot be cast to android.widget.FrameLayout
+> 04-03 16:12:21.326 W/System.err( 9135): 	at com.example.mqttpanelcraft.
+ui.components.prop.CommonPropBinder.bindColorPalette(CommonPropBinder.kt:
+34)
+> 04-03 16:12:21.326 W/System.err( 9135): 	at com.example.mqttpanelcraft.
+ui.components.prop.CommonPropBinder.bindColorPalette$default(CommonPropBi
+nder.kt:26)
+> 04-03 16:12:21.326 W/System.err( 9135): 	at com.example.mqttpanelcraft.
+ui.components.definitions.LedDefinition.bindPropertiesPanel(LedDefinition
+.kt:216)
+> 04-03 16:12:21.326 W/System.err( 9135): 	at com.example.mqttpanelcraft.
+ui.PropertiesSheetManager.showProperties(PropertiesSheetManager.kt:338)
+> 04-03 16:12:21.326 W/System.err( 9135): 	at com.example.mqttpanelcraft.
+ProjectViewActivity$initializeArchitecture$3.onNewComponent(ProjectViewAc
+tivity.kt:412)
+> 04-03 16:12:21.326 W/System.err( 9135): 	at com.example.mqttpanelcraft.
+ProjectViewActivity.initializeArchitecture$lambda$9(ProjectViewActivity.k
+t:458)
+> 04-03 16:12:21.326 W/System.err( 9135): 	at com.example.mqttpanelcraft.
+ProjectViewActivity.$r8$lambda$6aCMcQl87GY4zQ9CkqvRJyuof3Q(Unknown Source
+:0)
+> 04-03 16:12:21.326 W/System.err( 9135): 	at com.example.mqttpanelcraft.
+ProjectViewActivity$$ExternalSyntheticLambda3.onDrag(D8$$SyntheticClass:0
+)
+  04-03 16:12:21.326 W/System.err( 9135): 	at android.view.View.callDragE
+ventHandler(View.java:29751)
+  04-03 16:12:21.326 W/System.err( 9135): 	at android.view.View.dispatchD
+ragEvent(View.java:29742)
+  04-03 16:12:53.629 W/dumpsys ( 9419): Thread Pool max thread count is 0
+. Cannot cache binder as linkToDeath cannot be implemented. serviceName: 
+package
+  04-03 16:12:57.749 E/IPCThreadState(  479): binder thread pool (1 threa
+ds) starved for 198 ms
+> 04-03 16:12:57.816 W/ProcessStats(  682): Tracking association SourceSt
+ate{129542c com.example.mqttpanelcraft/10217 BTop #6338} whose proc state
+ 2 is better than process ProcessState{13bd41d com.google.android.gms/101
+48 pkg=com.google.android.gms} proc state 15 (17 skipped)
+  04-03 16:12:57.855 E/WifiStaIfaceAidlImpl(  682): stopRssiMonitoring fa
+iled with service-specific exception: android.os.ServiceSpecificException
+:  (code 5)
+  04-03 16:12:57.857 E/WifiStaIfaceAidlImpl(  682): setRoamingState faile
+d with service-specific exception: android.os.ServiceSpecificException:  
+(code 4)
+  04-03 16:13:14.880 W/JobService( 5174): onNetworkChanged() not implemen
+ted in com.google.android.finsky.scheduler.process.backgroundimpl.Phonesk
+yJobServiceBackground. Must override in a subclass.
+  04-03 16:13:15.008 W/JobService( 5174): onNetworkChanged() not implemen
+ted in com.google.android.finsky.scheduler.process.backgroundimpl.Phonesk
+yJobServiceBackground. Must override in a subclass.
+> 04-03 16:13:15.083 W/NotificationService(  682): Toast already killed. 
+pkg=com.example.mqttpanelcraft token=android.os.BinderProxy@27cb51d
+  04-03 16:13:15.087 W/.gms.persistent( 7050): Large reply transaction of
+ 1056768 bytes, interface descriptor , code 1
+  04-03 16:13:15.453 W/ctxmgr  ( 7050): [NetworkStateProducer] No state c
+hange for network connection context [CONTEXT service_id=47 ]
+  04-03 16:13:43.277 W/JobService( 5174): onNetworkChanged() not implemen
+ted in com.google.android.finsky.scheduler.process.backgroundimpl.Phonesk
+yJobServiceBackground. Must override in a subclass.
+  04-03 16:13:43.644 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+> 04-03 16:13:47.891 W/ProcessStats(  682): Tracking association SourceSt
+ate{129542c com.example.mqttpanelcraft/10217 BTop #6510} whose proc state
+ 2 is better than process ProcessState{13bd41d com.google.android.gms/101
+48 pkg=com.google.android.gms} proc state 15 (100 skipped)
+  04-03 16:13:48.188 W/libprocessgroup( 9764): A JoinCgroup action in the
+ SystemMemoryProcess profile is used for controller memory in the cgroup 
+v2 hierarchy and will be ignored
+  04-03 16:13:48.246 E/GmsCoreLogger( 7050): Missing account for FACET_US
+AGE_GAIA_UNSAMPLED [CONTEXT service_id=299 ]
+  04-03 16:13:56.314 E/ssioncontroller( 9823): Not starting debugger sinc
+e process cannot load the jdwp agent.
+  04-03 16:13:56.351 W/ForegroundServiceTypeLoggerModule(  682): FGS stop
+ call for: 10217 has no types!
+> 04-03 16:13:56.367 W/ActivityTaskManager(  682): Force removing Activit
+yRecord{157201824 u0 com.example.mqttpanelcraft/.ProjectViewActivity t9 f
+}}: app died, no saved state
+  04-03 16:13:56.395 W/AppOpService(  682): Ignored setUidMode call for r
+untime permission app op: uid = 1001, code = READ_SMS, mode = allow, call
+ingUid = 1001, oldMode = allow
+  04-03 16:13:56.426 W/AppOpService(  682): Ignored setUidMode call for r
+untime permission app op: uid = 1001, code = RECEIVE_SMS, mode = allow, c
+allingUid = 1001, oldMode = allow
+> 04-03 16:13:56.498 W/InputDispatcher(  682): channel '40e4691 com.examp
+le.mqttpanelcraft/com.example.mqttpanelcraft.ProjectViewActivity' ~ Consu
+mer closed input channel or an error occurred.  events=0x9
+> 04-03 16:13:56.498 E/InputDispatcher(  682): channel '40e4691 com.examp
+le.mqttpanelcraft/com.example.mqttpanelcraft.ProjectViewActivity' ~ Chann
+el is unrecoverably broken and will be disposed!
+  04-03 16:13:56.525 W/system_server(  682): Weak pointer dereference blo
+cked for 47 milliseconds.
+  04-03 16:13:56.526 E/AppOps  (  682): attributionTag VCN not declared i
+n manifest of android
+  04-03 16:13:56.585 W/AppOpService(  682): Ignored setUidMode call for r
+untime permission app op: uid = 1001, code = RECEIVE_WAP_PUSH, mode = all
+ow, callingUid = 1001, oldMode = allow
+> 04-03 16:13:56.619 W/ActivityTaskManager(  682): Force removing Activit
+yRecord{252199191 u0 com.example.mqttpanelcraft/.DashboardActivity t9 f}}
+: app died, no saved state
+> 04-03 16:13:56.623 W/UsageStatsService(  682): Unexpected activity even
+t reported! (com.example.mqttpanelcraft/com.example.mqttpanelcraft.Dashbo
+ardActivity event : 23 instanceId : 66363117)
+  04-03 16:13:56.640 W/AppOpService(  682): Ignored setUidMode call for r
+untime permission app op: uid = 1001, code = SEND_SMS, mode = allow, call
+ingUid = 1001, oldMode = allow
+  04-03 16:13:56.640 W/AppOpService(  682): Ignored setUidMode call for r
+untime permission app op: uid = 1001, code = READ_CELL_BROADCASTS, mode =
+ allow, callingUid = 1001, oldMode = allow
+  04-03 16:13:56.917 E/RoleControllerServiceImpl(  682): Default/fallback
+ role holder package doesn't qualify for the role, package: com.google.an
+droid.gms, role: android.app.role.WALLET
+  04-03 16:13:56.949 W/VvmPkgInstalledRcvr( 3587): carrierVvmPkgAdded: ca
+rrier vvm packages doesn't contain com.google.android.gms
+> 04-03 16:13:56.996 W/WindowManager(  682): removeAppToken: Attempted to
+ remove non-existing token: Token{26a4559 ActivityRecord{157201824 u0 com
+.example.mqttpanelcraft/.ProjectViewActivity t9 f} isExiting}}
+> 04-03 16:13:56.996 W/WindowManager(  682): removeAppToken: Attempted to
+ remove non-existing token: Token{3f49eed ActivityRecord{252199191 u0 com
+.example.mqttpanelcraft/.DashboardActivity t9 f} isExiting}}
+  04-03 16:13:57.053 W/ActivityManager(  682): pid 682 system sent binder
+ code 22 with flags 1 to frozen apps and got error -32
+  04-03 16:13:57.073 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+  04-03 16:13:57.101 W/ActivityManager(  682): Slow operation: 943ms so f
+ar, now at startProcess: starting to update pids map
+  04-03 16:13:57.101 W/ActivityManager(  682): Slow operation: 943ms so f
+ar, now at startProcess: done updating pids map
+> 04-03 16:13:57.146 W/PackageConfigPersister(  682): App-specific config
+uration not found for packageName: com.example.mqttpanelcraft and userId:
+ 0
+  04-03 16:13:57.211 W/ActivityManager(  682): Slow operation: 580ms so f
+ar, now at finishAttachApplicationInner: after mServices.attachApplicatio
+nLocked
+  04-03 16:13:57.211 W/ActivityManager(  682): Slow operation: 581ms so f
+ar, now at finishAttachApplicationInner: after dispatching broadcasts
+  04-03 16:13:57.753 W/ActivityTaskManager(  682): callingPackage for (ui
+d=2000, pid=9856) has no WPC
+  04-03 16:13:57.763 W/IPCThreadState(  682): Sending oneway calls to fro
+zen process.
+> 04-03 16:13:57.770 W/ziparchive(  682): Unable to open '/data/app/~~tRg
+RD1dTGW97FdrQFTd9dA==/com.example.mqttpanelcraft-b3m_Q46JseXDEddnJyCfSA==
+/base.apk': No such file or directory
+> 04-03 16:13:57.770 E/system_server(  682): Failed to open APK '/data/ap
+p/~~tRgRD1dTGW97FdrQFTd9dA==/com.example.mqttpanelcraft-b3m_Q46JseXDEddnJ
+yCfSA==/base.apk': I/O error
+> 04-03 16:13:57.784 W/ResourcesManager(  682): failed to preload asset p
+ath '/data/app/~~tRgRD1dTGW97FdrQFTd9dA==/com.example.mqttpanelcraft-b3m_
+Q46JseXDEddnJyCfSA==/base.apk'
+> 04-03 16:13:57.784 W/ResourcesManager(  682): java.io.IOException: Fail
+ed to load asset path /data/app/~~tRgRD1dTGW97FdrQFTd9dA==/com.example.mq
+ttpanelcraft-b3m_Q46JseXDEddnJyCfSA==/base.apk
+  04-03 16:13:57.784 W/ResourcesManager(  682): 	at android.content.res.A
+pkAssets.nativeLoad(Native Method)
+  04-03 16:13:57.784 W/ResourcesManager(  682): 	at android.content.res.A
+pkAssets.<init>(ApkAssets.java:322)
+  04-03 16:13:57.784 W/ResourcesManager(  682): 	at android.os.Binder.exe
+cTransactInternal(Binder.java:1426)
+  04-03 16:13:57.784 W/ResourcesManager(  682): 	at android.os.Binder.exe
+cTransact(Binder.java:1365)
+> 04-03 16:13:57.784 W/ziparchive(  682): Unable to open '/data/app/~~tRg
+RD1dTGW97FdrQFTd9dA==/com.example.mqttpanelcraft-b3m_Q46JseXDEddnJyCfSA==
+/base.apk': No such file or directory
+> 04-03 16:13:57.786 E/system_server(  682): Failed to open APK '/data/ap
+p/~~tRgRD1dTGW97FdrQFTd9dA==/com.example.mqttpanelcraft-b3m_Q46JseXDEddnJ
+yCfSA==/base.apk': I/O error
+> 04-03 16:13:57.788 E/ResourcesManager(  682): failed to add asset path 
+'/data/app/~~tRgRD1dTGW97FdrQFTd9dA==/com.example.mqttpanelcraft-b3m_Q46J
+seXDEddnJyCfSA==/base.apk'
+> 04-03 16:13:57.788 E/ResourcesManager(  682): java.io.IOException: Fail
+ed to load asset path /data/app/~~tRgRD1dTGW97FdrQFTd9dA==/com.example.mq
+ttpanelcraft-b3m_Q46JseXDEddnJyCfSA==/base.apk
+  04-03 16:13:57.788 E/ResourcesManager(  682): 	at android.content.res.A
+pkAssets.nativeLoad(Native Method)
+  04-03 16:13:57.788 E/ResourcesManager(  682): 	at android.content.res.A
+pkAssets.<init>(ApkAssets.java:322)
+  04-03 16:13:58.597 W/AppOpService(  682): Ignored setUidMode call for r
+untime permission app op: uid = 10144, code = READ_CELL_BROADCASTS, mode 
+= allow, callingUid = 1001, oldMode = allow
+  04-03 16:13:58.661 W/AppOpService(  682): Ignored setUidMode call for r
+untime permission app op: uid = 1001, code = READ_SMS, mode = allow, call
+ingUid = 1001, oldMode = allow
+> 04-03 16:13:58.673 W/.mqttpanelcraft( 9864): Unexpected CPU variant for
+ x86: x86_64.
+> 04-03 16:13:58.673 W/.mqttpanelcraft( 9864): Known variants: atom, sand
+ybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves
+, tremont, kabylake, alderlake, default
+  04-03 16:13:58.736 W/AppOpService(  682): Ignored setUidMode call for r
+untime permission app op: uid = 1001, code = RECEIVE_SMS, mode = allow, c
+allingUid = 1001, oldMode = allow
+  04-03 16:13:58.739 W/Finsky:background( 5174): [236] SM: enabledRollbac
+k=false for group, but true for com.android.chrome
+  04-03 16:13:58.826 W/Looper  (  682): Slow delivery took 282ms main app
+=system_server main=true group=FOREGROUND h=android.app.ActivityThread$H 
+c=android.app.LoadedApk$ReceiverDispatcher$Args$$ExternalSyntheticLambda0
+@efd66a5 m=0
+  04-03 16:13:58.839 W/Looper  (  682): Slow delivery took 258ms android.
+fg app=system_server main=false group=FOREGROUND h=android.os.Handler c=c
+om.android.server.am.SameProcessApplicationThread$$ExternalSyntheticLambd
+a1@7f4722b m=0
+> 04-03 16:13:58.840 W/WindowManager(  682): Exception thrown during disp
+atchAppVisibility Window{40e4691 u0 com.example.mqttpanelcraft/com.exampl
+e.mqttpanelcraft.ProjectViewActivity EXITING}
+  04-03 16:13:58.840 W/WindowManager(  682): android.os.DeadObjectExcepti
+on
+  04-03 16:13:58.840 W/WindowManager(  682): 	at android.os.BinderProxy.t
+ransactNative(Native Method)
+  04-03 16:13:59.700 W/AppOpService(  682): Ignored setUidMode call for r
+untime permission app op: uid = 1001, code = READ_CELL_BROADCASTS, mode =
+ allow, callingUid = 1001, oldMode = allow
+  04-03 16:13:59.861 W/SignedPackage(  682): Cannot get ApplicationInfo f
+or package: com.google.android.devicelockcontroller
+> 04-03 16:13:59.870 W/VvmPkgInstalledRcvr( 3587): carrierVvmPkgAdded: ca
+rrier vvm packages doesn't contain com.example.mqttpanelcraft
+  04-03 16:13:59.900 W/ChimeraApkLoader( 7050): Config is out of date: Co
+ntainerApk(com.google.android.gms) has been modified
+  04-03 16:13:59.951 W/Looper  (  682): Slow dispatch took 338ms main app
+=system_server main=true group=FOREGROUND h=android.app.ActivityThread$H 
+c=android.app.LoadedApk$ReceiverDispatcher$Args$$ExternalSyntheticLambda0
+@e976aac m=0
+> 04-03 16:14:00.075 W/AlarmManager(  682): Package com.example.mqttpanel
+craft, uid 10217 lost permission to set exact alarms!
+  04-03 16:14:00.126 E/FeatureFlagsImplExport( 9823): android.os.flagging
+.AconfigStorageReadException: ERROR_PACKAGE_NOT_FOUND: package android.xr
+ cannot be found on the device
+  04-03 16:14:00.265 E/ashmem  ( 9823): Pinning is deprecated since Andro
+id Q. Please use trim or other methods.
+  04-03 16:14:01.809 W/ActivityManager(  682): Rescheduling restart of cr
+ashed service com.android.settings/.SettingsDumpService in 5008805ms for 
+mem-pressure-event
+  04-03 16:14:01.978 W/HWUI    ( 1068): Image decoding logging dropped!
+> 04-03 16:14:02.005 E/Finsky  ( 8085): [99] ItemStore: getItems RPC fail
+ed for item com.example.mqttpanelcraft
+> 04-03 16:14:02.006 E/Finsky  ( 8085): [100] ItemStore: getItems RPC fai
+led for item com.example.mqttpanelcraft
+  04-03 16:14:02.101 E/TaskPersister(  682): File error accessing recents
+ directory (directory doesn't exist?).
+  04-03 16:14:02.329 W/HWUI    ( 9864): Image decoding logging dropped!
+  04-03 16:14:02.346 W/HWUI    ( 9864): Image decoding logging dropped!
+  04-03 16:14:02.434 W/ResourcesCompat( 9864): Failed to inflate ColorSta
+teList, leaving it to the framework
+> 04-03 16:14:02.434 W/ResourcesCompat( 9864): java.lang.UnsupportedOpera
+tionException: Failed to resolve attribute at index 0: TypedValue{t=0x2/d
+=0x7f0300f4 a=-1}, theme={InheritanceMap=[id=0x7f110291com.example.mqttpa
+nelcraft:style/ThemeOverlay.Material3.Button.TextButton], Themes=[com.exa
+mple.mqttpanelcraft:style/ThemeOverlay.Material3.Button.TextButton, force
+d, com.example.mqttpanelcraft:style/Theme.Helloworld, forced, com.example
+.mqttpanelcraft:style/Theme.AppCompat.Empty, forced, android:style/Theme.
+DeviceDefault.Light.DarkActionBar, forced]}
+  04-03 16:14:02.434 W/ResourcesCompat( 9864): 	at android.content.res.Ty
+pedArray.getColor(TypedArray.java:536)
+  04-03 16:14:02.434 W/ResourcesCompat( 9864): 	at androidx.core.content.
+res.ColorStateListInflaterCompat.inflate(ColorStateListInflaterCompat.jav
+a:160)
+  04-03 16:14:02.434 W/ResourcesCompat( 9864): 	at android.view.LayoutInf
+later.inflate(LayoutInflater.java:571)
+  04-03 16:14:02.434 W/ResourcesCompat( 9864): 	at android.view.LayoutInf
+later.inflate(LayoutInflater.java:462)
+> 04-03 16:14:02.434 W/ResourcesCompat( 9864): 	at com.example.mqttpanelc
+raft.databinding.ActivityDashboardBinding.inflate(ActivityDashboardBindin
+g.java:141)
+> 04-03 16:14:02.434 W/ResourcesCompat( 9864): 	at com.example.mqttpanelc
+raft.databinding.ActivityDashboardBinding.inflate(ActivityDashboardBindin
+g.java:135)
+> 04-03 16:14:02.434 W/ResourcesCompat( 9864): 	at com.example.mqttpanelc
+raft.DashboardActivity.onCreate(DashboardActivity.kt:37)
+  04-03 16:14:02.434 W/ResourcesCompat( 9864): 	at android.app.Activity.p
+erformCreate(Activity.java:9155)
+  04-03 16:14:02.434 W/ResourcesCompat( 9864): 	at android.app.Activity.p
+erformCreate(Activity.java:9133)
+  04-03 16:14:02.592 W/dumpsys ( 9937): Thread Pool max thread count is 0
+. Cannot cache binder as linkToDeath cannot be implemented. serviceName: 
+package
+  04-03 16:14:02.799 W/BLASTSyncEngine(  682): Sync group 51 timeout
+> 04-03 16:14:02.989 W/artd    ( 2005): Could not get dex checksums for l
+ocation /data/app/~~tRgRD1dTGW97FdrQFTd9dA==/com.example.mqttpanelcraft-b
+3m_Q46JseXDEddnJyCfSA==/base.apk, fd=-1
+  04-03 16:14:03.106 W/ChimeraModuleLdr( 6296): Module config changed, fo
+rcing restart due to module com.google.android.gms.nearby
+  04-03 16:14:03.111 W/ChimeraModuleLdr( 7050): Module config changed, fo
+rcing restart due to module com.google.android.gms.nearby
+  04-03 16:14:03.246 W/ActivityManager(  682): Scheduling restart of cras
+hed service com.google.android.gms/.chimera.GmsIntentOperationService in 
+11200ms for start-requested
+  04-03 16:14:03.252 W/ActivityManager(  682): pid 9482 com.google.androi
+d.googlequicksearchbox:search sent binder code 46 with flags 2 to frozen 
+apps and got error -32
+> 04-03 16:14:03.252 W/ActivityManager(  682): pid 9864 com.example.mqttp
+anelcraft sent binder code 1 with flags 2 to frozen apps and got error -3
+2
+  04-03 16:14:03.314 W/ActivityManager(  682): Scheduling restart of cras
+hed service com.google.android.gms/.auth.setup.devicesignals.LockScreenSe
+rvice in 41096ms for start-requested
+  04-03 16:14:03.322 W/ActivityManager(  682): Scheduling restart of cras
+hed service com.google.android.gms/com.google.android.location.network.Ne
+tworkLocationService in 71088ms for connection
+  04-03 16:14:04.939 W/ProviderHelper( 9942): Unknown dynamite feature pr
+oviderinstaller.dynamite
+  04-03 16:14:04.939 W/ProviderHelper( 9943): Unknown dynamite feature pr
+oviderinstaller.dynamite
+> 04-03 16:14:05.332 W/.mqttpanelcraft( 9864): ClassLoaderContext classpa
+th size mismatch. expected=1, found=0 (DLC[];PCL[PrebuiltGmsCore.apk*4276
+847573]{PCL[/system/framework/org.apache.http.legacy.jar*4247870504]#PCL[
+/system/framework/com.android.media.remotedisplay.jar*487574312]#PCL[/sys
+tem/framework/com.android.location.provider.jar*1570284764]#PCL[/system_e
+xt/framework/androidx.window.extensions.jar*1030441313]#PCL[/system_ext/f
+ramework/androidx.window.sidecar.jar*3860983653]} | DLC[];PCL[])
+  04-03 16:14:05.512 W/System  ( 9864): ClassLoader referenced unknown pa
+th: 
+  04-03 16:14:05.709 W/ActivityManager(  682): Rescheduling restart of cr
+ashed service com.google.android.gms/.auth.setup.devicesignals.LockScreen
+Service in 7605ms for other
+  04-03 16:14:06.053 W/ActivityManager(  682): Rescheduling restart of cr
+ashed service com.android.settings/.SettingsDumpService in 5004561ms for 
+other
+  04-03 16:14:06.775 E/ashmem  ( 9942): Pinning is deprecated since Andro
+id Q. Please use trim or other methods.
+> 04-03 16:14:06.908 W/.mqttpanelcraft( 9864): Loading /data/app/~~6gdoxh
+MEmYmMQ_4Mb-8YwQ==/com.google.android.webview-OM0nzM0iz54aNPEU9ezrUw==/oa
+t/x86_64/base.odex non-executable as it requires an image which we failed
+ to load
+  04-03 16:14:06.914 E/ashmem  ( 9943): Pinning is deprecated since Andro
+id Q. Please use trim or other methods.
+  04-03 16:14:06.967 W/etgc    ( 9943): Primes not initialized, returning
+ default (no-op) Primes instance which will ignore all calls. Please call
+ Primes.initialize(...) before using any Primes API.
+  04-03 16:14:10.438 W/ActivityManager(  682): Slow operation: 65ms so fa
+r, now at startProcess: returned from zygote!
+  04-03 16:14:10.439 W/ChimeraUtils( 9943): Module com.google.android.gms
+.nearby_nofp missing resource null(0)
+> 04-03 16:14:10.443 W/InputDispatcher(  682): Not sending touch gesture 
+to ecdf325 ActivityRecordInputSink com.example.mqttpanelcraft/.DashboardA
+ctivity because it has config NO_INPUT_CHANNEL
+  04-03 16:14:10.524 W/.adservices.api(10103): Unexpected CPU variant for
+ x86: x86_64.
+  04-03 16:14:10.524 W/.adservices.api(10103): Known variants: atom, sand
+ybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves
+, tremont, kabylake, alderlake, default
+  04-03 16:14:12.896 W/chromium(10060): [WARNING:content/child/runtime_fe
+atures.cc:609] SharedStorage cannot be enabled in this configuration. Use
+ --enable-features=SharedStorageAPI in addition.
+  04-03 16:14:13.009 W/dumpsys (10160): Thread Pool max thread count is 0
+. Cannot cache binder as linkToDeath cannot be implemented. serviceName: 
+package
+> 04-03 16:14:13.166 W/ActivityTaskManager(  682): Activity top resumed s
+tate loss timeout for ActivityRecord{23330042 u0 com.example.mqttpanelcra
+ft/.DashboardActivity t10}
+  04-03 16:14:13.585 W/Looper  (  682): Slow dispatch took 463ms android.
+fg app=system_server main=false group=FOREGROUND h=android.os.Handler c=c
+om.android.server.wm.ActivityMetricsLogger$$ExternalSyntheticLambda0@2372
+d7e m=0
+  04-03 16:14:13.586 W/Looper  (  682): Slow delivery took 492ms android.
+fg app=system_server main=false group=FOREGROUND h=android.os.Handler c=c
+om.android.server.wm.TransitionController$Logger@ecef2df m=0
+> 04-03 16:14:13.598 W/.mqttpanelcraft( 9864): Verification of boolean an
+droidx.constraintlayout.solver.widgets.ConstraintWidgetContainer.addChild
+renToSolver(androidx.constraintlayout.solver.LinearSystem) took 127.335ms
+ (1374.32 bytecodes/s) (0B arena alloc)
+  04-03 16:14:13.930 W/gle.android.gms( 9942): Verification of void com.g
+oogle.android.gms.chimera.GmsModuleInitializer.initializeModuleV0(android
+.content.Context, com.google.android.gms.common.app.BaseApplicationContex
+t) took 1.245s (614.79 bytecodes/s) (0B arena alloc)
+  04-03 16:14:14.265 W/Looper  (  682): Drained
+  04-03 16:14:16.680 W/Finsky:background( 5174): [2] SLM: no metadata pro
+perty com.android.vending.derived.apk.id found for shared library com.goo
+gle.android.trichromelibrary:
+  04-03 16:14:16.680 W/Finsky:background( 5174): [2] SLM: no metadata pro
+perty com.android.vending.sdk.version.patch found for shared library com.
+google.android.trichromelibrary:
+> 04-03 16:14:16.791 W/.mqttpanelcraft( 9864): Suspending all threads too
+k: 53.352ms
+  04-03 16:14:16.800 W/Finsky  ( 8085): [2] SLM: no metadata property com
+.android.vending.derived.apk.id found for shared library com.google.andro
+id.trichromelibrary:
+  04-03 16:14:16.800 W/Finsky  ( 8085): [2] SLM: no metadata property com
+.android.vending.sdk.version.patch found for shared library com.google.an
+droid.trichromelibrary:
+  04-03 16:14:18.267 W/Settings( 9943): Setting airplane_mode_on has move
+d from android.provider.Settings.System to android.provider.Settings.Glob
+al, returning read-only value.
+  04-03 16:14:18.312 W/System  (  682): A resource failed to call release
+. 
+> 04-03 16:14:18.333 W/PackageConfigPersister(  682): App-specific config
+uration not found for packageName: com.example.mqttpanelcraft and userId:
+ 0
+  04-03 16:14:18.378 W/Finsky  ( 8085): [2] SLM: no metadata property com
+.android.vending.derived.apk.id found for shared library com.google.andro
+id.trichromelibrary:
+  04-03 16:14:18.381 W/Finsky  ( 8085): [2] SLM: no metadata property com
+.android.vending.sdk.version.patch found for shared library com.google.an
+droid.trichromelibrary:
+
+
+

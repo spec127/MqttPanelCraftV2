@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- SECTION 2: INTERACTION (MOVED TO TOP) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_touch_app"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+
+        <TextView
+            android:text="@string/properties_section_interaction"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- 行為模式 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:text="觸發後行為 (Action Mode)"
+            android:textSize="12sp"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"/>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleLedActionMode"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_marginBottom="4dp"
+            android:gravity="center"
+            app:selectionRequired="true"
+            app:singleSelection="true"
+            app:checkedButton="@+id/btnActionLatch">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnActionLatch"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:text="常駐亮起"
+                android:padding="0dp"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnActionTimer"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:text="計時關閉"
+                android:padding="0dp"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/containerLedTimer"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="亮起持續時間 (毫秒/ms)"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusBottomEnd="16dp"
+            style="@style/Widget.App.TextInputLayout.Properties">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etLedTimer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="1500"
+                android:textSize="14sp"
+                android:textColor="@color/prop_text_primary"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/tvActionModeDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="@color/prop_text_secondary"
+            android:lineSpacingExtra="2dp"
+            android:text="" />
+    </LinearLayout>
+
+    <!-- 觸發模式 (Trigger Mode) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:text="觸發模式 (Trigger Mode)"
+            android:textSize="12sp"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"/>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleLedTriggerMode"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center"
+            app:selectionRequired="true"
+            app:singleSelection="true"
+            app:checkedButton="@+id/btnModeKeyword">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnModeKeyword"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:text="關鍵字"
+                android:padding="0dp"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnModeAny"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:text="全捕捉"
+                android:padding="0dp"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <TextView
+            android:id="@+id/tvTriggerModeDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="@color/prop_text_secondary"
+            android:lineSpacingExtra="2dp"
+            android:layout_marginTop="4dp"
+            android:text="" />
+    </LinearLayout>
+
+    <!-- 新 Row 1: Active Color (4:6) -->
+    <LinearLayout
+        android:id="@+id/containerActiveColorRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="bottom"
+        android:layout_marginBottom="12dp"
+        android:baselineAligned="false">
+
+            <!-- 40% Circle preview -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="0.4"
+                android:layout_height="52dp"
+                android:layout_marginEnd="6dp"
+                android:gravity="center">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    app:cardCornerRadius="14dp"
+                    app:strokeWidth="2dp"
+                    app:strokeColor="?android:attr/textColorSecondary"
+                    app:cardElevation="0dp"
+                    android:layout_gravity="center">
+                    <View
+                        android:id="@+id/vActiveColorPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#8BC34A"/>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- 60% Palette -->
+            <LinearLayout
+                android:id="@+id/containerGlobalActiveColorWrapper"
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="6dp">
+                <FrameLayout
+                    android:id="@+id/containerActiveColor"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- 新 Row 2: Match Mode dropdown & Keyword Input (4:6) -->
+        <LinearLayout
+            android:id="@+id/containerMatchRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:baselineAligned="false">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/containerMatchMode"
+                android:layout_width="0dp"
+                android:layout_weight="0.4"
+                android:layout_height="56dp"
+                android:hint="方式"
+                android:layout_marginEnd="6dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+                <AutoCompleteTextView
+                    android:id="@+id/spKeywordMatchType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:text="完全相符"
+                    android:textSize="11sp"
+                    android:maxLines="1"
+                    android:textColor="@color/prop_text_primary"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="8dp"
+                    android:popupBackground="@drawable/bg_popup_rounded"
+                    android:dropDownVerticalOffset="4dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/containerKeywordInputReal"
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="56dp"
+                android:layout_marginStart="6dp"
+                android:hint="輸入關鍵字 (Enter 新增)"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etKeywordAdd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:imeOptions="actionDone"
+                    android:textSize="14sp"
+                    android:textColor="@color/prop_text_primary"
+                    android:maxLines="1"
+                    android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+        
+        <!-- Chips below both rows -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cgLedKeywords"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:chipSpacingHorizontal="8dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_line"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp" />
+
+    <!-- SECTION 1: APPEARANCE -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+            
+        <TextView
+            android:text="@string/properties_section_appearance"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:gravity="start|center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
+    <!-- 觸發效果改為 ToggleGroup -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:text="觸發效果"
+            android:textSize="12sp"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"/>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleLedEffect"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center"
+            app:selectionRequired="true"
+            app:singleSelection="true"
+            app:checkedButton="@+id/btnEffectNone">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEffectNone"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:text="常亮"
+                android:padding="0dp"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEffectBlink"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:text="閃爍"
+                android:padding="0dp"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="bottom"
+        android:layout_marginBottom="12dp"
+        android:baselineAligned="false">
+        
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.4"
+            android:layout_height="56dp"
+            android:hint="顯示風格"
+            android:layout_marginEnd="6dp"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusBottomEnd="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+            <AutoCompleteTextView
+                android:id="@+id/spLedStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textSize="11sp"
+                android:maxLines="1"
+                android:textColor="@color/prop_text_primary"
+                android:gravity="start|center_vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="8dp"
+                android:popupBackground="@drawable/bg_popup_rounded"
+                android:dropDownVerticalOffset="4dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="6dp">
+            <!-- 已刪除 '熄滅時顏色' TEXTVIEW -->
+            <FrameLayout
+                android:id="@+id/containerIdleColor"
+                android:layout_width="match_parent"
+                android:layout_height="52dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Appearance Mode Row (Dropdown + Content) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="top"
+        android:layout_marginBottom="12dp">
+        
+        <!-- Mode Dropdown -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.4"
+            android:layout_height="56dp"
+            android:hint="相貌模式"
+            android:layout_marginEnd="6dp"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusBottomEnd="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            <AutoCompleteTextView
+                 android:id="@+id/spPropApprMode"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:inputType="none"
+                 android:text="文字"
+                 android:textSize="11sp"
+                 android:maxLines="1"
+                 android:textColor="@color/prop_text_primary"
+                 android:gravity="start|center_vertical"
+                 android:paddingStart="12dp"
+                 android:paddingEnd="8dp"
+                 android:popupBackground="@drawable/bg_popup_rounded"
+                 android:dropDownVerticalOffset="4dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        
+        <!-- Mode Content (Text Input OR Icon Grid) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:orientation="vertical">
+            
+            <!-- Text Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/containerPropText"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="標籤文字 (Label)"
+                android:layout_marginBottom="8dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLedLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textSize="14sp"
+                    android:textColor="@color/prop_text_primary"
+                    android:maxLines="1"
+                    android:singleLine="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            
+            <!-- Icon Container (Framed) -->
+            <LinearLayout
+                android:id="@+id/containerPropIcon"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_palette_border"
+                android:padding="4dp"
+                android:visibility="gone">
+                
+                <ImageView android:id="@+id/iconPreviewLED1" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_power" app:tint="@color/prop_text_primary" android:tag="ic_btn_power"/>
+                <ImageView android:id="@+id/iconPreviewLED2" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_lighting" app:tint="@color/prop_text_secondary" android:tag="ic_btn_lighting"/>
+                <ImageView android:id="@+id/iconPreviewLED3" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_fan" app:tint="@color/prop_text_secondary" android:tag="ic_btn_fan"/>
+                <ImageView android:id="@+id/iconPreviewLED4" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_play" app:tint="@color/prop_text_secondary" android:tag="ic_btn_play"/>
+                <ImageView android:id="@+id/iconPreviewLED5" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_tune" app:tint="@color/prop_text_secondary" android:tag="ic_btn_tune"/>
+                <ImageView android:id="@+id/iconPreviewLED6" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_energy" app:tint="@color/prop_text_secondary" android:tag="ic_btn_energy"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

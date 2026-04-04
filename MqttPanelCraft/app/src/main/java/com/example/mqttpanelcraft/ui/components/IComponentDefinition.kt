@@ -53,3 +53,9 @@ interface IComponentDefinition {
          */
         fun isFixedAspectRatio(data: ComponentData): Boolean = false
 }
+
+/**
+ * Standardized extension for finding the core interactive/display view within a component
+ * container.
+ */
+fun <T : View> View.findComponentTarget(): T? = this.findViewWithTag<T>("target")

@@ -5,13 +5,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider_line"
-        android:layout_marginBottom="16dp" />
-
     <!-- SECTION 2: INTERACTION (MOVED TO TOP) -->
     <LinearLayout
         android:layout_width="match_parent"

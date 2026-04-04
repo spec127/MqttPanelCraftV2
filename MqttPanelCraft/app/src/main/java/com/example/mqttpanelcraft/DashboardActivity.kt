@@ -176,6 +176,16 @@ class DashboardActivity : BaseActivity() {
 
     private fun setupDrawer() {
         val menu = binding.navigationView.menu
+        
+        // Dynamically set Version
+        val headerView = binding.navigationView.getHeaderView(0)
+        val tvVersion = headerView.findViewById<android.widget.TextView>(R.id.tvVersion)
+        try {
+            val pInfo = packageManager.getPackageInfo(packageName, 0)
+            tvVersion?.text = "v${pInfo.versionName} (Beta)"
+        } catch (e: Exception) {
+            tvVersion?.text = "v0.5.1 (Beta)"
+        }
 
         // 1. Dark Mode Switch
         val darkModeItem = menu.findItem(R.id.nav_dark_mode)
