@@ -66,9 +66,9 @@ object InputBoxDefinition : IComponentDefinition {
         val spStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spPropStyle)
         val styles =
                 listOf(
-                        context.getString(R.string.val_style_input_box_capsule) to "Capsule",
-                        context.getString(R.string.val_style_input_box_modular) to "Modular",
-                        context.getString(R.string.val_style_input_box_infinity) to "Infinity"
+                        context.getString(R.string.val_style_text_capsule) to "Capsule",
+                        context.getString(R.string.val_style_text_modular) to "Modular",
+                        context.getString(R.string.val_style_text_infinity) to "Infinity"
                 )
         // Map internal value to display string
         val currentStyle = data.props["style"] ?: "Capsule"

@@ -93,20 +93,20 @@
     <string name="copy_code">Copy Code</string>
 
     <!-- Component Labels -->
-    <string name="component_label_button">按鈕</string>
-    <string name="component_label_switch">開關</string>
-    <string name="component_label_slider">滑桿</string>
-    <string name="component_label_selector">選擇器</string>
-    <string name="component_label_image">圖片</string>
-    <string name="component_label_led">LED 狀態</string>
-    <string name="component_label_chart">折線圖</string>
-    <string name="component_label_joystick">搖桿</string>
-    <string name="component_label_palette">調色盤控制</string>
-    <string name="component_label_input">輸入框</string>
-    <string name="component_label_scale_meter">刻度計</string>
-    <string name="component_label_gauge">儀錶板</string>
-    <string name="component_label_value_display">數值顯示</string>
-    <string name="component_label_text_display">文字顯示</string>
+    <string name="component_label_button">Button</string>
+    <string name="component_label_switch">Switch</string>
+    <string name="component_label_slider">Slider</string>
+    <string name="component_label_selector">Selector</string>
+    <string name="component_label_image">Image</string>
+    <string name="component_label_led">LED Status</string>
+    <string name="component_label_chart">Chart</string>
+    <string name="component_label_joystick">Joystick</string>
+    <string name="component_label_palette">Color Palette</string>
+    <string name="component_label_input">Input</string>
+    <string name="component_label_scale_meter">Scale Meter</string>
+    <string name="component_label_gauge">Gauge</string>
+    <string name="component_label_value_display">Value Display</string>
+    <string name="component_label_text_display">Text Display</string>
 
     <!-- Joystick Properties -->
     <string name="properties_label_joystick_mode">Joystick Mode</string>
@@ -176,8 +176,8 @@
     <string name="title_limit_reached">Limit Reached</string>
     <string name="dialog_btn_upgrade">Upgrade</string>
     <string name="dialog_language_title">Select Language</string>
-    <string name="dialog_delete_title">刪除專案</string>
-    <string name="dialog_delete_message">確定要刪除「%s」嗎？</string>
+    <string name="dialog_delete_title">Delete Project</string>
+    <string name="dialog_delete_message">Are you sure you want to delete \'%s\'?</string>
     <string name="dialog_change_id_title">Change Project ID</string>
     <string name="dialog_import_title">Import Configuration</string>
     <string name="dialog_export_title">Export Configuration</string>
@@ -216,8 +216,8 @@
     <string name="prop_label_orientation">Orientation</string>
     <string name="prop_label_feedback">Hint</string>
 
-    <string name="val_orient_horizontal">水平</string>
-    <string name="val_orient_vertical">垂直</string>
+    <string name="val_orient_horizontal">Horizontal</string>
+    <string name="val_orient_vertical">Vertical</string>
     <string name="val_slider_style_classic">Classic</string>
     <string name="val_slider_style_capsule">Capsule</string>
     <string name="val_shape_square">Square</string>
@@ -236,15 +236,14 @@
     <string name="val_style_classic">Classic</string>
     <string name="val_style_lever">Lever</string>
     <string name="val_shape_rounded_rect">Rounded</string>
-
     <string name="val_shape_circle_style">Circles</string>
     <string name="val_style_rounded">Rects</string>
-    <string name="val_style_segmented">膠囊</string>
+    <string name="val_style_segmented">Capsule</string>
 
     <!-- Input Box Styles -->
-    <string name="val_style_input_box_capsule">圓滑 Capsule</string>
-    <string name="val_style_input_box_modular">模組 Modular</string>
-    <string name="val_style_input_box_infinity">無邊 Infinity</string>
+    <string name="val_style_text_capsule">Capsule</string>
+    <string name="val_style_text_modular">Modular</string>
+    <string name="val_style_text_infinity">Infinity</string>
     <string name="prop_label_clear_on_send">Clear on Send</string>
     <string name="prop_label_enter_as_send">Enter as Send</string>
     <string name="prop_desc_clear_on_send">Clear text field after sending.</string>
@@ -259,8 +258,6 @@
 
     <string name="properties_switch_mode_standard">Standard</string>
     <string name="properties_switch_mode_tri_state">Tri-State</string>
-    
-    <!-- Icons & Helper Descriptions -->
 
     <!-- Messages & Status -->
     <string name="project_msg_add_component">Component added</string>
@@ -274,40 +271,42 @@
     <string name="project_msg_mqtt_failed">MQTT failed</string>
     <string name="project_msg_mqtt_retrying">Retrying MQTT...</string>
     <string name="project_msg_select_component">Select a component</string>
-    <!-- LED Properties -->
-    <string name="prop_label_logic_mode">Logic Mode</string>
-    <string name="val_logic_dual">Dual State</string>
-    <string name="val_logic_multi">Multi State</string>
-    <string name="prop_label_trigger_type">Trigger Type</string>
-    <string name="val_trigger_boolean">Boolean (0/1)</string>
-    <string name="val_trigger_keyword">Keyword</string>
-    <string name="val_trigger_any">Any Message</string>
-    <string name="prop_label_keywords">Trigger Keywords</string>
-    <string name="prop_hint_keywords">Add tag...</string>
-    <string name="prop_label_match_mode">Match Mode</string>
-    <string name="val_match_exact">Exact Match</string>
-    <string name="val_match_contains">Contains</string>
-    <string name="prop_label_active_color">Active Color</string>
-    <string name="prop_label_idle_color">Idle Color</string>
-    <string name="prop_label_active_effect">Active Effect</string>
-    <string name="val_effect_steady">Steady</string>
-    <string name="val_effect_blink">Blink</string>
-    <string name="prop_label_blink_speed">Blink Speed</string>
-    <string name="val_speed_slow">Slow (1s)</string>
-    <string name="val_speed_normal">Normal (0.5s)</string>
-    <string name="val_speed_fast">Fast (0.2s)</string>
-    <string name="val_speed_breathe">Breathe</string>
-    <string name="prop_label_auto_reset">Auto Reset</string>
-    <string name="prop_label_reset_duration">Duration (ms)</string>
-    <string name="prop_label_visual_style">Visual Style</string>
-    <string name="val_style_orb">Orb</string>
-    <string name="val_style_lens">Lens</string>
-    <string name="val_style_pixel">Pixel</string>
-    <string name="val_style_text_only">Text Only</string>
-    <string name="prop_label_content_type">Content Type</string>
+
+    <!-- LED Property Specifics -->
+    <string name="prop_label_led_type">LED Type</string>
+    <string name="val_led_logic_standard">Standard LED</string>
+    <string name="val_led_logic_rgb">RGB Multi-State</string>
+    <string name="desc_led_logic_standard">Single state indicator using shared colors.</string>
+    <string name="desc_led_logic_rgb">RGB Mode: Displays specific colors based on keywords.</string>
+    <string name="desc_led_logic_standard_detail">Standard Mode: Lights up when keywords match, otherwise stays off.</string>
+    <string name="prop_label_led_action">Action Mode</string>
+    <string name="val_led_action_latch">Latch (Keywords)</string>
+    <string name="val_led_action_timer">Momentary (Timer)</string>
+    <string name="desc_led_action_timer">Timer Mode: Lights up on signal, auto-off after duration.</string>
+    <string name="desc_led_action_latch">Latch Mode: Lights up on trigger, off on restore signal.</string>
+    <string name="prop_label_led_timer_hint">Active Duration (ms)</string>
+    <string name="prop_label_led_restore_kw_hint">Restore Keywords (OFF/0/FALSE)</string>
+    <string name="prop_label_led_match_mode">Match Mode</string>
+    <string name="prop_label_led_add_kw">Add Keyword</string>
+    <string name="val_match_exact_alt">Exact</string>
+    <string name="val_match_contains_alt">Contains</string>
+    <string name="error_duplicate">Duplicate</string>
+    <string name="prop_label_led_color_active">Color</string>
+    <string name="prop_label_led_keyword">Keyword</string>
+    <string name="prop_label_led_effect">Active Effect</string>
+    <string name="val_effect_steady_short">Steady</string>
+    <string name="val_effect_blink_short">Blink</string>
+    <string name="prop_label_led_visual_style_alt">Display Style</string>
+    <string name="prop_label_led_content_mode">Display Label</string>
+    <string name="prop_label_led_text_content">Label Text</string>
+    <string name="prop_label_led_neon_multiline">Neon Label (Multiline)</string>
+    <string name="chip_match_contains">[Contains] %1$s</string>
+    <string name="chip_match_exact">[Exact] %1$s</string>
+
     <string name="val_content_icon">Icon</string>
     <string name="val_content_text">Text</string>
     <string name="val_content_both">Icon + Text</string>
+    <string name="val_style_orb">Glow Sphere</string>
     
     <string name="prop_label_label_caps">LABEL</string>
     <string name="prop_label_value_caps">VALUE</string>

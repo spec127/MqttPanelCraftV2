@@ -19,31 +19,44 @@
     <style name="Theme.Helloworld.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="Theme.Helloworld.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <!-- Properties Panel Styles -->
+    <!-- 屬性視窗 - 通用輸入欄樣式 (全局預設，圓角 16dp) -->
     <style name="Widget.App.TextInputLayout.Properties" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-        <item name="boxCornerRadiusTopStart">12dp</item>
-        <item name="boxCornerRadiusTopEnd">12dp</item>
-        <item name="boxCornerRadiusBottomStart">12dp</item>
-        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="boxCornerRadiusTopStart">@dimen/prop_input_corner_radius</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/prop_input_corner_radius</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/prop_input_corner_radius</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/prop_input_corner_radius</item>
         <item name="boxStrokeColor">@color/prop_input_stroke_selector</item>
         <item name="boxStrokeWidth">1dp</item>
         <item name="hintTextColor">@color/props_primary</item>
         <item name="android:textColorHint">@color/prop_text_secondary</item>
     </style>
 
+    <!-- 屬性視窗 - 通用下拉選單樣式 (全局預設，圓角 16dp)
+         Design Intent: popupBackground 設定統一展開列表的圆角背景，避免各元件各自呈現系統預設形式 -->
     <style name="Widget.App.TextInputLayout.Properties.Dropdown" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
-        <item name="boxCornerRadiusTopStart">12dp</item>
-        <item name="boxCornerRadiusTopEnd">12dp</item>
-        <item name="boxCornerRadiusBottomStart">12dp</item>
-        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="boxCornerRadiusTopStart">@dimen/prop_input_corner_radius</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/prop_input_corner_radius</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/prop_input_corner_radius</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/prop_input_corner_radius</item>
         <item name="boxStrokeColor">@color/prop_input_stroke_selector</item>
         <item name="boxStrokeWidth">1dp</item>
         <item name="hintTextColor">@color/props_primary</item>
         <item name="android:textColorHint">@color/prop_text_secondary</item>
+        <item name="android:popupBackground">@drawable/bg_popup_rounded</item>
+    </style>
+
+    <!-- 屬性視窗 - 緊湊型下拉選單樣式 (圓角 12dp，供 Slider 等使用):
+         Design Intent: 覆寫 Compact 版本保留「元件級特化」能力，其他屬性繼承自 Dropdown。-->
+    <style name="Widget.App.TextInputLayout.Properties.Compact" parent="Widget.App.TextInputLayout.Properties.Dropdown">
+        <item name="boxCornerRadiusTopStart">@dimen/prop_input_corner_radius_compact</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/prop_input_corner_radius_compact</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/prop_input_corner_radius_compact</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/prop_input_corner_radius_compact</item>
     </style>
     
+    <!-- 屬性視窗 - 動作按鈕樣式 (圓角加 12dp，透過令牌統一) -->
     <style name="Widget.App.Button.Outlined.Properties" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="cornerRadius">12dp</item>
+        <item name="cornerRadius">@dimen/prop_toggle_corner_radius</item>
         <item name="strokeColor">@color/props_primary</item>
         <item name="android:textColor">@color/props_primary</item>
     </style>

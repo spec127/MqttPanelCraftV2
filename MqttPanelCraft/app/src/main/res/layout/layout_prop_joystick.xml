@@ -52,6 +52,7 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:text="@string/val_joystick_mode_standard"
             android:textSize="12sp"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"
             android:insetTop="0dp"
             android:insetBottom="0dp"/>
         <com.google.android.material.button.MaterialButton
@@ -62,6 +63,7 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:text="@string/val_joystick_mode_buttons"
             android:textSize="12sp"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"
             android:insetTop="0dp"
             android:insetBottom="0dp"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
@@ -110,6 +112,7 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:text="@string/val_axis_4way"
             android:textSize="10sp"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:padding="0dp"/>
@@ -121,6 +124,7 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:text="@string/val_axis_2way_h"
             android:textSize="10sp"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:padding="0dp"/>
@@ -132,6 +136,7 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:text="@string/val_axis_2way_v"
             android:textSize="10sp"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:padding="0dp"/>
@@ -343,24 +348,18 @@
 
         <!-- Style Selection (Spinner/Dropdown) -->
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
             android:layout_width="0dp"
             android:layout_weight="4"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            app:boxCornerRadiusTopStart="20dp"
-            app:boxCornerRadiusTopEnd="20dp"
-            app:boxCornerRadiusBottomStart="20dp"
-            app:boxCornerRadiusBottomEnd="20dp"
             android:hint="@string/properties_label_joystick_style">
             <AutoCompleteTextView
                 android:id="@+id/tvJoystickStyle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="none"
-                android:textSize="12sp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"/>
+                android:textSize="12sp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Color Palette -->
@@ -369,7 +368,7 @@
             layout="@layout/layout_prop_generic_color"
             android:layout_width="0dp"
             android:layout_weight="6"
-            android:layout_height="48dp"/>
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
 </LinearLayout>

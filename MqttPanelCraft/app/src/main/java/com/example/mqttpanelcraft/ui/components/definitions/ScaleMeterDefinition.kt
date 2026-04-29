@@ -12,7 +12,7 @@ object ScaleMeterDefinition : IComponentDefinition {
     override val defaultSize: Size = Size(100, 200)
     override val labelPrefix: String = "scale"
     override val iconResId: Int = android.R.drawable.ic_menu_sort_by_size
-    override val group: String = "DISPLAY"
+    override val group: String = "SENSOR"
     override val propertiesLayoutId: Int = 0
 
     override fun createView(context: Context, isEditMode: Boolean): View {

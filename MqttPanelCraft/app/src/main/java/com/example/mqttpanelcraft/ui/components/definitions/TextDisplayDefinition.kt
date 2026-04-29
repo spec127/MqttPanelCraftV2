@@ -12,7 +12,7 @@ object TextDisplayDefinition : IComponentDefinition {
     override val defaultSize: Size = Size(150, 60)
     override val labelPrefix: String = "text"
     override val iconResId: Int = android.R.drawable.ic_menu_sort_alphabetically
-    override val group: String = "DISPLAY"
+    override val group: String = "SENSOR"
     override val propertiesLayoutId: Int = 0
 
     override fun createView(context: Context, isEditMode: Boolean): View {

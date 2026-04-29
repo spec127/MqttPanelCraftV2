@@ -22,6 +22,16 @@ import com.google.android.material.button.MaterialButtonToggleGroup
  */
 object CommonPropBinder {
 
+    private val activePalettes = java.util.WeakHashMap<View, (String?) -> Unit>()
+
+    fun registerPalette(container: View, refresher: (String?) -> Unit) {
+        activePalettes[container] = refresher
+    }
+
+    fun notifyHistoryChanged() {
+        activePalettes.values.forEach { it.invoke(null) }
+    }
+
     /** Binds a standard color palette + custom color picker to a FrameLayout container. */
     fun bindColorPalette(
             panelView: View,
@@ -29,15 +39,26 @@ object CommonPropBinder {
             propKey: String,
             data: ComponentData,
             onUpdate: (String, String) -> Unit,
-            label: String? = null
+            label: String? = null,
+            defaultColor: String = "#2196F3"
     ) {
         val container = panelView.findViewById<FrameLayout>(containerId) ?: return
         val context = panelView.context
-        val currentColor = data.props[propKey] ?: "#2196F3"
+        val currentColor = data.props[propKey] ?: defaultColor
 
         if (container.childCount == 0) {
             LayoutInflater.from(context)
                     .inflate(R.layout.layout_prop_generic_color, container, true)
+        }
+
+        // Apply Native Label
+        val inputLayout = container.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.containerColorInputLayout)
+        if (label != null) {
+            inputLayout?.hint = label
+            inputLayout?.isHintEnabled = true
+        } else {
+            inputLayout?.hint = null
+            inputLayout?.isHintEnabled = false
         }
 
         // Palette colors
@@ -47,29 +68,47 @@ object CommonPropBinder {
                 }
         val btnSelect = container.findViewById<View>(R.id.btnColorCustom)
 
-        fun refreshPalette() {
+        fun refreshPalette(currentSelectedColor: String?) {
+            val selected = currentSelectedColor ?: data.props[propKey] ?: defaultColor
             val recent = ColorHistoryManager.load(context)
             colorViews.forEachIndexed { i, v ->
                 if (v != null && i < recent.size) {
                     val colorStr = recent[i]
                     v.backgroundTintList = ColorStateList.valueOf(Color.parseColor(colorStr))
-                    v.setOnClickListener { onUpdate(propKey, colorStr) }
+                    v.setOnClickListener { 
+                        onUpdate(propKey, colorStr) 
+                        refreshPalette(colorStr)
+                        notifyHistoryChanged()
+                    }
                 }
             }
+            // Update custom picker icon to match currently selected color
+            try {
+                (btnSelect as? android.widget.ImageView)?.imageTintList = ColorStateList.valueOf(Color.parseColor(selected))
+            } catch (e: Exception) {}
         }
-        refreshPalette()
+        
+        activePalettes[container] = { refreshPalette(null) }
+        refreshPalette(currentColor)
 
         btnSelect?.setOnClickListener {
+            var latestSelectedColor = data.props[propKey] ?: defaultColor
             ColorPickerDialog(
                             context,
-                            currentColor,
+                            latestSelectedColor,
                             true,
                             { selectedColor ->
+                                latestSelectedColor = selectedColor
                                 onUpdate(propKey, selectedColor)
-                                ColorHistoryManager.save(context, selectedColor)
-                                refreshPalette()
+                                try {
+                                    (btnSelect as? android.widget.ImageView)?.imageTintList = ColorStateList.valueOf(Color.parseColor(selectedColor))
+                                } catch (e: Exception) {}
                             },
-                            {}
+                            {
+                                ColorHistoryManager.save(context, latestSelectedColor)
+                                refreshPalette(latestSelectedColor)
+                                notifyHistoryChanged()
+                            }
                     )
                     .show(btnSelect ?: container)
         }

@@ -14,8 +14,8 @@
         android:layout_marginBottom="12dp">
         
         <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="@dimen/prop_section_icon_size"
+            android:layout_height="@dimen/prop_section_icon_size"
             android:src="@drawable/ic_touch_app"
             app:tint="@color/props_primary"
             android:layout_marginEnd="6dp"/>
@@ -30,27 +30,23 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
-    <!-- Trigger Mode & Release Payload (Since 'Press' is main payload) -->
+    <!-- Trigger Mode & Release Payload -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Press Payload (Main) - NOW WITH DROPDOWN -->
+        <!-- Press Payload (Main) -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/properties_label_payload_press"
             android:layout_marginBottom="8dp"
-            app:boxCornerRadiusTopStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusBottomEnd="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown">
             <AutoCompleteTextView
                  android:id="@+id/etPropPayloadPress"
                  android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
+                 android:layout_height="@dimen/prop_input_height_inner"
                  android:inputType="text"
                  android:text="ON"
                  android:textSize="14sp"
@@ -75,8 +71,8 @@
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/togglePropTrigger"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_marginBottom="12dp"
+        android:layout_height="@dimen/prop_toggle_height"
+        android:layout_marginBottom="@dimen/prop_section_margin_bottom"
         android:gravity="center"
         app:selectionRequired="true"
         app:singleSelection="true"
@@ -126,24 +122,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginBottom="12dp">
+        android:layout_marginBottom="@dimen/prop_section_margin_bottom">
     
-        <!-- Release Only - NOW WITH DROPDOWN -->
+        <!-- Release Only -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/containerReleaseOnly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/properties_label_payload_release"
             android:visibility="gone"
-            app:boxCornerRadiusTopStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusBottomEnd="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown">
             <AutoCompleteTextView
                 android:id="@+id/etPropPayloadRelease"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="text"
                 android:textSize="14sp"
                 android:textColor="@color/prop_text_primary"
@@ -171,7 +163,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPropTimer"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="number"
                     android:textSize="14sp"
                     android:textColor="@color/prop_text_primary"/>
@@ -184,15 +176,11 @@
                 android:layout_weight="0.6"
                 android:layout_height="wrap_content"
                 android:hint="@string/properties_label_payload_release"
-                app:boxCornerRadiusTopStart="16dp"
-                app:boxCornerRadiusTopEnd="16dp"
-                app:boxCornerRadiusBottomStart="16dp"
-                app:boxCornerRadiusBottomEnd="16dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+                style="@style/Widget.App.TextInputLayout.Properties.Dropdown">
                 <AutoCompleteTextView
                     android:id="@+id/etPropPayloadReleaseRef"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="text"
                     android:textSize="14sp"
                     android:textColor="@color/prop_text_primary"
@@ -205,14 +193,14 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Trigger Mode Description (Moved Below) -->
+    <!-- Trigger Mode Description -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:textColor="@color/prop_text_secondary"
         android:lineSpacingExtra="2dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="@dimen/prop_section_margin_bottom"
         android:text="@string/desc_mode_tap"/>
     </LinearLayout>
 
@@ -232,8 +220,8 @@
         android:layout_marginBottom="4dp">
         
         <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="@dimen/prop_section_icon_size"
+            android:layout_height="@dimen/prop_section_icon_size"
             android:layout_gravity="center_vertical"
             android:src="@drawable/ic_palette"
             app:tint="@color/props_primary"
@@ -256,23 +244,19 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="top"
-        android:layout_marginBottom="12dp">
+        android:layout_marginBottom="@dimen/prop_section_margin_bottom">
         
         <!-- Mode Dropdown -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_weight="0.4"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
             android:hint="@string/properties_section_appearance"
-            app:boxCornerRadiusTopStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusBottomEnd="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown">
             <AutoCompleteTextView
                  android:id="@+id/spPropApprMode"
                  android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
+                 android:layout_height="@dimen/prop_input_height_inner"
                  android:inputType="none"
                  android:text="@string/properties_mode_text"
                  android:textSize="13sp"
@@ -303,18 +287,14 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/containerPropText"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
                 android:hint="@string/properties_label_button_text"
                 android:layout_marginBottom="8dp"
-                app:boxCornerRadiusTopStart="16dp"
-                app:boxCornerRadiusTopEnd="16dp"
-                app:boxCornerRadiusBottomStart="16dp"
-                app:boxCornerRadiusBottomEnd="16dp"
                 style="@style/Widget.App.TextInputLayout.Properties">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPropText"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="text"
                     android:textSize="14sp"
                     android:textColor="@color/prop_text_primary"/>
@@ -324,7 +304,7 @@
             <LinearLayout
                 android:id="@+id/containerPropIcon"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:background="@drawable/bg_palette_border"
@@ -346,25 +326,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="start|center_vertical"
-        android:layout_marginBottom="12dp">
+        android:gravity="center_vertical"
+        android:layout_marginBottom="@dimen/prop_section_margin_bottom">
 
-        <!-- Shape Selector (Spinner) -->
+        <!-- Shape Selector -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_weight="0.4"
-            android:layout_height="wrap_content" 
+            android:layout_height="wrap_content"
             android:hint="@string/prop_hint_shape"
-            app:boxCornerRadiusTopStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusBottomEnd="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown">
             
             <AutoCompleteTextView
                  android:id="@+id/spPropShape"
                  android:layout_width="match_parent"
-                 android:layout_height="52dp"
+                 android:layout_height="@dimen/prop_input_height_inner"
                  android:inputType="none"
                  android:textSize="13sp"
                  android:maxLines="1"
@@ -384,13 +360,12 @@
         <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
 
         <!-- Color Picker -->
-            <!-- Color Palette -->
-            <include
-                android:id="@+id/containerColorPalette"
-                layout="@layout/layout_prop_generic_color"
-                android:layout_width="0dp"
-                android:layout_weight="0.6"
-                android:layout_height="52dp" />
+        <include
+            android:id="@+id/containerColorPalette"
+            layout="@layout/layout_prop_generic_color"
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </LinearLayout>

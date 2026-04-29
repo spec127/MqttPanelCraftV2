@@ -9,6 +9,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import com.example.mqttpanelcraft.ui.views.LedView
 import android.view.ViewConfiguration
 import android.widget.EditText
 import android.widget.GridLayout
@@ -394,10 +395,16 @@ class SidebarManager(
                                         }
                                         "SELECTOR" -> {
                                                 // V21.8: Use 3 segments for sidebar icon to
-                                                // increase clarity in small 42dp container
                                                 dummyProps["segments"] =
                                                         "[{\"label\":\"S1\",\"val\":\"1\"},{\"label\":\"S2\",\"val\":\"2\"},{\"label\":\"S3\",\"val\":\"3\"}]"
                                                 dummyProps["style"] = "rounded"
+                                        }
+                                        "LED" -> {
+                                                dummyProps["style"] = "ORB"
+dummyProps["icon"] = "ic_btn_lighting"
+dummyProps["appearance_mode"] = "icon"
+                                                dummyProps["active_color"] = "#FFD600"
+                                                dummyProps["idle_color"] = "#9E9E9E"
                                         }
                                 }
 
@@ -408,7 +415,7 @@ class SidebarManager(
                                                 x = 0f,
                                                 y = 0f,
                                                 width = 100,
-                                                height = 100, // Dummy size
+                                                height = 100,
                                                 label = "",
                                                 topicConfig = "",
                                                 props = dummyProps
@@ -416,6 +423,13 @@ class SidebarManager(
 
                                 // Update View Appearance
                                 def.onUpdateView(previewView, dummyData)
+
+                                // V21.12: Force LED to be ON in sidebar preview
+                                if (def.type == "LED" && previewView is android.view.ViewGroup) {
+                                        val ledView = previewView.getChildAt(0) as? com.example.mqttpanelcraft.ui.views.LedView
+ledView?.isActive = true
+                                        ledView?.effect = com.example.mqttpanelcraft.ui.views.LedView.Effect.NONE
+                                }
 
                                 // Disable interaction on preview recursively
                                 fun disableView(v: View) {
@@ -435,13 +449,11 @@ class SidebarManager(
                                 }
 
                                 // Add to Container
-                                // Individualized Dimensions (V21.12: Even Shorter)
                                 val (pWidth, pHeight) =
                                         when (def.type) {
                                                 "SELECTOR" -> Pair(dpToPx(85), dpToPx(36))
                                                 "SLIDER" -> Pair(dpToPx(76), dpToPx(36))
-                                                "JOYSTICK", "PALETTE" ->
-                                                        Pair(dpToPx(42), dpToPx(42))
+                                                "JOYSTICK", "PALETTE" -> Pair(dpToPx(56), dpToPx(56))
                                                 "BUTTON" -> Pair(dpToPx(50), dpToPx(42))
                                                 "SWITCH" -> Pair(dpToPx(40), dpToPx(42))
                                                 "CAMERA" ->
@@ -451,7 +463,7 @@ class SidebarManager(
                                                                 dpToPx(36)
                                                         )
                                                 "INPUT" -> Pair(dpToPx(50), dpToPx(20))
-                                                "LED" -> Pair(dpToPx(32), dpToPx(32))
+                                                "LED" -> Pair(dpToPx(56), dpToPx(56))
                                                 "THERMOMETER", "LEVEL" ->
                                                         Pair(dpToPx(32), dpToPx(40))
                                                 "TEXT", "IMAGE" -> Pair(dpToPx(100), dpToPx(32))
@@ -471,9 +483,8 @@ class SidebarManager(
 
                                 val previewParams =
                                         android.widget.FrameLayout.LayoutParams(pWidth, pHeight)
-                                previewParams.gravity =
-                                        android.view.Gravity.CENTER_HORIZONTAL or
-                                                android.view.Gravity.BOTTOM
+                                previewParams.gravity = android.view.Gravity.CENTER
+                                 previewParams.topMargin = dpToPx(4)
 
                                 if (def.type == "PALETTE") {
                                         previewParams.setMargins(0, 0, 0, dpToPx(2))

@@ -12,7 +12,7 @@ object ValueDisplayDefinition : IComponentDefinition {
     override val defaultSize: Size = Size(150, 60)
     override val labelPrefix: String = "value"
     override val iconResId: Int = android.R.drawable.ic_menu_info_details
-    override val group: String = "DISPLAY"
+    override val group: String = "SENSOR"
     override val propertiesLayoutId: Int = 0
 
     override fun createView(context: Context, isEditMode: Boolean): View {

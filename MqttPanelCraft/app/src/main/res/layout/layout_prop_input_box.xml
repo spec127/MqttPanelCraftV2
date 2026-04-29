@@ -150,18 +150,14 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_weight="0.4"
-            android:layout_height="wrap_content" 
+            android:layout_height="wrap_content"
             android:hint="@string/prop_hint_style"
-            app:boxCornerRadiusTopStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusBottomEnd="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown">
             
             <AutoCompleteTextView
                  android:id="@+id/spPropStyle"
                  android:layout_width="match_parent"
-                 android:layout_height="52dp"
+                 android:layout_height="@dimen/prop_input_height_inner"
                  android:inputType="none"
                  android:textSize="13sp"
                  android:maxLines="1"
@@ -182,10 +178,11 @@
 
         <!-- Color Picker (Unified) -->
         <include
+            android:id="@+id/containerColorPalette"
             layout="@layout/layout_prop_generic_color"
             android:layout_width="0dp"
             android:layout_weight="0.6"
-            android:layout_height="52dp" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </LinearLayout>

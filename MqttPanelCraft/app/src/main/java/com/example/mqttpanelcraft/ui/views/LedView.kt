@@ -3,6 +3,7 @@ package com.example.mqttpanelcraft.ui.views
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
+import kotlin.math.*
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -117,8 +118,22 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         val cy = h / 2f
         val radius = Math.max(0.1f, (Math.min(w, h) / 2f) * 0.8f)
 
-        val baseColor = if (isActive) activeColor else idleColor
-        val alpha = if (isActive) (255 * animValue).toInt() else 255
+        val isDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        
+        // Enhanced color logic
+        var baseColor = if (isActive) activeColor else idleColor
+        
+        // Boost saturation when active as requested
+        if (isActive) {
+            val hsv = FloatArray(3)
+            Color.colorToHSV(baseColor, hsv)
+            hsv[1] = (hsv[1] * 1.2f).coerceAtMost(1.0f) // Boost saturation by 20%
+            hsv[2] = (hsv[2] * 1.1f).coerceAtMost(1.0f) // Slightly boost brightness too
+            baseColor = Color.HSVToColor(hsv)
+        }
+
+        // Reduced opacity when inactive (off) for transparency effect
+        val alpha = if (isActive) (255 * animValue).toInt() else 100 
         val colorWithAlpha =
                 Color.argb(
                         alpha,
@@ -126,6 +141,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         Color.green(baseColor),
                         Color.blue(baseColor)
                 )
+
+        if (isActive && style != Style.NEON_TEXT) {
+            // Skip center glow for Neon mode to avoid "blob" effect
+            drawAtmosphericGlow(canvas, cx, cy, radius, baseColor)
+        }
 
         when (style) {
             Style.ORB -> drawOrb(canvas, cx, cy, radius, colorWithAlpha)
@@ -137,6 +157,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
         // Default label drawing (only if label is explicitly needed for simple styles in future)
         // Currently all styles handle their text rendering internally
+    }
+
+    private fun drawAtmosphericGlow(canvas: Canvas, cx: Float, cy: Float, radius: Float, color: Int) {
+        val glowRadius = radius * 2.5f // V21.12: Increased from 1.75f for "WOW" effect
+        glowPaint.shader = RadialGradient(
+            cx, cy, glowRadius,
+            intArrayOf(
+                ColorUtils.setAlphaComponent(color, 150), // Slightly softer
+                ColorUtils.setAlphaComponent(color, 35),  
+                Color.TRANSPARENT
+            ),
+            floatArrayOf(0f, 0.45f, 1f), 
+            Shader.TileMode.CLAMP
+        )
+        canvas.drawCircle(cx, cy, glowRadius, glowPaint)
     }
 
     private fun drawOrb(canvas: Canvas, cx: Float, cy: Float, radius: Float, color: Int) {
@@ -278,82 +313,165 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
         // Central white icon
         if (iconResId != 0) {
-            val iconSize = radius * 0.7f
+            val iconSize = radius * 0.85f // Slightly larger icon
+            // V21.12: Always use White for glowing icons to emphasize light emission
             drawIcon(canvas, iconResId, cx, cy, iconSize, Color.WHITE)
         }
     }
 
     private fun drawConcentric(canvas: Canvas, cx: Float, cy: Float, radius: Float, color: Int) {
-        // Outer faint ring
+        // Enhanced Glow Fill for realistic "Light On" feeling
         mainPaint.style = Paint.Style.STROKE
-        mainPaint.strokeWidth = 2f
-        mainPaint.color = Color.argb(40, 200, 200, 200)
-        canvas.drawCircle(cx, cy, radius * 1.1f, mainPaint)
+        mainPaint.strokeWidth = 6f
+        mainPaint.color = if (isActive) ColorUtils.setAlphaComponent(color, 200) else Color.argb(60, 180, 180, 180)
+        canvas.drawCircle(cx, cy, radius * 1.3f, mainPaint)
 
-        // Inner filled circle (faint background)
         mainPaint.style = Paint.Style.FILL
-        mainPaint.color = ColorUtils.setAlphaComponent(color, 20)
-        canvas.drawCircle(cx, cy, radius * 0.8f, mainPaint)
+        if (isActive) {
+            // Stronger gradient to simulate light emission
+            val glowFill = RadialGradient(
+                cx, cy, radius * 1.3f,
+                intArrayOf(LedView.ColorUtils.lighten(color, 0.6f), color, LedView.ColorUtils.darken(color, 0.3f)),
+                floatArrayOf(0f, 0.6f, 1f),
+                Shader.TileMode.CLAMP
+            )
+            mainPaint.shader = glowFill
+        } else {
+            mainPaint.color = LedView.ColorUtils.setAlphaComponent(color, 80)
+            mainPaint.shader = null
+        }
+        canvas.drawCircle(cx, cy, radius * 1.1f, mainPaint)
+        mainPaint.shader = null
 
-        // Central Text
-        if (label.isNotEmpty()) {
-            textPaint.color = color
-            textPaint.textSize = radius * 0.4f
-            val fontMetrics = textPaint.fontMetrics
-            val textY = cy - (fontMetrics.ascent + fontMetrics.descent) / 2f
-            canvas.drawText(label, cx, textY, textPaint)
+        // Content drawing logic (icons/text)
+        val hasIcon = iconResId != 0
+        val hasLabel = label.isNotEmpty()
+        val contentColor = if (isDarkColor(color)) Color.WHITE else Color.BLACK
+        
+        if (hasIcon && hasLabel) {
+            val iconSize = radius * 0.9f
+            drawIcon(canvas, iconResId, cx, cy - radius * 0.35f, iconSize, contentColor)
+            drawMultilineText(canvas, label, cx, cy + radius * 0.65f, radius * 0.45f, contentColor)
+        } else if (hasIcon) {
+            val iconSize = radius * 1.3f
+            drawIcon(canvas, iconResId, cx, cy, iconSize, contentColor)
+        } else if (hasLabel) {
+            drawMultilineText(canvas, label, cx, cy, radius * 0.8f, contentColor, true)
         }
     }
 
     private fun drawRadiusXL(canvas: Canvas, cx: Float, cy: Float, radius: Float, color: Int) {
-        val rectWidth = radius * 1.6f
-        val rectHeight = radius * 1.6f
-        val rect =
-                RectF(
-                        cx - rectWidth / 2f,
-                        cy - rectHeight / 2f,
-                        cx + rectWidth / 2f,
-                        cy + rectHeight / 2f
-                )
-        val corner = radius * 0.4f
+        // Enhanced Glow Fill for Rectangle + Outer Ring (Consistent with Concentric)
+        val rectWidth = radius * 2.5f
+        val rectHeight = radius * 2.5f
+        val rect = RectF(cx - rectWidth / 2f, cy - rectHeight / 2f,
+                         cx + rectWidth / 2f, cy + rectHeight / 2f)
+        val corner = radius * 0.3f
 
-        // Border
+        // New Outer Ring for RadiusXL
+        val outerRect = RectF(cx - (rectWidth * 1.15f) / 2f, cy - (rectHeight * 1.15f) / 2f,
+                              cx + (rectWidth * 1.15f) / 2f, cy + (rectHeight * 1.15f) / 2f)
         mainPaint.style = Paint.Style.STROKE
         mainPaint.strokeWidth = 4f
-        mainPaint.color = Color.argb(30, 200, 200, 200)
+        mainPaint.color = if (isActive) ColorUtils.setAlphaComponent(color, 150) else Color.argb(60, 180, 180, 180)
+        canvas.drawRoundRect(outerRect, corner * 1.3f, corner * 1.3f, mainPaint)
+
+        mainPaint.style = Paint.Style.STROKE
+        mainPaint.strokeWidth = 6f
+        mainPaint.color = if (isActive) ColorUtils.setAlphaComponent(color, 200) else Color.argb(60, 180, 180, 180)
         canvas.drawRoundRect(rect, corner, corner, mainPaint)
 
-        // Inner Fill
         mainPaint.style = Paint.Style.FILL
-        mainPaint.color = ColorUtils.setAlphaComponent(color, 15)
-        canvas.drawRoundRect(rect, corner, corner, mainPaint)
-
-        // Icon (Top half)
-        if (iconResId != 0) {
-            val iconSize = radius * 0.5f
-            drawIcon(canvas, iconResId, cx, cy - radius * 0.25f, iconSize, color)
+        if (isActive) {
+            val glowFill = RadialGradient(
+                cx, cy, radius * 1.5f,
+                intArrayOf(LedView.ColorUtils.lighten(color, 0.4f), color, LedView.ColorUtils.darken(color, 0.2f)),
+                floatArrayOf(0f, 0.8f, 1f),
+                Shader.TileMode.CLAMP
+            )
+            mainPaint.shader = glowFill
+        } else {
+            mainPaint.color = LedView.ColorUtils.setAlphaComponent(color, 70)
+            mainPaint.shader = null
         }
+        canvas.drawRoundRect(rect, corner, corner, mainPaint)
+        mainPaint.shader = null
 
-        // Text (Bottom half)
-        if (label.isNotEmpty()) {
-            textPaint.color = color
-            textPaint.textSize = radius * 0.25f
-            textPaint.alpha = 255
-            canvas.drawText(label, cx, cy + radius * 0.45f, textPaint)
+        // Content drawing logic (icons/text)
+        val hasIcon = iconResId != 0
+        val hasLabel = label.isNotEmpty()
+        val contentColor = if (isDarkColor(color)) Color.WHITE else Color.BLACK
+
+        if (hasIcon && hasLabel) {
+            val iconSize = radius * 0.9f
+            drawIcon(canvas, iconResId, cx, cy - radius * 0.4f, iconSize, contentColor)
+            drawMultilineText(canvas, label, cx, cy + radius * 0.7f, radius * 0.45f, contentColor)
+        } else if (hasIcon) {
+            val iconSize = radius * 1.3f
+            drawIcon(canvas, iconResId, cx, cy, iconSize, contentColor)
+        } else if (hasLabel) {
+            drawMultilineText(canvas, label, cx, cy, radius * 0.8f, contentColor, true)
         }
     }
 
     private fun drawNeonText(canvas: Canvas, cx: Float, cy: Float, radius: Float, color: Int) {
-        // Glowing Text
-        if (label.isNotEmpty()) {
-            textPaint.textSize = radius * 0.6f
-            textPaint.color = color
-            textPaint.setShadowLayer(10f, 0f, 0f, color)
-            val fontMetrics = textPaint.fontMetrics
-            val textY = cy - (fontMetrics.ascent + fontMetrics.descent) / 2f
-            canvas.drawText(label, cx, textY, textPaint)
+        // Double-layer Neon Glow for better "Tube" effect
+        val contentColor = if (isActive) color else Color.DKGRAY
+        
+        if (iconResId != 0) {
+            if (isActive) {
+                // Outer faint glow
+                textPaint.setShadowLayer(25f, 0f, 0f, ColorUtils.setAlphaComponent(color, 120))
+                drawIcon(canvas, iconResId, cx, cy, radius * 1.2f, contentColor)
+                // Inner tight glow
+                textPaint.setShadowLayer(10f, 0f, 0f, color)
+                drawIcon(canvas, iconResId, cx, cy, radius * 1.2f, contentColor)
+            } else {
+                drawIcon(canvas, iconResId, cx, cy, radius * 1.2f, contentColor)
+            }
+            textPaint.clearShadowLayer()
+        } else if (label.isNotEmpty()) {
+            val maxLines = label.split("\n").size
+            val avgChars = label.length / maxLines
+            val baseSize = (radius * 2.5f) / max(1, avgChars / 2)
+            val finalSize = min(baseSize, (radius * 1.8f) / maxLines)
+            
+            // Draw with enhanced shadow layer
+            if (isActive) {
+                textPaint.setShadowLayer(20f, 0f, 0f, color)
+            }
+            drawMultilineText(canvas, label, cx, cy, finalSize, contentColor, true, isActive)
             textPaint.clearShadowLayer()
         }
+    }
+
+    private fun drawMultilineText(
+        canvas: Canvas,
+        text: String,
+        cx: Float,
+        cy: Float,
+        size: Float,
+        color: Int,
+        centerVertical: Boolean = false,
+        useShadow: Boolean = false
+    ) {
+        textPaint.color = color
+        textPaint.textSize = size
+        textPaint.alpha = Color.alpha(color)
+        if (useShadow) textPaint.setShadowLayer(10f, 0f, 0f, color) else textPaint.clearShadowLayer()
+        
+        val lines = text.split("\n")
+        val fm = textPaint.fontMetrics
+        val lineHeight = fm.descent - fm.ascent
+        val totalHeight = lineHeight * lines.size
+        
+        var startY = if (centerVertical) cy - (totalHeight / 2f) - fm.ascent else cy
+        
+        for (line in lines) {
+            canvas.drawText(line, cx, startY, textPaint)
+            startY += lineHeight
+        }
+        textPaint.clearShadowLayer()
     }
 
     private fun drawLabel(canvas: Canvas, cx: Float, cy: Float, radius: Float) {
@@ -386,6 +504,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun isDarkColor(color: Int): Boolean {
+        // Calculate relative luminance
+        val darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255
+        return darkness >= 0.4 // Threshold for white text
     }
 
     object ColorUtils {
