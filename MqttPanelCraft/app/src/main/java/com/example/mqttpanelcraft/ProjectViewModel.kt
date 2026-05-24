@@ -161,7 +161,9 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
 
     private fun getNextSmartLabel(type: String): String {
         val proj = project.value ?: return "${type.lowercase()}1"
-        val prefix = type.lowercase()
+        // 優先從元件註冊表獲取定義好的 labelPrefix，使預設名稱更簡潔且無底線（Design Intent：防呆命名）
+        val definition = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(type)
+        val prefix = definition?.labelPrefix ?: type.lowercase()
 
         // Find all used IDs for this Type (Labels starting with "type")
         val usedIds =
@@ -239,8 +241,7 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         // new helper?
         // Let's rely on getNextSmartLabel(type) for now -> It needs to be updated or we assume
         // prefix match.
-        val newLabel =
-                getNextSmartLabel(type) // TODO: Update this to use definition.labelPrefix later
+        val newLabel = getNextSmartLabel(type)
 
         // 2. Smart Topic
         val smartTopic = generateSmartTopic(type)

@@ -17,8 +17,8 @@ android {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
-        versionCode = 86
-        versionName = "0.6.27"
+        versionCode = 109
+        versionName = "0.7.12"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

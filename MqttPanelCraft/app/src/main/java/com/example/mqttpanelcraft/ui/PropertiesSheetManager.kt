@@ -328,37 +328,48 @@ class PropertiesSheetManager(
             containerSpecificProps?.removeAllViews()
 
             // PRIORITY 1: Definition Architecture
-            val def =
-                    com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(
-                            data.type
-                    )
+            val typeClean = data.type.trim()
+            val def = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(typeClean)
+            
+            android.util.Log.d("PropsManager", "Type: '$typeClean', Def found: ${def != null}")
+
             if (def != null && def.propertiesLayoutId != 0) {
-                val inflater = LayoutInflater.from(propertyContainer.context)
-                val root = inflater.inflate(def.propertiesLayoutId, containerSpecificProps, true)
-                def.bindPropertiesPanel(root, data) { key: String, value: String ->
-                    // Immediate Update from Definition
-                    if (currentData != null) {
-                        if (key == "w") {
-                            try {
-                                currentData?.width = value.toInt()
-                            } catch (e: Exception) {}
-                            onPropertyUpdated(currentData!!)
-                        } else if (key == "h") {
-                            try {
-                                currentData?.height = value.toInt()
-                            } catch (e: Exception) {}
-                            onPropertyUpdated(currentData!!)
-                        } else {
-                            // Allow "text" to be empty string (to override default label)
-                            if (value.isEmpty() && key != "text") {
-                                currentData?.props?.remove(key)
+                try {
+                    val inflater = LayoutInflater.from(propertyContainer.context)
+                    
+                    // Clear previous
+                    containerSpecificProps?.visibility = View.VISIBLE
+                    containerSpecificProps?.removeAllViews()
+                    
+                    // Inflate with attachToRoot = false for more control
+                    val specificView = inflater.inflate(def.propertiesLayoutId, containerSpecificProps, false)
+                    containerSpecificProps?.addView(specificView)
+                    
+                    android.util.Log.d("PropsManager", "Binding properties for $typeClean")
+                    def.bindPropertiesPanel(specificView, data) { key: String, value: String ->
+                        if (currentData != null) {
+                            if (key == "w") {
+                                try { currentData?.width = value.toInt() } catch (e: Exception) {}
+                                onPropertyUpdated(currentData!!)
+                            } else if (key == "h") {
+                                try { currentData?.height = value.toInt() } catch (e: Exception) {}
+                                onPropertyUpdated(currentData!!)
                             } else {
-                                currentData?.props?.put(key, value)
+                                if (value.isEmpty() && key != "text") {
+                                    currentData?.props?.remove(key)
+                                } else {
+                                    currentData?.props?.put(key, value)
+                                }
+                                onPropertyUpdated(currentData!!)
                             }
-                            onPropertyUpdated(currentData!!)
                         }
                     }
+                } catch (e: Exception) {
+                    android.util.Log.e("PropsManager", "Error inflating/binding specific props", e)
+                    Toast.makeText(propertyContainer.context, "加載專屬屬性失敗: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
+            } else {
+                android.util.Log.w("PropsManager", "No definition or layout for type: $typeClean")
             }
 
             // Generic Payload Logic

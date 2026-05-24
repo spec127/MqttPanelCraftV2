@@ -406,6 +406,12 @@ dummyProps["appearance_mode"] = "icon"
                                                 dummyProps["active_color"] = "#FFD600"
                                                 dummyProps["idle_color"] = "#9E9E9E"
                                         }
+                                        "SCALE_METER" -> {
+                                                dummyProps["value"] = "75"
+                                                dummyProps["style"] = "SOLID"
+                                                dummyProps["active_color"] = "#FF9800"
+                                                dummyProps["idle_color"] = "#E0E0E0"
+                                        }
                                 }
 
                                 val dummyData =
@@ -464,6 +470,7 @@ ledView?.isActive = true
                                                         )
                                                 "INPUT" -> Pair(dpToPx(50), dpToPx(20))
                                                 "LED" -> Pair(dpToPx(56), dpToPx(56))
+                                                "SCALE_METER" -> Pair(dpToPx(30), dpToPx(56))
                                                 "THERMOMETER", "LEVEL" ->
                                                         Pair(dpToPx(32), dpToPx(40))
                                                 "TEXT", "IMAGE" -> Pair(dpToPx(100), dpToPx(32))
@@ -519,15 +526,10 @@ ledView?.isActive = true
                                 tv.text = labelText
 
                                 // Card Layout Params for Grid (Square-ish Box)
-                                val params = android.widget.GridLayout.LayoutParams()
-                                // Fixed width to prevent single-item stretching. Sidebar ~280dp.
-                                // 280 - 32(padding) - 24(margins) = 224 / 2 = 112. Safe: 108dp.
-                                params.width = dpToPx(108)
-                                params.height = android.widget.GridLayout.LayoutParams.WRAP_CONTENT
-                                params.columnSpec =
-                                        android.widget.GridLayout.spec(
-                                                android.widget.GridLayout.UNDEFINED
-                                        ) // Removed Weight 1f
+                                val params = card.layoutParams as android.widget.GridLayout.LayoutParams
+                                params.width = 0
+                                params.height = dpToPx(100) // EXPLICIT HEIGHT 100dp
+                                params.columnSpec = android.widget.GridLayout.spec(android.widget.GridLayout.UNDEFINED, 1f)
                                 params.setMargins(dpToPx(6), dpToPx(6), dpToPx(6), dpToPx(6))
                                 card.layoutParams = params
 
