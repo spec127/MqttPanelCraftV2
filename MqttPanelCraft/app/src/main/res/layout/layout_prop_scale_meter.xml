@@ -21,7 +21,7 @@
             android:layout_marginEnd="6dp"/>
             
         <TextView
-            android:text="互動邏輯與回饋 (Logic &amp; Feedback)"
+            android:text="互動功能"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/prop_text_secondary"
@@ -262,7 +262,7 @@
             android:layout_marginEnd="6dp"/>
             
         <TextView
-            android:text="@string/properties_section_appearance"
+            android:text="外觀設定"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/prop_text_secondary"
@@ -285,13 +285,13 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_weight="4"
                 android:layout_height="wrap_content"
-                android:hint="@string/prop_hint_style"
+                android:hint="@string/prop_label_orientation"
                 style="@style/Widget.App.TextInputLayout.Properties.Compact"
                 android:layout_marginEnd="8dp">
                 <AutoCompleteTextView
-                    android:id="@+id/spScaleStyle"
+                    android:id="@+id/spScaleOrientation"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="none"
@@ -300,12 +300,12 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_weight="6"
                 android:layout_height="wrap_content"
-                android:hint="@string/prop_label_orientation"
+                android:hint="@string/prop_hint_style"
                 style="@style/Widget.App.TextInputLayout.Properties.Compact">
                 <AutoCompleteTextView
-                    android:id="@+id/spScaleOrientation"
+                    android:id="@+id/spScaleStyle"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="none"

@@ -5,82 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <!-- SECTION 1: APPEARANCE (外觀設定) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="start|center_vertical"
-        android:layout_marginBottom="12dp">
-        
-        <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_palette"
-            app:tint="@color/props_primary"
-            android:layout_marginEnd="6dp"/>
-            
-        <TextView
-            android:text="外觀設定 (Appearance)"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="@color/prop_text_secondary"
-            android:letterSpacing="0.05"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
-        
-        <!-- Style Selector -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilMeterStyle"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:hint="風格 (Style)"
-            android:layout_marginEnd="6dp"
-            app:hintTextColor="@color/props_primary">
-
-            <AutoCompleteTextView
-                android:id="@+id/acMeterStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:textSize="13sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Angle Selector -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilTrackAngle"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:hint="軌道角度 (Angle)"
-            app:hintTextColor="@color/props_primary">
-
-            <AutoCompleteTextView
-                android:id="@+id/acTrackAngle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:textSize="13sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider_line"
-        android:layout_marginBottom="16dp" />
-
-    <!-- SECTION 2: INTERACTION & LOGIC -->
+    <!-- SECTION 1: INTERACTION & LOGIC -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -96,7 +21,7 @@
             android:layout_marginEnd="6dp"/>
             
         <TextView
-            android:text="互動邏輯與數值 (Logic &amp; Data)"
+            android:text="互動功能"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/prop_text_secondary"
@@ -165,43 +90,7 @@
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider_line"
-        android:layout_marginBottom="16dp" />
-
-    <!-- SECTION 3: COLOR & THRESHOLDS -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="start|center_vertical"
-        android:layout_marginBottom="12dp">
-        
-        <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_palette"
-            app:tint="@color/props_primary"
-            android:layout_marginEnd="6dp"/>
-            
-        <TextView
-            android:text="色彩與狀態 (Color &amp; States)"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="@color/prop_text_secondary"
-            android:letterSpacing="0.05"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-    
-    <FrameLayout
-        android:id="@+id/containerThemeColor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <!-- Threshold Warning Mode Toggle -->
+    <!-- Threshold Warning Mode Toggle (現在併入互動功能區段) -->
     <LinearLayout
         android:id="@+id/itemThresholdMode"
         android:layout_width="match_parent"
@@ -308,6 +197,128 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginBottom="4dp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_line"
+        android:layout_marginBottom="16dp" />
+
+    <!-- SECTION 2: APPEARANCE (外觀設定) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+            
+        <TextView
+            android:text="外觀設定"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- 第一排：風格 4 : 角度 6 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+        
+        <!-- Style Selector -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilMeterStyle"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="wrap_content"
+            android:hint="風格 (Style)"
+            android:layout_marginEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:hintTextColor="@color/props_primary">
+
+            <AutoCompleteTextView
+                android:id="@+id/acMeterStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textSize="13sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Angle Selector -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilTrackAngle"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_weight="6"
+            android:layout_height="wrap_content"
+            android:hint="軌道角度 (Angle)"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:hintTextColor="@color/props_primary">
+
+            <AutoCompleteTextView
+                android:id="@+id/acTrackAngle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textSize="13sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <!-- 第二排：是否有刻度 4 : 主體顏色 6 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilGaugeTicks"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:layout_height="wrap_content"
+            android:hint="刻度"
+            android:layout_marginEnd="12dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:hintTextColor="@color/props_primary">
+            
+            <AutoCompleteTextView
+                android:id="@+id/acGaugeTicks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <FrameLayout
+            android:id="@+id/containerThemeColor"
+            android:layout_width="0dp"
+            android:layout_weight="6"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 
 </LinearLayout>

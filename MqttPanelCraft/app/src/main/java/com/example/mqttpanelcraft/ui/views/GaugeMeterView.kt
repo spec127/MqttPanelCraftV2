@@ -25,6 +25,9 @@ class GaugeMeterView @JvmOverloads constructor(
     var trackAngle: TrackAngle = TrackAngle.ARC_270
         set(value) { field = value; requestLayout(); invalidate() }
 
+    var showTicks: Boolean = false
+        set(value) { field = value; invalidate() }
+
     // --- 資料與數值 ---
     var unit: String = ""
         set(value) { field = value; invalidate() }
@@ -88,7 +91,7 @@ class GaugeMeterView @JvmOverloads constructor(
     
     private val minMaxTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
-        color = Color.LTGRAY
+        color = Color.parseColor("#94A3B8") // 加深為更清晰的灰色
     }
 
     init {
@@ -160,7 +163,7 @@ class GaugeMeterView @JvmOverloads constructor(
         trackPaint.strokeWidth = trackThickness
         progressPaint.strokeWidth = trackThickness
         
-        val maxTextSize = 24f * density * vScale
+        val maxTextSize = 12f * density * vScale // 再次縮小中央數值
         val padding = trackThickness / 2f + 20f * density * vScale // 為 Min/Max 標籤留出空間
         
         var cx = w / 2f
@@ -245,7 +248,7 @@ class GaugeMeterView @JvmOverloads constructor(
             
             // 畫指針
             val pointerAngleRad = Math.toRadians((startAngle + currentSweep).toDouble())
-            val needleLen = radius - trackThickness * 1.5f
+            val needleLen = radius - trackThickness * 0.5f // 加長指針，讓它看起來不那麼短
             val nx = cx + cos(pointerAngleRad).toFloat() * needleLen
             val ny = cy + sin(pointerAngleRad).toFloat() * needleLen
             
@@ -257,14 +260,38 @@ class GaugeMeterView @JvmOverloads constructor(
             
             // 繪製中心圓盤 (Pivot)
             needlePaint.style = Paint.Style.FILL
-            canvas.drawCircle(cx, cy, 6f * density * vScale, needlePaint)
+            canvas.drawCircle(cx, cy, 4f * density * vScale, needlePaint) // 縮小外圈軸心
             // 畫一個小黑點在中間增加立體感
             needlePaint.color = Color.BLACK
-            canvas.drawCircle(cx, cy, 2f * density * vScale, needlePaint)
+            canvas.drawCircle(cx, cy, 1.5f * density * vScale, needlePaint) // 縮小內圈黑點
+        }
+
+        // --- 3.5 繪製刻度 ---
+        if (showTicks) {
+            val count = 11
+            val majorTickLen = 8f * density * vScale
+            val minorTickLen = 4f * density * vScale
+            val tickPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.STROKE
+                strokeWidth = 1.5f * density
+                color = Color.parseColor("#40FFFFFF")
+            }
+            val angleStep = sweepAngle / (count - 1)
+            for (i in 0 until count) {
+                val currentAngle = startAngle + i * angleStep
+                val angleRad = Math.toRadians(currentAngle.toDouble())
+                val len = if (i % 5 == 0) majorTickLen else minorTickLen
+                // 從軌道內側邊緣往圓心畫
+                val tx1 = cx + cos(angleRad).toFloat() * (radius - trackThickness / 2f)
+                val ty1 = cy + sin(angleRad).toFloat() * (radius - trackThickness / 2f)
+                val tx2 = cx + cos(angleRad).toFloat() * (radius - trackThickness / 2f - len)
+                val ty2 = cy + sin(angleRad).toFloat() * (radius - trackThickness / 2f - len)
+                canvas.drawLine(tx1, ty1, tx2, ty2, tickPaint)
+            }
         }
 
         // --- 4. 繪製 Min / Max 標籤 ---
-        minMaxTextPaint.textSize = 10f * density * vScale
+        minMaxTextPaint.textSize = 9f * density * vScale // 頭尾數值調小
         // 算出起點與終點的座標
         val startRad = Math.toRadians(startAngle.toDouble())
         val endRad = Math.toRadians((startAngle + sweepAngle).toDouble())
@@ -286,7 +313,7 @@ class GaugeMeterView @JvmOverloads constructor(
         
         // 處理排版位置
         val textY = when (trackAngle) {
-            TrackAngle.ARC_270 -> cy + (maxTextSize / 3) // 置中
+            TrackAngle.ARC_270 -> cy + radius * 0.4f // 置於圓心下方
             TrackAngle.ARC_180 -> cy + maxTextSize // 置於圓心正下方
             TrackAngle.ARC_120 -> cy - radius / 2 // 置於圓心偏上方 (被指針蓋住的位置，營造層次感)
         }

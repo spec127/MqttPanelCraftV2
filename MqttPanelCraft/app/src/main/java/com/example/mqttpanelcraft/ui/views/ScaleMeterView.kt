@@ -196,7 +196,8 @@ class ScaleMeterView @JvmOverloads constructor(
             if (showValue) {
                 digitalScreenSize = (36f * density) * vScale // 縮小面板高度，解決臃腫
                 val panelTop = h - panelMarginBottom - digitalScreenSize
-                trackBottom = panelTop - panelMarginTop
+                val extraBubblePad = if (showBubble) bubbleRadius * 1.5f else 0f
+                trackBottom = panelTop - panelMarginTop - extraBubblePad
             }
         } else {
             val cy = topNeed + (h - topNeed - bottomNeed) / 2f
@@ -208,7 +209,8 @@ class ScaleMeterView @JvmOverloads constructor(
             if (showValue) {
                 digitalScreenSize = (36f * density) * vScale
                 val panelLeft = w - panelMarginBottom - digitalScreenSize
-                trackRight = panelLeft - panelMarginTop
+                val extraBubblePad = if (showBubble) bubbleRadius * 1.5f else 0f
+                trackRight = panelLeft - panelMarginTop - extraBubblePad
             }
         }
 
@@ -493,8 +495,9 @@ class ScaleMeterView @JvmOverloads constructor(
             RectF(cx - panelW / 2f, h - marginBottom - size, cx + panelW / 2f, h - marginBottom)
         } else {
             val panelH = Math.min(h * 0.8f, 70f * density)
-            val marginRight = 16f * density
-            RectF(w - marginRight - size, cy - panelH / 2f, w - marginRight, cy + panelH / 2f)
+            val marginRight = 24f * density // 往左微調
+            val offsetY = panelH * 0.2f // 往下微調
+            RectF(w - marginRight - size * 1.4f, cy - panelH / 2f + offsetY, w - marginRight, cy + panelH / 2f + offsetY)
         }
         
         val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
