@@ -15,7 +15,7 @@ object ComponentDefinitionRegistry {
         register(ImageDefinition)
         register(LedDefinition)
         register(ScaleMeterDefinition)
-        register(GaugeDefinition)
+        register(GaugeMeterDefinition)
         register(ValueDisplayDefinition)
         register(TextDisplayDefinition)
         register(LineChartDefinition)

@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- SECTION 1: APPEARANCE (外觀設定) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+            
+        <TextView
+            android:text="外觀設定 (Appearance)"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+        
+        <!-- Style Selector -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilMeterStyle"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="風格 (Style)"
+            android:layout_marginEnd="6dp"
+            app:hintTextColor="@color/props_primary">
+
+            <AutoCompleteTextView
+                android:id="@+id/acMeterStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textSize="13sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Angle Selector -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilTrackAngle"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="軌道角度 (Angle)"
+            app:hintTextColor="@color/props_primary">
+
+            <AutoCompleteTextView
+                android:id="@+id/acTrackAngle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textSize="13sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_line"
+        android:layout_marginBottom="16dp" />
+
+    <!-- SECTION 2: INTERACTION & LOGIC -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_touch_app"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+            
+        <TextView
+            android:text="互動邏輯與數值 (Logic &amp; Data)"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- Bounds & Unit in one row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="@string/prop_label_min"
+            android:layout_marginEnd="6dp"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etMin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:importantForAutofill="no"
+                android:inputType="numberDecimal|numberSigned"
+                android:text="0"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="@string/prop_label_max"
+            android:layout_marginEnd="6dp"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etMax"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:importantForAutofill="no"
+                android:inputType="numberDecimal|numberSigned"
+                android:text="100"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilUnit"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="單位 (Unit)"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etUnit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_line"
+        android:layout_marginBottom="16dp" />
+
+    <!-- SECTION 3: COLOR & THRESHOLDS -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+            
+        <TextView
+            android:text="色彩與狀態 (Color &amp; States)"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+    
+    <FrameLayout
+        android:id="@+id/containerThemeColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <!-- Threshold Warning Mode Toggle -->
+    <LinearLayout
+        android:id="@+id/itemThresholdMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="門檻值變色"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="啟用數值分段變色與漸層效果"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="11sp"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/checkThresholdMode"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_check_circle_premium"
+            android:visibility="visible"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/containerThresholdOptions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleThresholdEffect"
+                android:layout_width="0dp"
+                android:layout_weight="1.4"
+                android:layout_height="40dp"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:checkedButton="@+id/btnEffectSolid">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEffectSolid"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:text="區段變色"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minHeight="0dp"
+                    android:padding="0dp"
+                    android:textSize="11sp"
+                    app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEffectGradient"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:text="平滑漸層"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minHeight="0dp"
+                    android:padding="0dp"
+                    android:textSize="11sp"
+                    app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <LinearLayout
+                android:id="@+id/containerRgbStepper"
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="40dp"
+                android:layout_marginStart="12dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_input_outline"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/containerRgbStates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="4dp"/>
+    </LinearLayout>
+
+</LinearLayout>
