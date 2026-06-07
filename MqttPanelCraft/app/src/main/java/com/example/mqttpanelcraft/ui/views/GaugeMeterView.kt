@@ -321,12 +321,11 @@ class GaugeMeterView @JvmOverloads constructor(
             needlePaint.strokeCap = Paint.Cap.ROUND
             canvas.drawLine(cx, cy, nx, ny, needlePaint)
             
-            // 繪製中心圓盤 (Pivot)
+            // 繪製中心圓盤 (Pivot) 為純黑色
             needlePaint.style = Paint.Style.FILL
-            canvas.drawCircle(cx, cy, 3f * density * vScale, needlePaint) // 縮小外圈軸心，降低臃腫感
-            // 畫一個小黑點在中間增加立體感
             needlePaint.color = Color.BLACK
-            canvas.drawCircle(cx, cy, 1f * density * vScale, needlePaint) // 縮小內圈黑點
+            needlePaint.clearShadowLayer()
+            canvas.drawCircle(cx, cy, 3f * density * vScale, needlePaint)
         }
 
         val showTicksView = tickMode == TickMode.TICKS || tickMode == TickMode.ALL
