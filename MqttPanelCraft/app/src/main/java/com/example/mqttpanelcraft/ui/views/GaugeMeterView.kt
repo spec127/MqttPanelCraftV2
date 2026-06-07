@@ -197,16 +197,19 @@ class GaugeMeterView @JvmOverloads constructor(
             val range = maxValue - minValue
             val tolerance = 0.10f // 10% ratio (總計 20% 漸變區間，符合使用者期望的 40~60)
             
-            if (range > 0f) {
-                var prevColor = themeColor
+            if (range > 0f && thresholds.isNotEmpty()) {
+                var prevColor = thresholds[0].second
                 colors.add(prevColor)
                 positions.add(0f)
                 
-                for (th in thresholds) {
-                    val targetColor = th.second
-                    val centerRatio = ((th.first - minValue) / range).coerceIn(0f, 1f)
+                for (i in 0 until thresholds.size - 1) {
+                    val currentTh = thresholds[i]
+                    val nextTh = thresholds[i + 1]
                     
-                    // 計算漸變起點與終點 (前後 5%)
+                    val targetColor = nextTh.second
+                    val centerRatio = ((currentTh.first - minValue) / range).coerceIn(0f, 1f)
+                    
+                    // 計算漸變起點與終點 (前後 10%)
                     val startRatio = (centerRatio - tolerance).coerceIn(0f, 1f)
                     val endRatio = (centerRatio + tolerance).coerceIn(0f, 1f)
                     

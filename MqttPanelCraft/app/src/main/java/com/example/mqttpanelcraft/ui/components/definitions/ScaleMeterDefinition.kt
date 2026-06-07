@@ -290,7 +290,15 @@ object ScaleMeterDefinition : IComponentDefinition {
                         // 輸入框移除外框線，與文字無縫融合並置中 (可以設定的上限，藍色)
                         val et = android.widget.EditText(ctx).apply {
                             layoutParams = android.widget.LinearLayout.LayoutParams((40 * density).toInt(), -1)
-                            setText(statePair.first)
+                            val maxValue = data.props["max_value"] ?: "100"
+                            if (index == count - 1) {
+                                setText(maxValue)
+                                isEnabled = false
+                                currentStates[index] = maxValue to currentStates[index].second
+                            } else {
+                                setText(statePair.first)
+                                isEnabled = true
+                            }
                             textSize = 12f
                             background = null
                             setTextColor(Color.parseColor("#2196F3")) // 改為藍色

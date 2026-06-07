@@ -251,7 +251,15 @@ object GaugeMeterDefinition : IComponentDefinition {
                     
                     val et = android.widget.EditText(ctx).apply {
                         layoutParams = LinearLayout.LayoutParams((40 * density).toInt(), -1)
-                        setText(statePair.first)
+                        val maxValue = data.props["max_value"] ?: "100"
+                        if (index == count - 1) {
+                            setText(maxValue)
+                            isEnabled = false
+                            currentStates[index] = maxValue to currentStates[index].second
+                        } else {
+                            setText(statePair.first)
+                            isEnabled = true
+                        }
                         textSize = 12f
                         background = null
                         setTextColor(Color.parseColor("#2196F3"))
