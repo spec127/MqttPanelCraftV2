@@ -209,9 +209,16 @@ class GaugeMeterView @JvmOverloads constructor(
                     val targetColor = nextTh.second
                     val centerRatio = ((currentTh.first - minValue) / range).coerceIn(0f, 1f)
                     
-                    // 計算漸變起點與終點 (前後 10%)
-                    val startRatio = (centerRatio - tolerance).coerceIn(0f, 1f)
-                    val endRatio = (centerRatio + tolerance).coerceIn(0f, 1f)
+                    // 動態計算漸變起點與終點 (該區段長度的 20%，最小為整體的 2%)
+                    val prevThValue = if (i == 0) minValue else thresholds[i - 1].first
+                    val leftLen = currentTh.first - prevThValue
+                    val rightLen = nextTh.first - currentTh.first
+                    
+                    val leftTol = Math.max((leftLen / range) * 0.20f, 0.02f)
+                    val rightTol = Math.max((rightLen / range) * 0.20f, 0.02f)
+                    
+                    val startRatio = (centerRatio - leftTol).coerceIn(0f, 1f)
+                    val endRatio = (centerRatio + rightTol).coerceIn(0f, 1f)
                     
                     val startPos = startRatio * (sweepAngle / 360f)
                     val endPos = endRatio * (sweepAngle / 360f)
@@ -392,8 +399,8 @@ class GaugeMeterView @JvmOverloads constructor(
         }
         
         // 不管哪個角度，數字跟指針的圓心 (cy) 都保持一樣的絕對間隔距離
-        // 特別處理 270 度：因為 270 度的儀表弧線更長，留給下方的空間更多，數字應該稍微往下放一點
-        val textY = if (trackAngle == TrackAngle.ARC_270) cy + radius * 0.6f else cy + radius * 0.45f
+        // 特別處理 270 度：大幅往下放
+        val textY = if (trackAngle == TrackAngle.ARC_270) cy + radius * 0.9f else cy + radius * 0.45f
         
         textPaint.color = currentColor
         canvas.drawText(textToDraw, cx, textY, textPaint)

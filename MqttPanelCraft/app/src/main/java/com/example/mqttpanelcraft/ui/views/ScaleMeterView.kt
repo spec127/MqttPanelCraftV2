@@ -270,9 +270,16 @@ class ScaleMeterView @JvmOverloads constructor(
                         val targetColor = nextTh.second
                         val centerRatio = ((currentTh.first - minValue) / range).coerceIn(0f, 1f)
                         
-                        // 計算漸變起點與終點 (前後 10%)
-                        val startRatio = (centerRatio - tolerance).coerceIn(0f, 1f)
-                        val endRatio = (centerRatio + tolerance).coerceIn(0f, 1f)
+                        // 動態計算漸變起點與終點 (該區段長度的 20%，最小為整體的 2%)
+                        val prevThValue = if (i == 0) minValue else thresholds[i - 1].first
+                        val leftLen = currentTh.first - prevThValue
+                        val rightLen = nextTh.first - currentTh.first
+                        
+                        val leftTol = Math.max((leftLen / range) * 0.20f, 0.02f)
+                        val rightTol = Math.max((rightLen / range) * 0.20f, 0.02f)
+                        
+                        val startRatio = (centerRatio - leftTol).coerceIn(0f, 1f)
+                        val endRatio = (centerRatio + rightTol).coerceIn(0f, 1f)
                         
                         // 維持上一個顏色到 startRatio
                         colors.add(prevColor)
