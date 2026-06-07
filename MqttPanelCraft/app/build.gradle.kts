@@ -17,8 +17,8 @@ android {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
-        versionCode = 112 // 遞增版本代碼至 112，以配合 0.8.2 的儀表板與刻度劑 UI 重大更新，確保應用程式版本追蹤的一致性
-        versionName = "0.8.2" // 更新為 0.8.2 版本，此版本優化了刻度劑（ScaleMeterView）的數位面板佈局與遮擋問題，並全面升級了儀表板（GaugeMeterView）的互動分段色彩、指標與刻度顯示
+        versionCode = 119
+        versionName = "0.8.9" // 更新為 0.8.9 版本，修復漸層嚴格遞增問題、文字自適應縮小、270度排版與綠色預設BUG
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

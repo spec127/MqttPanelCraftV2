@@ -14,6 +14,7 @@ class GaugeMeterView @JvmOverloads constructor(
 
     enum class Style { NEEDLE, SEGMENTED }
     enum class TrackAngle { ARC_120, ARC_180, ARC_270 }
+    enum class TickMode { NONE, TICKS, LIMITS, ALL }
     
     // 與 ScaleMeter 共用的變色邏輯列舉
     enum class ThresholdEffect { GRADIENT, TOP_TIP, VALUE_CHANGE }
@@ -25,7 +26,7 @@ class GaugeMeterView @JvmOverloads constructor(
     var trackAngle: TrackAngle = TrackAngle.ARC_270
         set(value) { field = value; requestLayout(); invalidate() }
 
-    var showTicks: Boolean = false
+    var tickMode: TickMode = TickMode.LIMITS
         set(value) { field = value; invalidate() }
 
     // --- 資料與數值 ---
@@ -48,7 +49,7 @@ class GaugeMeterView @JvmOverloads constructor(
         }
 
     // --- 變色邏輯 (無縫繼承 ScaleMeter) ---
-    var themeColor: Int = Color.parseColor("#4CAF50")
+    var themeColor: Int = Color.parseColor("#FF9800")
         set(value) { field = value; invalidate() }
 
     var thresholdMode: Boolean = false
@@ -159,32 +160,30 @@ class GaugeMeterView @JvmOverloads constructor(
         }
 
         // --- 1. 計算幾何圓心與半徑 ---
-        val trackThickness = 12f * density * vScale
+        val trackThickness = if (meterStyle == Style.SEGMENTED) 12f * density * vScale else 6f * density * vScale // 陣列模式軌道加倍
         trackPaint.strokeWidth = trackThickness
         progressPaint.strokeWidth = trackThickness
         
-        val maxTextSize = 12f * density * vScale // 再次縮小中央數值
-        val padding = trackThickness / 2f + 20f * density * vScale // 為 Min/Max 標籤留出空間
+        val maxTextSize = 14f * density * vScale // 中央數值大小適中
+        val padding = trackThickness / 2f + 12f * density * vScale // 恢復正常的安全邊距，避免把半徑擠成負數
         
-        var cx = w / 2f
-        var cy = h / 2f
+        val cx = w / 2f
         var radius = minOf(w / 2f, h / 2f) - padding
+        if (radius < 10f * density * vScale) radius = 10f * density * vScale // 防止因畫布過小導致半徑崩潰
         
-        // 依照 Angle 調整圓心，極大化空間利用
+        var cy = h / 2f
         when (trackAngle) {
             TrackAngle.ARC_180 -> {
-                // 180度半圓：圓心盡量靠下，但要留一點空間給下方文字
-                radius = minOf(w / 2f, h) - padding - maxTextSize
-                cy = h - padding - maxTextSize
+                val totalH = radius + maxTextSize * 1.5f
+                val topY = (h - totalH) / 2f
+                cy = topY + radius
             }
             TrackAngle.ARC_120 -> {
-                // 120度圓弧：圓心靠下，半徑可以更大
-                radius = minOf(w / 2f, h * 1.5f) - padding
-                cy = h - padding
+                val totalH = radius * 0.5f + maxTextSize * 1.5f
+                val topY = (h - totalH) / 2f
+                cy = topY + radius
             }
-            TrackAngle.ARC_270 -> {
-                // 270度：完全置中
-            }
+            TrackAngle.ARC_270 -> cy = h / 2f
         }
         
         val arcRect = RectF(cx - radius, cy - radius, cx + radius, cy + radius)
@@ -196,27 +195,73 @@ class GaugeMeterView @JvmOverloads constructor(
             val colors = mutableListOf<Int>()
             val positions = mutableListOf<Float>()
             val range = maxValue - minValue
+            val tolerance = 0.10f // 10% ratio (總計 20% 漸變區間，符合使用者期望的 40~60)
             
-            // SweepGradient 的 0度在三點鐘方向。
-            // 我們需要把 threshold 從 minValue..maxValue 映射到 startAngle..startAngle+sweepAngle (轉換到 0..360 內)
-            // 為了簡化，如果在 Sweep 模式下，直接給定顏色陣列會更穩。
-            // 但因為要支援多段顏色，我們採用近似的漸變：
-            val gradientSweep = SweepGradient(cx, cy, 
-                intArrayOf(themeColor, themeColor), // Placeholder
-                null
-            )
-            // TODO: 完整的環形漸層矩陣映射，暫時用單色取代，後續可優化
-            progressPaint.shader = null
-            progressPaint.color = currentColor
-            needlePaint.color = currentColor
+            if (range > 0f) {
+                var prevColor = themeColor
+                colors.add(prevColor)
+                positions.add(0f)
+                
+                for (th in thresholds) {
+                    val targetColor = th.second
+                    val centerRatio = ((th.first - minValue) / range).coerceIn(0f, 1f)
+                    
+                    // 計算漸變起點與終點 (前後 5%)
+                    val startRatio = (centerRatio - tolerance).coerceIn(0f, 1f)
+                    val endRatio = (centerRatio + tolerance).coerceIn(0f, 1f)
+                    
+                    val startPos = startRatio * (sweepAngle / 360f)
+                    val endPos = endRatio * (sweepAngle / 360f)
+                    
+                    // 維持上一個顏色到 startPos
+                    colors.add(prevColor)
+                    positions.add(Math.max(positions.last() + 0.0001f, startPos))
+                    
+                    // 在 endPos 完成到目標顏色的漸變
+                    colors.add(targetColor)
+                    positions.add(Math.max(positions.last() + 0.0001f, endPos))
+                    
+                    prevColor = targetColor
+                }
+                
+                // 最後一段維持到結束
+                colors.add(prevColor)
+                positions.add(Math.max(positions.last() + 0.0001f, sweepAngle / 360f))
+            } else {
+                colors.add(themeColor)
+                positions.add(0f)
+                colors.add(themeColor)
+                positions.add(sweepAngle / 360f)
+            }
             
-            // 為光圈增加微發光感
-            progressPaint.setShadowLayer(8f * density * vScale, 0f, 0f, currentColor)
+            // 為了防範起點圓角往回長（例如 358度）吃到錯誤的漸變，必須在未繪製的空白區域中點切回第一色
+            val emptyMid = (sweepAngle / 360f + 1.0f) / 2f
+            colors.add(colors.last())
+            positions.add(emptyMid)
+            
+            colors.add(colors.first())
+            positions.add(emptyMid + 0.001f) // 硬切換
+            
+            colors.add(colors.first())
+            positions.add(1.0f)
+            
+            val gradientSweep = SweepGradient(cx, cy, colors.toIntArray(), positions.toFloatArray())
+            val matrix = Matrix()
+            matrix.setRotate(startAngle, cx, cy)
+            gradientSweep.setLocalMatrix(matrix)
+            
+            progressPaint.shader = gradientSweep
+            needlePaint.shader = gradientSweep // 讓指針也套用漸變，會與指向的角度完美吻合
+            progressPaint.color = Color.WHITE
+            
+            // 為光圈增加微發光感 (調細光暈)
+            progressPaint.setShadowLayer(4f * density * vScale, 0f, 0f, currentColor)
         } else {
             progressPaint.shader = null
+            needlePaint.shader = null
             progressPaint.color = currentColor
             needlePaint.color = currentColor
-            progressPaint.setShadowLayer(8f * density * vScale, 0f, 0f, currentColor)
+            progressPaint.setShadowLayer(4f * density * vScale, 0f, 0f, currentColor)
         }
 
         // --- 3. 繪製軌道 (Track & Progress) ---
@@ -224,14 +269,20 @@ class GaugeMeterView @JvmOverloads constructor(
         
         if (meterStyle == Style.SEGMENTED) {
             // 陣列風格 (Segmented)：無指針，打斷的軌道
-            val segmentCount = 40
-            val gapAngle = 2f // 每段之間的間隙角度
+            // 移除 ROUND 圓角，讓格子間的切割線明顯
+            progressPaint.strokeCap = Paint.Cap.BUTT
+            trackPaint.strokeCap = Paint.Cap.BUTT
+            trackPaint.color = Color.parseColor("#E2E8F0") // 未填塞部分改為淺灰色，確保在白底清晰可見
+            
+            val segmentCount = 15 // 陣列格寬度加倍，數量減半
+            val gapAngle = 4f // 增加間隙角度
             val segmentSweep = (sweepAngle - (segmentCount - 1) * gapAngle) / segmentCount
             
             for (i in 0 until segmentCount) {
                 val segStart = startAngle + i * (segmentSweep + gapAngle)
                 // 判斷這一段是否被點亮
-                val isLit = (i.toFloat() / segmentCount) <= getProgressRatio()
+                val ratio = getProgressRatio()
+                val isLit = if (ratio <= 0f) false else (i.toFloat() / segmentCount) < ratio
                 
                 if (isLit) {
                     canvas.drawArc(arcRect, segStart, segmentSweep, false, progressPaint)
@@ -243,80 +294,103 @@ class GaugeMeterView @JvmOverloads constructor(
             // 指針風格 (Needle)：連貫軌道 + 實體指針
             // 畫底軌道
             canvas.drawArc(arcRect, startAngle, sweepAngle, false, trackPaint)
-            // 畫進度
-            canvas.drawArc(arcRect, startAngle, currentSweep, false, progressPaint)
+            // 畫進度 (當 currentSweep > 0 時才畫，避免圓形端點在 0 時露出)
+            if (currentSweep > 0f) {
+                canvas.drawArc(arcRect, startAngle, currentSweep, false, progressPaint)
+            }
             
             // 畫指針
             val pointerAngleRad = Math.toRadians((startAngle + currentSweep).toDouble())
-            val needleLen = radius - trackThickness * 0.5f // 加長指針，讓它看起來不那麼短
+            val needleLen = radius - trackThickness - 6f * density * vScale // 讓指針與光軌保持間隔，不碰觸
             val nx = cx + cos(pointerAngleRad).toFloat() * needleLen
             val ny = cy + sin(pointerAngleRad).toFloat() * needleLen
             
             // 繪製細長指針 (從圓心到邊緣)
-            needlePaint.strokeWidth = 3f * density * vScale
+            needlePaint.strokeWidth = 2f * density * vScale // 指針變細
             needlePaint.style = Paint.Style.STROKE
             needlePaint.strokeCap = Paint.Cap.ROUND
             canvas.drawLine(cx, cy, nx, ny, needlePaint)
             
             // 繪製中心圓盤 (Pivot)
             needlePaint.style = Paint.Style.FILL
-            canvas.drawCircle(cx, cy, 4f * density * vScale, needlePaint) // 縮小外圈軸心
+            canvas.drawCircle(cx, cy, 3f * density * vScale, needlePaint) // 縮小外圈軸心，降低臃腫感
             // 畫一個小黑點在中間增加立體感
             needlePaint.color = Color.BLACK
-            canvas.drawCircle(cx, cy, 1.5f * density * vScale, needlePaint) // 縮小內圈黑點
+            canvas.drawCircle(cx, cy, 1f * density * vScale, needlePaint) // 縮小內圈黑點
         }
 
+        val showTicksView = tickMode == TickMode.TICKS || tickMode == TickMode.ALL
+        val showLimitsView = tickMode == TickMode.LIMITS || tickMode == TickMode.ALL
+
         // --- 3.5 繪製刻度 ---
-        if (showTicks) {
+        if (showTicksView) {
             val count = 11
             val majorTickLen = 8f * density * vScale
             val minorTickLen = 4f * density * vScale
             val tickPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 style = Paint.Style.STROKE
-                strokeWidth = 1.5f * density
-                color = Color.parseColor("#40FFFFFF")
+                strokeWidth = 2f * density // 刻度稍微加粗，確保可見
+                color = Color.parseColor("#94A3B8") // 統一採用 Slate 400 淺藍灰色，淺色畫布中清晰可見
+                strokeCap = Paint.Cap.ROUND
             }
             val angleStep = sweepAngle / (count - 1)
             for (i in 0 until count) {
                 val currentAngle = startAngle + i * angleStep
                 val angleRad = Math.toRadians(currentAngle.toDouble())
                 val len = if (i % 5 == 0) majorTickLen else minorTickLen
-                // 從軌道內側邊緣往圓心畫
-                val tx1 = cx + cos(angleRad).toFloat() * (radius - trackThickness / 2f)
-                val ty1 = cy + sin(angleRad).toFloat() * (radius - trackThickness / 2f)
-                val tx2 = cx + cos(angleRad).toFloat() * (radius - trackThickness / 2f - len)
-                val ty2 = cy + sin(angleRad).toFloat() * (radius - trackThickness / 2f - len)
+                
+                // 計算內圈邊緣，並加入保護機制確保不會穿透到另一邊
+                val innerEdge = (radius - trackThickness / 2f - 6f * density * vScale).coerceAtLeast(0f)
+                val innerEdgeEnd = (innerEdge - len).coerceAtLeast(0f)
+                
+                // 從軌道內側邊緣往圓心畫，並推離軌道邊緣以免被光暈吃掉
+                val tx1 = cx + cos(angleRad).toFloat() * innerEdge
+                val ty1 = cy + sin(angleRad).toFloat() * innerEdge
+                val tx2 = cx + cos(angleRad).toFloat() * innerEdgeEnd
+                val ty2 = cy + sin(angleRad).toFloat() * innerEdgeEnd
                 canvas.drawLine(tx1, ty1, tx2, ty2, tickPaint)
             }
         }
 
         // --- 4. 繪製 Min / Max 標籤 ---
-        minMaxTextPaint.textSize = 9f * density * vScale // 頭尾數值調小
-        // 算出起點與終點的座標
-        val startRad = Math.toRadians(startAngle.toDouble())
-        val endRad = Math.toRadians((startAngle + sweepAngle).toDouble())
-        // 讓文字稍微外推一點
-        val labelRadius = radius + trackThickness
-        
-        val minX = cx + cos(startRad).toFloat() * labelRadius
-        val minY = cy + sin(startRad).toFloat() * labelRadius
-        val maxX = cx + cos(endRad).toFloat() * labelRadius
-        val maxY = cy + sin(endRad).toFloat() * labelRadius
-        
-        canvas.drawText(String.format("%.0f", minValue), minX, minY + minMaxTextPaint.textSize / 3, minMaxTextPaint)
-        canvas.drawText(String.format("%.0f", maxValue), maxX, maxY + minMaxTextPaint.textSize / 3, minMaxTextPaint)
+        if (showLimitsView) {
+            minMaxTextPaint.textSize = 9f * density * vScale // 頭尾數值調小
+            // 算出起點與終點的座標
+            val startRad = Math.toRadians(startAngle.toDouble())
+            val endRad = Math.toRadians((startAngle + sweepAngle).toDouble())
+            // 讓文字稍微外推，但因為整體 padding 縮小，距離不可設太大以免出界
+            val labelRadius = radius + trackThickness / 2f + 6f * density * vScale
+            
+            val minX = cx + cos(startRad).toFloat() * labelRadius
+            val minY = cy + cy * 0f + sin(startRad).toFloat() * labelRadius
+            val maxX = cx + cos(endRad).toFloat() * labelRadius
+            val maxY = cy + cy * 0f + sin(endRad).toFloat() * labelRadius
+            
+            canvas.drawText(String.format("%.0f", minValue), minX, minY + minMaxTextPaint.textSize / 3, minMaxTextPaint)
+            canvas.drawText(String.format("%.0f", maxValue), maxX, maxY + minMaxTextPaint.textSize / 3, minMaxTextPaint)
+        }
 
-        // --- 5. 繪製中央資訊面板 (Value & Unit) ---
-        textPaint.textSize = maxTextSize
+        // --- 5. 繪製中央資訊面板
+        // --- 5. 繪製中央資訊面板
+        val centerTextSize = radius * 0.4f
+        var textSize = centerTextSize
+        textPaint.textSize = textSize
+        
         val valueStr = String.format("%.1f", currentAnimValue)
         val textToDraw = if (unit.isNotEmpty()) "$valueStr $unit" else valueStr
         
-        // 處理排版位置
-        val textY = when (trackAngle) {
-            TrackAngle.ARC_270 -> cy + radius * 0.4f // 置於圓心下方
-            TrackAngle.ARC_180 -> cy + maxTextSize // 置於圓心正下方
-            TrackAngle.ARC_120 -> cy - radius / 2 // 置於圓心偏上方 (被指針蓋住的位置，營造層次感)
+        // 文字太長時自動縮小字體 (防止單位過長爆出邊界)
+        var textWidth = textPaint.measureText(textToDraw)
+        val maxWidth = radius * 1.6f
+        while (textWidth > maxWidth && textSize > centerTextSize * 0.3f) {
+            textSize -= 2f
+            textPaint.textSize = textSize
+            textWidth = textPaint.measureText(textToDraw)
         }
+        
+        // 不管哪個角度，數字跟指針的圓心 (cy) 都保持一樣的絕對間隔距離
+        // 特別處理 270 度：因為 270 度的儀表弧線更長，留給下方的空間更多，數字應該稍微往下放一點
+        val textY = if (trackAngle == TrackAngle.ARC_270) cy + radius * 0.6f else cy + radius * 0.45f
         
         textPaint.color = currentColor
         canvas.drawText(textToDraw, cx, textY, textPaint)

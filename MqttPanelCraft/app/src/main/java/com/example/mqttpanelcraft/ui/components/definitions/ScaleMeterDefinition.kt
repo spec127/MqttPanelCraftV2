@@ -100,6 +100,7 @@ object ScaleMeterDefinition : IComponentDefinition {
             CommonPropBinder.bindEditText(panelView, R.id.etMin, "min", data, onUpdate, "0")
             CommonPropBinder.bindEditText(panelView, R.id.etMax, "max", data, onUpdate, "100")
             CommonPropBinder.bindEditText(panelView, R.id.etScaleUnit, "unit", data, onUpdate, "")
+            CommonPropBinder.bindColorPalette(panelView, R.id.containerThemeColor, "theme_color", data, onUpdate, "主體顏色", "#FF9800")
 
             // Feedback Checkboxes
             fun bindCheckbox(itemId: Int, checkId: Int, key: String) {
@@ -168,8 +169,8 @@ object ScaleMeterDefinition : IComponentDefinition {
                 fun updateThresholdRows() {
                     containerRgbStates?.removeAllViews()
                     val currentStates = parseThresholds()
-                    val defaultThemeColor = data.props["theme_color"] ?: "#4CAF50"
-                    val defaultColors = listOf(defaultThemeColor, "#F44336", "#FFEB3B", "#2196F3", "#9C27B0")
+                    val defaultThemeColor = data.props["theme_color"] ?: "#FF9800"
+                    val defaultColors = listOf("#FF9800", "#4CAF50", "#2196F3", "#9C27B0", "#F44336")
                     
                     while (currentStates.size < count) {
                         val size = currentStates.size
@@ -477,7 +478,6 @@ object ScaleMeterDefinition : IComponentDefinition {
                 onUpdate("feedback", feedbackKeys[position])
             }
 
-            CommonPropBinder.bindColorPalette(panelView, R.id.containerThemeColor, "theme_color", data, onUpdate, "主體顏色", "#4CAF50")
 
         } catch (e: Exception) {
             android.util.Log.e("ScaleMeterDef", "Error binding", e)

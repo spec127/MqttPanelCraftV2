@@ -100,6 +100,7 @@
     <string name="component_label_input">輸入框</string>
     <string name="component_label_scale_meter">刻度計</string>
     <string name="component_label_gauge">儀錶板</string>
+    <string name="component_label_gauge_meter">儀表板</string>
     <string name="component_label_value_display">數值顯示</string>
     <string name="component_label_text_display">文字顯示</string>
 

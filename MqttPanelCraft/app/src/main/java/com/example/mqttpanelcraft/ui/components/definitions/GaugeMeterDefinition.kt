@@ -57,7 +57,8 @@ object GaugeMeterDefinition : IComponentDefinition {
 
         data.props["theme_color"]?.let { c -> try { meter.themeColor = Color.parseColor(c) } catch (e: Exception) {} }
 
-        meter.showTicks = (data.props["show_ticks"] ?: "false").toBoolean()
+        val tickStr = data.props["tick_mode"] ?: "LIMITS"
+        meter.tickMode = try { GaugeMeterView.TickMode.valueOf(tickStr) } catch (e: Exception) { GaugeMeterView.TickMode.LIMITS }
 
         meter.thresholdMode = (data.props["threshold_mode"] ?: "false").toBoolean()
         val effectStr = data.props["threshold_effect"] ?: "VALUE_CHANGE"
@@ -89,7 +90,7 @@ object GaugeMeterDefinition : IComponentDefinition {
         CommonPropBinder.bindEditText(panelView, R.id.etMax, "max", data, onUpdate, "100")
         CommonPropBinder.bindEditText(panelView, R.id.etUnit, "unit", data, onUpdate, "")
         
-        CommonPropBinder.bindColorPalette(panelView, R.id.containerThemeColor, "theme_color", data, onUpdate, "主體顏色", "#4CAF50")
+        CommonPropBinder.bindColorPalette(panelView, R.id.containerThemeColor, "theme_color", data, onUpdate, "主體顏色", "#FF9800")
 
         // Threshold Mode Toggle
         val thresholdModeKey = "threshold_mode"
@@ -139,8 +140,8 @@ object GaugeMeterDefinition : IComponentDefinition {
             fun updateThresholdRows() {
                 containerRgbStates?.removeAllViews()
                 val currentStates = parseThresholds()
-                val defaultThemeColor = data.props["theme_color"] ?: "#4CAF50"
-                val defaultColors = listOf(defaultThemeColor, "#F44336", "#FFEB3B", "#2196F3", "#9C27B0")
+                val defaultThemeColor = data.props["theme_color"] ?: "#FF9800"
+                val defaultColors = listOf("#FF9800", "#4CAF50", "#2196F3", "#9C27B0", "#F44336")
                 
                 while (currentStates.size < count) {
                     val size = currentStates.size
@@ -383,10 +384,10 @@ object GaugeMeterDefinition : IComponentDefinition {
 
         // Style Selector
         val acStyle = panelView.findViewById<AutoCompleteTextView>(R.id.acMeterStyle)
-        val styleAdapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, listOf("指針 (Needle)", "陣列 (Segmented)"))
+        val styleAdapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, listOf("指針", "陣列"))
         acStyle.setAdapter(styleAdapter)
         val currentStyle = data.props["style"] ?: "NEEDLE"
-        acStyle.setText(if (currentStyle == "NEEDLE") "指針 (Needle)" else "陣列 (Segmented)", false)
+        acStyle.setText(if (currentStyle == "NEEDLE") "指針" else "陣列", false)
         acStyle.setOnItemClickListener { _, _, pos, _ ->
             val newValue = if (pos == 0) "NEEDLE" else "SEGMENTED"
             onUpdate("style", newValue)
@@ -414,14 +415,26 @@ object GaugeMeterDefinition : IComponentDefinition {
 
         // Ticks Selector
         val acGaugeTicks = panelView.findViewById<AutoCompleteTextView>(R.id.acGaugeTicks)
-        val ticksAdapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, listOf("隱藏刻度", "顯示刻度"))
+        val ticksAdapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, listOf("無", "刻度", "顯示極限", "刻度+極限"))
         if (acGaugeTicks != null) {
             acGaugeTicks.setAdapter(ticksAdapter)
-            val currentTicks = data.props["show_ticks"] ?: "false"
-            acGaugeTicks.setText(if (currentTicks == "true") "顯示刻度" else "隱藏刻度", false)
+            val currentMode = data.props["tick_mode"] ?: "LIMITS"
+            val tickStr = when (currentMode) {
+                "NONE" -> "無"
+                "TICKS" -> "刻度"
+                "LIMITS" -> "顯示極限"
+                "ALL" -> "刻度+極限"
+                else -> "無"
+            }
+            acGaugeTicks.setText(tickStr, false)
             acGaugeTicks.setOnItemClickListener { _, _, pos, _ ->
-                val newValue = if (pos == 1) "true" else "false"
-                onUpdate("show_ticks", newValue)
+                val newValue = when(pos) {
+                    0 -> "NONE"
+                    1 -> "TICKS"
+                    2 -> "LIMITS"
+                    else -> "ALL"
+                }
+                onUpdate("tick_mode", newValue)
             }
         }
     }

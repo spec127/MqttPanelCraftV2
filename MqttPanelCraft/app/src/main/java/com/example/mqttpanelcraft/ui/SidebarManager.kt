@@ -403,7 +403,7 @@ class SidebarManager(
                                                 dummyProps["style"] = "ORB"
 dummyProps["icon"] = "ic_btn_lighting"
 dummyProps["appearance_mode"] = "icon"
-                                                dummyProps["active_color"] = "#FFD600"
+                                                dummyProps["active_color"] = "#FF9800"
                                                 dummyProps["idle_color"] = "#9E9E9E"
                                         }
                                         "SCALE_METER" -> {
@@ -411,6 +411,11 @@ dummyProps["appearance_mode"] = "icon"
                                                 dummyProps["style"] = "SOLID"
                                                 dummyProps["active_color"] = "#FF9800"
                                                 dummyProps["idle_color"] = "#E0E0E0"
+                                        }
+                                        "GAUGE_METER" -> {
+                                                dummyProps["value"] = "75"
+                                                dummyProps["style"] = "NEEDLE"
+                                                dummyProps["theme_color"] = "#FF9800"
                                         }
                                 }
 
@@ -470,7 +475,8 @@ ledView?.isActive = true
                                                         )
                                                 "INPUT" -> Pair(dpToPx(50), dpToPx(20))
                                                 "LED" -> Pair(dpToPx(56), dpToPx(56))
-                                                "SCALE_METER" -> Pair(dpToPx(30), dpToPx(56))
+                                                "SCALE_METER" -> Pair(dpToPx(46), dpToPx(80))
+                                                "GAUGE_METER" -> Pair(dpToPx(76), dpToPx(76))
                                                 "THERMOMETER", "LEVEL" ->
                                                         Pair(dpToPx(32), dpToPx(40))
                                                 "TEXT", "IMAGE" -> Pair(dpToPx(100), dpToPx(32))

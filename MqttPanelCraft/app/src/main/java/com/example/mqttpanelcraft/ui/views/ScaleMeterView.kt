@@ -47,14 +47,14 @@ class ScaleMeterView @JvmOverloads constructor(
             }
         }
 
-    var themeColor: Int = Color.parseColor("#4CAF50")
+    var themeColor: Int = Color.parseColor("#FF9800")
         set(value) { 
             field = value
             trackColor = Color.argb(76, Color.red(value), Color.green(value), Color.blue(value))
             invalidate() 
         }
         
-    private var trackColor: Int = Color.argb(76, 76, 175, 80)
+    private var trackColor: Int = Color.argb(76, 255, 152, 0) // 預設配合 #FF9800 的半透明底色
 
     var thresholdMode: Boolean = false
         set(value) { field = value; invalidate() }
@@ -254,21 +254,41 @@ class ScaleMeterView @JvmOverloads constructor(
         when (thresholdEffect) {
             ThresholdEffect.GRADIENT -> {
                 val range = maxValue - minValue
-                val colors = mutableListOf(themeColor)
-                val positions = mutableListOf(0f)
+                val colors = mutableListOf<Int>()
+                val positions = mutableListOf<Float>()
+                val tolerance = 0.10f // 10% ratio (總計 20% 漸變區間，符合使用者期望的 40~60)
                 
                 if (range > 0f) {
+                    var prevColor = themeColor
+                    colors.add(prevColor)
+                    positions.add(0f)
+                    
                     for (th in thresholds) {
-                        colors.add(th.second)
-                        val pos = ((th.first - minValue) / range).coerceIn(0f, 1f)
-                        // 保證位置遞增，防止 Shader 錯誤
-                        positions.add(Math.max(positions.last(), pos))
+                        val targetColor = th.second
+                        val centerRatio = ((th.first - minValue) / range).coerceIn(0f, 1f)
+                        
+                        // 計算漸變起點與終點 (前後 5%)
+                        val startRatio = (centerRatio - tolerance).coerceIn(0f, 1f)
+                        val endRatio = (centerRatio + tolerance).coerceIn(0f, 1f)
+                        
+                        // 維持上一個顏色到 startRatio
+                        colors.add(prevColor)
+                        positions.add(Math.max(positions.last() + 0.0001f, startRatio))
+                        
+                        // 在 endRatio 完成到目標顏色的漸變
+                        colors.add(targetColor)
+                        positions.add(Math.max(positions.last() + 0.0001f, endRatio))
+                        
+                        prevColor = targetColor
                     }
-                }
-                
-                // 若最後一個節點未達頂部，補上頂端位置維持最後顏色
-                if (positions.last() < 1f) {
-                    colors.add(colors.last())
+                    
+                    // 最後一段維持到結束
+                    colors.add(prevColor)
+                    positions.add(Math.max(positions.last() + 0.0001f, 1f))
+                } else {
+                    colors.add(themeColor)
+                    positions.add(0f)
+                    colors.add(themeColor)
                     positions.add(1f)
                 }
 

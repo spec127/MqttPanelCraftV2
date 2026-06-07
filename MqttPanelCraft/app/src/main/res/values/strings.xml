@@ -105,6 +105,7 @@
     <string name="component_label_input">Input</string>
     <string name="component_label_scale_meter">Scale Meter</string>
     <string name="component_label_gauge">Gauge</string>
+    <string name="component_label_gauge_meter">Gauge Meter</string>
     <string name="component_label_value_display">Value Display</string>
     <string name="component_label_text_display">Text Display</string>
 

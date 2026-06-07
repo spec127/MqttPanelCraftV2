@@ -475,7 +475,7 @@ object LedDefinition : IComponentDefinition {
         }
         updateRgbStateRows()
 
-        CommonPropBinder.bindColorPalette(panelView, R.id.containerActiveColor, "active_color", data, onUpdate, context.getString(R.string.prop_label_led_color_active), "#4CAF50")
+        CommonPropBinder.bindColorPalette(panelView, R.id.containerActiveColor, "active_color", data, onUpdate, context.getString(R.string.prop_label_led_color_active), "#FF9800")
         CommonPropBinder.bindColorPalette(panelView, R.id.containerIdleColor, "idle_color", data, onUpdate, context.getString(R.string.properties_label_default), "#808080")
 
         val tgEffect = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleLedEffect)
@@ -540,7 +540,7 @@ object LedDefinition : IComponentDefinition {
         val currentRgbStates = data.props["rgb_states"] ?: ""
         val oldActive = led.activeColor
         
-        led.activeColor = try { Color.parseColor(data.props["active_color"] ?: "#4CAF50") } catch (e: Exception) { Color.parseColor("#4CAF50") }
+        led.activeColor = try { Color.parseColor(data.props["active_color"] ?: "#FF9800") } catch (e: Exception) { Color.parseColor("#FF9800") }
         led.idleColor = try { Color.parseColor(data.props["idle_color"] ?: "#808080") } catch (e: Exception) { Color.parseColor("#808080") }
 
         // V21.12: Refined Preview Flash logic
@@ -635,7 +635,7 @@ object LedDefinition : IComponentDefinition {
         val offRunnable = Runnable { led.isActive = false; view.invalidate() }
 
         var isMatched = false
-        var matchedKwColor = data.props["active_color"] ?: "#4CAF50"
+        var matchedKwColor = data.props["active_color"] ?: "#FF9800"
 
         if (logicMode == "STANDARD") {
             val kwsRaw = data.props["keywords"] ?: "ON|EXACT,1|EXACT,TRUE|EXACT"
@@ -647,7 +647,7 @@ object LedDefinition : IComponentDefinition {
                     if (kw.isEmpty()) continue
                     if (if (matchType == "CONTAINS") payload.contains(kw) else payload == kw) {
                         isMatched = true
-                        matchedKwColor = data.props["active_color"] ?: "#4CAF50"
+                        matchedKwColor = data.props["active_color"] ?: "#FF9800"
                         break
                     }
                 }
@@ -669,7 +669,7 @@ object LedDefinition : IComponentDefinition {
         }
 
         if (isMatched) {
-            led.activeColor = try { Color.parseColor(matchedKwColor) } catch (e: Exception) { Color.parseColor("#4CAF50") }
+            led.activeColor = try { Color.parseColor(matchedKwColor) } catch (e: Exception) { Color.parseColor("#FF9800") }
             led.isActive = true
             if (actionMode == "TIMER") {
                 timerMap[idStr]?.let { view.removeCallbacks(it) }
