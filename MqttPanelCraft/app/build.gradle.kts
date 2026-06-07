@@ -17,8 +17,8 @@ android {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
-        versionCode = 120
-        versionName = "0.8.11" // 更新為 0.8.11 版本，漸變範圍動態比例自適應、文字大幅下移
+        versionCode = 121
+        versionName = "0.8.12" // 更新為 0.8.12 版本，精簡程式碼、指針圓心改回單色
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

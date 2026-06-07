@@ -321,10 +321,14 @@ class GaugeMeterView @JvmOverloads constructor(
             needlePaint.strokeCap = Paint.Cap.ROUND
             canvas.drawLine(cx, cy, nx, ny, needlePaint)
             
-            // 繪製中心圓盤 (Pivot) 為純黑色
+            // 繪製中心圓盤 (Pivot) 為單色，跟隨指針
             needlePaint.style = Paint.Style.FILL
-            needlePaint.color = Color.BLACK
-            needlePaint.clearShadowLayer()
+            needlePaint.color = currentColor
+            if (thresholdMode && thresholdEffect == ThresholdEffect.GRADIENT) {
+                needlePaint.setShadowLayer(4f * density * vScale, 0f, 0f, currentColor)
+            } else {
+                needlePaint.clearShadowLayer()
+            }
             canvas.drawCircle(cx, cy, 3f * density * vScale, needlePaint)
         }
 
@@ -379,7 +383,6 @@ class GaugeMeterView @JvmOverloads constructor(
             canvas.drawText(String.format("%.0f", maxValue), maxX, maxY + minMaxTextPaint.textSize / 3, minMaxTextPaint)
         }
 
-        // --- 5. 繪製中央資訊面板
         // --- 5. 繪製中央資訊面板
         val centerTextSize = radius * 0.4f
         var textSize = centerTextSize
