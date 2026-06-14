@@ -417,6 +417,11 @@ dummyProps["appearance_mode"] = "icon"
                                                 dummyProps["style"] = "NEEDLE"
                                                 dummyProps["theme_color"] = "#FF9800"
                                         }
+                                        "SIGNAL_INDICATOR" -> {
+                                                dummyProps["value"] = "75"
+                                                dummyProps["color_mode"] = "SOLID"
+                                                dummyProps["theme_color"] = "#FF9800"
+                                        }
                                 }
 
                                 val dummyData =

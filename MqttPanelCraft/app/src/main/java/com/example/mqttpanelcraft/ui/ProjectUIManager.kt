@@ -351,6 +351,12 @@ class ProjectUIManager(
             // RUN MODE Logic
             editorCanvas.translationY = 0f
 
+            // Prevent layout thrashing during slide which causes GridPatternView to disappear
+            val state = sheetBehavior.state
+            if (state == BottomSheetBehavior.STATE_DRAGGING || state == BottomSheetBehavior.STATE_SETTLING) {
+                return
+            }
+
             val sheetLoc = IntArray(2)
             bottomSheet.getLocationOnScreen(sheetLoc)
             val sheetTop = sheetLoc[1]

@@ -16,7 +16,7 @@ object ComponentDefinitionRegistry {
         register(LedDefinition)
         register(ScaleMeterDefinition)
         register(GaugeMeterDefinition)
-        register(ValueDisplayDefinition)
+        register(SignalIndicatorDefinition)
         register(TextDisplayDefinition)
         register(LineChartDefinition)
         register(JoystickDefinition)

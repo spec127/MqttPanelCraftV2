@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- SECTION 1: INTERACTION & LOGIC -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_touch_app"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+            
+        <TextView
+            android:text="互動功能"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <TextView
+        android:text="圖示風格 (Icon Style)"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/prop_text_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"/>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:fillViewport="true"
+        android:layout_marginBottom="16dp">
+        <LinearLayout
+            android:id="@+id/containerIconStyles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="10"
+            android:background="@drawable/bg_input_outline"
+            android:padding="2dp"/>
+    </HorizontalScrollView>
+
+    <TextView
+        android:text="對應邏輯 (Value Mapping)"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/prop_text_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"/>
+        
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleMapping"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        android:layout_marginBottom="8dp">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMapAbsolute"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:cornerRadius="16dp"
+            android:text="絕對數值"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMapRatio"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:cornerRadius="16dp"
+            android:text="範圍換算"/>
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- Absolute Explanation -->
+    <TextView
+        android:id="@+id/tvAbsoluteDesc"
+        android:text="總隔數鎖定為 5。MQTT 收到的數值將直接做為亮起的格數 (0~5)。"
+        android:textColor="@color/prop_text_secondary"
+        android:textSize="11sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Ratio Explanation -->
+    <TextView
+        android:id="@+id/tvRatioDesc"
+        android:text="最大最小值會自動換算為總計 5 格。"
+        android:textColor="@color/prop_text_secondary"
+        android:textSize="11sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:visibility="gone"/>
+
+    <!-- Ratio Inputs -->
+    <LinearLayout
+        android:id="@+id/containerRatioInputs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:hint="最小值 (Min)"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etMin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned"
+                android:text="0"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="最大值 (Max)"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etMax"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned"
+                android:text="100"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/itemShowValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="數字面板"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="在圖示旁邊顯示接收到的數字"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="11sp"
+                android:layout_marginTop="2dp"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/checkShowValue"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_check_circle_premium"
+            app:tint="@color/props_primary"/>
+    </LinearLayout>
+
+    <!-- ALARM SECTION (Moved inside INTERACTION as requested) -->
+    <LinearLayout
+        android:id="@+id/itemAlarmEnable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="警告閃爍 (Alarm Blink)"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="當數值達到門檻時，圖示閃爍警告"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="11sp"
+                android:layout_marginTop="2dp"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/checkAlarmEnable"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_check_circle_premium"
+            app:tint="@color/props_primary"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/containerAlarmSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!-- High/Low Toggle -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleAlarmMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+            
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAlarmLow"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="下限(≤)"
+                android:textSize="12sp"
+                app:cornerRadius="16dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAlarmHigh"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="上限(≥)"
+                android:textSize="12sp"
+                app:cornerRadius="16dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!-- Inputs Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_weight="0.4"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:hint="持續秒數(0=無限)"
+                style="@style/Widget.App.TextInputLayout.Properties">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etAlarmDuration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:textSize="14sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content"
+                android:hint="警報閾值"
+                style="@style/Widget.App.TextInputLayout.Properties">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etAlarmThreshold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal|numberSigned"
+                    android:textSize="14sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- SECTION 2: VISUALS -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_line"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+            
+        <TextView
+            android:text="視覺設計"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="top"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.4"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:hint="色彩模式"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusBottomEnd="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            <AutoCompleteTextView
+                android:id="@+id/spinnerColorMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:textSize="12sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Color Pickers Area (Weight 0.6, Vertical) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            
+            <FrameLayout
+                android:id="@+id/containerColorStart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <FrameLayout
+                android:id="@+id/containerColorEnd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:visibility="gone"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

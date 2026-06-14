@@ -1,8 +1,7 @@
 package com.example.mqttpanelcraft.ui
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -15,45 +14,54 @@ class GridPatternView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val paint = Paint().apply {
+    private val patternPaint = Paint().apply {
         isAntiAlias = true
-        style = Paint.Style.FILL
+        isFilterBitmap = false
     }
 
     private val gridSize = Constants.GRID_UNIT_DP // dp (space between dots)
     private val dotRadius = Constants.GRID_DOT_RADIUS_DP // dp (radius of dots)
     
     private var density = 1f
+    private var patternBitmap: Bitmap? = null
 
     init {
         density = context.resources.displayMetrics.density
-        updateColor()
+        updatePattern()
     }
 
-    private fun updateColor() {
-        paint.color = ContextCompat.getColor(context, R.color.grid_dot_color)
+    private fun updatePattern() {
+        val spacing = (gridSize * density).toInt()
+        val radius = dotRadius * density / 2 // visual adjustment
+
+        if (spacing <= 0) return
+
+        val color = ContextCompat.getColor(context, R.color.grid_dot_color)
+        
+        val bitmap = Bitmap.createBitmap(spacing, spacing, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = color
+            style = Paint.Style.FILL
+        }
+        
+        // Draw dot at top-left so it tiles correctly
+        canvas.drawCircle(0f, 0f, radius, dotPaint)
+        
+        patternBitmap = bitmap
+        patternPaint.shader = BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        val spacing = gridSize * density
-        val radius = dotRadius * density / 2 // visual adjustment
-
-        val width = width.toFloat()
-        val height = height.toFloat()
-
-        val startX = 0f
-        val startY = 0f
-
-        var x = startX
-        while (x < width) {
-            var y = startY
-            while (y < height) {
-                canvas.drawCircle(x, y, radius, paint)
-                y += spacing
+        if (patternBitmap != null) {
+            val bounds = canvas.clipBounds
+            if (!bounds.isEmpty) {
+                canvas.drawRect(bounds, patternPaint)
+            } else {
+                canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), patternPaint)
             }
-            x += spacing
         }
     }
 }
