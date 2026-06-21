@@ -103,7 +103,7 @@
     <string name="component_label_gauge_meter">儀表板</string>
     <string name="component_label_value_display">數值顯示</string>
     <string name="component_label_text_display">文字顯示</string>
-    <string name="component_label_signal_indicator">階段面板</string>
+    <string name="component_label_signal_indicator">信號面板</string>
 
     <!-- Joystick Properties -->
     <string name="properties_label_joystick_mode">搖桿模式</string>

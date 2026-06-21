@@ -338,9 +338,10 @@ object SliderDefinition : IComponentDefinition {
         val slider = findSliderIn(container) ?: return
         try {
             val v = payload.toFloat()
-            val finalVal = v.coerceIn(slider.minValue, slider.maxValue)
-            slider.value = finalVal
-            onUpdateProp("value", finalVal.toString()) // Persist MQTT state
+            if (v in slider.minValue..slider.maxValue) {
+                slider.value = v
+                onUpdateProp("value", v.toString()) // Persist MQTT state
+            }
         } catch (_: Exception) {}
     }
 

@@ -463,8 +463,12 @@ object GaugeMeterDefinition : IComponentDefinition {
         val meter = view.findComponentTarget<GaugeMeterView>() ?: return
         try {
             val v = payload.toFloat()
-            meter.value = v
-            onUpdateProp("value", v.toString())
+            val min = data.props["min"]?.toFloatOrNull() ?: 0f
+            val max = data.props["max"]?.toFloatOrNull() ?: 100f
+            if (v in min..max) {
+                meter.value = v
+                onUpdateProp("value", v.toString())
+            }
         } catch (_: Exception) {}
     }
 }

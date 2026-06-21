@@ -92,7 +92,7 @@
     <!-- Absolute Explanation -->
     <TextView
         android:id="@+id/tvAbsoluteDesc"
-        android:text="總隔數鎖定為 5。MQTT 收到的數值將直接做為亮起的格數 (0~5)。"
+        android:text="總隔數鎖定為 5。MQTT 收到的數值將直接做為亮起的格數 (1~5)。"
         android:textColor="@color/prop_text_secondary"
         android:textSize="11sp"
         android:layout_width="match_parent"
@@ -377,6 +377,22 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:visibility="gone"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/containerStepThreshold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="階段變化門檻"
+                android:visibility="gone"
+                style="@style/Widget.App.TextInputLayout.Properties">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etStepThreshold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal|numberSigned"
+                    android:textSize="13sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </LinearLayout>
 

@@ -14,58 +14,37 @@ class GridPatternView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val patternPaint = Paint().apply {
-        isAntiAlias = true
-        isFilterBitmap = false
+    private var spacing = 0
+    private var dotRadiusPx = 0f
+    private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#EAEAEA")
+        style = Paint.Style.FILL
     }
-
-    private val gridSize = Constants.GRID_UNIT_DP // dp (space between dots)
-    private val dotRadius = Constants.GRID_DOT_RADIUS_DP // dp (radius of dots)
-    
-    private var density = 1f
-    private var patternBitmap: Bitmap? = null
+    private val clipRect = Rect()
 
     init {
-        density = context.resources.displayMetrics.density
-        updatePattern()
-    }
-
-    private fun updatePattern() {
-        val spacing = (gridSize * density).toInt()
-
-        // Fix: Draw dot correctly centered in the tile so it tiles properly
-        // without edge clipping, and make the dot size larger to be visible.
-        val cx = spacing / 2f
-        val cy = spacing / 2f
-        val radius = (dotRadius * density) * 0.5f // 1dp diameter, smaller dots
-
-        if (spacing <= 0) return
-
-        val color = Color.parseColor("#EAEAEA") // Lighter color
-        
-        val bitmap = Bitmap.createBitmap(spacing, spacing, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            this.color = color
-            style = Paint.Style.FILL
-        }
-        
-        canvas.drawCircle(cx, cy, radius, dotPaint)
-        
-        patternBitmap = bitmap
-        patternPaint.shader = BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
-        invalidate()
-    }
-
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        invalidate()
+        val density = context.resources.displayMetrics.density
+        spacing = (Constants.GRID_UNIT_DP * density).toInt()
+        dotRadiusPx = (Constants.GRID_DOT_RADIUS_DP * density) * 0.5f
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (patternBitmap != null) {
-            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), patternPaint)
+        if (spacing <= 0) return
+
+        canvas.getClipBounds(clipRect)
+
+        val startX = (clipRect.left / spacing) * spacing
+        val startY = (clipRect.top / spacing) * spacing
+        val endX = clipRect.right + spacing
+        val endY = clipRect.bottom + spacing
+
+        // Pre-allocate array for points could be an optimization, but direct drawCircle is also fine
+        // since the clip bounds are relatively small (screen size).
+        for (x in startX..endX step spacing) {
+            for (y in startY..endY step spacing) {
+                canvas.drawCircle(x + spacing / 2f, y + spacing / 2f, dotRadiusPx, dotPaint)
+            }
         }
     }
 }

@@ -494,12 +494,21 @@ object ScaleMeterDefinition : IComponentDefinition {
 
     override fun attachBehavior(view: View, data: ComponentData, sendMqtt: (String, String) -> Unit, onUpdateProp: (String, String) -> Unit) {}
 
-    override fun onMqttMessage(view: View, data: ComponentData, payload: String, onUpdateProp: (String, String) -> Unit) {
+    override fun onMqttMessage(
+        view: View,
+        data: ComponentData,
+        payload: String,
+        onUpdateProp: (key: String, value: String) -> Unit
+    ) {
         val meter = view.findComponentTarget<ScaleMeterView>() ?: return
         try {
             val v = payload.toFloat()
-            meter.value = v
-            onUpdateProp("value", v.toString())
+            val min = data.props["min"]?.toFloatOrNull() ?: 0f
+            val max = data.props["max"]?.toFloatOrNull() ?: 100f
+            if (v in min..max) {
+                meter.value = v
+                onUpdateProp("value", v.toString())
+            }
         } catch (_: Exception) {}
     }
 }

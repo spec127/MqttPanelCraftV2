@@ -65,12 +65,15 @@ class SignalIndicatorView @JvmOverloads constructor(
 
     var alarmEnabled: Boolean = false
         set(value) { field = value; checkAlarms() }
-    var alarmType: AlarmType = AlarmType.LOW
+    var alarmType: AlarmType = AlarmType.HIGH
         set(value) { field = value; checkAlarms() }
     var alarmThreshold: Float = 0f
         set(value) { field = value; checkAlarms() }
     var alarmDuration: Float = 0f
         set(value) { field = value; checkAlarms() }
+        
+    var stepThreshold: Float = 2f
+        set(value) { field = value; invalidate() }
 
     // Alarm animation
     private var isAlarmActive = false
@@ -153,7 +156,11 @@ class SignalIndicatorView @JvmOverloads constructor(
     private fun getActiveColor(): Int {
         if (colorMode == ColorMode.SOLID) return themeColor
         
-        // Ratio interpolation
+        if (colorMode == ColorMode.STEP) {
+            return if (value >= stepThreshold) colorEnd else colorStart
+        }
+        
+        // Ratio interpolation for Gradient
         val fraction = if (valueMapping == ValueMapping.ABSOLUTE) {
             (value / maxLevels).coerceIn(0f, 1f)
         } else {
@@ -165,31 +172,19 @@ class SignalIndicatorView @JvmOverloads constructor(
             return ArgbEvaluator().evaluate(fraction, colorStart, colorEnd) as Int
         }
         
-        // STEP mode: switch color midway? User didn't specify exactly. "階段" usually means discrete stops.
-        // I will do simple 50% cutoff for Step.
-        return if (fraction < 0.5f) colorStart else colorEnd
+        return themeColor
     }
 
     private fun getActiveLevels(): Int {
-        val isBackFive = (maxLevels == 5)
         return if (valueMapping == ValueMapping.ABSOLUTE) {
-            val v = value.toInt()
-            if (isBackFive) {
-                if (v <= 0) 0 else v.coerceIn(1, 5)
-            } else {
-                v.coerceIn(0, 4)
-            }
+            value.toInt().coerceIn(0, maxLevels)
         } else {
             val range = maxValue - minValue
             if (range <= 0f) {
-                if (isBackFive) 1 else 0
+                0
             } else {
                 val pct = ((value - minValue) / range).coerceIn(0f, 1f)
-                if (isBackFive) {
-                    Math.round(pct * 4) + 1
-                } else {
-                    Math.round(pct * 4)
-                }
+                Math.ceil((pct * maxLevels).toDouble()).toInt().coerceIn(0, maxLevels)
             }
         }
     }
@@ -256,10 +251,6 @@ class SignalIndicatorView @JvmOverloads constructor(
         if (colorMode == ColorMode.GRADIENT && total > 1) {
             val fraction = levelIndex.toFloat() / (total - 1)
             val stepColor = ArgbEvaluator().evaluate(fraction, colorStart, colorEnd) as Int
-            basePaint.color = Color.argb(alarmAlpha, Color.red(stepColor), Color.green(stepColor), Color.blue(stepColor))
-        } else if (colorMode == ColorMode.STEP) {
-            val fraction = levelIndex.toFloat() / (total - 1)
-            val stepColor = if (fraction < 0.5f) colorStart else colorEnd
             basePaint.color = Color.argb(alarmAlpha, Color.red(stepColor), Color.green(stepColor), Color.blue(stepColor))
         }
 
@@ -346,7 +337,7 @@ class SignalIndicatorView @JvmOverloads constructor(
             lineTo(spkR.left, spkR.bottom)
             close()
         }
-        val pBase = if (active > 0) paintActive else paintInactive
+        val pBase = getPaintForLevel(0, total, active > 0)
         canvas.drawPath(spkPath, pBase)
 
         val waveLines = total - 1
@@ -356,6 +347,8 @@ class SignalIndicatorView @JvmOverloads constructor(
         val cy = r.centerY()
         val maxRad = r.width() - spkW
 
+        val prevStyleA = paintActive.style
+        val prevStyleI = paintInactive.style
         paintActive.style = Paint.Style.STROKE
         paintActive.strokeWidth = r.width() * 0.08f
         paintActive.strokeCap = Paint.Cap.ROUND
@@ -366,18 +359,26 @@ class SignalIndicatorView @JvmOverloads constructor(
         for (i in 1 .. waveLines) {
             val rad = maxRad * (i.toFloat() / waveLines)
             val rect = RectF(cx - rad, cy - rad, cx + rad, cy + rad)
-            val paint = if (i < active) paintActive else paintInactive
+            val paint = getPaintForLevel(i, total, i < active)
+            val tempStyle = paint.style
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = r.width() * 0.08f
+            paint.strokeCap = Paint.Cap.ROUND
             canvas.drawArc(rect, -45f, 90f, false, paint)
+            paint.style = tempStyle
         }
-        paintActive.style = Paint.Style.FILL
-        paintInactive.style = Paint.Style.FILL
+        paintActive.style = prevStyleA
+        paintInactive.style = prevStyleI
     }
 
     private fun drawWifi(canvas: Canvas, cx: Float, cy: Float, rad: Float, active: Int, total: Int) {
         val dotRadius = rad * 0.15f
-        canvas.drawCircle(cx, cy + rad * 0.6f, dotRadius, if (active > 0) paintActive else paintInactive)
+        val dotPaint = getPaintForLevel(0, total, active > 0)
+        canvas.drawCircle(cx, cy + rad * 0.6f, dotRadius, dotPaint)
         
         val arcSpacing = rad * 0.3f
+        val prevStyleA = paintActive.style
+        val prevStyleI = paintInactive.style
         paintActive.style = Paint.Style.STROKE
         paintActive.strokeWidth = rad * 0.15f
         paintInactive.style = Paint.Style.STROKE
@@ -387,161 +388,141 @@ class SignalIndicatorView @JvmOverloads constructor(
             val arcRad = dotRadius + i * arcSpacing
             val oval = RectF(cx - arcRad, cy + rad * 0.6f - arcRad, cx + arcRad, cy + rad * 0.6f + arcRad)
             val paint = getPaintForLevel(i, total, i < active)
-            // Draw arc for wifi, sweep angle 90 degrees, centered at top (-135 to -45)
+            val tempStyle = paint.style
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = rad * 0.15f
             canvas.drawArc(oval, -135f, 90f, false, paint)
+            paint.style = tempStyle
         }
-        paintActive.style = Paint.Style.FILL
-        paintInactive.style = Paint.Style.FILL
+        paintActive.style = prevStyleA
+        paintInactive.style = prevStyleI
     }
 
     private fun drawFan(canvas: Canvas, cx: Float, cy: Float, rad: Float, active: Int, total: Int) {
-        val pBase = if (active > 0) paintActive else paintInactive
-        val centerRad = rad * 0.15f
+        val centerRad = rad * 0.25f
         
-        // Save current style
-        val originalStyleActive = paintActive.style
-        val originalStyleInactive = paintInactive.style
-        
-        paintActive.style = Paint.Style.STROKE
-        paintActive.strokeWidth = rad * 0.1f
-        paintInactive.style = Paint.Style.STROKE
-        paintInactive.strokeWidth = rad * 0.1f
-
-        canvas.drawCircle(cx, cy, centerRad, pBase)
-
-        if (active == 0) {
-            paintActive.style = originalStyleActive
-            paintInactive.style = originalStyleInactive
-            return
-        }
-
-        val blades = 4 // Image 2 is a 4-blade fan
+        val blades = 4 
         val angleStep = 360f / blades
-        val bladeRect = RectF(cx - rad*0.25f, cy - rad*0.9f, cx + rad*0.25f, cy - rad*0.15f)
         
         for (i in 0 until blades) {
             val paint = getPaintForLevel(i, blades, i < active)
             
             canvas.save()
             canvas.rotate(i * angleStep, cx, cy)
-            canvas.drawOval(bladeRect, paint)
+            
+            val path = android.graphics.Path()
+            path.moveTo(cx, cy - centerRad)
+            path.cubicTo(
+                cx + rad * 0.4f, cy - centerRad * 1.5f,
+                cx + rad * 0.5f, cy - rad * 0.8f,
+                cx, cy - rad
+            )
+            path.cubicTo(
+                cx - rad * 0.2f, cy - rad * 0.8f,
+                cx - rad * 0.1f, cy - centerRad * 1.5f,
+                cx, cy - centerRad
+            )
+            path.close()
+            
+            val tempStyle = paint.style
+            paint.style = Paint.Style.FILL
+            canvas.drawPath(path, paint)
+            paint.style = tempStyle
+            
             canvas.restore()
         }
         
-        paintActive.style = originalStyleActive
-        paintInactive.style = originalStyleInactive
+        val pBase = if (active > 0) paintActive else paintInactive
+        val tempBaseStyle = pBase.style
+        pBase.style = Paint.Style.FILL
+        canvas.drawCircle(cx, cy, centerRad, pBase)
+        pBase.style = tempBaseStyle
     }
 
     private fun drawArrows(canvas: Canvas, r: RectF, active: Int, total: Int, isLeft: Boolean) {
-        val totalUnits = total + (total - 1) * 0.25f
-        val maxItemW = r.width() / totalUnits
-        val itemSize = Math.min(maxItemW, r.height())
-        val gap = itemSize * 0.25f
-        val groupW = itemSize * total + gap * (total - 1)
-        val startX = r.left + (r.width() - groupW) / 2f
-        val startY = r.centerY()
+        val itemSize = Math.min(r.width(), r.height())
+        val rect = RectF(r.centerX() - itemSize/2, r.centerY() - itemSize/2, r.centerX() + itemSize/2, r.centerY() + itemSize/2)
+        val paint = if (active > 0) paintActive else paintInactive
         
-        paintActive.style = Paint.Style.STROKE
-        paintActive.strokeWidth = itemSize * 0.15f
-        paintActive.strokeJoin = Paint.Join.ROUND
-        paintActive.strokeCap = Paint.Cap.ROUND
-        paintInactive.style = Paint.Style.STROKE
-        paintInactive.strokeWidth = itemSize * 0.15f
-        paintInactive.strokeJoin = Paint.Join.ROUND
-        paintInactive.strokeCap = Paint.Cap.ROUND
-
-        for (i in 0 until total) {
-            val left = startX + i * (itemSize + gap)
-            val rect = RectF(left, startY - itemSize/2, left + itemSize, startY + itemSize/2)
-            val paint = getPaintForLevel(i, total, i < active)
-            
-            val path = android.graphics.Path()
-            val insetX = itemSize * 0.25f
-            val insetY = rect.height() * 0.25f
-            if (isLeft) {
-                path.moveTo(rect.right - insetX, rect.top + insetY)
-                path.lineTo(rect.left + insetX, rect.centerY())
-                path.lineTo(rect.right - insetX, rect.bottom - insetY)
-            } else {
-                path.moveTo(rect.left + insetX, rect.top + insetY)
-                path.lineTo(rect.right - insetX, rect.centerY())
-                path.lineTo(rect.left + insetX, rect.bottom - insetY)
-            }
-            
-            paint.style = Paint.Style.STROKE
-            paint.strokeWidth = rect.height() * 0.15f
-            paint.strokeCap = Paint.Cap.ROUND
-            paint.strokeJoin = Paint.Join.ROUND
-            canvas.drawPath(path, paint)
-            paint.style = Paint.Style.FILL
+        val prevStyleA = paintActive.style
+        val prevStyleI = paintInactive.style
+        
+        val path = android.graphics.Path()
+        val insetX = itemSize * 0.25f
+        val insetY = rect.height() * 0.25f
+        if (isLeft) {
+            path.moveTo(rect.right - insetX, rect.top + insetY)
+            path.lineTo(rect.left + insetX, rect.centerY())
+            path.lineTo(rect.right - insetX, rect.bottom - insetY)
+        } else {
+            path.moveTo(rect.left + insetX, rect.top + insetY)
+            path.lineTo(rect.right - insetX, rect.centerY())
+            path.lineTo(rect.left + insetX, rect.bottom - insetY)
         }
-        paintActive.style = Paint.Style.FILL
-        paintInactive.style = Paint.Style.FILL
+        
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = rect.height() * 0.15f
+        paint.strokeCap = Paint.Cap.ROUND
+        paint.strokeJoin = Paint.Join.ROUND
+        canvas.drawPath(path, paint)
+        
+        paintActive.style = prevStyleA
+        paintInactive.style = prevStyleI
     }
 
     private fun drawShapes(canvas: Canvas, r: RectF, active: Int, total: Int, type: String) {
-        val totalUnits = total + (total - 1) * 0.25f
-        val maxItemW = r.width() / totalUnits
-        val itemSize = Math.min(maxItemW, r.height())
-        val gap = itemSize * 0.25f
-        val groupW = itemSize * total + gap * (total - 1)
-        val startX = r.left + (r.width() - groupW) / 2f
-        val startY = r.centerY()
+        val itemSize = Math.min(r.width(), r.height())
+        val rect = RectF(r.centerX() - itemSize/2, r.centerY() - itemSize/2, r.centerX() + itemSize/2, r.centerY() + itemSize/2)
+        val paint = if (active > 0) paintActive else paintInactive
         
-        for (i in 0 until total) {
-            val left = startX + i * (itemSize + gap)
-            val rect = RectF(left, startY - itemSize/2, left + itemSize, startY + itemSize/2)
-            val paint = getPaintForLevel(i, total, i < active)
-            
-            val path = android.graphics.Path()
-            val cx = rect.centerX()
-            val cy = rect.centerY()
-            val w = rect.width()
-            val h = rect.height()
-            
-            when (type) {
-                "star" -> {
-                    val outerRad = Math.min(w, h) * 0.45f
-                    val innerRad = outerRad * 0.382f
-                    for (j in 0 until 10) {
-                        val angle = Math.toRadians((j * 36 - 90).toDouble())
-                        val rad = if (j % 2 == 0) outerRad else innerRad
-                        val x = (cx + rad * Math.cos(angle)).toFloat()
-                        val y = (cy + rad * Math.sin(angle)).toFloat()
-                        if (j == 0) path.moveTo(x, y) else path.lineTo(x, y)
-                    }
-                    path.close()
+        val path = android.graphics.Path()
+        val cx = rect.centerX()
+        val cy = rect.centerY()
+        val w = rect.width()
+        val h = rect.height()
+        
+        when (type) {
+            "star" -> {
+                val outerRad = Math.min(w, h) * 0.45f
+                val innerRad = outerRad * 0.382f
+                for (j in 0 until 10) {
+                    val angle = Math.toRadians((j * 36 - 90).toDouble())
+                    val rad = if (j % 2 == 0) outerRad else innerRad
+                    val x = (cx + rad * Math.cos(angle)).toFloat()
+                    val y = (cy + rad * Math.sin(angle)).toFloat()
+                    if (j == 0) path.moveTo(x, y) else path.lineTo(x, y)
                 }
-                "heart" -> {
-                    path.moveTo(cx, cy - h * 0.15f)
-                    path.cubicTo(
-                        cx + w * 0.55f, cy - h * 0.6f,
-                        cx + w * 0.65f, cy + h * 0.15f,
-                        cx, cy + h * 0.45f
-                    )
-                    path.cubicTo(
-                        cx - w * 0.65f, cy + h * 0.15f,
-                        cx - w * 0.55f, cy - h * 0.6f,
-                        cx, cy - h * 0.15f
-                    )
-                    path.close()
-                }
-                "drop" -> {
-                    path.moveTo(cx, rect.top + h * 0.05f)
-                    path.cubicTo(
-                        cx + w * 0.5f, rect.top + h * 0.45f,
-                        cx + w * 0.5f, rect.bottom - h * 0.05f,
-                        cx, rect.bottom - h * 0.05f
-                    )
-                    path.cubicTo(
-                        cx - w * 0.5f, rect.bottom - h * 0.05f,
-                        cx - w * 0.5f, rect.top + h * 0.45f,
-                        cx, rect.top + h * 0.05f
-                    )
-                    path.close()
-                }
+                path.close()
             }
-            canvas.drawPath(path, paint)
+            "heart" -> {
+                path.moveTo(cx, cy - h * 0.15f)
+                path.cubicTo(
+                    cx + w * 0.55f, cy - h * 0.6f,
+                    cx + w * 0.65f, cy + h * 0.15f,
+                    cx, cy + h * 0.45f
+                )
+                path.cubicTo(
+                    cx - w * 0.65f, cy + h * 0.15f,
+                    cx - w * 0.55f, cy - h * 0.6f,
+                    cx, cy - h * 0.15f
+                )
+                path.close()
+            }
+            "drop" -> {
+                path.moveTo(cx, rect.top + h * 0.05f)
+                path.cubicTo(
+                    cx + w * 0.5f, rect.top + h * 0.45f,
+                    cx + w * 0.5f, rect.bottom - h * 0.05f,
+                    cx, rect.bottom - h * 0.05f
+                )
+                path.cubicTo(
+                    cx - w * 0.5f, rect.bottom - h * 0.05f,
+                    cx - w * 0.5f, rect.top + h * 0.45f,
+                    cx, rect.top + h * 0.05f
+                )
+                path.close()
+            }
         }
+        canvas.drawPath(path, paint)
     }
 }

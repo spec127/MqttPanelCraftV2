@@ -365,17 +365,16 @@ class ProjectUIManager(
             val screenHeight = activity.resources.displayMetrics.heightPixels
             val visibleSheetHeight = (screenHeight - sheetTop).coerceAtLeast(0)
 
-            val density = activity.resources.displayMetrics.density
-            val requiredPadding = (visibleSheetHeight + (100 * density)).toInt()
+            // Fix: If called from onSlide/StateChanged with default 0f, fallback to stored Tag
+            // This matches legacy behavior where Tag held the truth.
+            val effectiveMaxY = if (compMaxY > 0f) compMaxY else (editorCanvas.tag as? Float) ?: 0f
 
-            val scrollView = root.findViewById<androidx.core.widget.NestedScrollView>(R.id.editorScrollView)
-            if (scrollView != null && scrollView.paddingBottom != requiredPadding) {
-                scrollView.setPadding(
-                    scrollView.paddingLeft,
-                    scrollView.paddingTop,
-                    scrollView.paddingRight,
-                    requiredPadding
-                )
+            val density = activity.resources.displayMetrics.density
+            val requiredHeight = (effectiveMaxY + visibleSheetHeight + (20 * density)).toInt()
+
+            if (editorCanvas.minimumHeight != requiredHeight) {
+                editorCanvas.minimumHeight = requiredHeight
+                editorCanvas.requestLayout()
             }
         }
     }

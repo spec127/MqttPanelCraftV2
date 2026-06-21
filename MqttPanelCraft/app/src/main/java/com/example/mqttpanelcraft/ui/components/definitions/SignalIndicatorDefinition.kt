@@ -44,6 +44,7 @@ object SignalIndicatorDefinition : IComponentDefinition {
         // Initialize default props if not already set (for fresh creation)
         if (!isEditMode && indicator.value == 0f && indicator.iconStyle == SignalIndicatorView.IconStyle.BATTERY) {
             indicator.iconStyle = SignalIndicatorView.IconStyle.CELLULAR
+            indicator.value = 4f
         }
         return container
     }
@@ -64,7 +65,18 @@ object SignalIndicatorDefinition : IComponentDefinition {
             SignalIndicatorView.IconStyle.HEARTS,
             SignalIndicatorView.IconStyle.DROPS
         )
-        val defaultMaxLevels = if (isBackFive) 5 else 4
+        val styleStr = data.props["icon_style"] ?: "CELLULAR"
+        val resolvedStyle = try { SignalIndicatorView.IconStyle.valueOf(styleStr) } catch (e: Exception) { SignalIndicatorView.IconStyle.CELLULAR }
+        indicator.iconStyle = resolvedStyle
+        
+        val lastFiveStylesList = listOf(
+            SignalIndicatorView.IconStyle.ARROWS_LEFT,
+            SignalIndicatorView.IconStyle.ARROWS_RIGHT,
+            SignalIndicatorView.IconStyle.STARS,
+            SignalIndicatorView.IconStyle.HEARTS,
+            SignalIndicatorView.IconStyle.DROPS
+        )
+        val defaultMaxLevels = if (resolvedStyle in lastFiveStylesList) 5 else 4
         
         if (indicator.valueMapping == SignalIndicatorView.ValueMapping.ABSOLUTE) {
             indicator.maxLevels = data.props["maxLevels"]?.toIntOrNull() ?: defaultMaxLevels
@@ -75,9 +87,6 @@ object SignalIndicatorDefinition : IComponentDefinition {
         indicator.value = data.props["value"]?.toFloatOrNull() ?: 2f
         indicator.showValue = (data.props["show_value"] ?: "false").toBoolean()
 
-        val styleStr = data.props["icon_style"] ?: "CELLULAR"
-        indicator.iconStyle = try { SignalIndicatorView.IconStyle.valueOf(styleStr) } catch (e: Exception) { SignalIndicatorView.IconStyle.CELLULAR }
-
         data.props["theme_color"]?.let { c -> try { indicator.themeColor = Color.parseColor(c) } catch (e: Exception) {} }
         data.props["color_start"]?.let { c -> try { indicator.colorStart = Color.parseColor(c) } catch (e: Exception) {} }
         data.props["color_end"]?.let { c -> try { indicator.colorEnd = Color.parseColor(c) } catch (e: Exception) {} }
@@ -87,13 +96,15 @@ object SignalIndicatorDefinition : IComponentDefinition {
 
         val alarmEnabled = (data.props["alarm_enabled"] ?: "false").toBoolean()
         if (alarmEnabled) {
-            indicator.alarmType = try { SignalIndicatorView.AlarmType.valueOf(data.props["alarm_type"] ?: "LOW") } catch (e: Exception) { SignalIndicatorView.AlarmType.LOW }
+            indicator.alarmType = try { SignalIndicatorView.AlarmType.valueOf(data.props["alarm_type"] ?: "HIGH") } catch (e: Exception) { SignalIndicatorView.AlarmType.HIGH }
             indicator.alarmThreshold = data.props["alarm_threshold"]?.toFloatOrNull() ?: 4f
             indicator.alarmDuration = data.props["alarm_duration"]?.toFloatOrNull() ?: 3f
             indicator.alarmEnabled = true
         } else {
             indicator.alarmEnabled = false
         }
+        
+        indicator.stepThreshold = data.props["step_threshold"]?.toFloatOrNull() ?: 2f
     }
 
     override fun bindPropertiesPanel(
@@ -114,11 +125,15 @@ object SignalIndicatorDefinition : IComponentDefinition {
         )
         val isBackFiveCurrent = (SignalIndicatorView.IconStyle.valueOf(currentStyleStr) in lastFiveStyles)
 
-        val defaultMin = if (isBackFiveCurrent) "1" else "0"
-        val defaultMax = if (isBackFiveCurrent) "5" else "100"
+        val defaultMin = if (isBackFiveCurrent) "1" else "1"
+        val defaultMax = if (isBackFiveCurrent) "5" else "5"
 
-        CommonPropBinder.bindEditText(panelView, R.id.etMin, "min", data, onUpdate, defaultMin)
-        CommonPropBinder.bindEditText(panelView, R.id.etMax, "max", data, onUpdate, defaultMax)
+        // Default ratio values
+        val ratioMin = "0"
+        val ratioMax = "100"
+
+        CommonPropBinder.bindEditText(panelView, R.id.etMin, "min", data, onUpdate, ratioMin)
+        CommonPropBinder.bindEditText(panelView, R.id.etMax, "max", data, onUpdate, ratioMax)
 
         // Icon Style Horizontal Selector
         val containerIconStyles = panelView.findViewById<LinearLayout>(R.id.containerIconStyles)
@@ -143,17 +158,18 @@ object SignalIndicatorDefinition : IComponentDefinition {
                     iconStyle = style
                     
                     if (style in lastFiveStyles) {
-                        maxLevels = 1
-                        value = 100f
+                        maxLevels = 5
+                        value = 5f
                     } else {
                         maxLevels = 4
-                        value = 100f
+                        value = 4f
                     }
                     
                     themeColor = if (isSelected) Color.parseColor("#2196F3") else Color.parseColor("#757575")
                     colorMode = SignalIndicatorView.ColorMode.SOLID
                     showValue = false
                     alarmEnabled = false
+                    valueMapping = SignalIndicatorView.ValueMapping.ABSOLUTE
                 }
                 addView(iconView)
                 
@@ -184,13 +200,14 @@ object SignalIndicatorDefinition : IComponentDefinition {
         toggleMapping.check(if (isAbsolute) R.id.btnMapAbsolute else R.id.btnMapRatio)
         
         val tvAbsoluteDesc = panelView.findViewById<TextView>(R.id.tvAbsoluteDesc)
-        val isBackFiveFlag = (SignalIndicatorView.IconStyle.valueOf(data.props["icon_style"] ?: "CELLULAR") in lastFiveStyles)
-        tvAbsoluteDesc.text = if (isBackFiveFlag) "絕對數值模式下，數值 1~5 將對應點亮 1~5 個圖示數量。" else "絕對數值模式下，數值 0~4 將對應圖示 5 個階段（0為全滅）。"
         val tvRatioDesc = panelView.findViewById<TextView>(R.id.tvRatioDesc)
         val containerRatioInputs = panelView.findViewById<View>(R.id.containerRatioInputs)
         
-        val htmlStr = if (isBackFiveFlag) "最大最小值將均分為 <font color='#EF4444'>1~5</font> 共 5 個階段。" else "最大最小值將均分為 <font color='#EF4444'>0~4</font> 共 5 個階段。"
-        tvRatioDesc.text = android.text.Html.fromHtml(htmlStr)
+        val absHtml = "絕對數值模式下，數值 <font color='#EF4444'>1~5</font> 將對應圖示 5 個階段（0為全滅）。"
+        tvAbsoluteDesc.text = android.text.Html.fromHtml(absHtml)
+        
+        val ratioHtml = "最大最小值將均分為 <font color='#EF4444'>1~5</font> 共 5 個階段（0為全滅）。"
+        tvRatioDesc.text = android.text.Html.fromHtml(ratioHtml)
         
         tvAbsoluteDesc.visibility = if (isAbsolute) View.VISIBLE else View.GONE
         tvRatioDesc.visibility = if (isAbsolute) View.GONE else View.VISIBLE
@@ -236,7 +253,7 @@ object SignalIndicatorDefinition : IComponentDefinition {
         }
         
         val toggleAlarmMode = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleAlarmMode)
-        val alarmTypeStr = data.props["alarm_type"] ?: "LOW"
+        val alarmTypeStr = data.props["alarm_type"] ?: "HIGH"
         toggleAlarmMode.check(if (alarmTypeStr == "HIGH") R.id.btnAlarmHigh else R.id.btnAlarmLow)
         
         toggleAlarmMode.addOnButtonCheckedListener { _, checkedId, isChecked ->
@@ -260,6 +277,9 @@ object SignalIndicatorDefinition : IComponentDefinition {
         spinnerColorMode.setText(colorModes[cmIndex], false)
         
         val containerColorEnd = panelView.findViewById<View>(R.id.containerColorEnd)
+        val containerStepThreshold = panelView.findViewById<View>(R.id.containerStepThreshold)
+        
+        CommonPropBinder.bindEditText(panelView, R.id.etStepThreshold, "step_threshold", data, onUpdate, "2")
         
         fun updateColorPickersVisibility(mode: String) {
             val isSolid = mode == "SOLID"
@@ -268,9 +288,11 @@ object SignalIndicatorDefinition : IComponentDefinition {
             } else {
                 containerColorEnd.visibility = View.VISIBLE
             }
-            CommonPropBinder.bindColorPalette(panelView, R.id.containerColorStart, "theme_color", data, onUpdate, if (isSolid) "主體顏色" else "最小顏色", "#FF9800")
+            containerStepThreshold.visibility = if (mode == "STEP") View.VISIBLE else View.GONE
+            
+            CommonPropBinder.bindColorPalette(panelView, R.id.containerColorStart, "theme_color", data, onUpdate, if (isSolid) "主體顏色" else "未達門檻顏色", "#FF9800")
             if (!isSolid) {
-                CommonPropBinder.bindColorPalette(panelView, R.id.containerColorEnd, "color_end", data, onUpdate, "最大顏色", "#F44336")
+                CommonPropBinder.bindColorPalette(panelView, R.id.containerColorEnd, "color_end", data, onUpdate, if (mode == "STEP") "達到門檻顏色" else "最大顏色", "#F44336")
             }
         }
         updateColorPickersVisibility(cmStr)
@@ -298,7 +320,28 @@ object SignalIndicatorDefinition : IComponentDefinition {
     ) {
         val floatVal = payload.toFloatOrNull()
         if (floatVal != null) {
-            updateProp("value", floatVal.toString())
+            val currentMapping = data.props["value_mapping"] ?: "ABSOLUTE"
+            val isBackFiveFlag = (SignalIndicatorView.IconStyle.valueOf(data.props["icon_style"] ?: "CELLULAR") in listOf(
+                SignalIndicatorView.IconStyle.ARROWS_LEFT,
+                SignalIndicatorView.IconStyle.ARROWS_RIGHT,
+                SignalIndicatorView.IconStyle.STARS,
+                SignalIndicatorView.IconStyle.HEARTS,
+                SignalIndicatorView.IconStyle.DROPS
+            ))
+            
+            val min: Float
+            val max: Float
+            if (currentMapping == "ABSOLUTE") {
+                min = 1f
+                max = 5f
+            } else {
+                min = data.props["min"]?.toFloatOrNull() ?: 0f
+                max = data.props["max"]?.toFloatOrNull() ?: 100f
+            }
+            
+            if (floatVal in min..max) {
+                updateProp("value", floatVal.toString())
+            }
         }
     }
 }
