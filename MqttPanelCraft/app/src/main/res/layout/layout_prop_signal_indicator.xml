@@ -248,7 +248,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="下限(≤)"
+                android:text="過低(≤)"
                 android:textSize="12sp"
                 app:cornerRadius="16dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
@@ -258,7 +258,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="上限(≥)"
+                android:text="過高(≥)"
                 android:textSize="12sp"
                 app:cornerRadius="16dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>

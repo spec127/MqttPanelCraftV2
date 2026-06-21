@@ -211,12 +211,12 @@ object SignalIndicatorDefinition : IComponentDefinition {
         val showValueKey = "show_value"
         val itemShowValue = panelView.findViewById<View>(R.id.itemShowValue)
         val checkShowValue = panelView.findViewById<ImageView>(R.id.checkShowValue)
-        val isShowValue = (data.props[showValueKey] ?: "false").toBoolean()
+        var isShowValue = (data.props[showValueKey] ?: "false").toBoolean()
         checkShowValue.visibility = if (isShowValue) View.VISIBLE else View.INVISIBLE
         itemShowValue.setOnClickListener {
-            val newVal = !(data.props[showValueKey] ?: "false").toBoolean()
-            checkShowValue.visibility = if (newVal) View.VISIBLE else View.INVISIBLE
-            onUpdate(showValueKey, newVal.toString())
+            isShowValue = !isShowValue
+            checkShowValue.visibility = if (isShowValue) View.VISIBLE else View.INVISIBLE
+            onUpdate(showValueKey, isShowValue.toString())
         }
 
         // Alarm Config
@@ -224,15 +224,15 @@ object SignalIndicatorDefinition : IComponentDefinition {
         val checkAlarmEnable = panelView.findViewById<ImageView>(R.id.checkAlarmEnable)
         val containerAlarmSettings = panelView.findViewById<View>(R.id.containerAlarmSettings)
         
-        val isAlarmEnabled = (data.props["alarm_enabled"] ?: "false").toBoolean()
+        var isAlarmEnabled = (data.props["alarm_enabled"] ?: "false").toBoolean()
         checkAlarmEnable.visibility = if (isAlarmEnabled) View.VISIBLE else View.INVISIBLE
         containerAlarmSettings.visibility = if (isAlarmEnabled) View.VISIBLE else View.GONE
         
         itemAlarmEnable.setOnClickListener {
-            val newVal = !(data.props["alarm_enabled"] ?: "false").toBoolean()
-            checkAlarmEnable.visibility = if (newVal) View.VISIBLE else View.INVISIBLE
-            containerAlarmSettings.visibility = if (newVal) View.VISIBLE else View.GONE
-            onUpdate("alarm_enabled", newVal.toString())
+            isAlarmEnabled = !isAlarmEnabled
+            checkAlarmEnable.visibility = if (isAlarmEnabled) View.VISIBLE else View.INVISIBLE
+            containerAlarmSettings.visibility = if (isAlarmEnabled) View.VISIBLE else View.GONE
+            onUpdate("alarm_enabled", isAlarmEnabled.toString())
         }
         
         val toggleAlarmMode = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleAlarmMode)

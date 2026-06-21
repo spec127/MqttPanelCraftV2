@@ -32,11 +32,16 @@ class GridPatternView @JvmOverloads constructor(
 
     private fun updatePattern() {
         val spacing = (gridSize * density).toInt()
-        val radius = dotRadius * density / 2 // visual adjustment
+
+        // Fix: Draw dot correctly centered in the tile so it tiles properly
+        // without edge clipping, and make the dot size larger to be visible.
+        val cx = spacing / 2f
+        val cy = spacing / 2f
+        val radius = (dotRadius * density) * 0.5f // 1dp diameter, smaller dots
 
         if (spacing <= 0) return
 
-        val color = ContextCompat.getColor(context, R.color.grid_dot_color)
+        val color = Color.parseColor("#EAEAEA") // Lighter color
         
         val bitmap = Bitmap.createBitmap(spacing, spacing, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -45,8 +50,7 @@ class GridPatternView @JvmOverloads constructor(
             style = Paint.Style.FILL
         }
         
-        // Draw dot at top-left so it tiles correctly
-        canvas.drawCircle(0f, 0f, radius, dotPaint)
+        canvas.drawCircle(cx, cy, radius, dotPaint)
         
         patternBitmap = bitmap
         patternPaint.shader = BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
@@ -56,12 +60,7 @@ class GridPatternView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (patternBitmap != null) {
-            val bounds = canvas.clipBounds
-            if (!bounds.isEmpty) {
-                canvas.drawRect(bounds, patternPaint)
-            } else {
-                canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), patternPaint)
-            }
+            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), patternPaint)
         }
     }
 }

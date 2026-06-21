@@ -248,10 +248,12 @@ class ProjectUIManager(
 
             btnUndo.visibility = View.GONE
             containerLogs.visibility = View.VISIBLE
-            propertiesManager.hide()
+            containerProperties.visibility = View.GONE
 
             sheetBehavior.isHideable = false
-            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
 
             // Clear Selection
             renderer.render(viewModel.components.value ?: emptyList(), false, null)

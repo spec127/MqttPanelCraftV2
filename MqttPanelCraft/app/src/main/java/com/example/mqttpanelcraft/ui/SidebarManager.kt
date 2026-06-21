@@ -418,7 +418,8 @@ dummyProps["appearance_mode"] = "icon"
                                                 dummyProps["theme_color"] = "#FF9800"
                                         }
                                         "SIGNAL_INDICATOR" -> {
-                                                dummyProps["value"] = "75"
+                                                dummyProps["value_mapping"] = "ABSOLUTE"
+                                                dummyProps["value"] = "3"
                                                 dummyProps["color_mode"] = "SOLID"
                                                 dummyProps["theme_color"] = "#FF9800"
                                         }

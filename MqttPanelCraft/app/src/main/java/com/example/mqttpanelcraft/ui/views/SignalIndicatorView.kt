@@ -221,8 +221,15 @@ class SignalIndicatorView @JvmOverloads constructor(
             
             canvas.drawText(textStr, startX + iconSize + gap + textW/2f, h/2f - (paintText.descent() + paintText.ascent())/2f, paintText)
         } else {
-            val iconSize = Math.min(w, h) * 0.9f
-            iconRect.set((w - iconSize)/2f, (h - iconSize)/2f, (w + iconSize)/2f, (h + iconSize)/2f)
+            val isBackFive = iconStyle in listOf(IconStyle.ARROWS_LEFT, IconStyle.ARROWS_RIGHT, IconStyle.STARS, IconStyle.HEARTS, IconStyle.DROPS)
+            if (isBackFive) {
+                val paddingX = w * 0.05f
+                val paddingY = h * 0.05f
+                iconRect.set(paddingX, paddingY, w - paddingX, h - paddingY)
+            } else {
+                val iconSize = Math.min(w, h) * 0.9f
+                iconRect.set((w - iconSize)/2f, (h - iconSize)/2f, (w + iconSize)/2f, (h + iconSize)/2f)
+            }
         }
 
         when (iconStyle) {
@@ -407,26 +414,29 @@ class SignalIndicatorView @JvmOverloads constructor(
 
     private fun drawArrows(canvas: Canvas, r: RectF, active: Int, total: Int, isLeft: Boolean) {
         val totalUnits = total + (total - 1) * 0.25f
-        val arrW = r.width() / totalUnits
-        val gap = arrW * 0.25f
-        val arrH = arrW
+        val maxItemW = r.width() / totalUnits
+        val itemSize = Math.min(maxItemW, r.height())
+        val gap = itemSize * 0.25f
+        val groupW = itemSize * total + gap * (total - 1)
+        val startX = r.left + (r.width() - groupW) / 2f
+        val startY = r.centerY()
         
         paintActive.style = Paint.Style.STROKE
-        paintActive.strokeWidth = arrH * 0.15f
+        paintActive.strokeWidth = itemSize * 0.15f
         paintActive.strokeJoin = Paint.Join.ROUND
         paintActive.strokeCap = Paint.Cap.ROUND
         paintInactive.style = Paint.Style.STROKE
-        paintInactive.strokeWidth = arrH * 0.15f
+        paintInactive.strokeWidth = itemSize * 0.15f
         paintInactive.strokeJoin = Paint.Join.ROUND
         paintInactive.strokeCap = Paint.Cap.ROUND
 
         for (i in 0 until total) {
-            val left = r.left + i * (arrW + gap)
-            val rect = RectF(left, r.centerY() - arrH/2, left + arrW, r.centerY() + arrH/2)
+            val left = startX + i * (itemSize + gap)
+            val rect = RectF(left, startY - itemSize/2, left + itemSize, startY + itemSize/2)
             val paint = if (i < active) paintActive else paintInactive
             
             val path = android.graphics.Path()
-            val insetX = arrW * 0.25f
+            val insetX = itemSize * 0.25f
             val insetY = rect.height() * 0.25f
             if (isLeft) {
                 path.moveTo(rect.right - insetX, rect.top + insetY)
@@ -451,13 +461,17 @@ class SignalIndicatorView @JvmOverloads constructor(
 
     private fun drawShapes(canvas: Canvas, r: RectF, active: Int, total: Int, type: String) {
         val totalUnits = total + (total - 1) * 0.25f
-        val itemW = r.width() / totalUnits
-        val gap = itemW * 0.25f
+        val maxItemW = r.width() / totalUnits
+        val itemSize = Math.min(maxItemW, r.height())
+        val gap = itemSize * 0.25f
+        val groupW = itemSize * total + gap * (total - 1)
+        val startX = r.left + (r.width() - groupW) / 2f
+        val startY = r.centerY()
         
         for (i in 0 until total) {
             val paint = if (i < active) paintActive else paintInactive
-            val left = r.left + i * (itemW + gap)
-            val rect = RectF(left, r.centerY() - itemW/2, left + itemW, r.centerY() + itemW/2)
+            val left = startX + i * (itemSize + gap)
+            val rect = RectF(left, startY - itemSize/2, left + itemSize, startY + itemSize/2)
             
             val path = android.graphics.Path()
             val cx = rect.centerX()

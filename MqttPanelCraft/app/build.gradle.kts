@@ -17,8 +17,8 @@ android {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
-        versionCode = 130
-        versionName = "0.9.0" // 新增 SignalIndicator 狀態指示器元件
+        versionCode = 133
+        versionName = "0.9.3" // 修復階段面板及畫布互動
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
