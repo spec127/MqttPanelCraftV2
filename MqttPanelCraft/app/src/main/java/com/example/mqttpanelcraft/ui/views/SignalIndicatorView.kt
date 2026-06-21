@@ -171,12 +171,11 @@ class SignalIndicatorView @JvmOverloads constructor(
     }
 
     private fun getActiveLevels(): Int {
-        if (!showValue) return maxLevels
         val isBackFive = (maxLevels == 5)
         return if (valueMapping == ValueMapping.ABSOLUTE) {
             val v = value.toInt()
             if (isBackFive) {
-                if (v == 0) 0 else v.coerceIn(1, 5)
+                if (v <= 0) 0 else v.coerceIn(1, 5)
             } else {
                 v.coerceIn(0, 4)
             }
@@ -246,6 +245,27 @@ class SignalIndicatorView @JvmOverloads constructor(
         }
     }
 
+    private fun getPaintForLevel(levelIndex: Int, total: Int, isActive: Boolean): Paint {
+        val basePaint = if (isActive) paintActive else paintInactive
+        if (!isActive) return basePaint
+
+        // Base active paint config
+        val c = getActiveColor()
+        basePaint.color = Color.argb(alarmAlpha, Color.red(c), Color.green(c), Color.blue(c))
+
+        if (colorMode == ColorMode.GRADIENT && total > 1) {
+            val fraction = levelIndex.toFloat() / (total - 1)
+            val stepColor = ArgbEvaluator().evaluate(fraction, colorStart, colorEnd) as Int
+            basePaint.color = Color.argb(alarmAlpha, Color.red(stepColor), Color.green(stepColor), Color.blue(stepColor))
+        } else if (colorMode == ColorMode.STEP) {
+            val fraction = levelIndex.toFloat() / (total - 1)
+            val stepColor = if (fraction < 0.5f) colorStart else colorEnd
+            basePaint.color = Color.argb(alarmAlpha, Color.red(stepColor), Color.green(stepColor), Color.blue(stepColor))
+        }
+
+        return basePaint
+    }
+
     private fun drawCellular(canvas: Canvas, r: RectF, active: Int, total: Int) {
         val gap = r.width() * 0.1f
         val barW = (r.width() - gap * (total - 1)) / total
@@ -253,7 +273,7 @@ class SignalIndicatorView @JvmOverloads constructor(
             val h = r.height() * ((i + 1).toFloat() / total)
             val left = r.left + i * (barW + gap)
             val rect = RectF(left, r.bottom - h, left + barW, r.bottom)
-            val paint = if (i < active) paintActive else paintInactive
+            val paint = getPaintForLevel(i, total, i < active)
             canvas.drawRoundRect(rect, barW*0.3f, barW*0.3f, paint)
         }
     }
@@ -272,7 +292,7 @@ class SignalIndicatorView @JvmOverloads constructor(
 
         for (i in 0 until total) {
             val rad = maxRad * ((i + 1).toFloat() / total)
-            val paint = if (i < active) paintActive else paintInactive
+            val paint = getPaintForLevel(i, total, i < active)
             
             if (i == 0) {
                 paint.style = Paint.Style.FILL
@@ -308,7 +328,7 @@ class SignalIndicatorView @JvmOverloads constructor(
         for (i in 0 until total) {
             val left = bodyR.left + pad + i*(cellW+gap)
             val rect = RectF(left, bodyR.top + pad, left + cellW, bodyR.top + pad + innerH)
-            val paint = if (i < active) paintActive else paintInactive
+            val paint = getPaintForLevel(i, total, i < active)
             canvas.drawRoundRect(rect, cellW*0.2f, cellW*0.2f, paint)
         }
     }
@@ -366,7 +386,7 @@ class SignalIndicatorView @JvmOverloads constructor(
         for (i in 1 until total) {
             val arcRad = dotRadius + i * arcSpacing
             val oval = RectF(cx - arcRad, cy + rad * 0.6f - arcRad, cx + arcRad, cy + rad * 0.6f + arcRad)
-            val paint = if (i < active) paintActive else paintInactive
+            val paint = getPaintForLevel(i, total, i < active)
             // Draw arc for wifi, sweep angle 90 degrees, centered at top (-135 to -45)
             canvas.drawArc(oval, -135f, 90f, false, paint)
         }
@@ -400,7 +420,7 @@ class SignalIndicatorView @JvmOverloads constructor(
         val bladeRect = RectF(cx - rad*0.25f, cy - rad*0.9f, cx + rad*0.25f, cy - rad*0.15f)
         
         for (i in 0 until blades) {
-            val paint = if (i < active) paintActive else paintInactive
+            val paint = getPaintForLevel(i, blades, i < active)
             
             canvas.save()
             canvas.rotate(i * angleStep, cx, cy)
@@ -433,7 +453,7 @@ class SignalIndicatorView @JvmOverloads constructor(
         for (i in 0 until total) {
             val left = startX + i * (itemSize + gap)
             val rect = RectF(left, startY - itemSize/2, left + itemSize, startY + itemSize/2)
-            val paint = if (i < active) paintActive else paintInactive
+            val paint = getPaintForLevel(i, total, i < active)
             
             val path = android.graphics.Path()
             val insetX = itemSize * 0.25f
@@ -469,9 +489,9 @@ class SignalIndicatorView @JvmOverloads constructor(
         val startY = r.centerY()
         
         for (i in 0 until total) {
-            val paint = if (i < active) paintActive else paintInactive
             val left = startX + i * (itemSize + gap)
             val rect = RectF(left, startY - itemSize/2, left + itemSize, startY + itemSize/2)
+            val paint = getPaintForLevel(i, total, i < active)
             
             val path = android.graphics.Path()
             val cx = rect.centerX()

@@ -54,8 +54,8 @@ object SignalIndicatorDefinition : IComponentDefinition {
         indicator.minValue = data.props["min"]?.toFloatOrNull() ?: 0f
         indicator.maxValue = data.props["max"]?.toFloatOrNull() ?: 100f
         
-        val mappingStr = data.props["value_mapping"] ?: "RATIO"
-        indicator.valueMapping = try { SignalIndicatorView.ValueMapping.valueOf(mappingStr) } catch (e: Exception) { SignalIndicatorView.ValueMapping.RATIO }
+        val mappingStr = data.props["value_mapping"] ?: "ABSOLUTE"
+        indicator.valueMapping = try { SignalIndicatorView.ValueMapping.valueOf(mappingStr) } catch (e: Exception) { SignalIndicatorView.ValueMapping.ABSOLUTE }
 
         val isBackFive = indicator.iconStyle in listOf(
             SignalIndicatorView.IconStyle.ARROWS_LEFT,
@@ -72,7 +72,7 @@ object SignalIndicatorDefinition : IComponentDefinition {
             indicator.maxLevels = data.props["maxLevels"]?.toIntOrNull() ?: defaultMaxLevels
         }
 
-        indicator.value = data.props["value"]?.toFloatOrNull() ?: 60f
+        indicator.value = data.props["value"]?.toFloatOrNull() ?: 2f
         indicator.showValue = (data.props["show_value"] ?: "false").toBoolean()
 
         val styleStr = data.props["icon_style"] ?: "CELLULAR"
@@ -178,7 +178,7 @@ object SignalIndicatorDefinition : IComponentDefinition {
 
         // Value Mapping Toggle
         val toggleMapping = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleMapping)
-        val currentMapping = data.props["value_mapping"] ?: "RATIO"
+        val currentMapping = data.props["value_mapping"] ?: "ABSOLUTE"
         val isAbsolute = currentMapping == "ABSOLUTE"
         
         toggleMapping.check(if (isAbsolute) R.id.btnMapAbsolute else R.id.btnMapRatio)
