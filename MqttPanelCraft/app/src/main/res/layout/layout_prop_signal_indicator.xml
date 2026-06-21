@@ -21,7 +21,7 @@
             android:layout_marginEnd="6dp"/>
             
         <TextView
-            android:text="互動功能"
+            android:text="@string/properties_section_interaction"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/prop_text_secondary"
@@ -31,7 +31,7 @@
     </LinearLayout>
 
     <TextView
-        android:text="圖示風格 (Icon Style)"
+        android:text="@string/prop_label_icon_style"
         android:textSize="12sp"
         android:textStyle="bold"
         android:textColor="@color/prop_text_secondary"
@@ -56,7 +56,7 @@
     </HorizontalScrollView>
 
     <TextView
-        android:text="對應邏輯 (Value Mapping)"
+        android:text="@string/prop_label_value_mapping"
         android:textSize="12sp"
         android:textStyle="bold"
         android:textColor="@color/prop_text_secondary"
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             app:cornerRadius="16dp"
-            android:text="絕對數值"/>
+            android:text="@string/prop_val_mapping_absolute"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnMapRatio"
             android:layout_width="0dp"
@@ -86,13 +86,13 @@
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             app:cornerRadius="16dp"
-            android:text="範圍換算"/>
+            android:text="@string/prop_val_mapping_ratio"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <!-- Absolute Explanation -->
     <TextView
         android:id="@+id/tvAbsoluteDesc"
-        android:text="總隔數鎖定為 5。MQTT 收到的數值將直接做為亮起的格數 (1~5)。"
+        android:text="@string/prop_desc_mapping_absolute"
         android:textColor="@color/prop_text_secondary"
         android:textSize="11sp"
         android:layout_width="match_parent"
@@ -102,7 +102,7 @@
     <!-- Ratio Explanation -->
     <TextView
         android:id="@+id/tvRatioDesc"
-        android:text="最大最小值會自動換算為總計 5 格。"
+        android:text="@string/prop_desc_mapping_ratio"
         android:textColor="@color/prop_text_secondary"
         android:textSize="11sp"
         android:layout_width="match_parent"
@@ -125,7 +125,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:hint="最小值 (Min)"
+            android:hint="@string/prop_label_min"
             style="@style/Widget.App.TextInputLayout.Properties">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etMin"
@@ -140,7 +140,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:hint="最大值 (Max)"
+            android:hint="@string/prop_label_max"
             style="@style/Widget.App.TextInputLayout.Properties">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etMax"
@@ -169,14 +169,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="數字面板"
+                android:text="@string/prop_label_value_display_panel"
                 android:textColor="@color/prop_text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="在圖示旁邊顯示接收到的數字"
+                android:text="@string/prop_desc_value_display_panel"
                 android:textColor="@color/prop_text_secondary"
                 android:textSize="11sp"
                 android:layout_marginTop="2dp"/>
@@ -207,14 +207,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="警告閃爍 (Alarm Blink)"
+                android:text="@string/prop_label_alarm_blink"
                 android:textColor="@color/prop_text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="當數值達到門檻時，圖示閃爍警告"
+                android:text="@string/prop_desc_alarm_blink"
                 android:textColor="@color/prop_text_secondary"
                 android:textSize="11sp"
                 android:layout_marginTop="2dp"/>
@@ -248,7 +248,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="過低(≤)"
+                android:text="@string/prop_val_alarm_low"
                 android:textSize="12sp"
                 app:cornerRadius="16dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
@@ -258,7 +258,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="過高(≥)"
+                android:text="@string/prop_val_alarm_high"
                 android:textSize="12sp"
                 app:cornerRadius="16dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
@@ -275,7 +275,7 @@
                 android:layout_weight="0.4"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:hint="持續秒數(0=無限)"
+                android:hint="@string/prop_label_alarm_duration"
                 style="@style/Widget.App.TextInputLayout.Properties">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etAlarmDuration"
@@ -289,7 +289,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="0.6"
                 android:layout_height="wrap_content"
-                android:hint="警報閾值"
+                android:hint="@string/prop_label_alarm_threshold"
                 style="@style/Widget.App.TextInputLayout.Properties">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etAlarmThreshold"
@@ -324,7 +324,7 @@
             android:layout_marginEnd="6dp"/>
             
         <TextView
-            android:text="視覺設計"
+            android:text="@string/properties_section_appearance"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/prop_text_secondary"
@@ -345,7 +345,7 @@
             android:layout_weight="0.4"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:hint="色彩模式"
+            android:hint="@string/properties_label_color_mode"
             app:boxCornerRadiusTopStart="16dp"
             app:boxCornerRadiusTopEnd="16dp"
             app:boxCornerRadiusBottomStart="16dp"
@@ -383,7 +383,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="階段變化門檻"
+                android:hint="@string/prop_label_step_threshold"
                 android:visibility="gone"
                 style="@style/Widget.App.TextInputLayout.Properties">
                 <com.google.android.material.textfield.TextInputEditText

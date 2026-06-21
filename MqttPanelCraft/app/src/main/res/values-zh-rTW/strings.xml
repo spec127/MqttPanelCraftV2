@@ -105,6 +105,30 @@
     <string name="component_label_text_display">文字顯示</string>
     <string name="component_label_signal_indicator">信號面板</string>
 
+    <!-- Signal Indicator Properties -->
+    <string name="prop_label_icon_style">圖示風格</string>
+    <string name="prop_label_value_mapping">對應邏輯</string>
+    <string name="prop_val_mapping_absolute">絕對數值</string>
+    <string name="prop_val_mapping_ratio">範圍換算</string>
+    <string name="prop_desc_mapping_absolute"><![CDATA[絕對數值模式下，數值 <font color=\"#EF4444\">1~5</font> 將對應圖示 5 個階段（0為全滅）。]]></string>
+    <string name="prop_desc_mapping_ratio"><![CDATA[最大最小值將均分為 <font color=\"#EF4444\">1~5</font> 共 5 個階段（0為全滅）。]]></string>
+    <string name="prop_label_value_display_panel">數字面板</string>
+    <string name="prop_desc_value_display_panel">在圖示旁邊顯示接收到的數字</string>
+    <string name="prop_label_alarm_blink">警告閃爍</string>
+    <string name="prop_desc_alarm_blink">當數值達到門檻時，圖示閃爍警告</string>
+    <string name="prop_val_alarm_low">過低(≤)</string>
+    <string name="prop_val_alarm_high">過高(≥)</string>
+    <string name="prop_label_alarm_duration">持續秒數(0=無限)</string>
+    <string name="prop_label_alarm_threshold">警報閾值</string>
+    <string name="prop_label_step_threshold">階段變化門檻</string>
+    <string name="prop_val_color_solid">純色</string>
+    <string name="prop_val_color_step">階段</string>
+    <string name="prop_val_color_gradient">漸變</string>
+    <string name="prop_label_color_base">主體顏色</string>
+    <string name="prop_label_color_unreached">未達門檻顏色</string>
+    <string name="prop_label_color_reached">達到門檻顏色</string>
+    <string name="prop_label_color_max">最大顏色</string>
+
     <!-- Joystick Properties -->
     <string name="properties_label_joystick_mode">搖桿模式</string>
     <string name="properties_label_axes">軸向設定</string>

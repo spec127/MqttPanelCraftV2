@@ -13,17 +13,17 @@ class SignalIndicatorView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    enum class IconStyle(val displayName: String) {
-        CELLULAR("行動網路"),
-        WIFI("WiFi"),
-        BATTERY("電池"),
-        SPEAKER("喇叭"),
-        FAN("風扇"),
-        ARROWS_LEFT("向左箭頭"),
-        ARROWS_RIGHT("向右箭頭"),
-        STARS("星星"),
-        HEARTS("愛心"),
-        DROPS("水滴")
+    enum class IconStyle {
+        CELLULAR,
+        WIFI,
+        BATTERY,
+        SPEAKER,
+        FAN,
+        ARROWS_LEFT,
+        ARROWS_RIGHT,
+        STARS,
+        HEARTS,
+        DROPS
     }
 
     enum class ValueMapping { ABSOLUTE, RATIO }

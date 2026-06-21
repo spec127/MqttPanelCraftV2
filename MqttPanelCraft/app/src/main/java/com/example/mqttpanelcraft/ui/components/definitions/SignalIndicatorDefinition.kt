@@ -18,6 +18,7 @@ import com.example.mqttpanelcraft.ui.components.findComponentTarget
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.SignalIndicatorView
 import com.google.android.material.button.MaterialButtonToggleGroup
+import androidx.core.text.HtmlCompat
 
 object SignalIndicatorDefinition : IComponentDefinition {
     override val type: String = "SIGNAL_INDICATOR"
@@ -78,11 +79,7 @@ object SignalIndicatorDefinition : IComponentDefinition {
         )
         val defaultMaxLevels = if (resolvedStyle in lastFiveStylesList) 5 else 4
         
-        if (indicator.valueMapping == SignalIndicatorView.ValueMapping.ABSOLUTE) {
-            indicator.maxLevels = data.props["maxLevels"]?.toIntOrNull() ?: defaultMaxLevels
-        } else {
-            indicator.maxLevels = data.props["maxLevels"]?.toIntOrNull() ?: defaultMaxLevels
-        }
+        indicator.maxLevels = data.props["maxLevels"]?.toIntOrNull() ?: defaultMaxLevels
 
         indicator.value = data.props["value"]?.toFloatOrNull() ?: 2f
         indicator.showValue = (data.props["show_value"] ?: "false").toBoolean()
@@ -124,9 +121,6 @@ object SignalIndicatorDefinition : IComponentDefinition {
             SignalIndicatorView.IconStyle.DROPS
         )
         val isBackFiveCurrent = (SignalIndicatorView.IconStyle.valueOf(currentStyleStr) in lastFiveStyles)
-
-        val defaultMin = if (isBackFiveCurrent) "1" else "1"
-        val defaultMax = if (isBackFiveCurrent) "5" else "5"
 
         // Default ratio values
         val ratioMin = "0"
@@ -203,11 +197,11 @@ object SignalIndicatorDefinition : IComponentDefinition {
         val tvRatioDesc = panelView.findViewById<TextView>(R.id.tvRatioDesc)
         val containerRatioInputs = panelView.findViewById<View>(R.id.containerRatioInputs)
         
-        val absHtml = "絕對數值模式下，數值 <font color='#EF4444'>1~5</font> 將對應圖示 5 個階段（0為全滅）。"
-        tvAbsoluteDesc.text = android.text.Html.fromHtml(absHtml)
+        val absHtml = ctx.getString(R.string.prop_desc_mapping_absolute)
+        tvAbsoluteDesc.text = HtmlCompat.fromHtml(absHtml, HtmlCompat.FROM_HTML_MODE_LEGACY)
         
-        val ratioHtml = "最大最小值將均分為 <font color='#EF4444'>1~5</font> 共 5 個階段（0為全滅）。"
-        tvRatioDesc.text = android.text.Html.fromHtml(ratioHtml)
+        val ratioHtml = ctx.getString(R.string.prop_desc_mapping_ratio)
+        tvRatioDesc.text = HtmlCompat.fromHtml(ratioHtml, HtmlCompat.FROM_HTML_MODE_LEGACY)
         
         tvAbsoluteDesc.visibility = if (isAbsolute) View.VISIBLE else View.GONE
         tvRatioDesc.visibility = if (isAbsolute) View.GONE else View.VISIBLE
@@ -268,7 +262,11 @@ object SignalIndicatorDefinition : IComponentDefinition {
 
         // Color Mode
         val spinnerColorMode = panelView.findViewById<AutoCompleteTextView>(R.id.spinnerColorMode)
-        val colorModes = arrayOf("純色", "階段", "漸變")
+        val colorModes = arrayOf(
+            ctx.getString(R.string.prop_val_color_solid),
+            ctx.getString(R.string.prop_val_color_step),
+            ctx.getString(R.string.prop_val_color_gradient)
+        )
         val adapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, colorModes)
         spinnerColorMode.setAdapter(adapter)
         
@@ -290,9 +288,11 @@ object SignalIndicatorDefinition : IComponentDefinition {
             }
             containerStepThreshold.visibility = if (mode == "STEP") View.VISIBLE else View.GONE
             
-            CommonPropBinder.bindColorPalette(panelView, R.id.containerColorStart, "theme_color", data, onUpdate, if (isSolid) "主體顏色" else "未達門檻顏色", "#FF9800")
+            val startLabel = if (isSolid) ctx.getString(R.string.prop_label_color_base) else ctx.getString(R.string.prop_label_color_unreached)
+            CommonPropBinder.bindColorPalette(panelView, R.id.containerColorStart, "theme_color", data, onUpdate, startLabel, "#FF9800")
             if (!isSolid) {
-                CommonPropBinder.bindColorPalette(panelView, R.id.containerColorEnd, "color_end", data, onUpdate, if (mode == "STEP") "達到門檻顏色" else "最大顏色", "#F44336")
+                val endLabel = if (mode == "STEP") ctx.getString(R.string.prop_label_color_reached) else ctx.getString(R.string.prop_label_color_max)
+                CommonPropBinder.bindColorPalette(panelView, R.id.containerColorEnd, "color_end", data, onUpdate, endLabel, "#F44336")
             }
         }
         updateColorPickersVisibility(cmStr)

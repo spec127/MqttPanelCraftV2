@@ -108,7 +108,31 @@
     <string name="component_label_gauge_meter">Gauge Meter</string>
     <string name="component_label_value_display">Value Display</string>
     <string name="component_label_text_display">Text Display</string>
-    <string name="component_label_signal_indicator">信號面板</string>
+    <string name="component_label_signal_indicator">Signal Indicator</string>
+
+    <!-- Signal Indicator Properties -->
+    <string name="prop_label_icon_style">Icon Style</string>
+    <string name="prop_label_value_mapping">Value Mapping</string>
+    <string name="prop_val_mapping_absolute">Absolute</string>
+    <string name="prop_val_mapping_ratio">Ratio</string>
+    <string name="prop_desc_mapping_absolute"><![CDATA[In absolute mode, values <font color=\"#EF4444\">1~5</font> light up the segments. (0 is all off)]]></string>
+    <string name="prop_desc_mapping_ratio"><![CDATA[Min and max values are equally divided into <font color=\"#EF4444\">1~5</font> segments. (0 is all off)]]></string>
+    <string name="prop_label_value_display_panel">Value Panel</string>
+    <string name="prop_desc_value_display_panel">Show the received value next to the icon.</string>
+    <string name="prop_label_alarm_blink">Alarm Blink</string>
+    <string name="prop_desc_alarm_blink">Blink the icon to warn when the threshold is reached.</string>
+    <string name="prop_val_alarm_low">Low (≤)</string>
+    <string name="prop_val_alarm_high">High (≥)</string>
+    <string name="prop_label_alarm_duration">Duration (0=infinite)</string>
+    <string name="prop_label_alarm_threshold">Alarm Threshold</string>
+    <string name="prop_label_step_threshold">Step Threshold</string>
+    <string name="prop_val_color_solid">Solid</string>
+    <string name="prop_val_color_step">Step</string>
+    <string name="prop_val_color_gradient">Gradient</string>
+    <string name="prop_label_color_base">Base Color</string>
+    <string name="prop_label_color_unreached">Unreached Color</string>
+    <string name="prop_label_color_reached">Reached Color</string>
+    <string name="prop_label_color_max">Max Color</string>
 
     <!-- Joystick Properties -->
     <string name="properties_label_joystick_mode">Joystick Mode</string>
