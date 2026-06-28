@@ -17,8 +17,8 @@ android {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
-        versionCode = 146
-        versionName = "0.9.16" // 修復前五個圖示的預設檔位異常
+        versionCode = 154
+        versionName = "0.10.7" // 接收框大小修正與質感提升 0.10.7
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

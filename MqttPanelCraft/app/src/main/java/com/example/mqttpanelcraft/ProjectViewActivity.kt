@@ -845,22 +845,39 @@ class ProjectViewActivity : BaseActivity() {
                             // Send to VM instead of Manager
                             viewModel.addLog(logMsg)
 
-                            // Update UI for all components that match the topic
-                            viewModel.components.value?.forEach { comp ->
-                                // Check for exact topic match or wildcard match
-                                if (comp.topicConfig == topic ||
-                                                (comp.topicConfig.endsWith("/#") &&
-                                                        topic.startsWith(
-                                                                comp.topicConfig.dropLast(2)
-                                                        ))
-                                ) {
-                                    val view = renderer.getView(comp.id)
-                                    if (view != null)
-                                            behaviorManager.onMqttMessageReceived(
-                                                    view,
-                                                    comp,
-                                                    payload
-                                            )
+                            val components = viewModel.components.value ?: emptyList()
+
+                            // Find all components that match the topic exactly or via wildcard
+                            val matchingComponents = components.filter { comp ->
+                                comp.topicConfig == topic ||
+                                (comp.topicConfig.endsWith("/#") && topic.startsWith(comp.topicConfig.dropLast(2)))
+                            }
+
+                            // 1. Send to matching components
+                            matchingComponents.forEach { comp ->
+                                val view = renderer.getView(comp.id)
+                                if (view != null) {
+                                    behaviorManager.onMqttMessageReceived(view, comp, payload)
+                                }
+                            }
+                            
+                            // 2. Send to any TEXT_DISPLAY components that link to the matching components
+                            components.forEach { comp ->
+                                if (comp.type == "TEXT_DISPLAY") {
+                                    val linkedStr = comp.props["linked_components"] ?: ""
+                                    if (linkedStr.isNotEmpty()) {
+                                        val linkedIds = linkedStr.split(",")
+                                        // If this TEXT_DISPLAY is linked to any of the matching components
+                                        val sourceComp = matchingComponents.find { linkedIds.contains(it.id.toString()) }
+                                        if (sourceComp != null) {
+                                            val view = renderer.getView(comp.id)
+                                            if (view != null) {
+                                                com.example.mqttpanelcraft.ui.components.definitions.TextDisplayDefinition.onLinkedMqttMessage(
+                                                    view, comp, payload, sourceComp
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

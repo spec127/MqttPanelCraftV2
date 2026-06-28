@@ -18,7 +18,7 @@ object InputBoxDefinition : IComponentDefinition {
 
     override val type = "INPUTBOX"
     override val defaultSize = Size(200, 60)
-    override val labelPrefix = "inputbox"
+    override val labelPrefix = "sendbox"
     override val iconResId = R.drawable.ic_edit // Generic edit icon
     override val group = "CONTROL"
 
