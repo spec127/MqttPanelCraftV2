@@ -296,22 +296,20 @@ class CanvasInteractionManager(
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 guideOverlay.clear()
+                val wasDeleteActive = (currentDeleteState == DeleteState.ACTIVE)
+                if (currentDeleteState != DeleteState.NONE) {
+                    currentDeleteState = DeleteState.NONE
+                    callbacks.onDeleteZoneState(DeleteState.NONE)
+                }
 
                 if (currentMode == Mode.DRAGGING && activeView != null) {
                     val canvasH = canvasCanvas.height
                     val compH = activeView!!.height
                     val safeLimitY = (canvasH - bottomInset - compH).toFloat()
 
-                    if (currentDeleteState == DeleteState.ACTIVE) {
+                    if (wasDeleteActive) {
                         callbacks.onComponentDeleted(activeView!!.id)
-                        currentDeleteState = DeleteState.NONE
-                        callbacks.onDeleteZoneState(DeleteState.NONE)
                     } else if (isDragDetected) {
-                        // Ensure state is reset if we didn't delete
-                        if (currentDeleteState != DeleteState.NONE) {
-                            currentDeleteState = DeleteState.NONE
-                            callbacks.onDeleteZoneState(DeleteState.NONE)
-                        }
 
                         if (activeView!!.y > safeLimitY && !isBottomSheetExpanded()) {
                             // Snap Back

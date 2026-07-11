@@ -160,8 +160,8 @@
     <string name="prop_label_text_color">文字顏色</string>
     <string name="prop_label_theme_color">整體顏色</string>
     <string name="prop_label_font">字體</string>
-    <string name="prop_val_font_normal">一般</string>
-    <string name="prop_val_font_handwriting">手寫</string>
+    <string name="prop_val_font_normal">標準字體</string>
+    <string name="prop_val_font_handwriting">手寫字體</string>
 
     <!-- Joystick Properties -->
     <string name="properties_label_joystick_mode">搖桿模式</string>
@@ -297,8 +297,9 @@
 
     <!-- Text Input Styles -->
     <string name="val_style_text_capsule">膠囊</string>
-    <string name="val_style_text_modular">模組</string>
     <string name="val_style_text_infinity">無極</string>
+    <string name="val_style_text_glass">玻璃</string>
+    <string name="val_style_text_note">筆記</string>
     <string name="prop_label_clear_on_send">發送後清空</string>
     <string name="prop_label_enter_as_send">換行鍵發送</string>
     <string name="prop_desc_clear_on_send">發送訊息後自動清空輸入框。</string>

@@ -167,8 +167,8 @@
     <string name="prop_label_text_color">Text Color</string>
     <string name="prop_label_theme_color">Theme Color</string>
     <string name="prop_label_font">Font Style</string>
-    <string name="prop_val_font_normal">Normal</string>
-    <string name="prop_val_font_handwriting">Handwriting</string>
+    <string name="prop_val_font_normal">Standard Font</string>
+    <string name="prop_val_font_handwriting">Handwriting Font</string>
 
     <!-- Joystick Properties -->
     <string name="properties_label_joystick_mode">Joystick Mode</string>
@@ -304,8 +304,9 @@
 
     <!-- Input Box Styles -->
     <string name="val_style_text_capsule">Capsule</string>
-    <string name="val_style_text_modular">Modular</string>
     <string name="val_style_text_infinity">Infinity</string>
+    <string name="val_style_text_glass">Glass</string>
+    <string name="val_style_text_note">Note</string>
     <string name="prop_label_clear_on_send">Clear on Send</string>
     <string name="prop_label_enter_as_send">Enter as Send</string>
     <string name="prop_desc_clear_on_send">Clear text field after sending.</string>

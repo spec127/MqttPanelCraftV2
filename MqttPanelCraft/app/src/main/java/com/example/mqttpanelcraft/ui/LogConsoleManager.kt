@@ -29,11 +29,19 @@ class LogConsoleManager(
         // Topic Adapter
         val atvTopic = rootView.findViewById<android.widget.AutoCompleteTextView>(R.id.etConsoleTopic)
         if (atvTopic != null) {
-            topicAdapter = TopicAdapter(rootView.context, emptyList())
+            topicAdapter = TopicAdapter(rootView.context, emptyList(), atvTopic)
             atvTopic.setAdapter(topicAdapter)
-            // Show all on click?
-            atvTopic.setOnClickListener { atvTopic.showDropDown() }
-            atvTopic.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) atvTopic.showDropDown() }
+            // Show all on click if items exist
+            atvTopic.setOnClickListener { if (topicAdapter.count > 0) atvTopic.showDropDown() }
+            atvTopic.setOnFocusChangeListener { _, hasFocus -> if (hasFocus && topicAdapter.count > 0) atvTopic.showDropDown() }
+            
+            // Limit height to max 5 items (~220dp) for scrolling and pop UPWARDS above input box
+            val density = rootView.resources.displayMetrics.density
+            val maxDropDownHeight = (220 * density).toInt()
+            atvTopic.dropDownHeight = maxDropDownHeight
+            atvTopic.post {
+                atvTopic.dropDownVerticalOffset = - (maxDropDownHeight + atvTopic.height + (8 * density).toInt())
+            }
         }
     }
     

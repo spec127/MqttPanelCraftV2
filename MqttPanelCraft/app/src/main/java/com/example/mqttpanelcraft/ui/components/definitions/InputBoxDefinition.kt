@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.util.Size
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -12,15 +13,22 @@ import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
+import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.InputBoxView
 
 object InputBoxDefinition : IComponentDefinition {
 
     override val type = "INPUTBOX"
-    override val defaultSize = Size(200, 60)
+    override val defaultSize = Size(200, 50)
     override val labelPrefix = "sendbox"
     override val iconResId = R.drawable.ic_edit // Generic edit icon
     override val group = "CONTROL"
+
+    override fun getDefaultProps(): Map<String, String> = mapOf(
+        "color" to "#FF2196F3",
+        "style" to "Capsule",
+        "font_style" to "NORMAL"
+    )
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
@@ -41,12 +49,13 @@ object InputBoxDefinition : IComponentDefinition {
         val inputView = view.findViewWithTag<InputBoxView>("target") ?: return
 
         inputView.style = data.props["style"] ?: "Capsule"
+        inputView.fontStyle = data.props["font_style"] ?: "NORMAL"
 
-        val colorHex = data.props["color"] ?: "#6366F1"
+        val colorHex = data.props["color"] ?: "#2196F3"
         try {
             inputView.themeColor = Color.parseColor(colorHex)
         } catch (e: Exception) {
-            inputView.themeColor = Color.parseColor("#6366F1")
+            inputView.themeColor = Color.parseColor("#2196F3")
         }
 
         inputView.clearOnSend = (data.props["clear_on_send"] ?: "true") == "true"
@@ -67,8 +76,9 @@ object InputBoxDefinition : IComponentDefinition {
         val styles =
                 listOf(
                         context.getString(R.string.val_style_text_capsule) to "Capsule",
-                        context.getString(R.string.val_style_text_modular) to "Modular",
-                        context.getString(R.string.val_style_text_infinity) to "Infinity"
+                        context.getString(R.string.val_style_text_infinity) to "Infinity",
+                        context.getString(R.string.val_style_text_glass) to "Glass",
+                        context.getString(R.string.val_style_text_note) to "Note"
                 )
         // Map internal value to display string
         val currentStyle = data.props["style"] ?: "Capsule"
@@ -87,47 +97,29 @@ object InputBoxDefinition : IComponentDefinition {
             onUpdate("style", styles[position].second)
         }
 
-        // 2. Color Picker (Full Palette)
-        val colorViews =
-                listOf(R.id.vColor1, R.id.vColor2, R.id.vColor3, R.id.vColor4, R.id.vColor5).map {
-                    panelView.findViewById<View>(it)
-                }
-
-        fun refreshColors() {
-            val recent = com.example.mqttpanelcraft.data.ColorHistoryManager.load(context)
-            colorViews.forEachIndexed { i, v ->
-                if (i < recent.size) {
-                    v?.backgroundTintList =
-                            android.content.res.ColorStateList.valueOf(Color.parseColor(recent[i]))
-                    v?.setOnClickListener { onUpdate("color", recent[i]) }
+        // Font Toggle (Standard / Handwriting)
+        panelView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleFont)?.let { toggleFont ->
+            val fontStyle = data.props["font_style"] ?: "NORMAL"
+            val checkedId = if (fontStyle == "HANDWRITING") R.id.btnFontHandwriting else R.id.btnFontNormal
+            toggleFont.check(checkedId)
+            toggleFont.addOnButtonCheckedListener { _, id, isChecked ->
+                if (isChecked) {
+                    val valStr = if (id == R.id.btnFontHandwriting) "HANDWRITING" else "NORMAL"
+                    onUpdate("font_style", valStr)
                 }
             }
         }
-        refreshColors()
 
-        panelView.findViewById<View>(R.id.btnColorCustom)?.setOnClickListener { anchor ->
-            val cur = data.props["color"] ?: "#6366F1"
-            var temp = cur
-            com.example.mqttpanelcraft.ui.ColorPickerDialog(
-                            context,
-                            cur,
-                            true,
-                            { selectedHex ->
-                                temp = selectedHex
-                                onUpdate("color", selectedHex)
-                            },
-                            {
-                                if (temp != cur) {
-                                    com.example.mqttpanelcraft.data.ColorHistoryManager.save(
-                                            context,
-                                            temp
-                                    )
-                                    refreshColors()
-                                }
-                            }
-                    )
-                    .show(anchor)
-        }
+        // 2. Color Picker (Full Palette)
+        CommonPropBinder.bindColorPalette(
+            panelView,
+            R.id.containerColorPalette,
+            "color",
+            data,
+            onUpdate,
+            context.getString(R.string.prop_label_theme_color),
+            "#FF2196F3"
+        )
 
         // 3. Toggles (Clear on Send)
         val itemClear = panelView.findViewById<LinearLayout>(R.id.itemClearOnSend)

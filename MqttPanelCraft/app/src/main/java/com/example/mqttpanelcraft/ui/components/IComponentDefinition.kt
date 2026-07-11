@@ -48,6 +48,19 @@ interface IComponentDefinition {
         )
 
         /**
+         * Returns standard default properties for this component type.
+         */
+        fun getDefaultProps(): Map<String, String> {
+                val groupColor = when (group) {
+                        "CONTROL" -> "#FF2196F3"
+                        "SENSOR" -> "#FFEB3B"
+                        "DISPLAY" -> "#FF9800"
+                        else -> "#FF7C3AED"
+                }
+                return mapOf("color" to groupColor, "theme_color" to groupColor)
+        }
+
+        /**
          * Returns true if the component should maintain its aspect ratio during resizing. Default
          * is false (free resizing).
          */

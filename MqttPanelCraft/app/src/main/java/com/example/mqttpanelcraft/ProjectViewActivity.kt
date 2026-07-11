@@ -96,7 +96,10 @@ class ProjectViewActivity : BaseActivity() {
                 viewModel.components.value?.let {
                     renderer.render(it, isEditMode, selectedComponentId)
                 }
-                if (!isEditMode) viewModel.saveProject()
+                if (!isEditMode) {
+                    viewModel.saveProject()
+                    ensureMqttConnectedAndSubscribed()
+                }
             }
 
             // Subscribers
@@ -266,6 +269,7 @@ class ProjectViewActivity : BaseActivity() {
 
                             override fun onComponentClicked(id: Int) {
                                 if (isEditMode) {
+                                    projectUIManager.setDeleteZoneState(CanvasInteractionManager.DeleteState.NONE)
                                     val sheet = findViewById<View>(R.id.bottomSheet)
                                     val behavior =
                                             com.google.android.material.bottomsheet
@@ -912,8 +916,8 @@ class ProjectViewActivity : BaseActivity() {
                         hasSubscribed = true
                     }
                 }
-            } else if (status == 2) { // Failed
-                hasSubscribed = false // Only reset on explicit failure
+            } else if (status != 1) { // Disconnected, Failed, or Connecting
+                hasSubscribed = false
             }
             // v44.4: Ignore status 0 (Connecting) to avoid redundant subscription triggers
         }
@@ -951,6 +955,31 @@ class ProjectViewActivity : BaseActivity() {
                 isEditMode,
                 selectedComponentId
         ) // Ensure UI state is consistent
+        if (!isEditMode) {
+            ensureMqttConnectedAndSubscribed()
+        }
+    }
+
+    private fun ensureMqttConnectedAndSubscribed() {
+        val proj = viewModel.project.value ?: return
+        val status = com.example.mqttpanelcraft.MqttRepository.connectionStatus.value
+        if (status == 1) {
+            val defaultTopic = "${proj.name}/${proj.id}/#"
+            val intent = android.content.Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java).apply {
+                action = "SUBSCRIBE"
+                putExtra("TOPIC", defaultTopic)
+            }
+            startService(intent)
+            viewModel.addLog("Re-subscribing to: $defaultTopic")
+        } else if (status != 0) {
+            viewModel.retryMqtt()
+        }
+        viewModel.components.value?.forEach { comp ->
+            val view = renderer.getView(comp.id)
+            if (view != null) {
+                behaviorManager.attachBehavior(view, comp)
+            }
+        }
     }
 
     override fun onPause() {

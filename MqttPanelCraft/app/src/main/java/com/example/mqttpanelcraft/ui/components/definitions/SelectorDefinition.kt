@@ -47,6 +47,12 @@ object SelectorDefinition : IComponentDefinition {
     override val iconResId = R.drawable.ic_selector_thumb
     override val group = "CONTROL"
 
+    override fun getDefaultProps(): Map<String, String> = mapOf(
+        "segments" to "",
+        "style" to "rounded",
+        "color" to "#FF2196F3"
+    )
+
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
         val contentRoot =

@@ -404,8 +404,8 @@ class ScaleMeterView @JvmOverloads constructor(
         val count = 11
         val majorTickLen = (8f * density) * vScale
         val minorTickLen = (4f * density) * vScale
-        paintScale.color = Color.parseColor("#40000000")
-        paintScale.strokeWidth = 1.2f * density
+        paintScale.color = Color.parseColor("#70000000")
+        paintScale.strokeWidth = 1.5f * density
         
         paintText.color = Color.parseColor("#777777")
         paintText.textSize = (10f * density) * vScale

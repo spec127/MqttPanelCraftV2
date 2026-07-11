@@ -266,25 +266,14 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         val maxId = proj.components.maxOfOrNull { it.id } ?: 100
         val newSystemId = maxId + 1
 
-        // 5. Default Props (Color from Group)
-        val initialProps = mutableMapOf<String, String>()
-        if (definition != null) {
-            val groupColor =
-                    when (definition.group) {
-                        "CONTROL" -> "#2196F3" // Default Blue for all controls
-                        "SENSOR" -> "#FFEB3B" // Yellow
-                        "DISPLAY" -> "#F44336" // Red
-                        else -> "#7C3AED" // Default Purple
-                    }
-            initialProps["color"] = groupColor
+        // 5. Default Props (From Component Definition single source of truth)
+        val initialProps = definition?.getDefaultProps()?.toMutableMap() ?: mutableMapOf()
 
-            // Special Default for Button
-            if (type == "BUTTON") {
-                initialProps["text"] = newLabel // Default text is the label name
-            } else if (type == "SELECTOR") {
-                initialProps["segments"] = "" // Triggers 4 segments fallback in definition
-                initialProps["style"] = "rounded"
-            }
+        if (type == "BUTTON") {
+            initialProps["text"] = newLabel // Default text is the label name
+        } else if (type == "SWITCH") {
+            initialProps["payloadLeft"] = "OFF"
+            initialProps["payloadRight"] = "ON"
         }
 
         return ComponentData(

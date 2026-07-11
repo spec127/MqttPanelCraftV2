@@ -17,8 +17,8 @@ android {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
-        versionCode = 154
-        versionName = "0.10.7" // 接收框大小修正與質感提升 0.10.7
+        versionCode = 165
+        versionName = "0.10.18" // 完成文字輸入接收框優化、字體切換、刻度計尺寸與單一資料源架構定版
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

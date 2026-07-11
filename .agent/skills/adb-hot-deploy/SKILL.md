@@ -20,3 +20,9 @@ When the user asks to "test the app", "deploy the app", or "run it on the emulat
 ```powershell
 $env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; & "C:\Users\jinab\AppData\Local\Android\Sdk\platform-tools\adb.exe" shell am force-stop com.example.mqttpanelcraft; ./gradlew assembleDebug; if ($LASTEXITCODE -eq 0) { & "C:\Users\jinab\AppData\Local\Android\Sdk\platform-tools\adb.exe" install -r app\build\outputs\apk\debug\app-debug.apk; & "C:\Users\jinab\AppData\Local\Android\Sdk\platform-tools\adb.exe" shell am start -n com.example.mqttpanelcraft/.DashboardActivity }
 ```
+
+### Wireless / Specific Device Deployment (無線與多裝置部署)
+When deploying over Wi-Fi to a tablet or when multiple emulators/devices are connected, explicitly connect and target the device using `-s <device_ip:port>`:
+```powershell
+$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"; $TARGET="<TARGET_IP>:<PORT>"; & "C:\Users\jinab\AppData\Local\Android\Sdk\platform-tools\adb.exe" connect $TARGET; & "C:\Users\jinab\AppData\Local\Android\Sdk\platform-tools\adb.exe" -s $TARGET shell am force-stop com.example.mqttpanelcraft; ./gradlew assembleDebug; if ($LASTEXITCODE -eq 0) { & "C:\Users\jinab\AppData\Local\Android\Sdk\platform-tools\adb.exe" -s $TARGET install -r app\build\outputs\apk\debug\app-debug.apk; & "C:\Users\jinab\AppData\Local\Android\Sdk\platform-tools\adb.exe" -s $TARGET shell am start -n com.example.mqttpanelcraft/.DashboardActivity }
+```

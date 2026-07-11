@@ -33,7 +33,7 @@ import java.util.Locale
 
 object TextDisplayDefinition : IComponentDefinition {
     override val type: String = "TEXT_DISPLAY"
-    override val defaultSize: Size = Size(200, 60)
+    override val defaultSize: Size = Size(200, 50)
     override val labelPrefix: String = "receivebox"
     override val iconResId: Int = android.R.drawable.ic_menu_sort_alphabetically
     override val group: String = "SENSOR"
@@ -47,6 +47,15 @@ object TextDisplayDefinition : IComponentDefinition {
         }
         return null
     }
+
+    override fun getDefaultProps(): Map<String, String> = mapOf(
+        "theme_color" to "#FF9800",
+        "style" to "CAPSULE",
+        "display_mode" to "SINGLE",
+        "display_lines" to "1",
+        "scrollable" to "false",
+        "default_text" to "loading ..."
+    )
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
@@ -65,38 +74,33 @@ object TextDisplayDefinition : IComponentDefinition {
         val tvView = container.getChildAt(0) as? TextDisplayView ?: return
 
         // Appearance
-        val styleStr = data.props["style"] ?: "GLASS"
+        val styleStr = data.props["style"] ?: "CAPSULE"
         tvView.currentStyle = try {
             TextDisplayView.Style.valueOf(styleStr)
-        } catch (e: Exception) { TextDisplayView.Style.GLASS }
+        } catch (e: Exception) { TextDisplayView.Style.CAPSULE }
 
-        val themeColor = data.props["theme_color"] ?: "#6681D4FA"
-        try { tvView.bgColor = Color.parseColor(themeColor) } catch (e: Exception) {}
-
-        val textColor = data.props["text_color"] ?: "#FFFF9800"
-        try { tvView.themeColor = Color.parseColor(textColor) } catch (e: Exception) {}
+        val themeColor = data.props["theme_color"] ?: "#FF9800"
+        val parsedColor = try { Color.parseColor(themeColor) } catch (e: Exception) { Color.parseColor("#FF9800") }
+        tvView.bgColor = parsedColor
+        tvView.themeColor = parsedColor
 
         val mode = data.props["display_mode"] ?: "SINGLE"
         val isLog = mode == "LOG"
         
-        val alignStr = data.props["text_align"] ?: "LEFT"
-        tvView.textView.gravity = when (alignStr) {
-            "CENTER" -> if (isLog) Gravity.CENTER_HORIZONTAL or Gravity.TOP else Gravity.CENTER
-            "RIGHT" -> if (isLog) Gravity.END or Gravity.TOP else Gravity.END or Gravity.CENTER_VERTICAL
-            else -> if (isLog) Gravity.START or Gravity.TOP else Gravity.START or Gravity.CENTER_VERTICAL
-        }
+        tvView.textView.gravity = if (isLog) Gravity.START or Gravity.TOP else Gravity.START or Gravity.CENTER_VERTICAL
 
         val fontStr = data.props["font_style"] ?: "NORMAL"
         tvView.fontStyle = fontStr
 
         // Logic pass to view
         tvView.isLogMode = isLog
-        tvView.displayLines = data.props["display_lines"]?.toIntOrNull() ?: 5
-        tvView.isScrollable = data.props["scrollable"] == "true"
+        tvView.displayLines = if (isLog) (data.props["display_lines"]?.toIntOrNull() ?: 5) else 1
+        tvView.isScrollable = if (isLog) (data.props["scrollable"] != "false") else false
         
         // Display Mode defaults
-        if (tvView.textView.text.isEmpty() && mode != "LOG") {
-            tvView.textView.text = data.props["default_text"] ?: "Waiting for data..."
+        if (tvView.textView.text.isEmpty() || tvView.textView.text == "Waiting for data..." || tvView.textView.text == "loading..." || tvView.textView.text == "loading ...") {
+            val defText = data.props["default_text"] ?: "loading ..."
+            tvView.textView.text = if (!isLog) defText.replace("\n", " ").replace("\r", "") else defText
         }
     }
     
@@ -119,7 +123,7 @@ object TextDisplayDefinition : IComponentDefinition {
         // Scrollable
         val itemScrollable = panelView.findViewById<LinearLayout>(R.id.itemScrollable)
         val checkScrollable = panelView.findViewById<ImageView>(R.id.checkScrollable)
-        var isScrollable = data.props["scrollable"] == "true"
+        var isScrollable = data.props["scrollable"] != "false"
         checkScrollable.visibility = if (isScrollable) View.VISIBLE else View.INVISIBLE
         itemScrollable.setOnClickListener {
             isScrollable = !isScrollable
@@ -148,6 +152,9 @@ object TextDisplayDefinition : IComponentDefinition {
             if (isChecked) {
                 val newMode = if (checkedId == R.id.btnModeSingle) "SINGLE" else "LOG"
                 onUpdate("display_mode", newMode)
+                if (newMode == "LOG" && data.props["display_lines"] == null) {
+                    onUpdate("display_lines", "5")
+                }
                 updateVisibility(newMode)
             }
         }
@@ -266,62 +273,40 @@ object TextDisplayDefinition : IComponentDefinition {
             })
         }
 
-        // Text Align (now a Toggle Group)
-        val toggleTextAlign = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleTextAlign)
-        val align = data.props["text_align"] ?: "LEFT"
-        toggleTextAlign.check(when(align) {
-            "CENTER" -> R.id.btnAlignCenter
-            "RIGHT" -> R.id.btnAlignRight
-            else -> R.id.btnAlignLeft
-        })
-        toggleTextAlign.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked) {
-                val newAlign = when (checkedId) {
-                    R.id.btnAlignCenter -> "CENTER"
-                    R.id.btnAlignRight -> "RIGHT"
-                    else -> "LEFT"
-                }
-                onUpdate("text_align", newAlign)
-            }
-        }
-
         // Style
         val spinnerStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spinnerStyle)
         val styles = arrayOf(
-            ctx.getString(R.string.prop_val_style_glass),
-            ctx.getString(R.string.prop_val_style_note)
+            ctx.getString(R.string.val_style_text_capsule),
+            ctx.getString(R.string.val_style_text_infinity),
+            ctx.getString(R.string.val_style_text_glass),
+            ctx.getString(R.string.val_style_text_note)
         )
         val sAdapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, styles)
         spinnerStyle.setAdapter(sAdapter)
         
-        val sTypeMap = mapOf("GLASS" to styles[0], "NOTE" to styles[1])
+        val sTypeMap = mapOf("CAPSULE" to styles[0], "INFINITY" to styles[1], "GLASS" to styles[2], "NOTE" to styles[3])
         val sTypeRevMap = sTypeMap.entries.associate { (k, v) -> v to k }
-        spinnerStyle.setText(sTypeMap[data.props["style"] ?: "GLASS"], false)
+        spinnerStyle.setText(sTypeMap[data.props["style"]?.uppercase() ?: "CAPSULE"], false)
         spinnerStyle.setOnItemClickListener { _, _, position, _ ->
-            onUpdate("style", sTypeRevMap[styles[position]] ?: "GLASS")
+            onUpdate("style", sTypeRevMap[styles[position]] ?: "CAPSULE")
         }
 
-        // Font
-        val spinnerFont = panelView.findViewById<AutoCompleteTextView>(R.id.spinnerFont)
-        val fonts = arrayOf(
-            ctx.getString(R.string.prop_val_font_normal),
-            ctx.getString(R.string.prop_val_font_handwriting)
-        )
-        val fAdapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, fonts)
-        spinnerFont.setAdapter(fAdapter)
-        
-        val fTypeMap = mapOf("NORMAL" to fonts[0], "HANDWRITING" to fonts[1])
-        val fTypeRevMap = fTypeMap.entries.associate { (k, v) -> v to k }
-        spinnerFont.setText(fTypeMap[data.props["font_style"] ?: "NORMAL"], false)
-        spinnerFont.setOnItemClickListener { _, _, position, _ ->
-            onUpdate("font_style", fTypeRevMap[fonts[position]] ?: "NORMAL")
+        // Font Toggle (Standard / Handwriting)
+        panelView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleFont)?.let { toggleFont ->
+            val fontStyle = data.props["font_style"] ?: "NORMAL"
+            val checkedId = if (fontStyle == "HANDWRITING") R.id.btnFontHandwriting else R.id.btnFontNormal
+            toggleFont.check(checkedId)
+            toggleFont.addOnButtonCheckedListener { _, id, isChecked ->
+                if (isChecked) {
+                    val valStr = if (id == R.id.btnFontHandwriting) "HANDWRITING" else "NORMAL"
+                    onUpdate("font_style", valStr)
+                }
+            }
         }
 
         // Colors
-        val defaultTheme = if (data.props["style"] == "NOTE") "#FFF9E6" else "#6681D4FA"
-        val defaultText = if (data.props["style"] == "NOTE") "#333333" else "#FFFF9800"
+        val defaultTheme = if (data.props["style"] == "NOTE") "#FFF9E6" else "#FF2196F3"
         CommonPropBinder.bindColorPalette(panelView, R.id.containerBgColor, "theme_color", data, onUpdate, ctx.getString(R.string.prop_label_theme_color), defaultTheme)
-        CommonPropBinder.bindColorPalette(panelView, R.id.containerTextColor, "text_color", data, onUpdate, ctx.getString(R.string.prop_label_text_color), defaultText)
     }
 
     override fun attachBehavior(
@@ -366,13 +351,13 @@ object TextDisplayDefinition : IComponentDefinition {
 
         val mode = data.props["display_mode"] ?: "SINGLE"
         if (mode == "SINGLE") {
-            tvView.textView.text = formattedText
+            tvView.isLogMode = false
+            tvView.textView.text = formattedText.replace("\n", " ").replace("\r", "")
             tvView.prefixLength = prefixStr.length // For drawing vertical line later
         } else {
+            tvView.isLogMode = true
             val maxLines = data.props["max_lines"]?.toIntOrNull() ?: 50
             tvView.appendText(formattedText, maxLines)
-            // Log mode may not easily support vertical prefix line per-row if it's just one big string, 
-            // but we can pass the prefix length to View to handle if needed.
             tvView.prefixLength = prefixStr.length
         }
     }

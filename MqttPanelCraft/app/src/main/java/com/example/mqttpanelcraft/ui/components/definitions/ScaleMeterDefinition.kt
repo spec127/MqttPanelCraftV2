@@ -16,11 +16,22 @@ import com.example.mqttpanelcraft.ui.views.ScaleMeterView
 
 object ScaleMeterDefinition : IComponentDefinition {
     override val type: String = "SCALE_METER"
-    override val defaultSize: Size = Size(60, 200) // Default Vertical
+    override val defaultSize: Size = Size(200, 70)
     override val labelPrefix: String = "meter"
     override val iconResId: Int = android.R.drawable.ic_menu_sort_by_size
     override val group: String = "SENSOR"
     override val propertiesLayoutId: Int = R.layout.layout_prop_scale_meter
+
+    override fun getDefaultProps(): Map<String, String> = mapOf(
+        "value" to "70",
+        "style" to "SEGMENTED",
+        "orientation" to "HORIZONTAL",
+        "feedback" to "Ticks",
+        "show_ticks" to "true",
+        "show_bubble" to "false",
+        "show_value" to "false",
+        "theme_color" to "#FF9800"
+    )
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
