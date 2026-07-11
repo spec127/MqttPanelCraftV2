@@ -14,6 +14,7 @@
         app:boxCornerRadiusBottomEnd="16dp"
         app:boxBackgroundColor="@color/prop_input_bg"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:hint="@string/prop_label_color"
         app:hintEnabled="true"
         app:expandedHintEnabled="false">
         

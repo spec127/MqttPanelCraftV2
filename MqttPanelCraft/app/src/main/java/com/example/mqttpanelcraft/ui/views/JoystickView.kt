@@ -597,10 +597,10 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
         // Icons
         val iconDist = radius * 0.65f
-        drawBevelIcon(canvas, cx, cy - iconDist, "up", active == "up", density)
-        drawBevelIcon(canvas, cx, cy + iconDist, "down", active == "down", density)
-        drawBevelIcon(canvas, cx - iconDist, cy, "left", active == "left", density)
-        drawBevelIcon(canvas, cx + iconDist, cy, "right", active == "right", density)
+        drawBevelIcon(canvas, cx, cy - iconDist, "up", active == "up", density, radius)
+        drawBevelIcon(canvas, cx, cy + iconDist, "down", active == "down", density, radius)
+        drawBevelIcon(canvas, cx - iconDist, cy, "left", active == "left", density, radius)
+        drawBevelIcon(canvas, cx + iconDist, cy, "right", active == "right", density, radius)
     }
 
     private fun draw2WayBeveledIntegrated(canvas: Canvas, active: String, density: Float) {
@@ -668,11 +668,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         // Icons
         val iconDist = (if (isVert) halfH else halfW) * 0.6f
         if (isVert) {
-            drawBevelIcon(canvas, centerX, centerY - iconDist, "up", active == "up", density)
-            drawBevelIcon(canvas, centerX, centerY + iconDist, "down", active == "down", density)
+            drawBevelIcon(canvas, centerX, centerY - iconDist, "up", active == "up", density, halfH)
+            drawBevelIcon(canvas, centerX, centerY + iconDist, "down", active == "down", density, halfH)
         } else {
-            drawBevelIcon(canvas, centerX - iconDist, centerY, "left", active == "left", density)
-            drawBevelIcon(canvas, centerX + iconDist, centerY, "right", active == "right", density)
+            drawBevelIcon(canvas, centerX - iconDist, centerY, "left", active == "left", density, halfW)
+            drawBevelIcon(canvas, centerX + iconDist, centerY, "right", active == "right", density, halfW)
         }
     }
 
@@ -682,13 +682,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             y: Float,
             dir: String,
             isActive: Boolean,
-            density: Float
+            density: Float,
+            componentRadius: Float = 100f * density
     ) {
         val isDarkMode =
                 (resources.configuration.uiMode and
                         android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
                         android.content.res.Configuration.UI_MODE_NIGHT_YES
-        val size = 6f * density
+        val maxArrowSize = 4.6f * density
+        val size = kotlin.math.min(componentRadius * 0.11f, maxArrowSize)
         val bevelGrey = Color.parseColor("#4D4D4D")
         val strokeCol =
                 if (isActive) {
@@ -696,12 +698,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 } else {
                     if (isDarkMode) bevelGrey else Color.WHITE
                 }
+        val strokeW = kotlin.math.min(componentRadius * 0.035f, 2.0f * density)
         val iconPaint =
                 Paint(Paint.ANTI_ALIAS_FLAG).apply {
                     color = strokeCol
                     alpha = 255 // 100% Opaque
                     style = Paint.Style.STROKE
-                    strokeWidth = 3.5f * density // Thicker icons
+                    strokeWidth = strokeW
                     strokeCap = Paint.Cap.ROUND
                     strokeJoin = Paint.Join.ROUND
                 }
@@ -1131,16 +1134,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                         "up" -> if (msgUp.isNotEmpty()) msgUp else "up"
                         "down" -> if (msgDown.isNotEmpty()) msgDown else "down"
                         "left" -> if (msgLeft.isNotEmpty()) msgLeft else "left"
-                        "right" -> if (msgRight.isNotEmpty()) msgRight else "right"
                         "none" ->
                                 if (msgRelease.isNotEmpty()) msgRelease
-                                else "none" // Send release msg if defined
+                                else "" // If release message is disabled/empty, send nothing
                         else -> dir
                     }
                 }
 
-        // Avoid duplicate emits if nothing changed
-        if (payload != lastEmittedPayload) {
+        // Avoid duplicate emits if nothing changed, and do not emit empty payload
+        if (payload.isNotEmpty() && payload != lastEmittedPayload) {
             onJoystickChange?.invoke(payload)
             lastEmittedPayload = payload
         }

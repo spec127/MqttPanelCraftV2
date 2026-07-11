@@ -17,8 +17,8 @@ android {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
-        versionCode = 165
-        versionName = "0.10.18" // 完成文字輸入接收框優化、字體切換、刻度計尺寸與單一資料源架構定版
+        versionCode = 175
+        versionName = "0.11.9" // 採用 ClippedScrollView 底層繪製邊界裁切解決滾動溢出、新增 IMAGE 影像元件及手勢縮放/旋轉/保存相簿/圖片資訊與多語系支援
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

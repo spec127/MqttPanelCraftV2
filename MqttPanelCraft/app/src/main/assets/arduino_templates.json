@@ -87,10 +87,19 @@
       "SWITCH": "SWITCH_CTRL",
       "SLIDER": "DIMMER_CTRL",
       "SELECTOR": "SELECTOR_CTRL",
+      "STEPPER": "DIMMER_CTRL",
       "JOYSTICK": "JOYSTICK_CTRL",
+      "DPAD": "JOYSTICK_CTRL",
       "PALETTE": "PALETTE_CTRL",
       "TEXT": "TEXT_DISP",
       "LED": "LED_DISP",
-      "THERMOMETER": "NUMBER_VAL"
+      "THERMOMETER": "NUMBER_VAL",
+      "IMAGE_SENSOR": "TEXT_DISP",
+      "AUDIO_SENSOR": "BUTTON_CTRL",
+      "CHART": "NUMBER_VAL",
+      "SHAPE": "TEXT_DISP",
+      "IMAGE": "TEXT_DISP",
+      "CALENDAR": "TEXT_DISP",
+      "WEB_BOX": "TEXT_DISP"
    }
 }

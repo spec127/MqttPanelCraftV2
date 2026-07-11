@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- SECTION 1: INTERACTION (互動功能) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/ic_menu_manage"
+                app:tint="@color/prop_text_secondary"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="@string/properties_section_interaction"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cbGestureZoom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prop_image_gesture_zoom"
+            android:textSize="13sp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:layout_marginBottom="4dp"/>
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cbQuickSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prop_image_quick_save"
+            android:textSize="13sp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- 分隔線 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- SECTION 2: VISUAL APPEARANCE (視覺外觀) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/ic_menu_view"
+                app:tint="@color/prop_text_secondary"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="@string/properties_section_appearance"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <!-- 左右 5:5 (左：旋轉角度 / 右：縮放模式) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="top"
+            android:baselineAligned="false"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.App.TextInputLayout.Properties.Compact"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:hint="@string/prop_image_rotation">
+
+                <AutoCompleteTextView
+                    android:id="@+id/tvImageRotation"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/prop_input_height_inner"
+                    android:inputType="none"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="12sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.App.TextInputLayout.Properties.Compact"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:hint="@string/prop_image_scale_mode">
+
+                <AutoCompleteTextView
+                    android:id="@+id/tvImageScaleMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/prop_input_height_inner"
+                    android:inputType="none"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="12sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- 是否顯示圖片資訊（打勾選擇） -->
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cbShowInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prop_image_show_info"
+            android:textSize="13sp"
+            android:textColor="?android:attr/textColorPrimary"/>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

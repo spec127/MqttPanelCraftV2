@@ -5,6 +5,28 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <!-- Section: Interaction -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_touch_app"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+        <TextView
+            android:text="@string/properties_section_interaction"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
     <!-- Controller Style Section -->
     <TextView
         android:layout_width="wrap_content"
@@ -251,15 +273,27 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Appearance Section -->
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/prop_label_appearance"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:textColor="@color/prop_text_secondary"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"/>
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp">
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+        <TextView
+            android:text="@string/properties_section_appearance"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/itemShowHex"

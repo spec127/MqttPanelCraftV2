@@ -111,6 +111,14 @@
     <string name="component_label_value_display">Value Display</string>
 
     <string name="component_label_signal_indicator">Signal Indicator</string>
+    <string name="component_label_stepper">Stepper</string>
+    <string name="component_label_dpad">D-Pad</string>
+    <string name="component_label_image_sensor">Image</string>
+    <string name="component_label_audio_sensor">Audio Alarm</string>
+    <string name="component_label_shape">Shape</string>
+    <string name="component_label_image_display">Image Display</string>
+    <string name="component_label_calendar_clock">Calendar Clock</string>
+    <string name="component_label_web_box">Web Box</string>
 
     <!-- Signal Indicator Properties -->
     <string name="prop_label_icon_style">Icon Style</string>
@@ -282,8 +290,26 @@
     <string name="val_orient_vertical">Vertical</string>
     <string name="val_slider_style_classic">Classic</string>
     <string name="val_slider_style_capsule">Capsule</string>
+    <string name="val_stepper_style_standard">Standard</string>
+    <string name="val_stepper_style_block">Block</string>
+    <string name="val_stepper_style_smooth">Smooth</string>
+    <string name="stepper_hint_release_send">Values are sent only when you release</string>
+    <string name="stepper_hint_style">Style</string>
+    <string name="prop_label_color">Color</string>
     <string name="val_shape_square">Square</string>
     <string name="val_shape_circle">Circle</string>
+    <!-- Image Component Properties -->
+    <string name="prop_image_gesture_zoom">Gesture Zoom &amp; Pan</string>
+    <string name="prop_image_quick_save">Quick Save Snapshot Button</string>
+    <string name="prop_image_rotation">Rotation Angle</string>
+    <string name="prop_image_scale_mode">Scale Mode</string>
+    <string name="prop_image_show_info">Show Image Info (Timestamp &amp; Resolution)</string>
+    <string name="val_image_rot_0">0°</string>
+    <string name="val_image_rot_90">90°</string>
+    <string name="val_image_rot_180">180°</string>
+    <string name="val_image_rot_270">270°</string>
+    <string name="val_image_scale_fit">Fit Center</string>
+    <string name="val_image_scale_crop">Center Crop</string>
     <string name="val_feedback_none">None</string>
     <string name="val_feedback_ticks">Ticks</string>
     <string name="val_feedback_bubble">Bubble</string>

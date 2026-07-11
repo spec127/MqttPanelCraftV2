@@ -43,7 +43,8 @@ object JoystickDefinition : IComponentDefinition {
     override fun onUpdateView(view: View, data: ComponentData) {
         val joystick = view.findViewWithTag<JoystickView>("target") ?: return
 
-        joystick.joystickMode = data.props["mode"] ?: "Joystick"
+        // 搖桿獨立為純類比方向搖桿模式，方向鍵已獨立為 DPAD 元件
+        joystick.joystickMode = "Joystick"
 
         // Consolidated Axis Mode
         // Default to "4-Way" if not set.
@@ -103,8 +104,10 @@ object JoystickDefinition : IComponentDefinition {
     ) {
         val context = panelView.context
 
-        // 1. Mode
+        // 1. Mode - 隱藏切換按鈕，專注於純搖桿與方向鍵各自獨立的屬性
         val toggleMode = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleJoystickMode)
+        toggleMode?.visibility = View.GONE
+
         val containerInterval = panelView.findViewById<View>(R.id.containerJoystickInterval)
         val containerButtonMessages = panelView.findViewById<View>(R.id.containerButtonMessages)
         val curMode = data.props["mode"] ?: "Joystick"
@@ -112,13 +115,11 @@ object JoystickDefinition : IComponentDefinition {
         val updateVisibility = { mode: String ->
             containerInterval?.visibility = if (mode == "Buttons") View.GONE else View.VISIBLE
             containerButtonMessages?.visibility = if (mode == "Buttons") View.VISIBLE else View.GONE
-            // Hide Range/Precision in Buttons mode (Req 2)
             val containerRange = panelView.findViewById<View>(R.id.containerRangePrecision)
             containerRange?.visibility = if (mode == "Buttons") View.GONE else View.VISIBLE
         }
 
         updateVisibility(curMode)
-        toggleMode?.check(if (curMode == "Buttons") R.id.btnModeButtons else R.id.btnModeStandard)
 
         toggleMode?.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {

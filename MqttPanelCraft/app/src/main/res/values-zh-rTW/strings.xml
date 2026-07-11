@@ -92,7 +92,7 @@
     <string name="component_label_switch">開關</string>
     <string name="component_label_slider">滑桿</string>
     <string name="component_label_selector">選擇器</string>
-    <string name="component_label_image">圖片</string>
+    <string name="component_label_image">影像</string>
     <string name="component_label_led">LED 狀態</string>
     <string name="component_label_chart">折線圖</string>
     <string name="component_label_joystick">搖桿</string>
@@ -104,6 +104,14 @@
     <string name="component_label_value_display">數值顯示</string>
 
     <string name="component_label_signal_indicator">信號面板</string>
+    <string name="component_label_stepper">數值步進</string>
+    <string name="component_label_dpad">方向鍵</string>
+    <string name="component_label_image_sensor">影像</string>
+    <string name="component_label_audio_sensor">聲音警示</string>
+    <string name="component_label_shape">圖形裝飾</string>
+    <string name="component_label_image_display">圖片展示</string>
+    <string name="component_label_calendar_clock">日曆時鐘</string>
+    <string name="component_label_web_box">內嵌網頁</string>
 
     <!-- Signal Indicator Properties -->
     <string name="prop_label_icon_style">圖示風格</string>
@@ -275,8 +283,26 @@
     <string name="val_orient_vertical">垂直</string>
     <string name="val_slider_style_classic">經典</string>
     <string name="val_slider_style_capsule">膠囊</string>
+    <string name="val_stepper_style_standard">標準</string>
+    <string name="val_stepper_style_block">方塊</string>
+    <string name="val_stepper_style_smooth">圓滑</string>
+    <string name="stepper_hint_release_send">數值僅在鬆手時才會發送</string>
+    <string name="stepper_hint_style">風格</string>
+    <string name="prop_label_color">顏色</string>
     <string name="val_shape_square">方形</string>
     <string name="val_shape_circle">圓形</string>
+    <!-- Image Component Properties -->
+    <string name="prop_image_gesture_zoom">手勢縮放控制</string>
+    <string name="prop_image_quick_save">快速保存按鈕</string>
+    <string name="prop_image_rotation">旋轉角度</string>
+    <string name="prop_image_scale_mode">畫面縮放模式</string>
+    <string name="prop_image_show_info">顯示圖片資訊 (接收時間與像素)</string>
+    <string name="val_image_rot_0">0°</string>
+    <string name="val_image_rot_90">90°</string>
+    <string name="val_image_rot_180">180°</string>
+    <string name="val_image_rot_270">270°</string>
+    <string name="val_image_scale_fit">適應填滿</string>
+    <string name="val_image_scale_crop">裁剪填滿</string>
     <string name="val_feedback_none">無</string>
     <string name="val_feedback_ticks">刻度線</string>
     <string name="val_feedback_bubble">數值氣泡</string>

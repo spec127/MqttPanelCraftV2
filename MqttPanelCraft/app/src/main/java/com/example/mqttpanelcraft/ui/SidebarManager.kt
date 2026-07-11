@@ -64,6 +64,19 @@ class SidebarManager(
                 categoryGrids.clear()
                 categoryArrowIcons.clear()
 
+                // 強制 ScrollView 以 GPU Outline 嚴格裁切，解決上滑溢出格線的問題
+                val scrollView = rootView.findViewById<android.widget.ScrollView>(R.id.sidebarScrollView)
+                scrollView?.apply {
+                        clipToOutline = true
+                        outlineProvider = object : android.view.ViewOutlineProvider() {
+                                override fun getOutline(view: View, outline: android.graphics.Outline) {
+                                        outline.setRect(0, 0, view.width, view.height)
+                                }
+                        }
+                        clipChildren = true
+                        clipToPadding = true
+                }
+
                 val registry = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry
                 val allDefs = registry.getAllTypes().mapNotNull { registry.get(it) }
 
@@ -286,11 +299,13 @@ class SidebarManager(
                         tvHeader.text = headerText
                         container.addView(headerView)
 
-                        // 2. Grid Container (2 Columns)
+                        // 2. Grid Container (2 Columns) — 啟用裁切避免溢出
                         val grid =
                                 android.widget.GridLayout(rootView.context).apply {
                                         columnCount = 2
                                         alignmentMode = android.widget.GridLayout.ALIGN_BOUNDS
+                                        clipChildren = true
+                                        clipToPadding = true
                                         layoutParams =
                                                 android.widget.LinearLayout.LayoutParams(
                                                         android.widget.LinearLayout.LayoutParams
@@ -301,29 +316,71 @@ class SidebarManager(
                                 }
                         container.addView(grid)
 
-                        // Accordion Logic
+                        // Accordion Logic: 使用高度動畫 + 箭頭旋轉實現流暢展開/合起效果
                         var isAccordionAnimating = false
                         fun updateCategoryState(targetIndex: Int) {
-                                // Prevent re-triggering if animating OR if the target is already open
                                 if (isAccordionAnimating) return
-                                if (categoryGrids[targetIndex].visibility == View.VISIBLE) return
+                                val wasOpen = categoryGrids[targetIndex].visibility == View.VISIBLE
 
                                 isAccordionAnimating = true
-
-                                androidx.transition.TransitionManager.beginDelayedTransition(
-                                        container
-                                )
                                 for (i in categoryGrids.indices) {
-                                        val expand = i == targetIndex
-                                        categoryGrids[i].visibility =
-                                                if (expand) View.VISIBLE else View.GONE
-                                        categoryArrowIcons[i]
-                                                .animate()
+                                        val expand = (i == targetIndex) && !wasOpen
+                                        val gridView = categoryGrids[i]
+                                        val arrowView = categoryArrowIcons[i]
+
+                                        // 箭頭旋轉動畫
+                                        arrowView.animate()
                                                 .rotation(if (expand) 0f else 180f)
-                                                .setDuration(200)
+                                                .setDuration(250)
                                                 .start()
+
+                                        if (expand) {
+                                                // 展開：先設 VISIBLE，量測高度後從 0 動畫到完整高度
+                                                gridView.visibility = View.VISIBLE
+                                                gridView.alpha = 1f
+                                                gridView.measure(
+                                                        View.MeasureSpec.makeMeasureSpec(container.width, View.MeasureSpec.EXACTLY),
+                                                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                                                )
+                                                val targetHeight = gridView.measuredHeight
+                                                gridView.layoutParams.height = 0
+                                                gridView.requestLayout()
+
+                                                val anim = android.animation.ValueAnimator.ofInt(0, targetHeight)
+                                                anim.addUpdateListener { animator ->
+                                                        gridView.layoutParams.height = animator.animatedValue as Int
+                                                        gridView.requestLayout()
+                                                }
+                                                anim.addListener(object : android.animation.AnimatorListenerAdapter() {
+                                                        override fun onAnimationEnd(animation: android.animation.Animator) {
+                                                                gridView.layoutParams.height = android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                                                                gridView.requestLayout()
+                                                        }
+                                                })
+                                                anim.duration = 250
+                                                anim.interpolator = android.view.animation.DecelerateInterpolator()
+                                                anim.start()
+                                        } else if (gridView.visibility == View.VISIBLE) {
+                                                // 合起：從當前高度動畫到 0 後設 GONE
+                                                val startHeight = gridView.height
+                                                val anim = android.animation.ValueAnimator.ofInt(startHeight, 0)
+                                                anim.addUpdateListener { animator ->
+                                                        gridView.layoutParams.height = animator.animatedValue as Int
+                                                        gridView.requestLayout()
+                                                }
+                                                anim.addListener(object : android.animation.AnimatorListenerAdapter() {
+                                                        override fun onAnimationEnd(animation: android.animation.Animator) {
+                                                                gridView.visibility = View.GONE
+                                                                gridView.layoutParams.height = android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                                                                gridView.alpha = 1f
+                                                        }
+                                                })
+                                                anim.duration = 200
+                                                anim.interpolator = android.view.animation.AccelerateInterpolator()
+                                                anim.start()
+                                        }
                                 }
-                                container.postDelayed({ isAccordionAnimating = false }, 500)
+                                container.postDelayed({ isAccordionAnimating = false }, 280)
                         }
 
                         val currentIndex = categoryHeaders.size
@@ -489,7 +546,8 @@ class SidebarManager(
                                         when (def.type) {
                                                 "SELECTOR" -> Pair(dpToPx(85), dpToPx(34))
                                                 "SLIDER" -> Pair(dpToPx(76), dpToPx(34))
-                                                "JOYSTICK", "PALETTE" -> Pair(dpToPx(46), dpToPx(46))
+                                                "DPAD", "JOYSTICK" -> Pair(dpToPx(52), dpToPx(52))
+                                                "PALETTE" -> Pair(dpToPx(46), dpToPx(46))
                                                 "BUTTON" -> Pair(dpToPx(50), dpToPx(38))
                                                 "SWITCH" -> Pair(dpToPx(40), dpToPx(38))
                                                 "CAMERA" ->
@@ -504,8 +562,10 @@ class SidebarManager(
                                                 "GAUGE_METER" -> Pair(dpToPx(56), dpToPx(56))
                                                 "THERMOMETER", "LEVEL" ->
                                                         Pair(dpToPx(32), dpToPx(40))
-                                                "TEXT", "IMAGE" -> Pair(dpToPx(96), dpToPx(30))
+                                                "TEXT" -> Pair(dpToPx(96), dpToPx(30))
+                                                "IMAGE" -> Pair(dpToPx(56), dpToPx(42))
                                                 "TEXT_DISPLAY" -> Pair(dpToPx(96), dpToPx(34))
+                                                "STEPPER" -> Pair(dpToPx(60), dpToPx(26))
                                                 "CHART" ->
                                                         Pair(
                                                                 android.widget.FrameLayout
