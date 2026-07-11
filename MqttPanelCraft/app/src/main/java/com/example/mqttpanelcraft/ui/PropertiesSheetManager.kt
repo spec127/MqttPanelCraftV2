@@ -115,7 +115,8 @@ class PropertiesSheetManager(
                         val valid = input.matches(Regex("^[a-zA-Z0-9_]*$"))
 
                         if (!valid) {
-                            etTopicName.error = "Invalid characters! Use (a-z, 0-9, _)"
+                            etTopicName.error =
+                                    propertyContainer.context.getString(R.string.msg_invalid_topic)
                         } else {
                             etTopicName.error = null
                         }
@@ -240,8 +241,14 @@ class PropertiesSheetManager(
         val wDp = kotlin.math.round(wPx / density).toInt()
         val hDp = kotlin.math.round(hPx / density).toInt()
 
-        etPropWidth?.setText(wDp.toString())
-        etPropHeight?.setText(hDp.toString())
+        val wStr = wDp.toString()
+        val hStr = hDp.toString()
+        if (etPropWidth?.text?.toString() != wStr) {
+            etPropWidth?.setText(wStr)
+        }
+        if (etPropHeight?.text?.toString() != hStr) {
+            etPropHeight?.setText(hStr)
+        }
         isBinding = false
     }
 
@@ -300,6 +307,7 @@ class PropertiesSheetManager(
         etPropWidth?.setText("")
         etPropHeight?.setText("")
         etTopicName?.setText("")
+        etTopicName?.hint = ""
         tvTopicPrefix?.text = ""
         tvTopicSuffix?.text = ""
         etPropGenericPayload?.setText("")
@@ -320,48 +328,65 @@ class PropertiesSheetManager(
             containerSpecificProps?.removeAllViews()
 
             // PRIORITY 1: Definition Architecture
-            val def =
-                    com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(
-                            data.type
-                    )
+            val typeClean = data.type.trim()
+            val def = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(typeClean)
+            
+            android.util.Log.d("PropsManager", "Type: '$typeClean', Def found: ${def != null}")
+
             if (def != null && def.propertiesLayoutId != 0) {
-                val inflater = LayoutInflater.from(propertyContainer.context)
-                val root = inflater.inflate(def.propertiesLayoutId, containerSpecificProps, true)
-                def.bindPropertiesPanel(root, data) { key: String, value: String ->
-                    // Immediate Update from Definition
-                    if (currentData != null) {
-                        if (key == "w") {
-                            try {
-                                currentData?.width = value.toInt()
-                            } catch (e: Exception) {}
-                            onPropertyUpdated(currentData!!)
-                        } else if (key == "h") {
-                            try {
-                                currentData?.height = value.toInt()
-                            } catch (e: Exception) {}
-                            onPropertyUpdated(currentData!!)
-                        } else {
-                            // Allow "text" to be empty string (to override default label)
-                            if (value.isEmpty() && key != "text") {
-                                currentData?.props?.remove(key)
+                try {
+                    val inflater = LayoutInflater.from(propertyContainer.context)
+                    
+                    // Clear previous
+                    containerSpecificProps?.visibility = View.VISIBLE
+                    containerSpecificProps?.removeAllViews()
+                    
+                    // Inflate with attachToRoot = false for more control
+                    val specificView = inflater.inflate(def.propertiesLayoutId, containerSpecificProps, false)
+                    containerSpecificProps?.addView(specificView)
+                    
+                    android.util.Log.d("PropsManager", "Binding properties for $typeClean")
+                    def.bindPropertiesPanel(specificView, data) { key: String, value: String ->
+                        if (currentData != null) {
+                            if (key == "w") {
+                                try { currentData?.width = value.toInt() } catch (e: Exception) {}
+                                onPropertyUpdated(currentData!!)
+                            } else if (key == "h") {
+                                try { currentData?.height = value.toInt() } catch (e: Exception) {}
+                                onPropertyUpdated(currentData!!)
                             } else {
-                                currentData?.props?.put(key, value)
+                                if (value.isEmpty() && key != "text") {
+                                    currentData?.props?.remove(key)
+                                } else {
+                                    currentData?.props?.put(key, value)
+                                }
+                                onPropertyUpdated(currentData!!)
                             }
-                            onPropertyUpdated(currentData!!)
                         }
                     }
+                } catch (e: Exception) {
+                    android.util.Log.e("PropsManager", "Error inflating/binding specific props", e)
+                    Toast.makeText(propertyContainer.context, "加載專屬屬性失敗: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
+            } else {
+                android.util.Log.w("PropsManager", "No definition or layout for type: $typeClean")
             }
 
             // Generic Payload Logic
             if (def != null && def.group == "CONTROL") {
                 tilGenericPayload?.visibility = View.VISIBLE
-                etPropGenericPayload?.setText(data.props["payload"] ?: "")
+                val payloadVal = data.props["payload"] ?: ""
+                if (etPropGenericPayload?.text?.toString() != payloadVal) {
+                    etPropGenericPayload?.setText(payloadVal)
+                }
             } else {
                 tilGenericPayload?.visibility = View.GONE
             }
 
-            etPropName?.setText(data.label)
+            val nameVal = data.label ?: ""
+            if (etPropName?.text?.toString() != nameVal) {
+                etPropName?.setText(nameVal)
+            }
 
             // Initial Visibility Icon State
             val isLabelHidden = data.props["showLabel"] == "false"
@@ -375,8 +400,15 @@ class PropertiesSheetManager(
             val density = propertyContainer.resources.displayMetrics.density
             val wDp = kotlin.math.round(data.width / density).toInt()
             val hDp = kotlin.math.round(data.height / density).toInt()
-            etPropWidth?.setText(wDp.toString())
-            etPropHeight?.setText(hDp.toString())
+
+            val wStr = wDp.toString()
+            val hStr = hDp.toString()
+            if (etPropWidth?.text?.toString() != wStr) {
+                etPropWidth?.setText(wStr)
+            }
+            if (etPropHeight?.text?.toString() != hStr) {
+                etPropHeight?.setText(hStr)
+            }
 
             // Topic Parsing
             val topicConfig = data.topicConfig
@@ -405,11 +437,16 @@ class PropertiesSheetManager(
                 }
 
                 tvTopicPrefix?.text = prefixStr
-                etTopicName?.setText(nameStr)
+                if (etTopicName?.text?.toString() != nameStr) {
+                    etTopicName?.setText(nameStr)
+                }
                 tvTopicSuffix?.text = ""
             } else {
                 tvTopicPrefix?.text = ""
-                etTopicName?.setText(topicConfig)
+                val topicVal = data.topicConfig ?: ""
+                if (etTopicName?.text?.toString() != topicVal) {
+                    etTopicName?.setText(topicVal)
+                }
                 tvTopicSuffix?.text = ""
             }
 

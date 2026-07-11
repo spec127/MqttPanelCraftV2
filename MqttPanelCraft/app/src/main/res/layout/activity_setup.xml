@@ -293,96 +293,104 @@
                 android:paddingVertical="12dp"
                 android:layout_marginBottom="12dp"/>
 
-            <!-- Theme Cards -->
+            <!-- Theme Selection Container (Hidden in Edit Mode) -->
             <LinearLayout
+                android:id="@+id/containerProjectType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical">
 
-                <!-- Panel Card -->
                 <LinearLayout
-                    android:id="@+id/cardHome"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_card_selected"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:clickable="true"
-                    android:focusable="true">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
 
-                    <ImageView
-                        android:id="@+id/ivHome"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_panel_mode"
-                        app:tint="@color/setup_accent_color"
-                        android:layout_marginBottom="8dp"/>
-
-                    <TextView
-                        android:id="@+id/tvHome"
-                        android:layout_width="wrap_content"
+                    <!-- Panel Card -->
+                    <LinearLayout
+                        android:id="@+id/cardHome"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Panel"
-                        android:textStyle="bold"
-                        android:textColor="@color/setup_accent_color"
-                        android:textSize="14sp"/>
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/bg_card_selected"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:id="@+id/ivHome"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_panel_mode"
+                            app:tint="@color/setup_accent_color"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:id="@+id/tvHome"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Panel"
+                            android:textStyle="bold"
+                            android:textColor="@color/setup_accent_color"
+                            android:textSize="14sp"/>
+                    </LinearLayout>
+
+                    <!-- Webview Card -->
+                    <LinearLayout
+                        android:id="@+id/cardWebview"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_card_unselected"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:id="@+id/ivWebview"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_globe"
+                            app:tint="#94A3B8"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:id="@+id/tvWebview"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Webview"
+                            android:textStyle="bold"
+                            android:textColor="#94A3B8"
+                            android:textSize="14sp"/>
+                    </LinearLayout>
                 </LinearLayout>
 
-                <!-- Webview Card -->
-                <LinearLayout
-                    android:id="@+id/cardWebview"
-                    android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/tvThemeDescription"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_card_unselected"
                     android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <ImageView
-                        android:id="@+id/ivWebview"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_globe"
-                        app:tint="#94A3B8"
-                        android:layout_marginBottom="8dp"/>
-
-                    <TextView
-                        android:id="@+id/tvWebview"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Webview"
-                        android:textStyle="bold"
-                        android:textColor="#94A3B8"
-                        android:textSize="14sp"/>
-                </LinearLayout>
+                    android:text="@string/setup_desc_panel"
+                    android:textColor="#94A3B8"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="12dp"/>
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tvThemeDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/setup_desc_panel"
-                android:textColor="#94A3B8"
-                android:textSize="12sp"
-                android:layout_marginBottom="12dp"/>
-
-            <!-- Orientation -->
+            <!-- Orientation (Logic kept, display hidden) -->
             <RadioGroup
                 android:id="@+id/rgOrientation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
 
                 <RadioButton
                     android:id="@+id/rbSensor"

@@ -6,6 +6,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.graphics.Typeface
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
@@ -15,9 +17,15 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import com.example.mqttpanelcraft.R
 
-class TextInputView(context: Context) : FrameLayout(context) {
+class InputBoxView(context: Context) : FrameLayout(context) {
 
-    var style: String = "Capsule" // Capsule, Modular, Infinity
+    var style: String = "Capsule" // Capsule, Infinity, Glass, Note
+        set(value) {
+            field = value
+            updateLayout()
+        }
+
+    var fontStyle: String = "NORMAL"
         set(value) {
             field = value
             updateLayout()
@@ -65,8 +73,11 @@ class TextInputView(context: Context) : FrameLayout(context) {
         inputField.textSize = 14f
         inputField.hint = "Enter text..."
         inputField.maxLines = 1
-        inputField.inputType = EditorInfo.TYPE_CLASS_TEXT
-        inputField.imeOptions = EditorInfo.IME_ACTION_SEND
+        inputField.isSingleLine = true
+        inputField.setHorizontallyScrolling(true)
+        inputField.isVerticalScrollBarEnabled = false
+        inputField.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_CAP_SENTENCES
+        inputField.imeOptions = EditorInfo.IME_ACTION_NONE
 
         inputField.setOnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -138,7 +149,17 @@ class TextInputView(context: Context) : FrameLayout(context) {
         inputField.isCursorVisible = true
         removeCallbacks(cursorRunnable)
 
+        val w = width
         val h = height
+
+        if (fontStyle == "HANDWRITING") {
+            inputField.typeface = Typeface.create("casual", Typeface.NORMAL)
+        } else {
+            inputField.typeface = Typeface.DEFAULT
+        }
+
+        val calculatedPx = (h * 0.38f).coerceIn(12f * density, 80f * density)
+        inputField.setTextSize(TypedValue.COMPLEX_UNIT_PX, calculatedPx)
 
         when (style) {
             "Capsule" -> {
@@ -171,31 +192,44 @@ class TextInputView(context: Context) : FrameLayout(context) {
                 val iconPad = (btnSize * 0.22f).toInt()
                 sendButton.setPadding(iconPad, iconPad, iconPad, iconPad)
             }
-            "Modular" -> {
-                // Input: Bracketed area
-                // Button is full height square-ish
-                val btnSize = h
-                // Alternatively, keep it square based on height? Yes.
-
-                val spacing = (8 * density).toInt()
-
+            "Glass" -> {
+                val btnSize = (h * 0.7f).toInt().coerceAtLeast((20 * density).toInt())
                 val lpInput =
                         FrameLayout.LayoutParams(
                                 FrameLayout.LayoutParams.MATCH_PARENT,
                                 FrameLayout.LayoutParams.MATCH_PARENT
                         )
-                lpInput.setMargins(0, 0, btnSize + spacing, 0)
+                lpInput.setMargins(padding, 0, btnSize + (8 * density).toInt(), 0)
                 inputField.layoutParams = lpInput
                 inputField.gravity = Gravity.CENTER_VERTICAL
-                inputField.setPadding(padding, 0, padding, 0)
+                inputField.setPadding(0, 0, 0, 0)
 
-                // Button: Separate Box
-                val lpBtn = FrameLayout.LayoutParams(btnSize, FrameLayout.LayoutParams.MATCH_PARENT)
-                lpBtn.gravity = Gravity.END
+                val lpBtn = FrameLayout.LayoutParams(btnSize, btnSize)
+                lpBtn.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+                lpBtn.rightMargin = (4 * density).toInt()
                 sendButton.layoutParams = lpBtn
 
-                // Icon Padding: ~22%
                 val iconPad = (btnSize * 0.22f).toInt()
+                sendButton.setPadding(iconPad, iconPad, iconPad, iconPad)
+            }
+            "Note" -> {
+                val btnSize = (h * 0.5f).toInt().coerceAtLeast((16 * density).toInt())
+                val lpInput =
+                        FrameLayout.LayoutParams(
+                                FrameLayout.LayoutParams.MATCH_PARENT,
+                                FrameLayout.LayoutParams.MATCH_PARENT
+                        )
+                lpInput.setMargins((32 * density).toInt(), 0, btnSize + (12 * density).toInt(), 0)
+                inputField.layoutParams = lpInput
+                inputField.gravity = Gravity.CENTER_VERTICAL
+                inputField.setPadding(0, 0, 0, 0)
+
+                val lpBtn = FrameLayout.LayoutParams(btnSize, btnSize)
+                lpBtn.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+                lpBtn.rightMargin = (8 * density).toInt()
+                sendButton.layoutParams = lpBtn
+
+                val iconPad = (btnSize * 0.15f).toInt()
                 sendButton.setPadding(iconPad, iconPad, iconPad, iconPad)
             }
             "Infinity" -> {
@@ -256,6 +290,7 @@ class TextInputView(context: Context) : FrameLayout(context) {
 
         when (style) {
             "Capsule" -> {
+                sendButton.setImageResource(R.drawable.ic_send)
                 // Button: Theme Color Circle, White Icon
                 val bg = android.graphics.drawable.GradientDrawable()
                 bg.setColor(themeColor)
@@ -263,18 +298,22 @@ class TextInputView(context: Context) : FrameLayout(context) {
                 sendButton.background = bg
                 sendButton.setColorFilter(Color.WHITE)
             }
-            "Modular" -> {
-                // Button Logic: Theme color outline
+            "Glass" -> {
+                sendButton.setImageResource(R.drawable.ic_send)
                 val bg = android.graphics.drawable.GradientDrawable()
-                bg.setColor(
-                        if (isDark) Color.parseColor("#1AFFFFFF") else Color.parseColor("#1A000000")
-                )
-                bg.setStroke((1.5f * resources.displayMetrics.density).toInt(), themeColor)
-                bg.cornerRadius = 4f * resources.displayMetrics.density
+                bg.setColor(Color.argb(50, Color.red(themeColor), Color.green(themeColor), Color.blue(themeColor)))
+                bg.setStroke((1.5f * resources.displayMetrics.density).toInt(), Color.argb(120, 255, 255, 255))
+                bg.cornerRadius = 16f * resources.displayMetrics.density
                 sendButton.background = bg
+                sendButton.setColorFilter(if (isDark) Color.WHITE else Color.BLACK)
+            }
+            "Note" -> {
+                sendButton.setImageResource(R.drawable.ic_edit)
+                sendButton.background = null
                 sendButton.setColorFilter(themeColor)
             }
             "Infinity" -> {
+                sendButton.setImageResource(R.drawable.ic_send)
                 sendButton.background = null
                 sendButton.setColorFilter(themeColor)
             }
@@ -345,42 +384,57 @@ class TextInputView(context: Context) : FrameLayout(context) {
                         if (isDark) Color.parseColor("#444444") else Color.parseColor("#E0E0E0")
                 canvas.drawRoundRect(bgRect, r, r, paint)
             }
-            "Modular" -> {
-                // Input Area: Corner Brackets
-                val btnWidth = (48 * density) + (8 * density)
-                val inputW = w - btnWidth
-
-                // Fill (Optional: very subtle)
-                bgRect.set(0f, 0f, inputW, h)
+            "Glass" -> {
+                val r = 20f * density
+                bgRect.set(0f, 0f, w, h)
+                bgRect.offset(0f, 4f * density)
                 paint.style = Paint.Style.FILL
-                paint.color =
-                        if (isDark) Color.parseColor("#11FFFFFF")
-                        else Color.parseColor("#05000000") // Very faint fill
-                canvas.drawRect(bgRect, paint)
+                paint.color = Color.argb(20, 0, 0, 0)
+                canvas.drawRoundRect(bgRect, r, r, paint)
+                bgRect.offset(0f, -4f * density)
 
-                // Corner Brackets
+                paint.color = Color.argb(50, Color.red(themeColor), Color.green(themeColor), Color.blue(themeColor))
+                canvas.drawRoundRect(bgRect, r, r, paint)
+
                 paint.style = Paint.Style.STROKE
-                paint.strokeWidth = 2f * density
-                paint.color = themeColor
-                paint.strokeCap = Paint.Cap.SQUARE
+                paint.strokeWidth = 1.5f * density
+                paint.color = Color.argb(120, 255, 255, 255)
+                canvas.drawRoundRect(bgRect, r, r, paint)
+            }
+            "Note" -> {
+                val r = 6f * density
+                bgRect.set(0f, 0f, w, h)
+                paint.style = Paint.Style.FILL
+                paint.color = if (isDark) Color.parseColor("#282826") else Color.parseColor("#F5F3ED")
+                canvas.drawRoundRect(bgRect, r, r, paint)
 
-                val cornerLen = 8f * density
+                // Paper specks for texture ("紙質感")
+                paint.color = if (isDark) Color.argb(18, 255, 255, 255) else Color.argb(18, 0, 0, 0)
+                val seed = (width * 31 + height).toLong()
+                val rnd = java.util.Random(seed)
+                val numDots = (width * height) / 200
+                for (i in 0 until numDots) {
+                    val dx = rnd.nextFloat() * width
+                    val dy = rnd.nextFloat() * height
+                    canvas.drawPoint(dx, dy, paint)
+                }
 
-                // Top-Left
-                canvas.drawLine(0f, 0f, cornerLen, 0f, paint)
-                canvas.drawLine(0f, 0f, 0f, cornerLen, paint)
+                // Horizontal ruling line ("輸入框的筆記本紙應該有一行")
+                paint.style = Paint.Style.STROKE
+                paint.strokeWidth = 1f * density
+                paint.color = if (isDark) Color.argb(100, 160, 170, 180) else Color.argb(100, 130, 145, 160)
+                val lineY = h - 8f * density
+                canvas.drawLine(0f, lineY, w, lineY, paint)
 
-                // Top-Right of input
-                canvas.drawLine(inputW, 0f, inputW - cornerLen, 0f, paint)
-                canvas.drawLine(inputW, 0f, inputW, cornerLen, paint)
+                paint.style = Paint.Style.STROKE
+                paint.strokeWidth = 1f * density
+                val compRed = themeColor
+                paint.color = compRed
+                canvas.drawLine(18f * density, 0f, 18f * density, h, paint)
+                canvas.drawLine(22f * density, 0f, 22f * density, h, paint)
 
-                // Bottom-Left
-                canvas.drawLine(0f, h, cornerLen, h, paint)
-                canvas.drawLine(0f, h, 0f, h - cornerLen, paint)
-
-                // Bottom-Right of input
-                canvas.drawLine(inputW, h, inputW - cornerLen, h, paint)
-                canvas.drawLine(inputW, h, inputW, h - cornerLen, paint)
+                paint.color = if (isDark) Color.parseColor("#444444") else Color.parseColor("#D8D0C0")
+                canvas.drawRoundRect(bgRect, r, r, paint)
             }
             "Infinity" -> {
                 // Bottom Line: Gradient or Solid? Solid theme color.

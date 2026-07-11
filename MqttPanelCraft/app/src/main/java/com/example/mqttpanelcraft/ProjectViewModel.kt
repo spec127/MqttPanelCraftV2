@@ -86,6 +86,12 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         connectionJob = null
         mqttStatus.postValue(MqttStatus.IDLE)
 
+        // v44.3: Reset Global MqttRepository state to prevent stall status leakage
+        com.example.mqttpanelcraft.MqttRepository.setStatus(
+                com.example.mqttpanelcraft.MqttStatus.CONNECTING
+        )
+        com.example.mqttpanelcraft.MqttRepository.activeProjectId = projectId
+
         _currentProjectId.value = projectId
     }
 
@@ -155,7 +161,9 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
 
     private fun getNextSmartLabel(type: String): String {
         val proj = project.value ?: return "${type.lowercase()}1"
-        val prefix = type.lowercase()
+        // 優先從元件註冊表獲取定義好的 labelPrefix，使預設名稱更簡潔且無底線（Design Intent：防呆命名）
+        val definition = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(type)
+        val prefix = definition?.labelPrefix ?: type.lowercase()
 
         // Find all used IDs for this Type (Labels starting with "type")
         val usedIds =
@@ -233,8 +241,7 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         // new helper?
         // Let's rely on getNextSmartLabel(type) for now -> It needs to be updated or we assume
         // prefix match.
-        val newLabel =
-                getNextSmartLabel(type) // TODO: Update this to use definition.labelPrefix later
+        val newLabel = getNextSmartLabel(type)
 
         // 2. Smart Topic
         val smartTopic = generateSmartTopic(type)
@@ -259,25 +266,14 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         val maxId = proj.components.maxOfOrNull { it.id } ?: 100
         val newSystemId = maxId + 1
 
-        // 5. Default Props (Color from Group)
-        val initialProps = mutableMapOf<String, String>()
-        if (definition != null) {
-            val groupColor =
-                    when (definition.group) {
-                        "CONTROL" -> "#2196F3" // Default Blue for all controls
-                        "SENSOR" -> "#FFEB3B" // Yellow
-                        "DISPLAY" -> "#F44336" // Red
-                        else -> "#7C3AED" // Default Purple
-                    }
-            initialProps["color"] = groupColor
+        // 5. Default Props (From Component Definition single source of truth)
+        val initialProps = definition?.getDefaultProps()?.toMutableMap() ?: mutableMapOf()
 
-            // Special Default for Button
-            if (type == "BUTTON") {
-                initialProps["text"] = newLabel // Default text is the label name
-            } else if (type == "SELECTOR") {
-                initialProps["segments"] = "" // Triggers 4 segments fallback in definition
-                initialProps["style"] = "rounded"
-            }
+        if (type == "BUTTON") {
+            initialProps["text"] = newLabel // Default text is the label name
+        } else if (type == "SWITCH") {
+            initialProps["payloadLeft"] = "OFF"
+            initialProps["payloadRight"] = "ON"
         }
 
         return ComponentData(

@@ -126,7 +126,7 @@
     <string name="project_msg_mqtt_failed">无法连接，请确认Broker设置后点击灯号重试</string>
     <string name="project_msg_mqtt_retrying">重试连接中...</string>
     <string name="project_log_mqtt_status">MQTT 状态: %1$s</string>
-    <string name="msg_limit_reached">免费版限制只能创建 3 个项目。</string>
+    <string name="msg_limit_reached">免费版限制只能创建 1 个项目。</string>
     <string name="title_limit_reached">达到上限</string>
     <string name="dialog_btn_upgrade">升级高级版</string>
 </resources>

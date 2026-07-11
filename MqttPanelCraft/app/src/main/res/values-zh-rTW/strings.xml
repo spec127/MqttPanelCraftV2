@@ -88,6 +88,80 @@
     <string name="copy_code">複製程式碼</string>
 
     <!-- Component Labels -->
+    <string name="component_label_button">按鈕</string>
+    <string name="component_label_switch">開關</string>
+    <string name="component_label_slider">滑桿</string>
+    <string name="component_label_selector">選擇器</string>
+    <string name="component_label_image">圖片</string>
+    <string name="component_label_led">LED 狀態</string>
+    <string name="component_label_chart">折線圖</string>
+    <string name="component_label_joystick">搖桿</string>
+    <string name="component_label_palette">調色盤控制</string>
+    <string name="component_label_input">輸入框</string>
+    <string name="component_label_scale_meter">刻度計</string>
+    <string name="component_label_gauge">儀錶板</string>
+    <string name="component_label_gauge_meter">儀表板</string>
+    <string name="component_label_value_display">數值顯示</string>
+
+    <string name="component_label_signal_indicator">信號面板</string>
+
+    <!-- Signal Indicator Properties -->
+    <string name="prop_label_icon_style">圖示風格</string>
+    <string name="prop_label_value_mapping">對應邏輯</string>
+    <string name="prop_val_mapping_absolute">絕對數值</string>
+    <string name="prop_val_mapping_ratio">範圍換算</string>
+    <string name="prop_desc_mapping_absolute"><![CDATA[絕對數值模式下，數值 <font color=\"#EF4444\">1~5</font> 將對應圖示 5 個階段（0為全滅）。]]></string>
+    <string name="prop_desc_mapping_ratio"><![CDATA[最大最小值將均分為 <font color=\"#EF4444\">1~5</font> 共 5 個階段（0為全滅）。]]></string>
+    <string name="prop_label_value_display_panel">數字面板</string>
+    <string name="prop_desc_value_display_panel">在圖示旁邊顯示接收到的數字</string>
+    <string name="prop_label_alarm_blink">警告閃爍</string>
+    <string name="prop_desc_alarm_blink">當數值達到門檻時，圖示閃爍警告</string>
+    <string name="prop_val_alarm_low">過低(≤)</string>
+    <string name="prop_val_alarm_high">過高(≥)</string>
+    <string name="prop_label_alarm_duration">持續秒數(0=無限)</string>
+    <string name="prop_label_alarm_threshold">警報閾值</string>
+    <string name="prop_label_step_threshold">階段變化門檻</string>
+    <string name="prop_val_color_solid">純色</string>
+    <string name="prop_val_color_step">階段</string>
+    <string name="prop_val_color_gradient">漸變</string>
+    <string name="prop_label_color_base">主體顏色</string>
+    <string name="prop_label_color_unreached">未達門檻顏色</string>
+    <string name="prop_label_color_reached">達到門檻顏色</string>
+    <string name="prop_label_color_max">最大顏色</string>
+
+    <!-- Text Display Properties -->
+    <string name="prop_label_display_mode">顯示模式</string>
+    <string name="prop_val_display_single">單行</string>
+    <string name="prop_val_display_log">日誌</string>
+    <string name="prop_label_prefix_type">前綴類型</string>
+    <string name="prop_val_prefix_none">無</string>
+    <string name="prop_val_prefix_name">名稱</string>
+    <string name="prop_val_prefix_topic">主題</string>
+    <string name="prop_val_prefix_time">時間</string>
+    <string name="prop_val_prefix_custom">自訂</string>
+    <string name="prop_label_prefix_custom">自訂前綴</string>
+    <string name="prop_label_linked_components">牽連其他元件</string>
+    <string name="prop_desc_linked_components">自動接收並顯示所選元件主題的資料。</string>
+    <string name="prop_label_text_style">風格</string>
+    <string name="prop_val_style_glass">玻璃</string>
+    <string name="prop_val_style_note">筆記本</string>
+    <string name="prop_label_text_align">對齊方式</string>
+    <string name="prop_val_align_left">靠左</string>
+    <string name="prop_val_align_center">置中</string>
+    <string name="prop_val_align_right">靠右</string>
+    <string name="prop_label_text_size">文字大小</string>
+    <string name="prop_label_max_lines">最大行數</string>
+    <string name="prop_label_display_lines">顯示行數</string>
+    <string name="prop_label_scrollable">可否滾動</string>
+    <string name="prop_desc_scrollable">允許上下滑動查看歷史文字。</string>
+    <string name="prop_label_enable_prefix">啟用前綴</string>
+    <string name="prop_desc_enable_prefix">在每筆訊息前加入來源資訊。</string>
+    <string name="prop_label_prefix_preview">前綴內容</string>
+    <string name="prop_label_text_color">文字顏色</string>
+    <string name="prop_label_theme_color">整體顏色</string>
+    <string name="prop_label_font">字體</string>
+    <string name="prop_val_font_normal">標準字體</string>
+    <string name="prop_val_font_handwriting">手寫字體</string>
 
     <!-- Joystick Properties -->
     <string name="properties_label_joystick_mode">搖桿模式</string>
@@ -97,13 +171,30 @@
     <string name="val_axes_2way">2 維 (2-Way)</string>
     <string name="val_axes_4way">4 維 (4-Way)</string>
     <string name="prop_label_direction">移動方向</string>
-    <string name="val_dir_horz">水平</string>
-    <string name="val_dir_vert">垂直</string>
+    <string name="tab_display">顯示</string>
+    <string name="tab_control">控制</string>
+
+    <string name="component_label_inputbox">發送框</string>
+    <string name="component_label_text_display">接收框</string>
     <string name="properties_label_joystick_style">視覺風格</string>
     <string name="val_joystick_style_neon">霓虹 (Neon)</string>
+    <string name="val_style_orb">光球</string>
     <string name="val_joystick_style_sharp">俐落 (Sharp)</string>
     <string name="val_joystick_style_smooth">圓滑 (Smooth)</string>
     <string name="val_joystick_style_arrow">箭頭 (Arrow)</string>
+    <string name="prop_label_axis_mode">軸向模式</string>
+    <string name="val_axis_4way">4維</string>
+    <string name="val_axis_2way_h">2維橫向</string>
+    <string name="val_axis_2way_v">2維縱向</string>
+    <string name="prop_label_range_precision">數值範圍 &amp; 精度</string>
+    <string name="prop_label_min_val">下限</string>
+    <string name="prop_label_max_val">上限</string>
+    <string name="prop_label_precision">精度</string>
+    <string name="prop_label_msg_release">鬆手發送</string>
+    <string name="prop_label_msg_up">上</string>
+    <string name="prop_label_msg_down">下</string>
+    <string name="prop_label_msg_left">左</string>
+    <string name="prop_label_msg_right">右</string>
 
     <!-- Color Palette Properties -->
     <string name="properties_label_controller_style">控制器樣式</string>
@@ -127,14 +218,16 @@
     <string name="properties_label_show_saturation">顯示飽和度</string>
     <string name="properties_label_show_brightness">顯示亮度</string>
     <string name="properties_label_brightness">亮度 (Brightness)</string>
+    <string name="prop_label_appearance">外觀設定</string>
 
     <!-- MQTT & Console -->
     <string name="project_console_title">MQTT/系統日誌</string>
     <string name="project_hint_payload">訊息 (Payload)</string>
     <string name="project_log_mqtt_status">MQTT 狀態: %1$s</string>
+    <string name="msg_invalid_topic">字元不合法！請使用 (a-z, A-Z, 0-9, _)</string>
 
     <!-- Common Messages & Dialogs -->
-    <string name="msg_limit_reached">免費版限制為 3 個專案。</string>
+    <string name="msg_limit_reached">免費版限制為 1 個專案。</string>
     <string name="title_limit_reached">達到限制</string>
     <string name="dialog_btn_upgrade">升級</string>
     <string name="dialog_language_title">選擇語言</string>
@@ -171,7 +264,7 @@
     <string name="prop_label_min">最小值</string>
     <string name="prop_label_max">最大值</string>
     <string name="prop_label_step">間距</string>
-    <string name="prop_val_on_release">放開時發送</string>
+    <string name="prop_val_on_release">鬆手發送</string>
     <string name="prop_val_continuous">連續發送</string>
     <string name="prop_label_interval">傳送間隔 (ms)</string>
     <string name="prop_helper_interval">最小值 50ms</string>
@@ -185,7 +278,7 @@
     <string name="val_shape_square">方形</string>
     <string name="val_shape_circle">圓形</string>
     <string name="val_feedback_none">無</string>
-    <string name="val_feedback_ticks">"刻度線 "</string>
+    <string name="val_feedback_ticks">刻度線</string>
     <string name="val_feedback_bubble">數值氣泡</string>
     <string name="val_feedback_both">刻度 + 氣泡</string>
 
@@ -204,8 +297,9 @@
 
     <!-- Text Input Styles -->
     <string name="val_style_text_capsule">膠囊</string>
-    <string name="val_style_text_modular">模組</string>
     <string name="val_style_text_infinity">無極</string>
+    <string name="val_style_text_glass">玻璃</string>
+    <string name="val_style_text_note">筆記</string>
     <string name="prop_label_clear_on_send">發送後清空</string>
     <string name="prop_label_enter_as_send">換行鍵發送</string>
     <string name="prop_desc_clear_on_send">發送訊息後自動清空輸入框。</string>
@@ -220,8 +314,6 @@
 
     <string name="properties_switch_mode_standard">標準</string>
     <string name="properties_switch_mode_tri_state">三段</string>
-    
-    <!-- Icons & Helper Descriptions -->
 
     <!-- Messages & Status -->
     <string name="project_msg_add_component">組件已新增</string>
@@ -236,4 +328,34 @@
     <string name="project_msg_mqtt_retrying">正在嘗試重新連線...</string>
     <string name="project_msg_select_component">請選擇組件</string>
 
+    <!-- LED Property Specifics -->
+    <string name="prop_label_led_type">LED 類型 (Type)</string>
+    <string name="val_led_logic_standard">傳統指示燈</string>
+    <string name="val_led_logic_rgb">RGB 狀態燈</string>
+    <string name="desc_led_logic_standard">使用共用外觀顏色的單一狀態提示燈</string>
+    <string name="desc_led_logic_rgb">RGB 模式：根據不同關鍵字顯示對應顏色。</string>
+    <string name="desc_led_logic_standard_detail">傳統模式：匹配關鍵字時亮起，否則維持關閉。</string>
+    <string name="prop_label_led_action">還原動作 (Action)</string>
+    <string name="val_led_action_latch">關鍵字還原</string>
+    <string name="val_led_action_timer">計時自動還原</string>
+    <string name="desc_led_action_timer">點動模式：接收信號後亮起，計時結束後自動熄滅。</string>
+    <string name="desc_led_action_latch">自鎖模式：接收觸發信號亮起，接收復原信號熄滅。</string>
+    <string name="prop_label_led_timer_hint">亮起持續時間 (毫秒/ms)</string>
+    <string name="prop_label_led_restore_kw_hint">復原關鍵字 (OFF/0/FALSE)</string>
+    <string name="prop_label_led_match_mode">比對</string>
+    <string name="prop_label_led_add_kw">新增關鍵字</string>
+    <string name="val_match_exact_alt">相符</string>
+    <string name="val_match_contains_alt">包含</string>
+    <string name="error_duplicate">重複</string>
+    <string name="prop_label_led_color_active">顏色</string>
+    <string name="prop_label_led_keyword">關鍵字</string>
+    <string name="prop_label_led_effect">觸發效果</string>
+    <string name="val_effect_steady_short">常亮</string>
+    <string name="val_effect_blink_short">閃爍</string>
+    <string name="prop_label_led_visual_style_alt">顯示風格</string>
+    <string name="prop_label_led_content_mode">顯示標籤</string>
+    <string name="prop_label_led_text_content">標籤文字</string>
+    <string name="prop_label_led_neon_multiline">霓虹文字標籤 (支援多行)</string>
+    <string name="chip_match_contains">[包含] %1$s</string>
+    <string name="chip_match_exact">[相符] %1$s</string>
 </resources>

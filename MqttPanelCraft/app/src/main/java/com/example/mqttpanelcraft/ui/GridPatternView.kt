@@ -1,8 +1,7 @@
 package com.example.mqttpanelcraft.ui
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -15,45 +14,37 @@ class GridPatternView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val paint = Paint().apply {
-        isAntiAlias = true
+    private var spacing = 0
+    private var dotRadiusPx = 0f
+    private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#EAEAEA")
         style = Paint.Style.FILL
     }
-
-    private val gridSize = Constants.GRID_UNIT_DP // dp (space between dots)
-    private val dotRadius = Constants.GRID_DOT_RADIUS_DP // dp (radius of dots)
-    
-    private var density = 1f
+    private val clipRect = Rect()
 
     init {
-        density = context.resources.displayMetrics.density
-        updateColor()
-    }
-
-    private fun updateColor() {
-        paint.color = ContextCompat.getColor(context, R.color.grid_dot_color)
+        val density = context.resources.displayMetrics.density
+        spacing = (Constants.GRID_UNIT_DP * density).toInt()
+        dotRadiusPx = (Constants.GRID_DOT_RADIUS_DP * density) * 0.5f
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        if (spacing <= 0) return
 
-        val spacing = gridSize * density
-        val radius = dotRadius * density / 2 // visual adjustment
+        canvas.getClipBounds(clipRect)
 
-        val width = width.toFloat()
-        val height = height.toFloat()
+        val startX = (clipRect.left / spacing) * spacing
+        val startY = (clipRect.top / spacing) * spacing
+        val endX = clipRect.right + spacing
+        val endY = clipRect.bottom + spacing
 
-        val startX = 0f
-        val startY = 0f
-
-        var x = startX
-        while (x < width) {
-            var y = startY
-            while (y < height) {
-                canvas.drawCircle(x, y, radius, paint)
-                y += spacing
+        // Pre-allocate array for points could be an optimization, but direct drawCircle is also fine
+        // since the clip bounds are relatively small (screen size).
+        for (x in startX..endX step spacing) {
+            for (y in startY..endY step spacing) {
+                canvas.drawCircle(x + spacing / 2f, y + spacing / 2f, dotRadiusPx, dotPaint)
             }
-            x += spacing
         }
     }
 }

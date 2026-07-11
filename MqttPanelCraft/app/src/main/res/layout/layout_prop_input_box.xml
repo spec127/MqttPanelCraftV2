@@ -138,6 +138,32 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
+    <!-- Row: 字體切換按鈕 (標準字體 / 手寫字體) -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleFont"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        app:singleSelection="true"
+        app:selectionRequired="true">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFontNormal"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:cornerRadius="16dp"
+            android:text="@string/prop_val_font_normal"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFontHandwriting"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:cornerRadius="16dp"
+            android:text="@string/prop_val_font_handwriting"/>
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
     <!-- Style & Color Row (4:6) -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -150,18 +176,14 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_weight="0.4"
-            android:layout_height="wrap_content" 
+            android:layout_height="wrap_content"
             android:hint="@string/prop_hint_style"
-            app:boxCornerRadiusTopStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusBottomEnd="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown">
             
             <AutoCompleteTextView
                  android:id="@+id/spPropStyle"
                  android:layout_width="match_parent"
-                 android:layout_height="52dp"
+                 android:layout_height="@dimen/prop_input_height_inner"
                  android:inputType="none"
                  android:textSize="13sp"
                  android:maxLines="1"
@@ -182,10 +204,11 @@
 
         <!-- Color Picker (Unified) -->
         <include
+            android:id="@+id/containerColorPalette"
             layout="@layout/layout_prop_generic_color"
             android:layout_width="0dp"
             android:layout_weight="0.6"
-            android:layout_height="52dp" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </LinearLayout>

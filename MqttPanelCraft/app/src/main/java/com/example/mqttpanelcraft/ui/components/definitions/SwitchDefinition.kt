@@ -355,7 +355,7 @@ object SwitchDefinition : IComponentDefinition {
                     et.setText(
                             data.props[prop]
                                     ?: if (prop == "payloadCenter") "1"
-                                    else if (prop.endsWith("Left")) "0" else "2"
+                                    else if (prop.endsWith("Left")) "OFF" else "ON"
                     )
                     et.setOnFocusChangeListener { _, hasFocus ->
                         if (!hasFocus) onUpdate(prop, et.text.toString())
@@ -418,8 +418,8 @@ object SwitchDefinition : IComponentDefinition {
             updateTriStateVisuals(tri, data, color, mode, style, animate = true)
             val payload =
                     when (newState) {
-                        0 -> data.props["payloadLeft"] ?: "0"
-                        2 -> data.props["payloadRight"] ?: "2"
+                        0 -> data.props["payloadLeft"] ?: "OFF"
+                        2 -> data.props["payloadRight"] ?: "ON"
                         else -> data.props["payloadCenter"] ?: "1"
                     }
             sendMqtt(data.topicConfig, payload)
@@ -448,10 +448,12 @@ object SwitchDefinition : IComponentDefinition {
         val mode = resolveMode(data)
         val color = resolveColor(data)
         val style = data.props["style"] ?: Style.CLASSIC
+        val leftTarget = data.props["payloadLeft"] ?: "OFF"
+        val rightTarget = data.props["payloadRight"] ?: "ON"
         val newState =
                 when (payload) {
-                    data.props["payloadLeft"] ?: "0" -> 0
-                    data.props["payloadRight"] ?: "2" -> 2
+                    leftTarget, "OFF", "0", "off" -> 0
+                    rightTarget, "ON", "2", "on" -> 2
                     else -> 1
                 }
         tri.tag = newState

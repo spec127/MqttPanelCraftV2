@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- =====================================================================
+         屬性視窗設計令牌 (Property Panel Design Tokens)
+         ─────────────────────────────────────────────────────────────────────
+         設計理念：函數預設值模式。所有屬性視窗的 TextInputLayout 均調用
+         Widget.App.TextInputLayout.Properties 樣式，該樣式統一從以下尺寸
+         令牌取值。若某元件需要特定例外，請在 themes.xml 建立繼承樣式並
+         覆寫對應令牌，不可直接在佈局 XML 內寫入硬碼數值。
+         ===================================================================== -->
+
+    <!-- 輸入框圓角半徑 (全局預設 = 16dp) -->
+    <dimen name="prop_input_corner_radius">16dp</dimen>
+
+    <!-- 緊湊型圓角半徑：供 Slider 的緊湊下拉選單使用 (= 12dp) -->
+    <dimen name="prop_input_corner_radius_compact">12dp</dimen>
+
+    <!-- 內部 EditText / AutoCompleteTextView 高度 (全局預設 = 52dp)
+         配合 TextInputLayout 在 wrap_content 下展開後的整體高度約 56dp -->
+    <dimen name="prop_input_height_inner">52dp</dimen>
+
+    <!-- MaterialButtonToggleGroup 切換列高度 (全局預設 = 36dp) -->
+    <dimen name="prop_toggle_height">36dp</dimen>
+
+    <!-- MaterialButton 個別按鈕圓角 (全局預設 = 12dp) -->
+    <dimen name="prop_toggle_corner_radius">12dp</dimen>
+
+    <!-- 區段底部間距 (全局預設 = 12dp) -->
+    <dimen name="prop_section_margin_bottom">12dp</dimen>
+
+    <!-- 區段標題圖示尺寸 -->
+    <dimen name="prop_section_icon_size">16dp</dimen>
+</resources>

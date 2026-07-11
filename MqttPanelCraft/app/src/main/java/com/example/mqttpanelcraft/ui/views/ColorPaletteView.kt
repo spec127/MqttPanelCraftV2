@@ -155,7 +155,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         val isSmall = this.height < 100 * density
         topSpaceHeightReal = if (isSmall) 0f else 24f * density
         swatchAreaHeightReal =
-                if (colorMode == "Full Color" || this.height < 120 * density) 0f else 32f * density
+                if (colorMode == "Full Color" || this.height < 120 * density) 0f else 24f * density
 
         if (this.width <= 0 || this.height <= 0) return
 
@@ -514,19 +514,19 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                 val inPal = event.y in topSpaceHeightReal..(topSpaceHeightReal + paletteHeight)
                 activeTouchArea =
                         if (inPal) 1 else if (event.y > topSpaceHeightReal + paletteHeight) 2 else 0
-                handleTouch(event.x, event.y)
+                handleTouch(event.x, event.y, false)
                 emitColor(false)
                 invalidate()
                 return true
             }
             MotionEvent.ACTION_MOVE -> {
-                if (activeTouchArea > 0) handleTouch(event.x, event.y)
+                if (activeTouchArea > 0) handleTouch(event.x, event.y, true)
                 emitColor(false)
                 invalidate()
                 return true
             }
             MotionEvent.ACTION_UP -> {
-                handleTouch(event.x, event.y)
+                handleTouch(event.x, event.y, false)
                 emitColor(true)
                 activeTouchArea = 0
                 invalidate()
@@ -536,7 +536,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         return super.onTouchEvent(event)
     }
 
-    private fun handleTouch(tx: Float, ty: Float) {
+    private fun handleTouch(tx: Float, ty: Float, isDragging: Boolean = false) {
         val paletteHeight =
                 max(100f * density, this.height - swatchAreaHeightReal - topSpaceHeightReal)
         if (activeTouchArea == 2) {
@@ -560,16 +560,43 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                             90f
             if (angle < 0) angle += 360f
             if (angle >= 360f) angle -= 360f
-            if (colorMode == "Full Color") currentH = angle
-            else {
-                val ratio = angle / 360f
-                if (controlTarget == "Brightness") {
-                    currentV = ratio
+
+            if (colorMode == "Full Color") {
+                currentH = angle
+            } else {
+                // Phase 54: Prevent abrupt 0 <-> 360 jump during drag
+                // If it's Monochromatic, the ends (0 and 360) have totally different meanings
+                val oldAngle =
+                        if (controlTarget == "Brightness") currentV * 360f
+                        else (1f - currentS) * 360f
+                val diff = abs(angle - oldAngle)
+
+                // Phase 55.6: Fix jump logic to snap to boundary (0 or 1)
+                // Trigger on ANY large jump (>180 deg), whether dragging or tapping/releasing
+                val isGapJump = diff > 180f
+                if (isGapJump) {
+                    // Snap to the closest boundary
+                    // If old angle was > 180 (near 360), snap to 1.0
+                    // If old angle was < 180 (near 0), snap to 0.0
+                    val targetRatio = if (oldAngle > 180f) 1.0f else 0.0f
+                    if (controlTarget == "Brightness") {
+                        currentV = targetRatio
+                    } else {
+                        // For Saturation, S=0 is White (End/360), S=1 is Theme (Start/0)
+                        // If snapping to End (1.0 ratio), S should be 0.0
+                        // If snapping to Start (0.0 ratio), S should be 1.0
+                        currentS = 1f - targetRatio
+                    }
                 } else {
-                    // Phase 36: Saturation Calibration - Ensure 100% at exactly Top
-                    // Any angle above 355 deg (ratio 0.98+) snaps back to 100% to satisfy "Top is
-                    // 100%"
-                    currentS = if (ratio > 0.985f) 1f else (1f - ratio)
+                    val ratio = angle / 360f
+                    if (controlTarget == "Brightness") {
+                        currentV = ratio
+                    } else {
+                        // Phase 36: Saturation Calibration
+                        // Removed the > 0.985f check to preventing wrapping back to 1.0 (Color) at
+                        // the end (White)
+                        currentS = 1f - ratio
+                    }
                 }
             }
         } else {
@@ -605,7 +632,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             currentH = themeHsv[0]
             // Phase 35: Default to 100% saturation (top position) when switching to mono
             currentS = 1.0f
-            if (currentV < 0.2f) currentV = 0.8f
+            // Phase 55.7: Default brightness to 0% (Off) when switching to Mono, unless manually
+            // set
+            if (!isManualColorSet) currentV = 0.0f
+        } else {
+            // Phase 54: Ensure S/V are 1.0 when switching to Full Color if they were low
+            // This prevents the "always black" issue in Full Color Arc mode
+            currentS = 1.0f
+            currentV = 1.0f
         }
         isManualColorSet = false
     }
@@ -620,17 +654,24 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
                     }
             return Color.HSVToColor(floatArrayOf(h, currentS, currentV))
         }
-        if (colorMode == "Monochrome") {
-            Color.colorToHSV(themeColor, themeHsv)
-            val themeC = Color.HSVToColor(floatArrayOf(themeHsv[0], themeHsv[1], 1f))
-            val ratio = if (controlTarget == "Brightness") currentV else currentS
-            return if (controlTarget == "Brightness") {
-                // Phase 32: 0% Black (Ratio 0) -> 100% White (Ratio 1)
-                if (ratio <= 0.5f) blendColors(Color.BLACK, themeC, ratio * 2f)
-                else blendColors(themeC, Color.WHITE, (ratio - 0.5f) * 2f)
-            } else blendColors(Color.WHITE, themeC, ratio)
+        if (colorMode == "Full Color") {
+            // Phase 54: Ensure Full Color Ring mode also returns correct HSV color
+            // Phase 55.6: Force V=1.0 for Arc Ring to prevent "Black" if V somehow got set to 0
+            if (controllerStyle == "Arc Ring") {
+                return Color.HSVToColor(floatArrayOf(currentH, 1f, 1f))
+            }
+            return Color.HSVToColor(floatArrayOf(currentH, currentS, currentV))
         }
-        return Color.HSVToColor(floatArrayOf(currentH, currentS, currentV))
+
+        // Monochrome fallback
+        Color.colorToHSV(themeColor, themeHsv)
+        val themeC = Color.HSVToColor(floatArrayOf(themeHsv[0], themeHsv[1], 1f))
+        val ratio = if (controlTarget == "Brightness") currentV else currentS
+        return if (controlTarget == "Brightness") {
+            // Phase 32: 0% Black (Ratio 0) -> 100% White (Ratio 1)
+            if (ratio <= 0.5f) blendColors(Color.BLACK, themeC, ratio * 2f)
+            else blendColors(themeC, Color.WHITE, (ratio - 0.5f) * 2f)
+        } else blendColors(Color.WHITE, themeC, ratio)
     }
 
     private fun blendColors(c1: Int, c2: Int, ratio: Float): Int {

@@ -1,6 +1,7 @@
 package com.example.mqttpanelcraft
 
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.MotionEvent
@@ -11,6 +12,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
+import com.example.mqttpanelcraft.service.MqttService
 import com.example.mqttpanelcraft.ui.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.Locale
@@ -19,7 +21,6 @@ class ProjectViewActivity : BaseActivity() {
 
     // ViewModel
     private lateinit var viewModel: ProjectViewModel
-    fun getViewModelAccess() = viewModel
 
     // UI
     private lateinit var editorCanvas: FrameLayout
@@ -37,14 +38,14 @@ class ProjectViewActivity : BaseActivity() {
     private lateinit var sidebarManager: SidebarManager
     private lateinit var propertiesManager: PropertiesSheetManager
     private lateinit var logConsoleManager: LogConsoleManager
-    private lateinit var idleAdController: com.example.mqttpanelcraft.ui.IdleAdController
+    private lateinit var idleAdController: IdleAdController
 
     private var selectedComponentId: Int? = null
     private var isEditMode = false
     private var lastResizeUpdate = 0L
 
     // Manager
-    private lateinit var projectUIManager: com.example.mqttpanelcraft.ui.ProjectUIManager
+    private lateinit var projectUIManager: ProjectUIManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +75,7 @@ class ProjectViewActivity : BaseActivity() {
 
             // Initialize UI Manager
             projectUIManager =
-                    com.example.mqttpanelcraft.ui.ProjectUIManager(
+                    ProjectUIManager(
                             this,
                             window.decorView.findViewById(android.R.id.content),
                             viewModel,
@@ -95,7 +96,10 @@ class ProjectViewActivity : BaseActivity() {
                 viewModel.components.value?.let {
                     renderer.render(it, isEditMode, selectedComponentId)
                 }
-                if (!isEditMode) viewModel.saveProject()
+                if (!isEditMode) {
+                    viewModel.saveProject()
+                    ensureMqttConnectedAndSubscribed()
+                }
             }
 
             // Subscribers
@@ -191,17 +195,11 @@ class ProjectViewActivity : BaseActivity() {
                         { topic, payload ->
                             // Send MQTT
                             val intent =
-                                    Intent(
-                                                    this,
-                                                    com.example.mqttpanelcraft.service
-                                                                    .MqttService::class
-                                                            .java
-                                            )
-                                            .apply {
-                                                action = "PUBLISH"
-                                                putExtra("TOPIC", topic)
-                                                putExtra("PAYLOAD", payload)
-                                            }
+                                    Intent(this, MqttService::class.java).apply {
+                                        action = "PUBLISH"
+                                        putExtra("TOPIC", topic)
+                                        putExtra("PAYLOAD", payload)
+                                    }
                             startService(intent)
                         },
                         { id, key, value ->
@@ -271,6 +269,7 @@ class ProjectViewActivity : BaseActivity() {
 
                             override fun onComponentClicked(id: Int) {
                                 if (isEditMode) {
+                                    projectUIManager.setDeleteZoneState(CanvasInteractionManager.DeleteState.NONE)
                                     val sheet = findViewById<View>(R.id.bottomSheet)
                                     val behavior =
                                             com.google.android.material.bottomsheet
@@ -576,42 +575,47 @@ class ProjectViewActivity : BaseActivity() {
         }
 
         viewModel.mqttStatus.observe(this) { status ->
-            val light = findViewById<View>(R.id.indicatorMqttStatus) ?: return@observe
-            val bg = light.background as? android.graphics.drawable.GradientDrawable
-            bg?.mutate()
+            val iconView =
+                    findViewById<android.widget.ImageView>(R.id.indicatorMqttStatus)
+                            ?: return@observe
 
             // Define Colors explicitly
-            val colorGray = android.graphics.Color.parseColor("#B0BEC5") // Blue Grey 200 (Neutral)
-            val colorGreen = android.graphics.Color.parseColor("#4CAF50") // Green 500
-            val colorRed = android.graphics.Color.parseColor("#F44336") // Red 500
+            val colorGray = Color.parseColor("#B0BEC5") // Blue Grey 200 (Neutral)
+            val colorGreen = Color.parseColor("#4CAF50") // Green 500
+            val colorRed = Color.parseColor("#F44336") // Red 500
 
-            val color =
-                    when (status) {
-                        ProjectViewModel.MqttStatus.CONNECTED -> {
-                            light.tag = "CONNECTED"
-                            colorGreen
-                        }
-                        ProjectViewModel.MqttStatus.FAILED -> {
-                            if (light.tag != "FAILED_SHOWN") {
-                                Toast.makeText(
-                                                this,
-                                                getString(R.string.project_msg_mqtt_failed),
-                                                Toast.LENGTH_LONG
-                                        )
-                                        .show()
-                                light.tag = "FAILED_SHOWN"
-                            }
-                            colorRed
-                        }
-                        ProjectViewModel.MqttStatus.CONNECTING -> {
-                            light.tag = null
-                            colorGray
-                        }
-                        else -> colorGray // IDLE
+            when (status) {
+                ProjectViewModel.MqttStatus.CONNECTED -> {
+                    iconView.tag = "CONNECTED"
+                    iconView.setImageResource(R.drawable.ic_link)
+                    iconView.setColorFilter(colorGreen)
+                }
+                ProjectViewModel.MqttStatus.FAILED -> {
+                    if (iconView.tag != "FAILED_SHOWN") {
+                        Toast.makeText(
+                                        this,
+                                        getString(R.string.project_msg_mqtt_failed),
+                                        Toast.LENGTH_LONG
+                                )
+                                .show()
+                        iconView.tag = "FAILED_SHOWN"
                     }
-            bg?.setColor(color)
+                    iconView.setImageResource(R.drawable.ic_link_off)
+                    iconView.setColorFilter(colorRed)
+                }
+                ProjectViewModel.MqttStatus.CONNECTING -> {
+                    iconView.tag = null
+                    iconView.setImageResource(R.drawable.ic_link)
+                    iconView.setColorFilter(colorGray)
+                }
+                else -> { // IDLE or default
+                    iconView.setImageResource(R.drawable.ic_link)
+                    iconView.setColorFilter(colorGray)
+                }
+            }
+
             viewModel.addLog(getString(R.string.project_log_mqtt_status, status))
-            light.setOnClickListener {
+            iconView.setOnClickListener {
                 if (status == ProjectViewModel.MqttStatus.FAILED) {
                     Toast.makeText(
                                     this,
@@ -845,22 +849,39 @@ class ProjectViewActivity : BaseActivity() {
                             // Send to VM instead of Manager
                             viewModel.addLog(logMsg)
 
-                            // Update UI for all components that match the topic
-                            viewModel.components.value?.forEach { comp ->
-                                // Check for exact topic match or wildcard match
-                                if (comp.topicConfig == topic ||
-                                                (comp.topicConfig.endsWith("/#") &&
-                                                        topic.startsWith(
-                                                                comp.topicConfig.dropLast(2)
-                                                        ))
-                                ) {
-                                    val view = renderer.getView(comp.id)
-                                    if (view != null)
-                                            behaviorManager.onMqttMessageReceived(
-                                                    view,
-                                                    comp,
-                                                    payload
-                                            )
+                            val components = viewModel.components.value ?: emptyList()
+
+                            // Find all components that match the topic exactly or via wildcard
+                            val matchingComponents = components.filter { comp ->
+                                comp.topicConfig == topic ||
+                                (comp.topicConfig.endsWith("/#") && topic.startsWith(comp.topicConfig.dropLast(2)))
+                            }
+
+                            // 1. Send to matching components
+                            matchingComponents.forEach { comp ->
+                                val view = renderer.getView(comp.id)
+                                if (view != null) {
+                                    behaviorManager.onMqttMessageReceived(view, comp, payload)
+                                }
+                            }
+                            
+                            // 2. Send to any TEXT_DISPLAY components that link to the matching components
+                            components.forEach { comp ->
+                                if (comp.type == "TEXT_DISPLAY") {
+                                    val linkedStr = comp.props["linked_components"] ?: ""
+                                    if (linkedStr.isNotEmpty()) {
+                                        val linkedIds = linkedStr.split(",")
+                                        // If this TEXT_DISPLAY is linked to any of the matching components
+                                        val sourceComp = matchingComponents.find { linkedIds.contains(it.id.toString()) }
+                                        if (sourceComp != null) {
+                                            val view = renderer.getView(comp.id)
+                                            if (view != null) {
+                                                com.example.mqttpanelcraft.ui.components.definitions.TextDisplayDefinition.onLinkedMqttMessage(
+                                                    view, comp, payload, sourceComp
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -895,9 +916,10 @@ class ProjectViewActivity : BaseActivity() {
                         hasSubscribed = true
                     }
                 }
-            } else {
+            } else if (status != 1) { // Disconnected, Failed, or Connecting
                 hasSubscribed = false
             }
+            // v44.4: Ignore status 0 (Connecting) to avoid redundant subscription triggers
         }
     }
 
@@ -933,6 +955,31 @@ class ProjectViewActivity : BaseActivity() {
                 isEditMode,
                 selectedComponentId
         ) // Ensure UI state is consistent
+        if (!isEditMode) {
+            ensureMqttConnectedAndSubscribed()
+        }
+    }
+
+    private fun ensureMqttConnectedAndSubscribed() {
+        val proj = viewModel.project.value ?: return
+        val status = com.example.mqttpanelcraft.MqttRepository.connectionStatus.value
+        if (status == 1) {
+            val defaultTopic = "${proj.name}/${proj.id}/#"
+            val intent = android.content.Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java).apply {
+                action = "SUBSCRIBE"
+                putExtra("TOPIC", defaultTopic)
+            }
+            startService(intent)
+            viewModel.addLog("Re-subscribing to: $defaultTopic")
+        } else if (status != 0) {
+            viewModel.retryMqtt()
+        }
+        viewModel.components.value?.forEach { comp ->
+            val view = renderer.getView(comp.id)
+            if (view != null) {
+                behaviorManager.attachBehavior(view, comp)
+            }
+        }
     }
 
     override fun onPause() {

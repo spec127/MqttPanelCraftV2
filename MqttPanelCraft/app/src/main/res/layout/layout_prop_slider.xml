@@ -53,7 +53,7 @@
                 android:layout_height="match_parent"
                 android:text="@string/prop_val_on_release"
                 android:textSize="12sp"
-                app:cornerRadius="12dp"/>
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnModeContinuous"
@@ -63,7 +63,7 @@
                 android:layout_height="match_parent"
                 android:text="@string/prop_val_continuous"
                 android:textSize="12sp"
-                app:cornerRadius="12dp"/>
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <!-- Interval Input (Conditional) -->
@@ -189,14 +189,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prop_hint_style"
-                android:layout_marginBottom="12dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+                android:layout_marginBottom="@dimen/prop_section_margin_bottom"
+                style="@style/Widget.App.TextInputLayout.Properties.Compact">
                 <AutoCompleteTextView
                     android:id="@+id/spPropStyle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="none"
                     android:maxLines="1"
                     app:autoSizeTextType="uniform"
@@ -220,14 +218,12 @@
                     android:layout_weight="4"
                     android:layout_height="wrap_content"
                     android:hint="@string/prop_label_orientation"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_marginEnd="12dp"
-                    app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+                    style="@style/Widget.App.TextInputLayout.Properties.Compact"
+                    android:layout_marginEnd="12dp">
                     <AutoCompleteTextView
                         android:id="@+id/spOrientation"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="@dimen/prop_input_height_inner"
                         android:inputType="none"
                         android:maxLines="1"
                         app:autoSizeTextType="uniform"
@@ -243,13 +239,11 @@
                     android:layout_weight="6"
                     android:layout_height="wrap_content"
                     android:hint="@string/prop_hint_shape"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+                    style="@style/Widget.App.TextInputLayout.Properties.Compact">
                     <AutoCompleteTextView
                         android:id="@+id/spPropShape"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="@dimen/prop_input_height_inner"
                         android:inputType="none"
                         android:maxLines="1"
                         app:autoSizeTextType="uniform"
@@ -269,6 +263,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:baselineAligned="false"
             android:layout_marginBottom="16dp">
 
@@ -279,13 +274,11 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/prop_label_feedback"
                 android:layout_marginEnd="12dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+                style="@style/Widget.App.TextInputLayout.Properties.Compact">
                 <AutoCompleteTextView
                     android:id="@+id/spFeedback"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="none"
                     android:maxLines="1"
                     app:autoSizeTextType="uniform"
@@ -301,8 +294,7 @@
                 layout="@layout/layout_prop_generic_color"
                 android:layout_width="0dp"
                 android:layout_weight="6"
-                android:layout_height="52dp"
-                android:layout_marginTop="6dp" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
     </LinearLayout>

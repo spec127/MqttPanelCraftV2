@@ -269,7 +269,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
         var shiftAmount = defaultShift
 
-        if (hasBubble && !isSmall) {
+        if (feedback == "None") {
+            shiftAmount = 0.0f
+        } else if (hasBubble && !isSmall) {
             val availableHalf = if (isVertical) w / 2f else h / 2f
             val requiredShift = bubbleExtension - availableHalf + (4f * density) // +4dp margin
             if (requiredShift > shiftAmount) {

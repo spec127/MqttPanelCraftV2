@@ -13,12 +13,15 @@ object ComponentDefinitionRegistry {
         register(SliderDefinition)
         register(SelectorDefinition)
         register(ImageDefinition)
-        register(ThermometerDefinition)
-        register(LevelIndicatorDefinition)
+        register(LedDefinition)
+        register(ScaleMeterDefinition)
+        register(GaugeMeterDefinition)
+        register(SignalIndicatorDefinition)
+        register(TextDisplayDefinition)
         register(LineChartDefinition)
         register(JoystickDefinition)
         register(ColorPaletteDefinition)
-        register(TextInputDefinition)
+        register(InputBoxDefinition)
     }
 
     fun register(def: IComponentDefinition) {

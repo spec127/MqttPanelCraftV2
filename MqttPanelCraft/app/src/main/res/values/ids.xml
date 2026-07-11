@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tag_is_initialized" type="id" />
+    <item name="tag_old_rgb_states" type="id" />
+</resources>

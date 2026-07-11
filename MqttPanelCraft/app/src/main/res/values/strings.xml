@@ -68,6 +68,8 @@
     <!-- Project Editor & Sidebar -->
     <string name="project_sidebar_category_display">Display</string>
     <string name="project_cat_control">Control</string>
+    <string name="component_label_inputbox">Sendbox</string>
+    <string name="component_label_text_display">Receivebox</string>
     <string name="project_cat_sensor">Sensor</string>
 
     <string name="project_btn_exit_app">Exit App</string>
@@ -93,6 +95,80 @@
     <string name="copy_code">Copy Code</string>
 
     <!-- Component Labels -->
+    <string name="component_label_button">Button</string>
+    <string name="component_label_switch">Switch</string>
+    <string name="component_label_slider">Slider</string>
+    <string name="component_label_selector">Selector</string>
+    <string name="component_label_image">Image</string>
+    <string name="component_label_led">LED Status</string>
+    <string name="component_label_chart">Chart</string>
+    <string name="component_label_joystick">Joystick</string>
+    <string name="component_label_palette">Color Palette</string>
+    <string name="component_label_input">Input</string>
+    <string name="component_label_scale_meter">Scale Meter</string>
+    <string name="component_label_gauge">Gauge</string>
+    <string name="component_label_gauge_meter">Gauge Meter</string>
+    <string name="component_label_value_display">Value Display</string>
+
+    <string name="component_label_signal_indicator">Signal Indicator</string>
+
+    <!-- Signal Indicator Properties -->
+    <string name="prop_label_icon_style">Icon Style</string>
+    <string name="prop_label_value_mapping">Value Mapping</string>
+    <string name="prop_val_mapping_absolute">Absolute</string>
+    <string name="prop_val_mapping_ratio">Ratio</string>
+    <string name="prop_desc_mapping_absolute"><![CDATA[In absolute mode, values <font color=\"#EF4444\">1~5</font> light up the segments. (0 is all off)]]></string>
+    <string name="prop_desc_mapping_ratio"><![CDATA[Min and max values are equally divided into <font color=\"#EF4444\">1~5</font> segments. (0 is all off)]]></string>
+    <string name="prop_label_value_display_panel">Value Panel</string>
+    <string name="prop_desc_value_display_panel">Show the received value next to the icon.</string>
+    <string name="prop_label_alarm_blink">Alarm Blink</string>
+    <string name="prop_desc_alarm_blink">Blink the icon to warn when the threshold is reached.</string>
+    <string name="prop_val_alarm_low">Low (≤)</string>
+    <string name="prop_val_alarm_high">High (≥)</string>
+    <string name="prop_label_alarm_duration">Duration (0=infinite)</string>
+    <string name="prop_label_alarm_threshold">Alarm Threshold</string>
+    <string name="prop_label_step_threshold">Step Threshold</string>
+    <string name="prop_val_color_solid">Solid</string>
+    <string name="prop_val_color_step">Step</string>
+    <string name="prop_val_color_gradient">Gradient</string>
+    <string name="prop_label_color_base">Base Color</string>
+    <string name="prop_label_color_unreached">Unreached Color</string>
+    <string name="prop_label_color_reached">Reached Color</string>
+    <string name="prop_label_color_max">Max Color</string>
+
+    <!-- Text Display Properties -->
+    <string name="prop_label_display_mode">Display Mode</string>
+    <string name="prop_val_display_single">Single-Line</string>
+    <string name="prop_val_display_log">Log</string>
+    <string name="prop_label_prefix_type">Prefix Type</string>
+    <string name="prop_val_prefix_none">None</string>
+    <string name="prop_val_prefix_name">Component Name</string>
+    <string name="prop_val_prefix_topic">Topic</string>
+    <string name="prop_val_prefix_time">Timestamp</string>
+    <string name="prop_val_prefix_custom">Custom</string>
+    <string name="prop_label_prefix_custom">Custom Prefix</string>
+    <string name="prop_label_linked_components">Linked Components</string>
+    <string name="prop_desc_linked_components">Automatically receive data from the topics of selected components.</string>
+    <string name="prop_label_text_style">Style</string>
+    <string name="prop_val_style_glass">Glass</string>
+    <string name="prop_val_style_note">Note</string>
+    <string name="prop_label_text_align">Text Align</string>
+    <string name="prop_val_align_left">Left</string>
+    <string name="prop_val_align_center">Center</string>
+    <string name="prop_val_align_right">Right</string>
+    <string name="prop_label_text_size">Text Size</string>
+    <string name="prop_label_max_lines">Max Lines</string>
+    <string name="prop_label_display_lines">Display Lines</string>
+    <string name="prop_label_scrollable">Scrollable</string>
+    <string name="prop_desc_scrollable">Allow scrolling through text history.</string>
+    <string name="prop_label_enable_prefix">Enable Prefix</string>
+    <string name="prop_desc_enable_prefix">Add a prefix before each message.</string>
+    <string name="prop_label_prefix_preview">Preview / Content</string>
+    <string name="prop_label_text_color">Text Color</string>
+    <string name="prop_label_theme_color">Theme Color</string>
+    <string name="prop_label_font">Font Style</string>
+    <string name="prop_val_font_normal">Standard Font</string>
+    <string name="prop_val_font_handwriting">Handwriting Font</string>
 
     <!-- Joystick Properties -->
     <string name="properties_label_joystick_mode">Joystick Mode</string>
@@ -109,6 +185,19 @@
     <string name="val_joystick_style_sharp">Sharp</string>
     <string name="val_joystick_style_smooth">Smooth</string>
     <string name="val_joystick_style_arrow">Arrow</string>
+    <string name="prop_label_axis_mode">Axis Mode</string>
+    <string name="val_axis_4way">4-Way</string>
+    <string name="val_axis_2way_h">2-Way Horz</string>
+    <string name="val_axis_2way_v">2-Way Vert</string>
+    <string name="prop_label_range_precision">Range &amp; Precision</string>
+    <string name="prop_label_min_val">Min</string>
+    <string name="prop_label_max_val">Max</string>
+    <string name="prop_label_precision">Scale Unit</string>
+    <string name="prop_label_msg_release">Release Msg</string>
+    <string name="prop_label_msg_up">Up</string>
+    <string name="prop_label_msg_down">Down</string>
+    <string name="prop_label_msg_left">Left</string>
+    <string name="prop_label_msg_right">Right</string>
 
     <!-- Color Palette Properties -->
     <string name="properties_label_controller_style">Controller Style</string>
@@ -142,14 +231,15 @@
     <string name="msg_mqtt_connected">Connected</string>
     <string name="msg_mqtt_disconnected">Disconnected</string>
     <string name="project_log_mqtt_status">MQTT Status: %1$s</string>
+    <string name="msg_invalid_topic">Invalid characters! Use (a-z, A-Z, 0-9, _)</string>
 
     <!-- Common Messages & Dialogs -->
-    <string name="msg_limit_reached">Free version is limited to 3 projects.</string>
+    <string name="msg_limit_reached">Free version is limited to 1 projects.</string>
     <string name="title_limit_reached">Limit Reached</string>
     <string name="dialog_btn_upgrade">Upgrade</string>
     <string name="dialog_language_title">Select Language</string>
-    <string name="dialog_delete_title">刪除專案</string>
-    <string name="dialog_delete_message">確定要刪除「%s」嗎？</string>
+    <string name="dialog_delete_title">Delete Project</string>
+    <string name="dialog_delete_message">Are you sure you want to delete \'%s\'?</string>
     <string name="dialog_change_id_title">Change Project ID</string>
     <string name="dialog_import_title">Import Configuration</string>
     <string name="dialog_export_title">Export Configuration</string>
@@ -188,8 +278,8 @@
     <string name="prop_label_orientation">Orientation</string>
     <string name="prop_label_feedback">Hint</string>
 
-    <string name="val_orient_horizontal">水平</string>
-    <string name="val_orient_vertical">垂直</string>
+    <string name="val_orient_horizontal">Horizontal</string>
+    <string name="val_orient_vertical">Vertical</string>
     <string name="val_slider_style_classic">Classic</string>
     <string name="val_slider_style_capsule">Capsule</string>
     <string name="val_shape_square">Square</string>
@@ -208,15 +298,15 @@
     <string name="val_style_classic">Classic</string>
     <string name="val_style_lever">Lever</string>
     <string name="val_shape_rounded_rect">Rounded</string>
-
     <string name="val_shape_circle_style">Circles</string>
     <string name="val_style_rounded">Rects</string>
-    <string name="val_style_segmented">膠囊</string>
+    <string name="val_style_segmented">Capsule</string>
 
-    <!-- Text Input Styles -->
+    <!-- Input Box Styles -->
     <string name="val_style_text_capsule">Capsule</string>
-    <string name="val_style_text_modular">Modular</string>
     <string name="val_style_text_infinity">Infinity</string>
+    <string name="val_style_text_glass">Glass</string>
+    <string name="val_style_text_note">Note</string>
     <string name="prop_label_clear_on_send">Clear on Send</string>
     <string name="prop_label_enter_as_send">Enter as Send</string>
     <string name="prop_desc_clear_on_send">Clear text field after sending.</string>
@@ -231,8 +321,6 @@
 
     <string name="properties_switch_mode_standard">Standard</string>
     <string name="properties_switch_mode_tri_state">Tri-State</string>
-    
-    <!-- Icons & Helper Descriptions -->
 
     <!-- Messages & Status -->
     <string name="project_msg_add_component">Component added</string>
@@ -242,10 +330,47 @@
     <string name="project_msg_file_save_failed">Save failed</string>
     <string name="project_msg_file_saved">Saved</string>
     <string name="project_msg_id_copied">ID copied</string>
-    <string name="project_msg_init_error">Init error</string>
+    <string name="project_msg_init_error">Init error: %1$s</string>
     <string name="project_msg_mqtt_failed">MQTT failed</string>
     <string name="project_msg_mqtt_retrying">Retrying MQTT...</string>
     <string name="project_msg_select_component">Select a component</string>
+
+    <!-- LED Property Specifics -->
+    <string name="prop_label_led_type">LED Type</string>
+    <string name="val_led_logic_standard">Standard LED</string>
+    <string name="val_led_logic_rgb">RGB Multi-State</string>
+    <string name="desc_led_logic_standard">Single state indicator using shared colors.</string>
+    <string name="desc_led_logic_rgb">RGB Mode: Displays specific colors based on keywords.</string>
+    <string name="desc_led_logic_standard_detail">Standard Mode: Lights up when keywords match, otherwise stays off.</string>
+    <string name="prop_label_led_action">Action Mode</string>
+    <string name="val_led_action_latch">Latch (Keywords)</string>
+    <string name="val_led_action_timer">Momentary (Timer)</string>
+    <string name="desc_led_action_timer">Timer Mode: Lights up on signal, auto-off after duration.</string>
+    <string name="desc_led_action_latch">Latch Mode: Lights up on trigger, off on restore signal.</string>
+    <string name="prop_label_led_timer_hint">Active Duration (ms)</string>
+    <string name="prop_label_led_restore_kw_hint">Restore Keywords (OFF/0/FALSE)</string>
+    <string name="prop_label_led_match_mode">Match Mode</string>
+    <string name="prop_label_led_add_kw">Add Keyword</string>
+    <string name="val_match_exact_alt">Exact</string>
+    <string name="val_match_contains_alt">Contains</string>
+    <string name="error_duplicate">Duplicate</string>
+    <string name="prop_label_led_color_active">Color</string>
+    <string name="prop_label_led_keyword">Keyword</string>
+    <string name="prop_label_led_effect">Active Effect</string>
+    <string name="val_effect_steady_short">Steady</string>
+    <string name="val_effect_blink_short">Blink</string>
+    <string name="prop_label_led_visual_style_alt">Display Style</string>
+    <string name="prop_label_led_content_mode">Display Label</string>
+    <string name="prop_label_led_text_content">Label Text</string>
+    <string name="prop_label_led_neon_multiline">Neon Label (Multiline)</string>
+    <string name="chip_match_contains">[Contains] %1$s</string>
+    <string name="chip_match_exact">[Exact] %1$s</string>
+
+    <string name="val_content_icon">Icon</string>
+    <string name="val_content_text">Text</string>
+    <string name="val_content_both">Icon + Text</string>
+    <string name="val_style_orb">Glow Sphere</string>
+    
     <string name="prop_label_label_caps">LABEL</string>
     <string name="prop_label_value_caps">VALUE</string>
 </resources>

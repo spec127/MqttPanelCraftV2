@@ -38,11 +38,9 @@
 
             <!-- App Logo & Version -->
             <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:src="@drawable/ic_launcher_foreground"
-                android:background="@drawable/ic_launcher_background"
-                app:tint="@color/primary" 
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:src="@drawable/ic_app_logo"
                 android:contentDescription="@string/app_logo"/>
             
             <TextView

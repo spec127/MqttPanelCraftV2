@@ -78,6 +78,42 @@ class ProjectUIManager(
         // Initial Layout
         bottomSheet.post { updateBottomInset() }
 
+        // IME push-up: shift rootCoordinator up by keyboard height + 20dp ONLY when BottomSheet is open or focused
+        val rootCoord = root.findViewById<View>(R.id.rootCoordinator)
+        if (rootCoord != null) {
+            androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(rootCoord) { view, insets ->
+                val imeVisible = insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())
+                val imeHeight = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime()).bottom
+                val density = view.resources.displayMetrics.density
+                val shouldPushUp = sheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
+                        sheetBehavior.state == BottomSheetBehavior.STATE_HALF_EXPANDED ||
+                        bottomSheet.findFocus() != null
+                if (imeVisible && imeHeight > 0 && shouldPushUp) {
+                    view.translationY = - (imeHeight + 20 * density)
+                } else if (!imeVisible || imeHeight == 0) {
+                    view.translationY = 0f
+                }
+                insets
+            }
+
+            // Universal fallback for older Android devices (e.g., Android 7.1.2)
+            root.viewTreeObserver.addOnGlobalLayoutListener {
+                val r = android.graphics.Rect()
+                root.getWindowVisibleDisplayFrame(r)
+                val screenHeight = root.rootView.height
+                val keypadHeight = screenHeight - r.bottom
+                val density = root.resources.displayMetrics.density
+                val shouldPushUp = sheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
+                        sheetBehavior.state == BottomSheetBehavior.STATE_HALF_EXPANDED ||
+                        bottomSheet.findFocus() != null
+                if (keypadHeight > screenHeight * 0.15 && shouldPushUp) {
+                    rootCoord.translationY = - (keypadHeight + 20 * density)
+                } else if (keypadHeight <= screenHeight * 0.15 && rootCoord.translationY != 0f) {
+                    rootCoord.translationY = 0f
+                }
+            }
+        }
+
         // Mode FAB
         fabMode.setOnClickListener { onModeToggleCallback?.invoke() }
 
@@ -248,10 +284,12 @@ class ProjectUIManager(
 
             btnUndo.visibility = View.GONE
             containerLogs.visibility = View.VISIBLE
-            propertiesManager.hide()
+            containerProperties.visibility = View.GONE
 
             sheetBehavior.isHideable = false
-            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
 
             // Clear Selection
             renderer.render(viewModel.components.value ?: emptyList(), false, null)
@@ -350,6 +388,12 @@ class ProjectUIManager(
         } else {
             // RUN MODE Logic
             editorCanvas.translationY = 0f
+
+            // Prevent layout thrashing during slide which causes GridPatternView to disappear
+            val state = sheetBehavior.state
+            if (state == BottomSheetBehavior.STATE_DRAGGING || state == BottomSheetBehavior.STATE_SETTLING) {
+                return
+            }
 
             val sheetLoc = IntArray(2)
             bottomSheet.getLocationOnScreen(sheetLoc)

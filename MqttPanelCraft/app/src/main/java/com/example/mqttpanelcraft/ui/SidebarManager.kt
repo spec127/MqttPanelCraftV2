@@ -9,6 +9,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import com.example.mqttpanelcraft.ui.views.LedView
 import android.view.ViewConfiguration
 import android.widget.EditText
 import android.widget.GridLayout
@@ -160,7 +161,7 @@ class SidebarManager(
                                                                         height = h,
                                                                         label = def.labelPrefix,
                                                                         topicConfig = "",
-                                                                        props = mutableMapOf()
+                                                                        props = def.getDefaultProps().toMutableMap()
                                                                 )
                                                 def.onUpdateView(previewView, dummyData)
                                         }
@@ -370,12 +371,10 @@ class SidebarManager(
                                         ) // isPreview/EditMode = false for clean look
                                 previewView.background = null // Card has border, component does not
 
-                                // Init Dummy Data
-                                val dummyProps = mutableMapOf<String, String>()
-                                // Default colors (respect component specific overrides if needed)
-                                val initialColor = "#2196F3" // Always Blue for preview base
-                                dummyProps["color"] = initialColor
-                                dummyProps["colorOn"] = initialColor
+                                // Init Dummy Data from Definition defaults
+                                val dummyProps = def.getDefaultProps().toMutableMap()
+                                if (!dummyProps.containsKey("color")) dummyProps["color"] = "#2196F3"
+                                dummyProps["colorOn"] = dummyProps["color"] ?: "#2196F3"
                                 dummyProps["colorOff"] = "#BDBDBD"
 
                                 // Special handling for specific component types
@@ -388,16 +387,40 @@ class SidebarManager(
                                                 dummyProps["state"] = "2" // ON state (solid track)
                                         }
                                         "SLIDER" -> {
-                                                dummyProps["value"] =
-                                                        "35" // V18.4: Set to 35% for better
-                                                // visibility in sidebar
+                                                dummyProps["value"] = "35"
                                         }
                                         "SELECTOR" -> {
-                                                // V21.8: Use 3 segments for sidebar icon to
-                                                // increase clarity in small 42dp container
                                                 dummyProps["segments"] =
                                                         "[{\"label\":\"S1\",\"val\":\"1\"},{\"label\":\"S2\",\"val\":\"2\"},{\"label\":\"S3\",\"val\":\"3\"}]"
                                                 dummyProps["style"] = "rounded"
+                                        }
+                                        "LED" -> {
+                                                dummyProps["style"] = "ORB"
+                                                dummyProps["icon"] = "ic_btn_lighting"
+                                                dummyProps["appearance_mode"] = "icon"
+                                                dummyProps["active_color"] = "#FF9800"
+                                                dummyProps["idle_color"] = "#9E9E9E"
+                                        }
+                                        "SCALE_METER" -> {
+                                                dummyProps["value"] = "70"
+                                                dummyProps["style"] = "SEGMENTED"
+                                                dummyProps["orientation"] = "HORIZONTAL"
+                                                dummyProps["feedback"] = "Ticks"
+                                                dummyProps["show_ticks"] = "true"
+                                                dummyProps["show_bubble"] = "false"
+                                                dummyProps["show_value"] = "false"
+                                                dummyProps["theme_color"] = "#FF9800"
+                                        }
+                                        "GAUGE_METER" -> {
+                                                dummyProps["value"] = "75"
+                                                dummyProps["style"] = "NEEDLE"
+                                                dummyProps["theme_color"] = "#FF9800"
+                                        }
+                                        "SIGNAL_INDICATOR" -> {
+                                                dummyProps["value_mapping"] = "ABSOLUTE"
+                                                dummyProps["value"] = "2"
+                                                dummyProps["color_mode"] = "SOLID"
+                                                dummyProps["theme_color"] = "#FF9800"
                                         }
                                 }
 
@@ -408,7 +431,7 @@ class SidebarManager(
                                                 x = 0f,
                                                 y = 0f,
                                                 width = 100,
-                                                height = 100, // Dummy size
+                                                height = 100,
                                                 label = "",
                                                 topicConfig = "",
                                                 props = dummyProps
@@ -417,12 +440,39 @@ class SidebarManager(
                                 // Update View Appearance
                                 def.onUpdateView(previewView, dummyData)
 
+                                // V21.12: Force LED to be ON in sidebar preview
+                                if (def.type == "LED" && previewView is android.view.ViewGroup) {
+                                        val ledView = previewView.getChildAt(0) as? com.example.mqttpanelcraft.ui.views.LedView
+                                        ledView?.isActive = true
+                                        ledView?.effect = com.example.mqttpanelcraft.ui.views.LedView.Effect.NONE
+                                }
+
                                 // Disable interaction on preview recursively
                                 fun disableView(v: View) {
                                         v.isClickable = false
                                         v.isFocusable = false
+                                        v.isFocusableInTouchMode = false
                                         v.isEnabled = false
+                                        v.setOnTouchListener { _, _ -> false }
+                                        if (v is android.widget.TextView) {
+                                                v.movementMethod = null
+                                        }
+                                        if (v is android.widget.EditText) {
+                                                v.isSingleLine = true
+                                                v.maxLines = 1
+                                                v.isVerticalScrollBarEnabled = false
+                                                v.isHorizontalScrollBarEnabled = false
+                                        }
+                                        if (v is com.example.mqttpanelcraft.ui.views.TextDisplayView) {
+                                                v.isScrollable = false
+                                                v.displayLines = 1
+                                        }
+                                        if (v is android.widget.ScrollView || v is androidx.core.widget.NestedScrollView) {
+                                                v.requestDisallowInterceptTouchEvent(false)
+                                                v.setOnTouchListener { _, _ -> false }
+                                        }
                                         if (v is android.view.ViewGroup) {
+                                                v.descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
                                                 for (i in 0 until v.childCount) {
                                                         disableView(v.getChildAt(i))
                                                 }
@@ -434,49 +484,50 @@ class SidebarManager(
                                                 android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
                                 }
 
-                                // Add to Container
-                                // Individualized Dimensions (V21.12: Even Shorter)
+                                // Add to Container (slightly scaled down so bottom is never clipped)
                                 val (pWidth, pHeight) =
                                         when (def.type) {
-                                                "SELECTOR" -> Pair(dpToPx(85), dpToPx(36))
-                                                "SLIDER" -> Pair(dpToPx(76), dpToPx(36))
-                                                "JOYSTICK", "PALETTE" ->
-                                                        Pair(dpToPx(42), dpToPx(42))
-                                                "BUTTON" -> Pair(dpToPx(50), dpToPx(42))
-                                                "SWITCH" -> Pair(dpToPx(40), dpToPx(42))
+                                                "SELECTOR" -> Pair(dpToPx(85), dpToPx(34))
+                                                "SLIDER" -> Pair(dpToPx(76), dpToPx(34))
+                                                "JOYSTICK", "PALETTE" -> Pair(dpToPx(46), dpToPx(46))
+                                                "BUTTON" -> Pair(dpToPx(50), dpToPx(38))
+                                                "SWITCH" -> Pair(dpToPx(40), dpToPx(38))
                                                 "CAMERA" ->
+                                                        Pair(
+                                                                android.widget.FrameLayout
+                                                                        .LayoutParams.MATCH_PARENT,
+                                                                dpToPx(34)
+                                                        )
+                                                "INPUT", "INPUTBOX" -> Pair(dpToPx(96), dpToPx(30))
+                                                "LED" -> Pair(dpToPx(52), dpToPx(52))
+                                                "SCALE_METER" -> Pair(dpToPx(96), dpToPx(48))
+                                                "GAUGE_METER" -> Pair(dpToPx(56), dpToPx(56))
+                                                "THERMOMETER", "LEVEL" ->
+                                                        Pair(dpToPx(32), dpToPx(40))
+                                                "TEXT", "IMAGE" -> Pair(dpToPx(96), dpToPx(30))
+                                                "TEXT_DISPLAY" -> Pair(dpToPx(96), dpToPx(34))
+                                                "CHART" ->
                                                         Pair(
                                                                 android.widget.FrameLayout
                                                                         .LayoutParams.MATCH_PARENT,
                                                                 dpToPx(36)
                                                         )
-                                                "INPUT" -> Pair(dpToPx(50), dpToPx(20))
-                                                "LED" -> Pair(dpToPx(32), dpToPx(32))
-                                                "THERMOMETER", "LEVEL" ->
-                                                        Pair(dpToPx(32), dpToPx(40))
-                                                "TEXT", "IMAGE" -> Pair(dpToPx(100), dpToPx(32))
-                                                "CHART" ->
-                                                        Pair(
-                                                                android.widget.FrameLayout
-                                                                        .LayoutParams.MATCH_PARENT,
-                                                                dpToPx(38)
-                                                        )
                                                 else ->
                                                         Pair(
                                                                 android.widget.FrameLayout
                                                                         .LayoutParams.MATCH_PARENT,
-                                                                dpToPx(32)
+                                                                dpToPx(30)
                                                         )
                                         }
 
                                 val previewParams =
                                         android.widget.FrameLayout.LayoutParams(pWidth, pHeight)
-                                previewParams.gravity =
-                                        android.view.Gravity.CENTER_HORIZONTAL or
-                                                android.view.Gravity.BOTTOM
+                                previewParams.gravity = android.view.Gravity.CENTER
 
                                 if (def.type == "PALETTE") {
                                         previewParams.setMargins(0, 0, 0, dpToPx(2))
+                                } else if (def.type == "LED" || def.type == "GAUGE_METER" || def.type == "SCALE_METER") {
+                                        previewParams.gravity = android.view.Gravity.BOTTOM or android.view.Gravity.CENTER_HORIZONTAL
                                 }
                                 previewView.layoutParams = previewParams
                                 previewContainer.addView(previewView)
@@ -484,12 +535,19 @@ class SidebarManager(
                                 previewContainer.isFocusable = false
                                 previewContainer.isEnabled = false
 
+                                // Transparent shield on top of previewView to block ALL touch interactions and pass to card drag
+                                val touchShield = View(rootView.context)
+                                touchShield.layoutParams = android.widget.FrameLayout.LayoutParams(
+                                        android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                                        android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+                                )
+                                touchShield.setOnTouchListener(touchListener)
+                                previewContainer.addView(touchShield)
+
                                 // No more img.setColorFilter needed (handled by onUpdateView with
                                 // props)
 
                                 val tv = card.findViewById<android.widget.TextView>(R.id.tvLabel)
-
-                                // Localized Label
                                 val labelResName = "component_label_${def.type.lowercase()}"
                                 val labelId =
                                         rootView.resources.getIdentifier(
@@ -508,15 +566,10 @@ class SidebarManager(
                                 tv.text = labelText
 
                                 // Card Layout Params for Grid (Square-ish Box)
-                                val params = android.widget.GridLayout.LayoutParams()
-                                // Fixed width to prevent single-item stretching. Sidebar ~280dp.
-                                // 280 - 32(padding) - 24(margins) = 224 / 2 = 112. Safe: 108dp.
-                                params.width = dpToPx(108)
-                                params.height = android.widget.GridLayout.LayoutParams.WRAP_CONTENT
-                                params.columnSpec =
-                                        android.widget.GridLayout.spec(
-                                                android.widget.GridLayout.UNDEFINED
-                                        ) // Removed Weight 1f
+                                val params = card.layoutParams as android.widget.GridLayout.LayoutParams
+                                params.width = 0
+                                params.height = dpToPx(100) // EXPLICIT HEIGHT 100dp
+                                params.columnSpec = android.widget.GridLayout.spec(android.widget.GridLayout.UNDEFINED, 1f)
                                 params.setMargins(dpToPx(6), dpToPx(6), dpToPx(6), dpToPx(6))
                                 card.layoutParams = params
 

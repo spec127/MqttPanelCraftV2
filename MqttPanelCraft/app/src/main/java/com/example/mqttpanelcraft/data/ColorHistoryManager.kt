@@ -5,7 +5,7 @@ import android.content.Context
 object ColorHistoryManager {
     private const val PREF_NAME = "global_colors"
     private const val KEY_HISTORY = "history"
-    private val DEFAULT_COLORS = listOf("#a573bc", "#2196F3", "#4CAF50", "#FFC107", "#FF5722")
+    private val DEFAULT_COLORS = listOf("#F44336", "#4CAF50", "#2196F3", "#FFC107", "#FFFFFF")
 
     fun load(context: Context): List<String> {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
