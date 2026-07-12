@@ -44,13 +44,15 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="4dp"
-                android:hint="最小值 (Min)">
+                android:layout_marginEnd="6dp"
+                android:hint="@string/stepper_hint_min">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPropMin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberSigned|numberDecimal" />
+                    android:inputType="numberDecimal|numberSigned"
+                    android:textSize="13sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -58,17 +60,19 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="4dp"
-                android:hint="最大值 (Max)">
+                android:layout_marginStart="6dp"
+                android:hint="@string/stepper_hint_max">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPropMax"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberSigned|numberDecimal" />
+                    android:inputType="numberDecimal|numberSigned"
+                    android:textSize="13sp" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- 步進量 (Step) 與 當前數值 (Value) -->
+        <!-- 步進長度 (Step Size) 與 單位 (Unit) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,13 +85,15 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="4dp"
-                android:hint="步進量 (Step)">
+                android:layout_marginEnd="6dp"
+                android:hint="@string/stepper_hint_step">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPropStep"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal" />
+                    android:inputType="numberDecimal"
+                    android:textSize="13sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -95,30 +101,33 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="4dp"
-                android:hint="當前數值">
+                android:layout_marginStart="6dp"
+                android:hint="@string/stepper_hint_unit">
+
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etPropValue"
+                    android:id="@+id/etPropUnit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberSigned|numberDecimal" />
+                    android:inputType="text"
+                    android:textSize="13sp" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- 長按連續步進開關 -->
+        <!-- 長按連續調整 (開關按鈕) -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="長按連續調整"
-            android:textSize="11sp"
-            android:textColor="@color/prop_text_secondary"
-            android:layout_marginBottom="4dp"/>
+            android:text="@string/stepper_prop_long_press"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_primary"
+            android:layout_marginBottom="6dp"/>
 
         <com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleLongPress"
             android:layout_width="match_parent"
             android:layout_height="38dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="4dp"
             app:singleSelection="true"
             app:selectionRequired="true">
 
@@ -128,7 +137,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="開啟"
+                android:text="@string/val_boolean_true"
                 android:textSize="12sp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"/>
@@ -139,7 +148,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="關閉"
+                android:text="@string/val_boolean_false"
                 android:textSize="12sp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"/>
@@ -185,6 +194,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
+
+        <!-- TOP: Orientation Toggle (Horizontal / Vertical) -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleOrientation"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginBottom="12dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@+id/btnOrientationHoriz">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOrientationHoriz"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/prop_btn_orient_horizontal"
+                android:textSize="12sp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOrientationVert"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/prop_btn_orient_vertical"
+                android:textSize="12sp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <!-- 左右比 4:6 (左邊風格 / 右邊調色盤) -->
         <LinearLayout

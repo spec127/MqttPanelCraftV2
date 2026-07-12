@@ -453,33 +453,31 @@ object ScaleMeterDefinition : IComponentDefinition {
             val styleMap = mapOf("經典實心 (Solid)" to "SOLID", "分段陣列 (Segmented)" to "SEGMENTED", "溫度計 (Thermometer)" to "THERMOMETER")
             CommonPropBinder.bindDropdown(panelView, R.id.spScaleStyle, "style", data, onUpdate, styleOptions, styleMap, "SOLID")
 
-            // 方向選擇：切換 VERTICAL / HORIZONTAL 時，同時互換元件的長寬 w 與 h，讓畫布上的元件形狀即時旋轉！
-            val spScaleOrientation = panelView.findViewById<android.widget.AutoCompleteTextView>(R.id.spScaleOrientation)
-            val orientOptions = listOf("垂直 (Vertical)", "水平 (Horizontal)")
-            val orientKeys = listOf("VERTICAL", "HORIZONTAL")
+            // 方向選擇器切換按鈕 (VERTICAL / HORIZONTAL)
+            val toggleOrientation = panelView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleOrientation)
             val currentOrient = data.props["orientation"] ?: "VERTICAL"
-
-            spScaleOrientation?.setAdapter(android.widget.ArrayAdapter(ctx, R.layout.list_item_dropdown, orientOptions))
-            val orientIndex = orientKeys.indexOf(currentOrient).coerceAtLeast(0)
-            spScaleOrientation?.setText(orientOptions[orientIndex], false)
-
-            spScaleOrientation?.setOnItemClickListener { _, _, position, _ ->
-                val newOrientation = orientKeys[position]
-                val oldOrientation = data.props["orientation"] ?: "VERTICAL"
-                if (newOrientation != oldOrientation) {
-                    val oldW = data.width
-                    val oldH = data.height
-                    onUpdate("w", oldH.toString())
-                    onUpdate("h", oldW.toString())
+            if (toggleOrientation != null) {
+                toggleOrientation.check(
+                    if (currentOrient.equals("VERTICAL", ignoreCase = true)) R.id.btnOrientationVert else R.id.btnOrientationHoriz
+                )
+                toggleOrientation.addOnButtonCheckedListener { _, checkedId, isChecked ->
+                    if (isChecked) {
+                        val newOrientation = if (checkedId == R.id.btnOrientationVert) "VERTICAL" else "HORIZONTAL"
+                        val oldOrientation = data.props["orientation"] ?: "VERTICAL"
+                        if (!newOrientation.equals(oldOrientation, ignoreCase = true)) {
+                            val oldW = data.width
+                            val oldH = data.height
+                            onUpdate("w", oldH.toString())
+                            onUpdate("h", oldW.toString())
+                        }
+                        onUpdate("orientation", newOrientation)
+                    }
                 }
-                onUpdate("orientation", newOrientation)
             }
 
-            // 綁定「刻度與氣泡」下拉選單，與 Slider 的 feedback 同源，並提供向後相容舊資料的自動升級邏輯
-            val feedbackDropdown = panelView.findViewById<android.widget.AutoCompleteTextView>(R.id.spScaleFeedback)
-            val feedbackKeys = listOf("None", "Ticks", "Bubble", "Both")
-            val feedbackOptions = listOf("無", "刻度", "氣泡", "兩者")
-            feedbackDropdown?.setAdapter(android.widget.ArrayAdapter(ctx, R.layout.list_item_dropdown, feedbackOptions))
+            // 綁定「刻度與氣泡」勾選框 (與 Slider UI 及操作 100% 統一)
+            val cbShowTicks = panelView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cbShowTicks)
+            val cbShowBubble = panelView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cbShowBubble)
 
             val currentFeedback = data.props["feedback"] ?: run {
                 val hasTicks = (data.props["show_ticks"] ?: "false").toBoolean()
@@ -491,10 +489,26 @@ object ScaleMeterDefinition : IComponentDefinition {
                     else -> "None"
                 }
             }
-            val fbIndex = feedbackKeys.indexOf(currentFeedback).coerceAtLeast(0)
-            feedbackDropdown?.setText(feedbackOptions[fbIndex], false)
-            feedbackDropdown?.setOnItemClickListener { _, _, position, _ ->
-                onUpdate("feedback", feedbackKeys[position])
+
+            fun updateFeedbackProps() {
+                val hasTicks = cbShowTicks?.isChecked == true
+                val hasBubble = cbShowBubble?.isChecked == true
+                val fb = when {
+                    hasTicks && hasBubble -> "Both"
+                    hasTicks -> "Ticks"
+                    hasBubble -> "Bubble"
+                    else -> "None"
+                }
+                onUpdate("feedback", fb)
+            }
+
+            cbShowTicks?.apply {
+                isChecked = currentFeedback == "Ticks" || currentFeedback == "Both"
+                setOnCheckedChangeListener { _, _ -> updateFeedbackProps() }
+            }
+            cbShowBubble?.apply {
+                isChecked = currentFeedback == "Bubble" || currentFeedback == "Both"
+                setOnCheckedChangeListener { _, _ -> updateFeedbackProps() }
             }
 
 

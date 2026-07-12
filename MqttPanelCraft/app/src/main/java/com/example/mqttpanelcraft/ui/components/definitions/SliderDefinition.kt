@@ -141,9 +141,30 @@ object SliderDefinition : IComponentDefinition {
             addTextChangedListener(watcher("interval"))
         }
 
+        // Appearance - Orientation Toggle Button
+        val toggleOrientation = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleOrientation)
+        val currentOrient = data.props["orientation"] ?: "Horizontal"
+        if (toggleOrientation != null) {
+            toggleOrientation.check(
+                if (currentOrient.equals("Vertical", ignoreCase = true)) R.id.btnOrientationVert else R.id.btnOrientationHoriz
+            )
+            toggleOrientation.addOnButtonCheckedListener { _, checkedId, isChecked ->
+                if (isChecked) {
+                    val newOrientation = if (checkedId == R.id.btnOrientationVert) "Vertical" else "Horizontal"
+                    val oldOrientation = data.props["orientation"] ?: "Horizontal"
+                    if (!newOrientation.equals(oldOrientation, ignoreCase = true)) {
+                        val oldW = data.width
+                        val oldH = data.height
+                        onUpdate("w", oldH.toString())
+                        onUpdate("h", oldW.toString())
+                    }
+                    onUpdate("orientation", newOrientation)
+                }
+            }
+        }
+
         // Appearance - Style Selection
         val spStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spPropStyle)
-
         val context = panelView.context
         val styleOptions =
                 listOf(
@@ -162,33 +183,6 @@ object SliderDefinition : IComponentDefinition {
             onUpdate("sliderStyle", newStyle)
         }
 
-        // Orientation
-        val spOrient = panelView.findViewById<AutoCompleteTextView>(R.id.spOrientation)
-        val orientKeys = listOf("Horizontal", "Vertical")
-        val orientOptions =
-                listOf(
-                        context.getString(R.string.val_orient_horizontal),
-                        context.getString(R.string.val_orient_vertical)
-                )
-
-        spOrient?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, orientOptions))
-        val currentOrient = data.props["orientation"] ?: "Horizontal"
-        val orientIndex = orientKeys.indexOf(currentOrient).coerceAtLeast(0)
-        spOrient?.setText(orientOptions[orientIndex], false)
-
-        spOrient?.setOnItemClickListener { _, _, position, _ ->
-            val newOrientation = orientKeys[position]
-            val oldOrientation = data.props["orientation"] ?: "Horizontal"
-            if (newOrientation != oldOrientation) {
-                // Swap W and H to reflect rotation in the editor
-                val oldW = data.width
-                val oldH = data.height
-                onUpdate("w", oldH.toString())
-                onUpdate("h", oldW.toString())
-            }
-            onUpdate("orientation", newOrientation)
-        }
-
         val spShape = panelView.findViewById<AutoCompleteTextView>(R.id.spPropShape)
         val shapeOptions =
                 listOf(
@@ -202,6 +196,32 @@ object SliderDefinition : IComponentDefinition {
         spShape?.setText(shapeOptions[shapeIndex], false)
         spShape?.setOnItemClickListener { _, _, position, _ ->
             onUpdate("shape", shapeKeys[position])
+        }
+
+        // Feedback Checkboxes (Ticks & Bubble)
+        val currentFeedback = data.props["feedback"] ?: "None"
+        val cbShowTicks = panelView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cbShowTicks)
+        val cbShowBubble = panelView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cbShowBubble)
+
+        fun updateFeedbackProps() {
+            val hasTicks = cbShowTicks?.isChecked == true
+            val hasBubble = cbShowBubble?.isChecked == true
+            val fb = when {
+                hasTicks && hasBubble -> "Both"
+                hasTicks -> "Ticks"
+                hasBubble -> "Bubble"
+                else -> "None"
+            }
+            onUpdate("feedback", fb)
+        }
+
+        cbShowTicks?.apply {
+            isChecked = currentFeedback == "Ticks" || currentFeedback == "Both"
+            setOnCheckedChangeListener { _, _ -> updateFeedbackProps() }
+        }
+        cbShowBubble?.apply {
+            isChecked = currentFeedback == "Bubble" || currentFeedback == "Both"
+            setOnCheckedChangeListener { _, _ -> updateFeedbackProps() }
         }
 
         // Color Palette Logic
@@ -237,28 +257,6 @@ object SliderDefinition : IComponentDefinition {
                             }
                     )
                     .show(anchor)
-        }
-
-        // --- Bottom Row: Hint & Color ---
-        val currentFeedback = data.props["feedback"] ?: "None"
-        val feedbackDropdown = panelView.findViewById<AutoCompleteTextView>(R.id.spFeedback)
-        val feedbackKeys = listOf("None", "Ticks", "Bubble", "Both")
-        val feedbackOptions =
-                listOf(
-                        context.getString(R.string.val_feedback_none),
-                        context.getString(R.string.val_feedback_ticks),
-                        context.getString(R.string.val_feedback_bubble),
-                        context.getString(R.string.val_feedback_both)
-                )
-
-        feedbackDropdown?.setAdapter(
-                ArrayAdapter(context, R.layout.list_item_dropdown, feedbackOptions)
-        )
-        val fbIndex = feedbackKeys.indexOf(currentFeedback).coerceAtLeast(0)
-        feedbackDropdown?.setText(feedbackOptions[fbIndex], false)
-
-        feedbackDropdown?.setOnItemClickListener { _, _, position, _ ->
-            onUpdate("feedback", feedbackKeys[position])
         }
     }
 

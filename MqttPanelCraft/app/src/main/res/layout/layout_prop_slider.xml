@@ -9,7 +9,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-
         <!-- SECTION 1: INTERACTION -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,8 +85,7 @@
                 android:textSize="14sp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-
-
+        <!-- Min / Max / Step -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -152,7 +150,7 @@
             android:background="@color/divider_line"
             android:layout_marginBottom="16dp" />
 
-        <!-- SECTION 4: APPEARANCE -->
+        <!-- SECTION 2: APPEARANCE -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -177,20 +175,52 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <!-- Dynamic Appearance Selection -->
+        <!-- TOP: Orientation Toggle (Horizontal / Vertical) -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleOrientation"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginBottom="12dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@+id/btnOrientationHoriz">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOrientationHoriz"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/prop_btn_orient_horizontal"
+                android:textSize="12sp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOrientationVert"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/prop_btn_orient_vertical"
+                android:textSize="12sp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!-- ROW 2: Style (Left 4) / Shape (Right 6) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="4dp">
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:layout_marginBottom="12dp">
 
-            <!-- MAIN STYLE DROPDOWN (Top) -->
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="4"
                 android:layout_height="wrap_content"
                 android:hint="@string/prop_hint_style"
-                android:layout_marginBottom="@dimen/prop_section_margin_bottom"
-                style="@style/Widget.App.TextInputLayout.Properties.Compact">
+                style="@style/Widget.App.TextInputLayout.Properties.Compact"
+                android:layout_marginEnd="12dp">
                 <AutoCompleteTextView
                     android:id="@+id/spPropStyle"
                     android:layout_width="match_parent"
@@ -204,79 +234,14 @@
                     android:textSize="12sp"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- GROUP 1: NORMAL STYLE (Classic / Capsule) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:visibility="visible"
-                android:layout_marginBottom="8dp">
-
-                <!-- Orientation (Left) -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="4"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prop_label_orientation"
-                    style="@style/Widget.App.TextInputLayout.Properties.Compact"
-                    android:layout_marginEnd="12dp">
-                    <AutoCompleteTextView
-                        android:id="@+id/spOrientation"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/prop_input_height_inner"
-                        android:inputType="none"
-                        android:maxLines="1"
-                        app:autoSizeTextType="uniform"
-                        app:autoSizeMinTextSize="10sp"
-                        app:autoSizeMaxTextSize="14sp"
-                        android:ellipsize="end"
-                        android:textSize="12sp"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Shape (Right) -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="6"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prop_hint_shape"
-                    style="@style/Widget.App.TextInputLayout.Properties.Compact">
-                    <AutoCompleteTextView
-                        android:id="@+id/spPropShape"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/prop_input_height_inner"
-                        android:inputType="none"
-                        android:maxLines="1"
-                        app:autoSizeTextType="uniform"
-                        app:autoSizeMinTextSize="10sp"
-                        app:autoSizeMaxTextSize="14sp"
-                        android:ellipsize="end"
-                        android:textSize="12sp"/>
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-
-
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:baselineAligned="false"
-            android:layout_marginBottom="16dp">
-
-            <!-- Feedback (Left) -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
-                android:layout_weight="4"
+                android:layout_weight="6"
                 android:layout_height="wrap_content"
-                android:hint="@string/prop_label_feedback"
-                android:layout_marginEnd="12dp"
+                android:hint="@string/prop_hint_shape"
                 style="@style/Widget.App.TextInputLayout.Properties.Compact">
                 <AutoCompleteTextView
-                    android:id="@+id/spFeedback"
+                    android:id="@+id/spPropShape"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="none"
@@ -287,8 +252,41 @@
                     android:ellipsize="end"
                     android:textSize="12sp"/>
             </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
 
-            <!-- Color Palette (Right) -->
+        <!-- ROW 3: Checkboxes (Left 4) / Color Palette (Right 6) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="top">
+
+            <!-- Ticks & Bubble Checkboxes (Left 4) -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginEnd="12dp">
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cbShowTicks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/prop_cb_show_ticks"
+                    android:textSize="12sp"
+                    android:minHeight="36dp"/>
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cbShowBubble"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/prop_cb_show_bubble"
+                    android:textSize="12sp"
+                    android:minHeight="36dp"/>
+            </LinearLayout>
+
+            <!-- Color Palette (Right 6) -->
             <include
                 android:id="@+id/containerColorPalette"
                 layout="@layout/layout_prop_generic_color"

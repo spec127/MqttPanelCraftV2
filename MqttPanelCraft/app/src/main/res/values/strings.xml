@@ -186,6 +186,8 @@
     <string name="val_axes_2way">2-Way</string>
     <string name="val_axes_4way">4-Way</string>
     <string name="prop_label_direction">Movement Dir</string>
+    <string name="tab_display">Display</string>
+    <string name="tab_control">Control</string>
     <string name="val_dir_horz">Horizontal</string>
     <string name="val_dir_vert">Vertical</string>
     <string name="properties_label_joystick_style">Visual Style</string>
@@ -295,6 +297,13 @@
     <string name="val_stepper_style_smooth">Smooth</string>
     <string name="stepper_hint_release_send">Values are sent only when you release</string>
     <string name="stepper_hint_style">Style</string>
+    <string name="stepper_hint_min">Min Value</string>
+    <string name="stepper_hint_max">Max Value</string>
+    <string name="stepper_hint_step">Step Size</string>
+    <string name="stepper_hint_unit">Unit</string>
+    <string name="stepper_prop_long_press">Long Press Continuous Step</string>
+    <string name="val_boolean_true">Enabled</string>
+    <string name="val_boolean_false">Disabled</string>
     <string name="prop_label_color">Color</string>
     <string name="val_shape_square">Square</string>
     <string name="val_shape_circle">Circle</string>
@@ -399,4 +408,10 @@
     
     <string name="prop_label_label_caps">LABEL</string>
     <string name="prop_label_value_caps">VALUE</string>
+
+    <!-- Slider & ScaleMeter & Stepper Orientation Toggle & Checkboxes -->
+    <string name="prop_btn_orient_horizontal">Horizontal</string>
+    <string name="prop_btn_orient_vertical">Vertical</string>
+    <string name="prop_cb_show_ticks">Show Ticks</string>
+    <string name="prop_cb_show_bubble">Show Bubble</string>
 </resources>

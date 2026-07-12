@@ -288,6 +288,13 @@
     <string name="val_stepper_style_smooth">圓滑</string>
     <string name="stepper_hint_release_send">數值僅在鬆手時才會發送</string>
     <string name="stepper_hint_style">風格</string>
+    <string name="stepper_hint_min">最小值</string>
+    <string name="stepper_hint_max">最大值</string>
+    <string name="stepper_hint_step">步進大小</string>
+    <string name="stepper_hint_unit">單位</string>
+    <string name="stepper_prop_long_press">長按連續調整</string>
+    <string name="val_boolean_true">啟用</string>
+    <string name="val_boolean_false">停用</string>
     <string name="prop_label_color">顏色</string>
     <string name="val_shape_square">方形</string>
     <string name="val_shape_circle">圓形</string>
@@ -384,4 +391,10 @@
     <string name="prop_label_led_neon_multiline">霓虹文字標籤 (支援多行)</string>
     <string name="chip_match_contains">[包含] %1$s</string>
     <string name="chip_match_exact">[相符] %1$s</string>
+
+    <!-- Slider & ScaleMeter & Stepper Orientation Toggle & Checkboxes -->
+    <string name="prop_btn_orient_horizontal">水平</string>
+    <string name="prop_btn_orient_vertical">垂直</string>
+    <string name="prop_cb_show_ticks">顯示刻度線</string>
+    <string name="prop_cb_show_bubble">顯示數值氣泡</string>
 </resources>

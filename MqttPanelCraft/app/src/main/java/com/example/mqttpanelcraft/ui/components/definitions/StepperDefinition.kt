@@ -73,6 +73,7 @@ object StepperDefinition : IComponentDefinition {
         stepperView.currentValue = (data.props["value"] ?: "50").toFloatOrNull() ?: 50f
         stepperView.longPressEnabled = (data.props["long_press"] ?: "true") == "true"
         stepperView.visualStyle = data.props["style"] ?: "Standard"
+        stepperView.orientation = data.props["orientation"] ?: "Horizontal"
 
         val colorHex = data.props["color"] ?: "#6366F1"
         try {
@@ -100,7 +101,7 @@ object StepperDefinition : IComponentDefinition {
         bindNum(R.id.etPropMin, "min", "0")
         bindNum(R.id.etPropMax, "max", "100")
         bindNum(R.id.etPropStep, "step", "1")
-        bindNum(R.id.etPropValue, "value", "50")
+        bindNum(R.id.etPropUnit, "unit", "")
 
         // 2. 長按連續步進 Toggle
         val toggleLongPress = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleLongPress)
@@ -114,6 +115,28 @@ object StepperDefinition : IComponentDefinition {
             if (isChecked) {
                 val enabled = (checkedId == R.id.btnLongPressTrue)
                 onUpdate("long_press", if (enabled) "true" else "false")
+            }
+        }
+
+        // 方向切換按鈕 (Horizontal / Vertical)
+        val toggleOrientation = panelView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleOrientation)
+        val currentOrient = data.props["orientation"] ?: "Horizontal"
+        if (toggleOrientation != null) {
+            toggleOrientation.check(
+                if (currentOrient.equals("Vertical", ignoreCase = true)) R.id.btnOrientationVert else R.id.btnOrientationHoriz
+            )
+            toggleOrientation.addOnButtonCheckedListener { _, checkedId, isChecked ->
+                if (isChecked) {
+                    val newOrient = if (checkedId == R.id.btnOrientationVert) "Vertical" else "Horizontal"
+                    val oldOrient = data.props["orientation"] ?: "Horizontal"
+                    if (!newOrient.equals(oldOrient, ignoreCase = true)) {
+                        val oldW = data.width
+                        val oldH = data.height
+                        onUpdate("w", oldH.toString())
+                        onUpdate("h", oldW.toString())
+                    }
+                    onUpdate("orientation", newOrient)
+                }
             }
         }
 

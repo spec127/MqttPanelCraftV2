@@ -49,6 +49,12 @@ class StepperView @JvmOverloads constructor(
             invalidate()
         }
 
+    var orientation: String = "Horizontal"
+        set(value) {
+            field = value
+            invalidate()
+        }
+
     var themeColor: Int = Color.parseColor("#6366F1")
         set(value) {
             field = value
@@ -107,6 +113,11 @@ class StepperView @JvmOverloads constructor(
                 android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
                 android.content.res.Configuration.UI_MODE_NIGHT_YES
 
+        if (orientation.equals("Vertical", ignoreCase = true)) {
+            drawVerticalStyle(canvas, w, h, density, isDark)
+            return
+        }
+
         val btnW = w * 0.28f
 
         when (visualStyle) {
@@ -114,6 +125,49 @@ class StepperView @JvmOverloads constructor(
             "Smooth" -> drawSmoothStyle(canvas, w, h, btnW, density, isDark)
             else -> drawStandardStyle(canvas, w, h, btnW, density, isDark)
         }
+    }
+
+    private fun drawVerticalStyle(
+        canvas: Canvas,
+        w: Float,
+        h: Float,
+        density: Float,
+        isDark: Boolean
+    ) {
+        val corner = 12f * density
+        val btnH = h * 0.28f
+
+        // 卡片底色
+        bgPaint.style = Paint.Style.FILL
+        bgPaint.color = if (isDark) Color.parseColor("#1F2128") else Color.parseColor("#FFFFFF")
+        canvas.drawRoundRect(1f * density, 1f * density, w - 1f * density, h - 1f * density, corner, corner, bgPaint)
+
+        rectPlus.set(0f, 0f, w, btnH)
+        rectMinus.set(0f, h - btnH, w, h)
+        rectValue.set(0f, btnH, w, h - btnH)
+
+        if (pressedButton == 1) {
+            btnPaint.style = Paint.Style.FILL
+            btnPaint.color = adjustAlpha(themeColor, 0.2f)
+            canvas.drawRoundRect(0f, 0f, w, btnH * 1.3f, corner, corner, btnPaint)
+        } else if (pressedButton == -1) {
+            btnPaint.style = Paint.Style.FILL
+            btnPaint.color = adjustAlpha(themeColor, 0.2f)
+            canvas.drawRoundRect(0f, h - btnH * 1.3f, w, h, corner, corner, btnPaint)
+        }
+
+        // 精緻邊框
+        borderPaint.style = Paint.Style.STROKE
+        borderPaint.strokeWidth = 1.6f * density
+        borderPaint.color = adjustAlpha(themeColor, 0.8f)
+        canvas.drawRoundRect(1f * density, 1f * density, w - 1f * density, h - 1f * density, corner, corner, borderPaint)
+
+        // 中間數值 (正向清晰顯示)
+        drawCenteredText(canvas, formatValue(currentValue), rectValue, isDark, density)
+
+        // 上下按鈕圖示 (+ 上, - 下)
+        drawPlusIcon(canvas, rectPlus.centerX(), rectPlus.centerY(), min(w, btnH) * 0.22f, density, themeColor)
+        drawMinusIcon(canvas, rectMinus.centerX(), rectMinus.centerY(), min(w, btnH) * 0.22f, density, themeColor)
     }
 
     /**
@@ -342,12 +396,22 @@ class StepperView @JvmOverloads constructor(
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 parent?.requestDisallowInterceptTouchEvent(true)
-                val x = event.x
-                val btnW = width * 0.28f
-                pressedButton = when {
-                    x <= btnW -> -1
-                    x >= width - btnW -> 1
-                    else -> 0
+                pressedButton = if (orientation.equals("Vertical", ignoreCase = true)) {
+                    val y = event.y
+                    val btnH = height * 0.28f
+                    when {
+                        y <= btnH -> 1
+                        y >= height - btnH -> -1
+                        else -> 0
+                    }
+                } else {
+                    val x = event.x
+                    val btnW = width * 0.28f
+                    when {
+                        x <= btnW -> -1
+                        x >= width - btnW -> 1
+                        else -> 0
+                    }
                 }
                 if (pressedButton != 0) {
                     step(pressedButton)
