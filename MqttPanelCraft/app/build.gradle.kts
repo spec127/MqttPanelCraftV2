@@ -17,8 +17,8 @@ android {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
-        versionCode = 175
-        versionName = "0.11.9" // 採用 ClippedScrollView 底層繪製邊界裁切解決滾動溢出、新增 IMAGE 影像元件及手勢縮放/旋轉/保存相簿/圖片資訊與多語系支援
+        versionCode = 178
+        versionName = "0.11.12" // v0.11.12：改名加減鍵、Slider刻度氣泡對齊刻度計、Cam畫布底部獨立邊框控制列與200x150預設尺寸、補全Arduino模板映射
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

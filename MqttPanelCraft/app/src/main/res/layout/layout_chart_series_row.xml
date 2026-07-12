@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="6dp"
+    android:layout_marginBottom="6dp"
+    android:background="@drawable/bg_prop_item_premium"
+    android:weightSum="10">
+
+    <!-- 左邊 60% (比重 6) : 序列色彩選擇卡 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="6"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="8dp">
+
+        <View
+            android:id="@+id/vSeriesColorCurrent"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="@drawable/shape_circle_color"
+            android:backgroundTint="#00BCD4"
+            android:layout_marginEnd="6dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <View android:id="@+id/vSeriesColor1" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#00E5FF" android:layout_marginEnd="4dp"/>
+            <View android:id="@+id/vSeriesColor2" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#00E676" android:layout_marginEnd="4dp"/>
+            <View android:id="@+id/vSeriesColor3" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#FFAB00" android:layout_marginEnd="4dp"/>
+            <View android:id="@+id/vSeriesColor4" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#F50057" android:layout_marginEnd="4dp"/>
+            <View android:id="@+id/vSeriesColor5" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#AA00FF"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 右邊 40% (比重 4) : 序列 Key 鍵名輸入框 -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="4"
+        android:hint="序列名稱 (Key)"
+        style="@style/Widget.App.TextInputLayout.Properties.Compact">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etSeriesKey"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:inputType="text"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

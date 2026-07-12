@@ -104,7 +104,7 @@
     <string name="component_label_value_display">數值顯示</string>
 
     <string name="component_label_signal_indicator">信號面板</string>
-    <string name="component_label_stepper">數值步進</string>
+    <string name="component_label_stepper">加減鍵</string>
     <string name="component_label_dpad">方向鍵</string>
     <string name="component_label_image_sensor">影像</string>
     <string name="component_label_audio_sensor">聲音警示</string>
@@ -302,14 +302,22 @@
     <string name="prop_image_gesture_zoom">手勢縮放控制</string>
     <string name="prop_image_quick_save">快速保存按鈕</string>
     <string name="prop_image_rotation">旋轉角度</string>
-    <string name="prop_image_scale_mode">畫面縮放模式</string>
     <string name="prop_image_show_info">顯示圖片資訊 (接收時間與像素)</string>
+    <string name="prop_image_mode">運作模式</string>
+    <string name="prop_image_mode_stream">連續串流 (FPS)</string>
+    <string name="prop_image_mode_single">單次快照 (Single)</string>
+    <string name="prop_image_fps">串流更新頻率 (FPS)</string>
+    <string name="prop_image_trigger_type">單次快照更新方式</string>
+    <string name="prop_image_trigger_timer">定時自動刷新</string>
+    <string name="prop_image_trigger_btn">手動點擊按鈕</string>
+    <string name="component_label_broadcast">廣播</string>
     <string name="val_image_rot_0">0°</string>
     <string name="val_image_rot_90">90°</string>
     <string name="val_image_rot_180">180°</string>
     <string name="val_image_rot_270">270°</string>
     <string name="val_image_scale_fit">適應填滿</string>
     <string name="val_image_scale_crop">裁剪填滿</string>
+    <string name="val_image_scale_xy">拉伸填滿</string>
     <string name="val_feedback_none">無</string>
     <string name="val_feedback_ticks">刻度線</string>
     <string name="val_feedback_bubble">數值氣泡</string>

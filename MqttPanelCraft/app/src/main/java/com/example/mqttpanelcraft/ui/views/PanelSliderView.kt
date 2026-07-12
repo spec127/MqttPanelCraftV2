@@ -377,8 +377,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             drawCircleThumb(canvas, currX, currY, thumbSize, density, vScale)
         }
 
-        // 5. Feedback: Bubble
-        if (isDragging && hasBubble) {
+        // 5. Feedback: Bubble (常駐顯示)
+        if (hasBubble) {
             val formatted =
                     when {
                         value < 10f -> String.format("%.2f", value)
@@ -405,86 +405,66 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             bubbleScale: Float
     ) {
         val isVertical = orientation == "Vertical"
-
-        // V15.4: Bubble size capped at 1.0x. -> REMOVED cap in V18.2
-        val bubbleRadius = 10f * density * bubbleScale
-
-        // V18.2: Offset scales with bubble size (vScale)
-        // thumbSize is already scaled
-        val offsetFromThumb = thumbSize / 2 + 8f * density * bubbleScale
-
-        val isLight = ColorUtils.calculateLuminance(this@PanelSliderView.color) > 0.52
-        val contentColor = if (isLight) Color.BLACK else Color.WHITE
-
-        val bubblePaint =
-                Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = this@PanelSliderView.color
-                    style = Paint.Style.FILL
-                }
-
-        val textPaint =
-                Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = contentColor
-                    textSize = 12f * density * bubbleScale
-                    typeface = Typeface.DEFAULT_BOLD
-                    textAlign = Paint.Align.CENTER
-                }
-
-        // V15.5: Reduced size
-        val glowPaint =
-                Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = this@PanelSliderView.color
-                    style = Paint.Style.STROKE
-                    strokeWidth = 1.4f * density * bubbleScale
-                    maskFilter =
-                            BlurMaskFilter(2.8f * density * bubbleScale, BlurMaskFilter.Blur.NORMAL)
-                }
-
-        val hRadius = bubbleRadius * 1.3f
-        val vRadius = bubbleRadius * 1.0f
-        val tipDistance = bubbleRadius * 2.0f
-
-        val path = Path()
-        val bx: Float
-        val by: Float
-        val rect: RectF
-
-        if (isVertical) {
-            bx = cx - offsetFromThumb - tipDistance
-            by = cy
-            rect = RectF(bx - hRadius, by - vRadius, bx + hRadius, by + vRadius)
-            path.moveTo(cx - offsetFromThumb, cy)
-            path.quadTo(cx - offsetFromThumb - hRadius * 0.5f, by - vRadius, bx, by - vRadius)
-            path.arcTo(rect, 270f, -180f, false)
-            path.quadTo(
-                    cx - offsetFromThumb - hRadius * 0.5f,
-                    by + vRadius,
-                    cx - offsetFromThumb,
-                    cy
-            )
-            path.close()
-        } else {
-            bx = cx
-            by = cy - offsetFromThumb - tipDistance
-            rect = RectF(bx - hRadius, by - vRadius, bx + hRadius, by + vRadius)
-            path.moveTo(cx, cy - offsetFromThumb)
-            path.quadTo(bx - hRadius, cy - offsetFromThumb - vRadius * 0.5f, bx - hRadius, by)
-            path.arcTo(rect, 180f, 180f, false)
-            path.quadTo(
-                    bx + hRadius,
-                    cy - offsetFromThumb - vRadius * 0.5f,
-                    cx,
-                    cy - offsetFromThumb
-            )
-            path.close()
+        val bubbleRadius = (12f * density) * bubbleScale
+        val bubblePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            this.color = this@PanelSliderView.color
+            style = Paint.Style.FILL
+            setShadowLayer(4f * density, 0f, 2f * density, Color.argb(60, 0, 0, 0))
         }
 
-        canvas.drawPath(path, bubblePaint)
-        canvas.drawPath(path, glowPaint)
+        setLayerType(LAYER_TYPE_SOFTWARE, null)
+        val gap = 4f * density
+        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.WHITE
+            textSize = bubbleRadius * 1.1f
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            textAlign = Paint.Align.CENTER
+        }
 
-        val fontMetrics = textPaint.fontMetrics
-        val textOffset = (fontMetrics.ascent + fontMetrics.descent) / 2
-        canvas.drawText(text, bx, by - textOffset, textPaint)
+        val path = Path()
+        if (isVertical) {
+            val tipX = cx - thumbSize / 2 - gap
+            val tipY = cy
+
+            canvas.save()
+            canvas.translate(tipX, tipY)
+
+            val offset = bubbleRadius * 1.414f
+            canvas.translate(-offset, 0f)
+            canvas.rotate(-45f)
+
+            val rect = RectF(-bubbleRadius, -bubbleRadius, bubbleRadius, bubbleRadius)
+            val radii = floatArrayOf(bubbleRadius, bubbleRadius, bubbleRadius, bubbleRadius, 0f, 0f, bubbleRadius, bubbleRadius)
+            path.addRoundRect(rect, radii, Path.Direction.CW)
+            canvas.drawPath(path, bubblePaint)
+
+            canvas.rotate(45f)
+            val fontMetrics = textPaint.fontMetrics
+            val textOffset = (fontMetrics.ascent + fontMetrics.descent) / 2
+            canvas.drawText(text, 0f, -textOffset, textPaint)
+            canvas.restore()
+        } else {
+            val tipX = cx
+            val tipY = cy - thumbSize / 2 - gap
+
+            canvas.save()
+            canvas.translate(tipX, tipY)
+
+            val offset = bubbleRadius * 1.414f
+            canvas.translate(0f, -offset)
+            canvas.rotate(45f)
+
+            val rect = RectF(-bubbleRadius, -bubbleRadius, bubbleRadius, bubbleRadius)
+            val radii = floatArrayOf(bubbleRadius, bubbleRadius, bubbleRadius, bubbleRadius, 0f, 0f, bubbleRadius, bubbleRadius)
+            path.addRoundRect(rect, radii, Path.Direction.CW)
+            canvas.drawPath(path, bubblePaint)
+
+            canvas.rotate(-45f)
+            val fontMetrics = textPaint.fontMetrics
+            val textOffset = (fontMetrics.ascent + fontMetrics.descent) / 2
+            canvas.drawText(text, 0f, -textOffset, textPaint)
+            canvas.restore()
+        }
     }
 
     private fun drawTicks(
@@ -497,62 +477,50 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             density: Float,
             scale: Float
     ) {
-        val totalLength =
-                if (orientation == "Vertical") Math.abs(startY - endY) else Math.abs(endX - startX)
-
-        val rawN = (totalLength / (20f * density)).toInt()
-        val tickCount = (rawN / 5 * 5).coerceIn(5, 30)
-
-        val currentNightMode =
-                resources.configuration.uiMode and
-                        android.content.res.Configuration.UI_MODE_NIGHT_MASK
-        val isDarkMode = currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        val tickColor = if (isDarkMode) Color.LTGRAY else Color.DKGRAY
-
-        val tickPaint =
-                Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = tickColor
-                    alpha = 180
-                    strokeCap = Paint.Cap.ROUND
-                }
-
         val isVertical = orientation == "Vertical"
-        val isCapsule = sliderStyle == "Capsule"
+        val count = 11 // 10 個主要刻度區間，跟 ScaleMeter 一樣
+        val majorTickLen = (10f * density) * scale
+        val minorTickLen = (5f * density) * scale
+        val tickColor = Color.parseColor("#888888")
 
-        // V18.1: Reduced gap between track and ticks (4f -> 2f)
-        val offset = if (isCapsule) 0f else (trackThickness / 2 + 2f * density * scale)
+        val paintScale = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = tickColor
+            strokeWidth = 1.5f * density * scale
+            strokeCap = Paint.Cap.ROUND
+        }
+        val paintText = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.parseColor("#888888")
+            textSize = (10f * density) * scale
+        }
 
-        for (i in 0..tickCount) {
-            val p = i.toFloat() / tickCount
-            val tx = startX + (endX - startX) * p
-            val ty = startY + (endY - startY) * p
-
-            val isBig = (i % 10 == 0)
-            val isSmall = (i % 5 == 0 && !isBig)
-
-            // V18.1: Thinner and shorter ticks
-            // Length: Big 15->10, Small 9->6, Tiny 4->3
-            var tickLen = (if (isBig) 10f else if (isSmall) 6f else 3f) * density * scale
-            if (isCapsule) {
-                tickLen = Math.min(tickLen, trackThickness * 0.8f)
-            }
-
-            // Width: Big 2.5->1.5, Small 1.5->1.0, Tiny 0.8->0.6
-            tickPaint.strokeWidth =
-                    (if (isBig) 1.5f else if (isSmall) 1.0f else 0.6f) * density * scale
-            tickPaint.alpha = if (isBig) 255 else if (isSmall) 180 else 100
-
-            if (isVertical) {
-                if (isCapsule) {
-                    canvas.drawLine(tx - tickLen / 2, ty, tx + tickLen / 2, ty, tickPaint)
-                } else {
-                    canvas.drawLine(tx + offset, ty, tx + offset + tickLen, ty, tickPaint)
+        if (isVertical) {
+            val step = (endY - startY) / (count - 1)
+            for (i in 0 until count) {
+                val ty = startY + i * step
+                val len = if (i % 2 == 0) majorTickLen else minorTickLen
+                val tx = startX + trackThickness / 2 + 4f * density * scale
+                canvas.drawLine(tx, ty, tx + len, ty, paintScale)
+                if (i % 2 == 0) {
+                    val p = i.toFloat() / (count - 1)
+                    val valAtTick = minValue + p * (maxValue - minValue)
+                    val label = if (maxValue - minValue >= 10f) String.format("%.0f", valAtTick) else String.format("%.1f", valAtTick)
+                    paintText.textAlign = Paint.Align.LEFT
+                    canvas.drawText(label, tx + len + 4f * density * scale, ty + (paintText.textSize / 3f), paintText)
                 }
-            } else {
-                if (isCapsule) {
-                    canvas.drawLine(tx, ty - tickLen / 2, tx, ty + tickLen / 2, tickPaint)
-                } else {
-                    canvas.drawLine(tx, ty + offset, tx, ty + offset + tickLen, tickPaint)
+            }
+        } else {
+            val step = (endX - startX) / (count - 1)
+            for (i in 0 until count) {
+                val tx = startX + i * step
+                val len = if (i % 2 == 0) majorTickLen else minorTickLen
+                val ty = startY + trackThickness / 2 + 4f * density * scale
+                canvas.drawLine(tx, ty, tx, ty + len, paintScale)
+                if (i % 2 == 0) {
+                    val p = i.toFloat() / (count - 1)
+                    val valAtTick = minValue + p * (maxValue - minValue)
+                    val label = if (maxValue - minValue >= 10f) String.format("%.0f", valAtTick) else String.format("%.1f", valAtTick)
+                    paintText.textAlign = Paint.Align.CENTER
+                    canvas.drawText(label, tx, ty + len + 4f * density * scale + paintText.textSize, paintText)
                 }
             }
         }

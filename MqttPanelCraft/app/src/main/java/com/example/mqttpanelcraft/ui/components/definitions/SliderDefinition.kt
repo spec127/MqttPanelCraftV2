@@ -62,7 +62,17 @@ object SliderDefinition : IComponentDefinition {
         slider.orientation = data.props["orientation"] ?: "Horizontal"
         slider.sliderStyle = data.props["sliderStyle"] ?: "Classic"
         slider.shape = data.props["shape"] ?: "Circle"
-        slider.feedback = data.props["feedback"] ?: "None"
+        val feedbackStr = data.props["feedback"] ?: run {
+            val hasTicks = (data.props["show_ticks"] ?: "false").toBoolean()
+            val hasBubble = (data.props["show_bubble"] ?: "false").toBoolean()
+            when {
+                hasTicks && hasBubble -> "Both"
+                hasTicks -> "Ticks"
+                hasBubble -> "Bubble"
+                else -> "None"
+            }
+        }
+        slider.feedback = feedbackStr
 
         // Advanced props
 
@@ -163,49 +173,58 @@ object SliderDefinition : IComponentDefinition {
             }
         }
 
-        // Appearance - Style Selection
+        // Appearance - Combined Style & Shape Selection
         val spStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spPropStyle)
         val context = panelView.context
-        val styleOptions =
-                listOf(
-                        context.getString(R.string.val_slider_style_classic),
-                        context.getString(R.string.val_slider_style_capsule)
-                )
-        val styleKeys = listOf("Classic", "Capsule")
+        val styleOptions = listOf("經典 (Classic)", "膠囊 (Capsule)", "撥桿 (Toggle)")
+        val styleKeys = listOf("Classic", "Capsule", "Toggle")
         spStyle?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, styleOptions))
 
         val currentStyle = data.props["sliderStyle"] ?: "Classic"
-        val styleIndex = styleKeys.indexOf(currentStyle).coerceAtLeast(0)
+        val currentShape = data.props["shape"] ?: "Circle"
+        val initialKey = when {
+            currentStyle == "Capsule" && currentShape == "Square" -> "Toggle"
+            currentStyle == "Capsule" -> "Capsule"
+            else -> "Classic"
+        }
+        val styleIndex = styleKeys.indexOf(initialKey).coerceAtLeast(0)
         spStyle?.setText(styleOptions[styleIndex], false)
 
         spStyle?.setOnItemClickListener { _, _, position, _ ->
-            val newStyle = styleKeys[position]
-            onUpdate("sliderStyle", newStyle)
+            when (styleKeys[position]) {
+                "Classic" -> {
+                    onUpdate("sliderStyle", "Classic")
+                    onUpdate("shape", "Circle")
+                }
+                "Capsule" -> {
+                    onUpdate("sliderStyle", "Capsule")
+                    onUpdate("shape", "Circle")
+                }
+                "Toggle" -> {
+                    onUpdate("sliderStyle", "Capsule")
+                    onUpdate("shape", "Square")
+                }
+            }
         }
 
-        val spShape = panelView.findViewById<AutoCompleteTextView>(R.id.spPropShape)
-        val shapeOptions =
-                listOf(
-                        context.getString(R.string.val_shape_square),
-                        context.getString(R.string.val_shape_circle)
-                )
-        val shapeKeys = listOf("Square", "Circle")
-        spShape?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, shapeOptions))
-        val currentShape = data.props["shape"] ?: "Circle"
-        val shapeIndex = shapeKeys.indexOf(currentShape).coerceAtLeast(0)
-        spShape?.setText(shapeOptions[shapeIndex], false)
-        spShape?.setOnItemClickListener { _, _, position, _ ->
-            onUpdate("shape", shapeKeys[position])
+        // Feedback Checkboxes (Ticks & Bubble) - Premium row design
+        val currentFeedback = data.props["feedback"] ?: run {
+            val t = (data.props["show_ticks"] ?: "false").toBoolean()
+            val b = (data.props["show_bubble"] ?: "false").toBoolean()
+            when {
+                t && b -> "Both"
+                t -> "Ticks"
+                b -> "Bubble"
+                else -> "None"
+            }
         }
+        var hasTicks = currentFeedback == "Ticks" || currentFeedback == "Both"
+        var hasBubble = currentFeedback == "Bubble" || currentFeedback == "Both"
 
-        // Feedback Checkboxes (Ticks & Bubble)
-        val currentFeedback = data.props["feedback"] ?: "None"
-        val cbShowTicks = panelView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cbShowTicks)
-        val cbShowBubble = panelView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cbShowBubble)
+        val checkShowTicks = panelView.findViewById<android.widget.ImageView>(R.id.checkShowTicks)
+        val checkShowBubble = panelView.findViewById<android.widget.ImageView>(R.id.checkShowBubble)
 
         fun updateFeedbackProps() {
-            val hasTicks = cbShowTicks?.isChecked == true
-            val hasBubble = cbShowBubble?.isChecked == true
             val fb = when {
                 hasTicks && hasBubble -> "Both"
                 hasTicks -> "Ticks"
@@ -215,13 +234,18 @@ object SliderDefinition : IComponentDefinition {
             onUpdate("feedback", fb)
         }
 
-        cbShowTicks?.apply {
-            isChecked = currentFeedback == "Ticks" || currentFeedback == "Both"
-            setOnCheckedChangeListener { _, _ -> updateFeedbackProps() }
+        checkShowTicks?.visibility = if (hasTicks) View.VISIBLE else View.INVISIBLE
+        panelView.findViewById<View>(R.id.itemShowTicks)?.setOnClickListener {
+            hasTicks = !hasTicks
+            checkShowTicks?.visibility = if (hasTicks) View.VISIBLE else View.INVISIBLE
+            updateFeedbackProps()
         }
-        cbShowBubble?.apply {
-            isChecked = currentFeedback == "Bubble" || currentFeedback == "Both"
-            setOnCheckedChangeListener { _, _ -> updateFeedbackProps() }
+
+        checkShowBubble?.visibility = if (hasBubble) View.VISIBLE else View.INVISIBLE
+        panelView.findViewById<View>(R.id.itemShowBubble)?.setOnClickListener {
+            hasBubble = !hasBubble
+            checkShowBubble?.visibility = if (hasBubble) View.VISIBLE else View.INVISIBLE
+            updateFeedbackProps()
         }
 
         // Color Palette Logic

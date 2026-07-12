@@ -10,7 +10,7 @@ import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.views.ImageDisplayView
-import com.google.android.material.checkbox.MaterialCheckBox
+import android.widget.ImageView
 
 /**
  * 影像顯示元件 (ImageDisplayDefinition)
@@ -66,24 +66,32 @@ object ImageDisplayDefinition : IComponentDefinition {
     ) {
         val context = panelView.context
 
-        // 1. Gesture Zoom CheckBox (互動功能)
-        panelView.findViewById<MaterialCheckBox>(R.id.cbGestureZoom)?.apply {
-            isChecked = (data.props["gesture_zoom"] ?: "true") == "true"
-            setOnCheckedChangeListener { _, isChecked ->
-                onUpdate("gesture_zoom", if (isChecked) "true" else "false")
-            }
+        // 1. Gesture Zoom Premium Check Row
+        var hasGesture = (data.props["gesture_zoom"] ?: "true") == "true"
+        val checkGesture = panelView.findViewById<ImageView>(R.id.checkGestureZoom)
+        checkGesture?.visibility = if (hasGesture) View.VISIBLE else View.INVISIBLE
+        panelView.findViewById<View>(R.id.itemGestureZoom)?.setOnClickListener {
+            hasGesture = !hasGesture
+            checkGesture?.visibility = if (hasGesture) View.VISIBLE else View.INVISIBLE
+            onUpdate("gesture_zoom", hasGesture.toString())
         }
 
-        // 2. Quick Save CheckBox (互動功能)
-        panelView.findViewById<MaterialCheckBox>(R.id.cbQuickSave)?.apply {
-            isChecked = (data.props["quick_save"] ?: "true") == "true"
-            setOnCheckedChangeListener { _, isChecked ->
-                onUpdate("quick_save", if (isChecked) "true" else "false")
-            }
+        // 2. Quick Save Premium Check Row
+        var hasSave = (data.props["quick_save"] ?: "true") == "true"
+        val checkSave = panelView.findViewById<ImageView>(R.id.checkQuickSave)
+        checkSave?.visibility = if (hasSave) View.VISIBLE else View.INVISIBLE
+        panelView.findViewById<View>(R.id.itemQuickSave)?.setOnClickListener {
+            hasSave = !hasSave
+            checkSave?.visibility = if (hasSave) View.VISIBLE else View.INVISIBLE
+            onUpdate("quick_save", hasSave.toString())
         }
+
+        // Hide stream sensor controls for standard ImageDisplay
+        panelView.findViewById<View>(R.id.toggleImageMode)?.visibility = View.GONE
+        panelView.findViewById<View>(R.id.containerStreamConfig)?.visibility = View.GONE
 
         // 3. Rotation Angle Dropdown (視覺外觀)
-        val rotAuto = panelView.findViewById<AutoCompleteTextView>(R.id.tvImageRotation)
+        val rotAuto = panelView.findViewById<AutoCompleteTextView>(R.id.spImageRot)
         if (rotAuto != null) {
             val rotItems = listOf(
                 context.getString(R.string.val_image_rot_0) to "0",
@@ -108,11 +116,12 @@ object ImageDisplayDefinition : IComponentDefinition {
         }
 
         // 4. Scale Mode Dropdown (視覺外觀)
-        val scaleAuto = panelView.findViewById<AutoCompleteTextView>(R.id.tvImageScaleMode)
+        val scaleAuto = panelView.findViewById<AutoCompleteTextView>(R.id.spImageScale)
         if (scaleAuto != null) {
             val scaleItems = listOf(
                 context.getString(R.string.val_image_scale_fit) to "FIT_CENTER",
-                context.getString(R.string.val_image_scale_crop) to "CENTER_CROP"
+                context.getString(R.string.val_image_scale_crop) to "CENTER_CROP",
+                context.getString(R.string.val_image_scale_xy) to "FIT_XY"
             )
             val scaleAdapter = ArrayAdapter(
                 context,
@@ -130,12 +139,14 @@ object ImageDisplayDefinition : IComponentDefinition {
             }
         }
 
-        // 5. Show Info CheckBox (視覺外觀)
-        panelView.findViewById<MaterialCheckBox>(R.id.cbShowInfo)?.apply {
-            isChecked = (data.props["show_info"] ?: "true") == "true"
-            setOnCheckedChangeListener { _, isChecked ->
-                onUpdate("show_info", if (isChecked) "true" else "false")
-            }
+        // 5. Show Info Premium Check Row
+        var hasInfo = (data.props["show_info"] ?: "true") == "true"
+        val checkInfo = panelView.findViewById<ImageView>(R.id.checkShowInfo)
+        checkInfo?.visibility = if (hasInfo) View.VISIBLE else View.INVISIBLE
+        panelView.findViewById<View>(R.id.itemShowInfo)?.setOnClickListener {
+            hasInfo = !hasInfo
+            checkInfo?.visibility = if (hasInfo) View.VISIBLE else View.INVISIBLE
+            onUpdate("show_info", hasInfo.toString())
         }
     }
 

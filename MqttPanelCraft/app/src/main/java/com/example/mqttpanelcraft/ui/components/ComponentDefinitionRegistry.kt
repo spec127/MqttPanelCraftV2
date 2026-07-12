@@ -24,11 +24,11 @@ object ComponentDefinitionRegistry {
         register(GaugeMeterDefinition)
         register(SignalIndicatorDefinition)
         register(TextDisplayDefinition)
-        register(ImageSensorDefinition) // 新增影像(圖片與串流)
-        register(AudioSensorDefinition) // 新增聲音
+        register(ImageSensorDefinition) // 影像(圖片與串流)
 
-        // --- DISPLAY 多媒體分類 (6 個元件：圖表、圖形、圖片、文字、日曆時鐘、內嵌方塊網頁) ---
+        // --- DISPLAY 多媒體分類 ---
         register(LineChartDefinition)
+        register(BroadcastDefinition) // 廣播(TTS文字轉語音)
         register(ShapeDefinition)
         register(ImageDisplayDefinition)
         register(TextDefinition)

@@ -475,24 +475,25 @@ object ScaleMeterDefinition : IComponentDefinition {
                 }
             }
 
-            // 綁定「刻度與氣泡」勾選框 (與 Slider UI 及操作 100% 統一)
-            val cbShowTicks = panelView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cbShowTicks)
-            val cbShowBubble = panelView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cbShowBubble)
+            // 綁定「刻度與氣泡」勾選框 (與 ColorPalette Premium Row 100% 統一)
+            val checkShowTicks = panelView.findViewById<android.widget.ImageView>(R.id.checkShowTicks)
+            val checkShowBubble = panelView.findViewById<android.widget.ImageView>(R.id.checkShowBubble)
 
             val currentFeedback = data.props["feedback"] ?: run {
-                val hasTicks = (data.props["show_ticks"] ?: "false").toBoolean()
-                val hasBubble = (data.props["show_bubble"] ?: "false").toBoolean()
+                val t = (data.props["show_ticks"] ?: "false").toBoolean()
+                val b = (data.props["show_bubble"] ?: "false").toBoolean()
                 when {
-                    hasTicks && hasBubble -> "Both"
-                    hasTicks -> "Ticks"
-                    hasBubble -> "Bubble"
+                    t && b -> "Both"
+                    t -> "Ticks"
+                    b -> "Bubble"
                     else -> "None"
                 }
             }
 
+            var hasTicks = currentFeedback == "Ticks" || currentFeedback == "Both"
+            var hasBubble = currentFeedback == "Bubble" || currentFeedback == "Both"
+
             fun updateFeedbackProps() {
-                val hasTicks = cbShowTicks?.isChecked == true
-                val hasBubble = cbShowBubble?.isChecked == true
                 val fb = when {
                     hasTicks && hasBubble -> "Both"
                     hasTicks -> "Ticks"
@@ -502,13 +503,18 @@ object ScaleMeterDefinition : IComponentDefinition {
                 onUpdate("feedback", fb)
             }
 
-            cbShowTicks?.apply {
-                isChecked = currentFeedback == "Ticks" || currentFeedback == "Both"
-                setOnCheckedChangeListener { _, _ -> updateFeedbackProps() }
+            checkShowTicks?.visibility = if (hasTicks) View.VISIBLE else View.INVISIBLE
+            panelView.findViewById<View>(R.id.itemShowTicks)?.setOnClickListener {
+                hasTicks = !hasTicks
+                checkShowTicks?.visibility = if (hasTicks) View.VISIBLE else View.INVISIBLE
+                updateFeedbackProps()
             }
-            cbShowBubble?.apply {
-                isChecked = currentFeedback == "Bubble" || currentFeedback == "Both"
-                setOnCheckedChangeListener { _, _ -> updateFeedbackProps() }
+
+            checkShowBubble?.visibility = if (hasBubble) View.VISIBLE else View.INVISIBLE
+            panelView.findViewById<View>(R.id.itemShowBubble)?.setOnClickListener {
+                hasBubble = !hasBubble
+                checkShowBubble?.visibility = if (hasBubble) View.VISIBLE else View.INVISIBLE
+                updateFeedbackProps()
             }
 
 

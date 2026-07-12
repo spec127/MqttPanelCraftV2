@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- SECTION 1: INTERACTION & TTS CONFIG -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_touch_app"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+        <TextView
+            android:text="@string/properties_section_interaction"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- Speech Rate Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilSpeechRate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="播報語速 (例如 1.0 標準, 1.2 稍快)"
+        android:layout_marginBottom="12dp"
+        style="@style/Widget.App.TextInputLayout.Properties">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etSpeechRate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:textSize="14sp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Speech Pitch Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilSpeechPitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="聲音音調 (例如 1.0 標準, 1.1 高音)"
+        android:layout_marginBottom="16dp"
+        style="@style/Widget.App.TextInputLayout.Properties">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etSpeechPitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:textSize="14sp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

@@ -100,6 +100,13 @@
       "SHAPE": "TEXT_DISP",
       "IMAGE": "TEXT_DISP",
       "CALENDAR": "TEXT_DISP",
-      "WEB_BOX": "TEXT_DISP"
+      "WEB_BOX": "TEXT_DISP",
+      "BROADCAST": "TEXT_DISP",
+      "GAUGE": "NUMBER_VAL",
+      "GAUGE_METER": "NUMBER_VAL",
+      "SCALE_METER": "NUMBER_VAL",
+      "SIGNAL_INDICATOR": "NUMBER_VAL",
+      "TEXT_DISPLAY": "TEXT_DISP",
+      "INPUTBOX": "SELECTOR_CTRL"
    }
 }

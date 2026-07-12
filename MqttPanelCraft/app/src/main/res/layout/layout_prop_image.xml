@@ -8,10 +8,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <!-- SECTION 1: INTERACTION (互動功能) -->
+        <!-- SECTION 1: INTERACTION & STREAM MODE -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,8 +20,8 @@
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@android:drawable/ic_menu_manage"
-                app:tint="@color/prop_text_secondary"
+                android:src="@drawable/ic_touch_app"
+                app:tint="@color/props_primary"
                 android:layout_marginEnd="6dp"/>
             <TextView
                 android:text="@string/properties_section_interaction"
@@ -33,32 +32,148 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/cbGestureZoom"
+        <!-- Single Snapshot vs Stream Toggle (預設單次快照在左) -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleImageMode"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="12dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@+id/btnModeSingle">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnModeSingle"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/prop_image_mode_single"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnModeStream"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/prop_image_mode_stream"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!-- Container for Stream FPS (Visible when Mode == Stream) -->
+        <LinearLayout
+            android:id="@+id/containerStreamConfig"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/prop_image_gesture_zoom"
-            android:textSize="13sp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:layout_marginBottom="4dp"/>
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp">
 
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/cbQuickSave"
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prop_image_fps"
+                style="@style/Widget.App.TextInputLayout.Properties.Compact">
+                <AutoCompleteTextView
+                    android:id="@+id/spImageFps"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:inputType="none"
+                    android:textSize="12sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+
+        <!-- Premium Check Rows: Gesture Zoom & Quick Save -->
+        <LinearLayout
+            android:id="@+id/itemGestureZoom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/prop_image_quick_save"
-            android:textSize="13sp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:layout_marginBottom="16dp"/>
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:background="@drawable/bg_prop_item_premium"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/prop_image_gesture_zoom"
+                    android:textColor="@color/prop_text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="支援雙擊或雙指手勢縮放與拖曳平移影像"
+                    android:textColor="@color/prop_text_secondary"
+                    android:textSize="11sp"/>
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/checkGestureZoom"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle_premium"
+                android:visibility="visible"/>
+        </LinearLayout>
 
-        <!-- 分隔線 -->
+        <LinearLayout
+            android:id="@+id/itemQuickSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:background="@drawable/bg_prop_item_premium"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/prop_image_quick_save"
+                    android:textColor="@color/prop_text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="點擊右下角按鈕一鍵保存畫面至手機相簿"
+                    android:textColor="@color/prop_text_secondary"
+                    android:textSize="11sp"/>
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/checkQuickSave"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle_premium"
+                android:visibility="visible"/>
+        </LinearLayout>
+
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="?android:attr/listDivider"
+            android:background="@color/divider_line"
             android:layout_marginBottom="16dp"/>
 
-        <!-- SECTION 2: VISUAL APPEARANCE (視覺外觀) -->
+        <!-- SECTION 2: VISUAL APPEARANCE -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,8 +183,8 @@
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@android:drawable/ic_menu_view"
-                app:tint="@color/prop_text_secondary"
+                android:src="@drawable/ic_palette"
+                app:tint="@color/props_primary"
                 android:layout_marginEnd="6dp"/>
             <TextView
                 android:text="@string/properties_section_appearance"
@@ -80,12 +195,11 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <!-- 左右 5:5 (左：旋轉角度 / 右：縮放模式) -->
+        <!-- Row: Rotation Angle (4) & Scale Mode (6) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="top"
             android:baselineAligned="false"
             android:layout_marginBottom="12dp">
 
@@ -93,47 +207,69 @@
                 style="@style/Widget.App.TextInputLayout.Properties.Compact"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="4"
                 android:layout_marginEnd="6dp"
                 android:hint="@string/prop_image_rotation">
-
                 <AutoCompleteTextView
-                    android:id="@+id/tvImageRotation"
+                    android:id="@+id/spImageRot"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/prop_input_height_inner"
+                    android:layout_height="52dp"
                     android:inputType="none"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.App.TextInputLayout.Properties.Compact"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="6"
                 android:layout_marginStart="6dp"
                 android:hint="@string/prop_image_scale_mode">
-
                 <AutoCompleteTextView
-                    android:id="@+id/tvImageScaleMode"
+                    android:id="@+id/spImageScale"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/prop_input_height_inner"
+                    android:layout_height="52dp"
                     android:inputType="none"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- 是否顯示圖片資訊（打勾選擇） -->
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/cbShowInfo"
+        <!-- Premium Check Row: Show Info (在視覺外觀的最下面) -->
+        <LinearLayout
+            android:id="@+id/itemShowInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/prop_image_show_info"
-            android:textSize="13sp"
-            android:textColor="?android:attr/textColorPrimary"/>
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:background="@drawable/bg_prop_item_premium"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/prop_image_show_info"
+                    android:textColor="@color/prop_text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="顯示接收時間標記與像素解析度資訊狀態列"
+                    android:textColor="@color/prop_text_secondary"
+                    android:textSize="11sp"/>
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/checkShowInfo"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle_premium"
+                android:visibility="visible"/>
+        </LinearLayout>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
