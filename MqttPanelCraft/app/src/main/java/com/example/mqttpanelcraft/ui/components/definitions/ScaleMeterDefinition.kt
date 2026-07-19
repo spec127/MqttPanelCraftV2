@@ -24,6 +24,7 @@ object ScaleMeterDefinition : IComponentDefinition {
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
         "value" to "70",
+        "unit" to "%",
         "style" to "SEGMENTED",
         "orientation" to "HORIZONTAL",
         "feedback" to "Ticks",
@@ -41,6 +42,7 @@ object ScaleMeterDefinition : IComponentDefinition {
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
             tag = "target"
+            this.isEditMode = isEditMode
         }
         container.addView(meter)
         return container

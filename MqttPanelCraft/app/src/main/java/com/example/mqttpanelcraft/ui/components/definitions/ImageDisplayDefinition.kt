@@ -57,6 +57,17 @@ object ImageDisplayDefinition : IComponentDefinition {
         imgView.rotationAngle = (data.props["rotation"] ?: "0").toIntOrNull() ?: 0
         imgView.setScaleMode(data.props["scale_mode"] ?: "FIT_CENTER")
         imgView.showInfo = (data.props["show_info"] ?: "true") == "true"
+
+        // Restore cached image from properties
+        imgView.placeholderIconResId = R.drawable.ic_image_placeholder
+        val savedTime = data.props["image_time"] ?: ""
+        imgView.lastReceivedTime = savedTime
+        val cachedImage = data.props["value"]
+        if (!cachedImage.isNullOrEmpty()) {
+            imgView.updatePayload(cachedImage, isNewArrival = false)
+        } else {
+            imgView.clearCurrentBitmap()
+        }
     }
 
     override fun bindPropertiesPanel(
@@ -155,7 +166,19 @@ object ImageDisplayDefinition : IComponentDefinition {
         data: ComponentData,
         sendMqtt: (topic: String, payload: String) -> Unit,
         onUpdateProp: (key: String, value: String) -> Unit
-    ) {}
+    ) {
+        val imageDisplayView = view.findViewWithTag<ImageDisplayView>("target_img_view") ?: return
+        imageDisplayView.isEditMode = false
+        // Persist reassembled image string and timestamp when a full frame is decoded
+        imageDisplayView.onImageReassembled = { fullB64, timeStr ->
+            onUpdateProp("value", fullB64)
+            onUpdateProp("image_time", timeStr)
+        }
+        imageDisplayView.onImageCleared = {
+            onUpdateProp("value", "")
+            onUpdateProp("image_time", "")
+        }
+    }
 
     override fun onMqttMessage(
         view: View,
@@ -164,6 +187,6 @@ object ImageDisplayDefinition : IComponentDefinition {
         onUpdateProp: (key: String, value: String) -> Unit
     ) {
         val imgView = view.findViewWithTag<ImageDisplayView>("target_img_view") ?: return
-        imgView.updatePayload(payload)
+        imgView.updatePayload(payload, isNewArrival = true)
     }
 }

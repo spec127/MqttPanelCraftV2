@@ -3,63 +3,91 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
 
-    <!-- Section 1: 通用資料與取樣設定 -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="通用"
-        android:textColor="@color/prop_text_primary"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
-
-    <!-- 1. 有無時間戳勾選列與小字說明 -->
+    <!-- Section 1: INTERACTION & LOGIC (互動功能) -->
     <LinearLayout
-        android:id="@+id/itemHasTimestamp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp"
-        android:background="@drawable/bg_prop_item_premium"
-        android:gravity="center_vertical"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_touch_app"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+        <TextView
+            android:text="@string/prop_section_interaction"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- 縱軸上下限與單位 (1:1:1) 在資料數上面 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3"
         android:layout_marginBottom="10dp">
-        <LinearLayout
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="帶入時間戳記"
-                android:textColor="@color/prop_text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/tvTimestampDesc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="由邊緣裝置 Payload 帶時間戳 (如 JSON 內 t)；未勾選則由手機紀錄當前時間"
-                android:textColor="@color/prop_text_secondary"
-                android:textSize="11sp"/>
-        </LinearLayout>
-        <ImageView
-            android:id="@+id/checkHasTimestamp"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:src="@drawable/ic_check_circle_premium"
-            android:visibility="invisible"/>
+            android:hint="@string/prop_chart_y_max"
+            style="@style/Widget.App.TextInputLayout.Properties"
+            android:layout_marginEnd="6dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etYMax"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="numberDecimal|numberSigned"
+                android:maxLines="1"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/prop_chart_y_min"
+            style="@style/Widget.App.TextInputLayout.Properties"
+            android:layout_marginEnd="6dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etYMin"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="numberDecimal|numberSigned"
+                android:maxLines="1"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/prop_chart_unit"
+            style="@style/Widget.App.TextInputLayout.Properties">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etChartUnit"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:maxLines="1"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
     <!-- 2. 資料數上限 (單行輸入框 10~1000 筆) -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="資料數上限 (10~1000 筆)"
-        style="@style/Widget.App.TextInputLayout.Properties.Compact"
+        android:hint="@string/prop_chart_max_points"
+        style="@style/Widget.App.TextInputLayout.Properties"
         android:layout_marginBottom="10dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etMaxPoints"
@@ -86,7 +114,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="單線資料"
+            android:text="@string/prop_chart_mode_single"
             android:textSize="12sp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
@@ -99,7 +127,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="多線資料"
+            android:text="@string/prop_chart_mode_multi"
             android:textSize="12sp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
@@ -107,8 +135,9 @@
             app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <!-- 4. 單位 加減數量 (左邊是輸入框表示縱座標單位，右邊加減數量) -->
+    <!-- 4. 多線專用列：左側是圖例底列開關，右側加減數量 (減少高度為 32dp) -->
     <LinearLayout
+        android:id="@+id/containerSeriesCount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -116,26 +145,33 @@
         android:weightSum="10"
         android:layout_marginBottom="10dp">
 
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
+            android:id="@+id/itemMultiLegend"
             android:layout_width="0dp"
             android:layout_weight="6"
             android:layout_height="wrap_content"
-            android:hint="縱座標單位 (Unit)"
-            style="@style/Widget.App.TextInputLayout.Properties.Compact"
-            android:layout_marginEnd="8dp">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etChartUnit"
-                android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:textSize="12sp"
-                android:maxLines="1"/>
-        </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginEnd="8dp"
+            android:paddingVertical="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/prop_chart_multi_legend"
+                android:textSize="11sp"
+                android:textColor="@color/prop_text_primary"/>
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchMultiLegend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"/>
+        </LinearLayout>
 
-        <!-- 加減數量操作鈕 -->
+        <!-- 加減數量操作鈕 (減少高度) -->
         <LinearLayout
-            android:id="@+id/containerSeriesCount"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="32dp"
             android:layout_weight="4"
             android:orientation="horizontal"
             android:gravity="center"
@@ -143,10 +179,10 @@
 
             <ImageView
                 android:id="@+id/btnSeriesDec"
-                android:layout_width="32dp"
+                android:layout_width="28dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_remove"
-                android:padding="8dp"
+                android:padding="6dp"
                 android:contentDescription="減少序列"/>
 
             <TextView
@@ -158,37 +194,114 @@
                 android:text="1"
                 android:textColor="@color/prop_text_primary"
                 android:textStyle="bold"
-                android:textSize="13sp"/>
+                android:textSize="12sp"/>
 
             <ImageView
                 android:id="@+id/btnSeriesInc"
-                android:layout_width="32dp"
+                android:layout_width="28dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_add"
-                android:padding="8dp"
+                android:padding="6dp"
                 android:contentDescription="新增序列"/>
         </LinearLayout>
     </LinearLayout>
 
-    <!-- 5. 序列色表與 Key 列表容器 (動態渲染) -->
+    <!-- 5. 序列色表與 Key 列表標頭 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp"
+        android:paddingHorizontal="2dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
+            android:layout_height="wrap_content"
+            android:text="序列顏色 (COLOR)"
+            android:paddingStart="12dp"
+            android:textSize="10sp"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="0.4"
+            android:layout_height="wrap_content"
+            android:text="@string/prop_chart_series_key_hint"
+            android:paddingStart="12dp"
+            android:textSize="10sp"
+            android:textColor="@color/prop_text_secondary"
+            android:letterSpacing="0.05"/>
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/llSeriesContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- 時間戳勾選列移動至多線顏色下方 -->
+    <LinearLayout
+        android:id="@+id/itemHasTimestamp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prop_chart_cb_phone_time"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/checkHasTimestamp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_check_circle_premium"
+            android:visibility="invisible"/>
+    </LinearLayout>
+
+    <!-- 分隔線 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        android:layout_marginTop="4dp"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Section 2: 風格與外觀設定 -->
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Section 2: VISUAL APPEARANCE (視覺外觀) -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="風格"
-        android:textColor="@color/prop_text_primary"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="12dp">
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+        <TextView
+            android:text="@string/prop_section_visual"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
-    <!-- 6. 風格 網格顏色 (左右比 4:6，左 40% 下拉選單，右 60% 網格顏色選色) -->
+    <!-- 6. 風格下拉與網格顏色選色卡放在同一行，左4右6 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -201,7 +314,7 @@
             android:layout_width="0dp"
             android:layout_weight="4"
             android:layout_height="wrap_content"
-            android:hint="線條風格"
+            android:hint="@string/prop_chart_style_label"
             style="@style/Widget.App.TextInputLayout.Properties.Compact"
             android:layout_marginEnd="8dp">
             <AutoCompleteTextView
@@ -213,32 +326,11 @@
                 android:textSize="12sp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- 網格顏色選擇卡片 -->
-        <LinearLayout
+        <FrameLayout
+            android:id="@+id/containerGridColor"
             android:layout_width="0dp"
             android:layout_weight="6"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_prop_item_premium"
-            android:padding="8dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="網格顏色"
-                android:textSize="10sp"
-                android:textColor="@color/prop_text_secondary"
-                android:layout_marginBottom="4dp"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-                <View android:id="@+id/vGridColor1" android:layout_width="20dp" android:layout_height="20dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#3A4659" android:layout_marginEnd="6dp"/>
-                <View android:id="@+id/vGridColor2" android:layout_width="20dp" android:layout_height="20dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#546E7A" android:layout_marginEnd="6dp"/>
-                <View android:id="@+id/vGridColor3" android:layout_width="20dp" android:layout_height="20dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#78909C" android:layout_marginEnd="6dp"/>
-                <View android:id="@+id/vGridColor4" android:layout_width="20dp" android:layout_height="20dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#CFD8DC"/>
-            </LinearLayout>
-        </LinearLayout>
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <!-- 7. 顯示標點 (勾選卡片) -->
@@ -259,16 +351,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="顯示標點"
+                android:text="@string/prop_chart_cb_show_dots"
                 android:textColor="@color/prop_text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="在每個接收點標註圓形節點"
-                android:textColor="@color/prop_text_secondary"
-                android:textSize="11sp"/>
         </LinearLayout>
         <ImageView
             android:id="@+id/checkShowDots"
@@ -296,16 +382,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="顯示數值"
+                android:text="@string/prop_chart_cb_show_values"
                 android:textColor="@color/prop_text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="在圖表每個資料節點上方標示數值"
-                android:textColor="@color/prop_text_secondary"
-                android:textSize="11sp"/>
         </LinearLayout>
         <ImageView
             android:id="@+id/checkShowValues"

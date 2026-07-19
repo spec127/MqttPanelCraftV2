@@ -865,7 +865,7 @@ class ProjectViewActivity : BaseActivity() {
                                 }
                             }
                             
-                            // 2. Send to any TEXT_DISPLAY components that link to the matching components
+                            // 2. Send to any TEXT_DISPLAY or BROADCAST components that link to the matching components
                             components.forEach { comp ->
                                 if (comp.type == "TEXT_DISPLAY") {
                                     val linkedStr = comp.props["linked_components"] ?: ""
@@ -877,6 +877,20 @@ class ProjectViewActivity : BaseActivity() {
                                             val view = renderer.getView(comp.id)
                                             if (view != null) {
                                                 com.example.mqttpanelcraft.ui.components.definitions.TextDisplayDefinition.onLinkedMqttMessage(
+                                                    view, comp, payload, sourceComp
+                                                )
+                                            }
+                                        }
+                                    }
+                                } else if (comp.type == "BROADCAST") {
+                                    val linkedStr = comp.props["linked_components"] ?: ""
+                                    if (linkedStr.isNotEmpty()) {
+                                        val linkedIds = linkedStr.split(",")
+                                        val sourceComp = matchingComponents.find { linkedIds.contains(it.id.toString()) }
+                                        if (sourceComp != null) {
+                                            val view = renderer.getView(comp.id)
+                                            if (view != null) {
+                                                com.example.mqttpanelcraft.ui.components.definitions.BroadcastDefinition.onLinkedMqttMessage(
                                                     view, comp, payload, sourceComp
                                                 )
                                             }

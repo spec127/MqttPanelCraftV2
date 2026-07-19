@@ -48,7 +48,7 @@ object SelectorDefinition : IComponentDefinition {
     override val group = "CONTROL"
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
-        "segments" to "",
+        "segments" to "[{\"label\":\"S1\",\"val\":\"1\"},{\"label\":\"S2\",\"val\":\"2\"},{\"label\":\"S3\",\"val\":\"3\"}]",
         "style" to "rounded",
         "color" to "#FF2196F3"
     )

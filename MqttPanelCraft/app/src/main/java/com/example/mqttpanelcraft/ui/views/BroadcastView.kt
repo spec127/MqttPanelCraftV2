@@ -13,19 +13,42 @@ import com.example.mqttpanelcraft.R
 import java.util.Locale
 
 /**
- * 語音廣播畫布專屬視覺元件 (BroadcastView)
- * 接收文字訊息時利用 Android 系統內建 TTS 引擎進行語音播送，同時顯示近期廣播訊息。
+ * 語音廣播與警報視覺元件 (BroadcastView)
+ * 支援單純 TTS 語音廣播、單純警報音效 (ToneGenerator)、以及警報前奏+TTS雙重廣播。
  */
 class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnInitListener {
 
     private val titleText: TextView
+    private val modeChip: TextView
     private val contentText: TextView
     private val speakButton: ImageView
     private var tts: TextToSpeech? = null
     private var isTtsReady = false
-    private var lastMessage: String = "等待語音廣播文字..."
+    private var lastMessage: String = context.getString(R.string.broadcast_waiting_text)
 
     var isEditMode: Boolean = false
+
+    var broadcastMode: String = "TTS_ONLY"
+        set(value) {
+            field = value
+            modeChip.text = when (value) {
+                "ALERT_ONLY" -> context.getString(R.string.broadcast_mode_pure_alert)
+                "ALERT_AND_TTS" -> context.getString(R.string.broadcast_mode_alert_tts)
+                else -> context.getString(R.string.broadcast_mode_pure_tts)
+            }
+            modeChip.setBackgroundColor(when (value) {
+                "ALERT_ONLY" -> Color.parseColor("#33EF5350")
+                "ALERT_AND_TTS" -> Color.parseColor("#33FFAB00")
+                else -> Color.parseColor("#334CAF50")
+            })
+            modeChip.setTextColor(when (value) {
+                "ALERT_ONLY" -> Color.parseColor("#EF5350")
+                "ALERT_AND_TTS" -> Color.parseColor("#FFAB00")
+                else -> Color.parseColor("#4CAF50")
+            })
+        }
+
+    var alertType: String = "Chime"
 
     var speechRate: Float = 1.0f
         set(value) {
@@ -39,9 +62,21 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
             tts?.setPitch(value)
         }
 
+    var voicePreset: String = "F1"
+
+    fun setVoiceSettings(preset: String, pitch: Float, rate: Float) {
+        voicePreset = preset
+        speechPitch = pitch
+        speechRate = rate
+        applyVoiceSettings()
+    }
+
     init {
         setBackgroundResource(R.drawable.bg_card_unselected)
-        setPadding(24, 20, 24, 20)
+        val density = resources.displayMetrics.density
+        val padH = (14 * density).toInt()
+        val padV = (12 * density).toInt()
+        setPadding(padH, padV, padH, padV)
 
         tts = TextToSpeech(context, this)
 
@@ -61,8 +96,8 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
         }
 
         val icon = ImageView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(40, 40).apply {
-                marginEnd = 12
+            layoutParams = LinearLayout.LayoutParams((24 * density).toInt(), (24 * density).toInt()).apply {
+                marginEnd = (8 * density).toInt()
             }
             setImageResource(android.R.drawable.ic_lock_silent_mode_off)
             setColorFilter(Color.parseColor("#4CAF50"))
@@ -71,20 +106,37 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
 
         titleText = TextView(context).apply {
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-            text = "TTS 語音廣播"
+            text = context.getString(R.string.broadcast_title)
             textSize = 13f
             typeface = android.graphics.Typeface.DEFAULT_BOLD
             setTextColor(Color.parseColor("#E0E0E0"))
         }
         headerRow.addView(titleText)
 
+        modeChip = TextView(context).apply {
+            text = context.getString(R.string.broadcast_mode_pure_tts)
+            textSize = 10f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            setTextColor(Color.parseColor("#4CAF50"))
+            setBackgroundColor(Color.parseColor("#334CAF50"))
+            val padChipH = (6 * density).toInt()
+            val padChipV = (2 * density).toInt()
+            setPadding(padChipH, padChipV, padChipH, padChipV)
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                marginEnd = (8 * density).toInt()
+            }
+        }
+        headerRow.addView(modeChip)
+
         speakButton = ImageView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(56, 56)
+            val btnSize = (36 * density).toInt()
+            layoutParams = LinearLayout.LayoutParams(btnSize, btnSize)
             setImageResource(android.R.drawable.ic_media_play)
             setColorFilter(Color.WHITE)
             setBackgroundResource(R.drawable.shape_circle_color)
             backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2E3846"))
-            setPadding(12, 12, 12, 12)
+            val padP = (8 * density).toInt()
+            setPadding(padP, padP, padP, padP)
             setOnClickListener {
                 speak(lastMessage)
             }
@@ -99,10 +151,10 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                topMargin = 12
+                topMargin = (8 * density).toInt()
             }
             text = lastMessage
-            textSize = 14f
+            textSize = 13f
             setTextColor(Color.parseColor("#B0B8C4"))
             maxLines = 3
             ellipsize = android.text.TextUtils.TruncateAt.END
@@ -117,18 +169,112 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
             val result = tts?.setLanguage(Locale.getDefault())
             isTtsReady = result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED
             if (isTtsReady) {
-                tts?.setSpeechRate(speechRate)
-                tts?.setPitch(speechPitch)
+                applyVoiceSettings()
             }
+        }
+    }
+
+    private fun applyVoiceSettings() {
+        if (!isTtsReady || tts == null) return
+        try {
+            tts?.setSpeechRate(speechRate)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                val allVoices = tts?.voices ?: emptySet()
+                val curLocale = Locale.getDefault()
+                val matchingVoices = allVoices.filter { 
+                    it.locale.language == curLocale.language
+                }.sortedByDescending { 
+                    (if (it.locale.country == curLocale.country) 10 else 0) + 
+                    (if (it.quality >= android.speech.tts.Voice.QUALITY_HIGH) 5 else 0) +
+                    (if (!it.isNetworkConnectionRequired) 2 else 0)
+                }
+
+                if (matchingVoices.isNotEmpty()) {
+                    val maleCandidates = matchingVoices.filter { 
+                        it.name.contains("male", true) || it.name.contains("-a-", true) || it.name.contains("-c-", true)
+                    }
+                    val femaleCandidates = matchingVoices.filter { 
+                        it.name.contains("female", true) || it.name.contains("-b-", true) || it.name.contains("-d-", true)
+                    }
+
+                    val selectedVoice = when (voicePreset) {
+                        "M1" -> maleCandidates.firstOrNull() ?: matchingVoices.getOrNull(0)
+                        "M2" -> maleCandidates.getOrNull(1) ?: maleCandidates.firstOrNull() ?: matchingVoices.getOrNull(1) ?: matchingVoices.getOrNull(0)
+                        "F1" -> femaleCandidates.firstOrNull() ?: matchingVoices.getOrNull(0)
+                        "F2" -> femaleCandidates.getOrNull(1) ?: femaleCandidates.firstOrNull() ?: matchingVoices.getOrNull(2) ?: matchingVoices.getOrNull(0)
+                        else -> matchingVoices.firstOrNull()
+                    }
+
+                    if (selectedVoice != null) {
+                        tts?.voice = selectedVoice
+                    }
+                }
+            }
+            val naturalPitch = when (voicePreset) {
+                "M1" -> 0.92f
+                "M2" -> 0.86f
+                "F1" -> 1.08f
+                "F2" -> 1.15f
+                else -> speechPitch
+            }
+            tts?.setPitch(naturalPitch)
+        } catch (_: Exception) {
+            tts?.setPitch(speechPitch)
+        }
+    }
+
+    private fun playAlertTone(onComplete: (() -> Unit)? = null) {
+        try {
+            val toneGen = android.media.ToneGenerator(android.media.AudioManager.STREAM_NOTIFICATION, 100)
+            val (toneType, durationMs) = when (alertType) {
+                "Chime" -> Pair(android.media.ToneGenerator.TONE_PROP_PROMPT, 400)
+                "Beep" -> Pair(android.media.ToneGenerator.TONE_PROP_ACK, 350)
+                "Emergency" -> Pair(android.media.ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 800)
+                "Siren" -> Pair(android.media.ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE, 700)
+                "Buzzer" -> Pair(android.media.ToneGenerator.TONE_PROP_NACK, 500)
+                else -> Pair(android.media.ToneGenerator.TONE_PROP_PROMPT, 400)
+            }
+            toneGen.startTone(toneType, durationMs)
+            if (onComplete != null) {
+                postDelayed({
+                    try { toneGen.release() } catch (_: Exception) {}
+                    onComplete()
+                }, durationMs + 150L)
+            } else {
+                postDelayed({ try { toneGen.release() } catch (_: Exception) {} }, durationMs + 150L)
+            }
+        } catch (e: Exception) {
+            onComplete?.invoke()
         }
     }
 
     fun speak(textMessage: String) {
         lastMessage = textMessage
         contentText.text = textMessage
-        if (!isEditMode && isTtsReady && textMessage.isNotBlank()) {
-            tts?.speak(textMessage, TextToSpeech.QUEUE_FLUSH, null, "BROADCAST_${System.currentTimeMillis()}")
+        if (!isEditMode && textMessage.isNotBlank()) {
+            when (broadcastMode) {
+                "ALERT_ONLY" -> {
+                    playAlertTone()
+                }
+                "ALERT_AND_TTS" -> {
+                    playAlertTone {
+                        if (isTtsReady) {
+                            tts?.speak(textMessage, TextToSpeech.QUEUE_FLUSH, null, "BROADCAST_${System.currentTimeMillis()}")
+                        }
+                    }
+                }
+                else -> { // TTS_ONLY
+                    if (isTtsReady) {
+                        tts?.speak(textMessage, TextToSpeech.QUEUE_FLUSH, null, "BROADCAST_${System.currentTimeMillis()}")
+                    }
+                }
+            }
         }
+    }
+
+    fun setMessageQuietly(textMessage: String) {
+        lastMessage = textMessage
+        contentText.text = textMessage
     }
 
     override fun onDetachedFromWindow() {

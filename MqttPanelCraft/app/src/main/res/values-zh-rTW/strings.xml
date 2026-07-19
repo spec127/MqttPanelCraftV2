@@ -405,4 +405,83 @@
     <string name="prop_btn_orient_vertical">垂直</string>
     <string name="prop_cb_show_ticks">顯示刻度線</string>
     <string name="prop_cb_show_bubble">顯示數值氣泡</string>
+
+    <!-- ImageSensor (Cam), LineChart, Broadcast I18n -->
+    <string name="prop_section_interaction">互動功能</string>
+    <string name="prop_cb_auto_collapse">MQTT 日誌圖片洗版時自動折疊收納</string>
+    <string name="prop_section_visual">視覺外觀</string>
+    <string name="prop_style_label">顯示樣式</string>
+    <string name="prop_style_glass">毛玻璃外框</string>
+    <string name="prop_style_solid">極簡實體</string>
+    <string name="prop_style_cyberpunk">電競科技</string>
+    <string name="prop_fit_label">縮放對齊模式</string>
+    <string name="prop_fit_contain">等比縮放留邊 (Contain)</string>
+    <string name="prop_fit_cover">裁切填滿 (Cover)</string>
+    <string name="prop_fit_fill">拉伸填滿 (Fill)</string>
+
+    <string name="prop_chart_y_max">上限</string>
+    <string name="prop_chart_y_min">下限</string>
+    <string name="prop_chart_unit">單位</string>
+    <string name="prop_chart_max_points">資料數上限 (10~1000 筆)</string>
+    <string name="prop_chart_mode_single">單線資料</string>
+    <string name="prop_chart_mode_multi">多線資料</string>
+    <string name="prop_chart_multi_legend">顯示多線圖例底欄 (附刪除按鈕)</string>
+    <string name="prop_chart_series_key_hint">序列鍵名 (Key)</string>
+    <string name="prop_chart_style_label">曲線與填充風格</string>
+    <string name="prop_chart_style_solid">實線連接</string>
+    <string name="prop_chart_style_area">漸層面積</string>
+    <string name="prop_chart_style_smooth">圓滑貝茲曲線</string>
+    <string name="prop_chart_grid_color">網格線條顏色</string>
+    <string name="prop_chart_cb_phone_time">時間戳記僅採用手機當下時間 (不採用裝置 JSON 傳送時間)</string>
+    <string name="prop_chart_cb_show_dots">顯示資料標記點</string>
+    <string name="prop_chart_cb_show_values">標註數值標籤 (同線條顏色)</string>
+
+    <string name="prop_broadcast_mode_label">播報切換模式</string>
+    <string name="prop_broadcast_mode_tts">TTS 語音播報</string>
+    <string name="prop_broadcast_mode_alert">單純警報聲</string>
+    <string name="prop_broadcast_mode_both">事前提示+TTS</string>
+    <string name="prop_broadcast_mode_tip">提示：收訊時將先播發警報提示音，隨後進行語音播送文字。</string>
+    <string name="prop_broadcast_alert_type">警報音效 (Alert Sound Tone)</string>
+    <string name="val_alert_alarm_classic">經典警鈴 (Classic Alarm)</string>
+    <string name="val_alert_siren">雙重警報巡邏 (Siren)</string>
+    <string name="val_alert_beep_long">高頻連續嗶聲 (Beep)</string>
+    <string name="val_alert_warning_pulse">急促脈衝警告 (Warning Pulse)</string>
+    <string name="val_alert_synthesizer">電子合成升頻音 (Synthesizer)</string>
+    <string name="prop_broadcast_voice_label">語音聲線</string>
+    <string name="val_voice_m1">男聲 1 (自然溫和)</string>
+    <string name="val_voice_f1">女聲 1 (清晰明亮)</string>
+    <string name="val_voice_m2">男聲 2 (渾厚播報)</string>
+    <string name="val_voice_f2">女聲 2 (快節奏提醒)</string>
+    <string name="prop_broadcast_rate_label">語速調整</string>
+    <string name="val_rate_slow">慢速 (0.8x)</string>
+    <string name="val_rate_normal">正常 (1.0x)</string>
+    <string name="val_rate_fast">快速 (1.3x)</string>
+    <string name="prop_broadcast_test_input_hint">輸入測試播報文字...</string>
+    <string name="prop_broadcast_linked_tip">掛勾接收對象 (與接收框同步聯動，接收到內容立刻觸發播報)</string>
+
+    <!-- Image Stream (cam) description and options -->
+    <string name="prop_image_gesture_zoom_desc">支援雙擊或雙指手勢縮放與拖曳平移影像</string>
+    <string name="prop_image_quick_save_desc">點擊右下角按鈕一鍵保存畫面至手機相簿</string>
+    <string name="prop_image_show_info_desc">顯示接收時間標記與像素解析度資訊狀態列</string>
+    <string name="val_fps_1">1 FPS</string>
+    <string name="val_fps_2">2 FPS</string>
+    <string name="val_fps_3">3 FPS</string>
+    <string name="val_fps_5">5 FPS</string>
+    <string name="val_rot_0">0°</string>
+    <string name="val_rot_90">90°</string>
+    <string name="val_rot_180">180°</string>
+    <string name="val_rot_270">270°</string>
+
+    <!-- LineChart Error Logs -->
+    <string name="chart_err_format">%1$s (ERROR): JSON 格式不符或找不到有效序列鍵值 [%2$s]</string>
+    <string name="chart_err_parse">%1$s (ERROR): JSON 解析失敗 - %2$s</string>
+    <string name="chart_err_number">%1$s (ERROR): 無法將純文字轉為數值 [%2$s]</string>
+
+    <!-- Broadcast View & Linked strings -->
+    <string name="broadcast_title">語音警報廣播</string>
+    <string name="broadcast_mode_pure_tts">純語音</string>
+    <string name="broadcast_mode_pure_alert">純警報</string>
+    <string name="broadcast_mode_alert_tts">警報+語音</string>
+    <string name="broadcast_waiting_text">等待語音廣播文字...</string>
+    <string name="broadcast_no_linked">無其他可連結的接收元件</string>
 </resources>

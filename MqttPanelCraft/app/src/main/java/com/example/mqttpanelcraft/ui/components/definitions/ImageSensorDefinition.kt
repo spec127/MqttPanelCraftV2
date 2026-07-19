@@ -5,6 +5,7 @@ import android.util.Size
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -45,7 +46,12 @@ object ImageSensorDefinition : IComponentDefinition {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
         val imageDisplayView = ImageDisplayView(context).apply {
             tag = "target_img_view"
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
             this.isEditMode = isEditMode
+            placeholderIconResId = R.drawable.ic_camera_placeholder
         }
         container.addView(imageDisplayView, 0)
         return container
@@ -60,6 +66,17 @@ object ImageSensorDefinition : IComponentDefinition {
         imgView.showInfo = (data.props["show_info"] ?: "true") == "true"
         imgView.streamMode = data.props["stream_mode"] ?: "SINGLE"
         imgView.fps = data.props["stream_fps"] ?: "2"
+
+        // Restore cached image from properties
+        imgView.placeholderIconResId = R.drawable.ic_camera_placeholder
+        val savedTime = data.props["image_time"] ?: ""
+        imgView.lastReceivedTime = savedTime
+        val cachedImage = data.props["value"]
+        if (!cachedImage.isNullOrEmpty()) {
+            imgView.updatePayload(cachedImage, isNewArrival = false)
+        } else {
+            imgView.clearCurrentBitmap()
+        }
     }
 
     override fun bindPropertiesPanel(
@@ -96,7 +113,12 @@ object ImageSensorDefinition : IComponentDefinition {
         // FPS Selection (1~5 FPS 適合 MQTT 即時影像極限穩定傳輸)
         val spFps = panelView.findViewById<AutoCompleteTextView>(R.id.spImageFps)
         if (spFps != null) {
-            val fpsOptions = listOf("1 FPS", "2 FPS", "3 FPS", "5 FPS")
+            val fpsOptions = listOf(
+                context.getString(R.string.val_fps_1),
+                context.getString(R.string.val_fps_2),
+                context.getString(R.string.val_fps_3),
+                context.getString(R.string.val_fps_5)
+            )
             val fpsVals = listOf("1", "2", "3", "5")
             spFps.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, fpsOptions))
             val curFps = data.props["stream_fps"] ?: "2"
@@ -138,7 +160,12 @@ object ImageSensorDefinition : IComponentDefinition {
         // Rotation
         val spRot = panelView.findViewById<AutoCompleteTextView>(R.id.spImageRot)
         if (spRot != null) {
-            val rotOptions = listOf("0°", "90°", "180°", "270°")
+            val rotOptions = listOf(
+                context.getString(R.string.val_rot_0),
+                context.getString(R.string.val_rot_90),
+                context.getString(R.string.val_rot_180),
+                context.getString(R.string.val_rot_270)
+            )
             val rotValues = listOf("0", "90", "180", "270")
             spRot.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, rotOptions))
             val curRot = data.props["rotation"] ?: "0"
@@ -176,6 +203,15 @@ object ImageSensorDefinition : IComponentDefinition {
     ) {
         val imageDisplayView = view.findViewWithTag<ImageDisplayView>("target_img_view") ?: return
         imageDisplayView.isEditMode = false
+        // Persist reassembled image string and timestamp when a full frame is decoded
+        imageDisplayView.onImageReassembled = { fullB64, timeStr ->
+            onUpdateProp("value", fullB64)
+            onUpdateProp("image_time", timeStr)
+        }
+        imageDisplayView.onImageCleared = {
+            onUpdateProp("value", "")
+            onUpdateProp("image_time", "")
+        }
     }
 
     override fun onMqttMessage(
@@ -185,6 +221,6 @@ object ImageSensorDefinition : IComponentDefinition {
         onUpdateProp: (key: String, value: String) -> Unit
     ) {
         val imageDisplayView = view.findViewWithTag<ImageDisplayView>("target_img_view") ?: return
-        imageDisplayView.updatePayload(payload)
+        imageDisplayView.updatePayload(payload, isNewArrival = true)
     }
 }

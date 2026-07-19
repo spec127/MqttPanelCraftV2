@@ -16,9 +16,8 @@ android {
     defaultConfig {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 178
-        versionName = "0.11.12" // v0.11.12：改名加減鍵、Slider刻度氣泡對齊刻度計、Cam畫布底部獨立邊框控制列與200x150預設尺寸、補全Arduino模板映射
+        versionCode = 182
+        versionName = "0.12.0" // v0.12.0：實作語音廣播（四組聲線與純警報掛勾連動）、折線圖互動優化及全元件多語系適配
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -423,4 +423,84 @@
     <string name="prop_btn_orient_vertical">Vertical</string>
     <string name="prop_cb_show_ticks">Show Ticks</string>
     <string name="prop_cb_show_bubble">Show Bubble</string>
+
+    <!-- ImageSensor (Cam), LineChart, Broadcast I18n -->
+    <string name="prop_section_interaction">Interaction</string>
+    <string name="prop_cb_auto_collapse">Auto collapse images in MQTT log to prevent clutter</string>
+    <string name="prop_section_visual">Visual Appearance</string>
+    <string name="prop_style_label">Display Style</string>
+    <string name="prop_style_glass">Glassmorphism Frame</string>
+    <string name="prop_style_solid">Minimal Solid</string>
+    <string name="prop_style_cyberpunk">Cyberpunk</string>
+    <string name="prop_fit_label">Scale &amp; Fit Mode</string>
+    <string name="prop_fit_contain">Contain (Keep Aspect Ratio)</string>
+    <string name="prop_fit_cover">Cover (Crop to Fill)</string>
+    <string name="prop_fit_fill">Stretch to Fill</string>
+
+    <string name="prop_chart_y_max">Y Max</string>
+    <string name="prop_chart_y_min">Y Min</string>
+    <string name="prop_chart_unit">Unit</string>
+    <string name="prop_chart_max_points">Max Data Points (10~1000)</string>
+    <string name="prop_chart_mode_single">Single Line</string>
+    <string name="prop_chart_mode_multi">Multi Lines</string>
+    <string name="prop_chart_multi_legend">Show Legend Bar (With Delete Button)</string>
+    <string name="prop_chart_series_key_hint">Series Key Name</string>
+    <string name="prop_chart_style_label">Chart Style</string>
+    <string name="prop_chart_style_solid">Solid Line</string>
+    <string name="prop_chart_style_area">Area Gradient</string>
+    <string name="prop_chart_style_smooth">Smooth Curve</string>
+    <string name="prop_chart_grid_color">Grid Line Color</string>
+    <string name="prop_chart_cb_phone_time">Use local phone timestamp only (ignore device JSON time)</string>
+    <string name="prop_chart_cb_show_dots">Show Data Points</string>
+    <string name="prop_chart_cb_show_values">Show Point Values (Matching Series Color)</string>
+
+    <string name="prop_broadcast_mode_label">Broadcast Mode</string>
+    <string name="prop_broadcast_mode_tts">TTS Speech</string>
+    <string name="prop_broadcast_mode_alert">Alert Tone Only</string>
+    <string name="prop_broadcast_mode_both">Alert + TTS</string>
+    <string name="prop_broadcast_mode_tip">Tip: An alert sound will play before speaking the text.</string>
+    <string name="prop_broadcast_alert_type">Alert Sound Tone</string>
+    <string name="val_alert_alarm_classic">Classic Alarm</string>
+    <string name="val_alert_siren">Siren Patrol</string>
+    <string name="val_alert_beep_long">High Beep</string>
+    <string name="val_alert_warning_pulse">Warning Pulse</string>
+    <string name="val_alert_synthesizer">Synthesizer Up</string>
+    <string name="prop_broadcast_voice_label">Voice Preset</string>
+    <string name="val_voice_m1">Male 1 (Natural Warm)</string>
+    <string name="val_voice_f1">Female 1 (Clear Bright)</string>
+    <string name="val_voice_m2">Male 2 (Authoritative)</string>
+    <string name="val_voice_f2">Female 2 (Brisk Alert)</string>
+    <string name="prop_broadcast_rate_label">Speech Rate</string>
+    <string name="val_rate_slow">Slow (0.8x)</string>
+    <string name="val_rate_normal">Normal (1.0x)</string>
+    <string name="val_rate_fast">Fast (1.3x)</string>
+    <string name="prop_broadcast_test_input_hint">Enter test speech text...</string>
+    <string name="prop_broadcast_btn_test">Test Play</string>
+    <string name="prop_broadcast_linked_tip">Linked Target Components (Trigger when selected components receive data)</string>
+
+    <!-- Image Stream (cam) description and options -->
+    <string name="prop_image_gesture_zoom_desc">支援雙擊或雙指手勢縮放與拖曳平移影像</string>
+    <string name="prop_image_quick_save_desc">點擊右下角按鈕一鍵保存畫面至手機相簿</string>
+    <string name="prop_image_show_info_desc">顯示接收時間標記與像素解析度資訊狀態列</string>
+    <string name="val_fps_1">1 FPS</string>
+    <string name="val_fps_2">2 FPS</string>
+    <string name="val_fps_3">3 FPS</string>
+    <string name="val_fps_5">5 FPS</string>
+    <string name="val_rot_0">0°</string>
+    <string name="val_rot_90">90°</string>
+    <string name="val_rot_180">180°</string>
+    <string name="val_rot_270">270°</string>
+
+    <!-- LineChart Error Logs -->
+    <string name="chart_err_format">%1$s (ERROR): JSON 格式不符或找不到有效序列鍵值 [%2$s]</string>
+    <string name="chart_err_parse">%1$s (ERROR): JSON 解析失敗 - %2$s</string>
+    <string name="chart_err_number">%1$s (ERROR): 無法將純文字轉為數值 [%2$s]</string>
+
+    <!-- Broadcast View & Linked strings -->
+    <string name="broadcast_title">語音警報廣播</string>
+    <string name="broadcast_mode_pure_tts">純語音</string>
+    <string name="broadcast_mode_pure_alert">純警報</string>
+    <string name="broadcast_mode_alert_tts">警報+語音</string>
+    <string name="broadcast_waiting_text">等待語音廣播文字...</string>
+    <string name="broadcast_no_linked">無其他可連結的接收元件</string>
 </resources>

@@ -28,6 +28,11 @@ object SliderDefinition : IComponentDefinition {
     override val iconResId = android.R.drawable.ic_menu_preferences
     override val group = "CONTROL"
 
+    override fun getDefaultProps(): Map<String, String> = mapOf(
+        "value" to "35",
+        "color" to "#2196F3"
+    )
+
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
         // V17.0: Allow bubble to overflow

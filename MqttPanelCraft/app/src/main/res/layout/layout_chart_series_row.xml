@@ -24,7 +24,6 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:background="@drawable/shape_circle_color"
-            android:backgroundTint="#00BCD4"
             android:layout_marginEnd="6dp"/>
 
         <LinearLayout
@@ -32,11 +31,11 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
-            <View android:id="@+id/vSeriesColor1" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#00E5FF" android:layout_marginEnd="4dp"/>
-            <View android:id="@+id/vSeriesColor2" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#00E676" android:layout_marginEnd="4dp"/>
-            <View android:id="@+id/vSeriesColor3" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#FFAB00" android:layout_marginEnd="4dp"/>
-            <View android:id="@+id/vSeriesColor4" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#F50057" android:layout_marginEnd="4dp"/>
-            <View android:id="@+id/vSeriesColor5" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:backgroundTint="#AA00FF"/>
+            <View android:id="@+id/vSeriesColor1" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:layout_marginEnd="4dp"/>
+            <View android:id="@+id/vSeriesColor2" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:layout_marginEnd="4dp"/>
+            <View android:id="@+id/vSeriesColor3" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:layout_marginEnd="4dp"/>
+            <View android:id="@+id/vSeriesColor4" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color" android:layout_marginEnd="4dp"/>
+            <View android:id="@+id/vSeriesColor5" android:layout_width="16dp" android:layout_height="16dp" android:background="@drawable/shape_circle_color"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -46,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="4"
         android:hint="序列名稱 (Key)"
-        style="@style/Widget.App.TextInputLayout.Properties.Compact">
+        style="@style/Widget.App.TextInputLayout.Properties">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSeriesKey"

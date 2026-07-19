@@ -29,7 +29,17 @@ class ScaleMeterView @JvmOverloads constructor(
     var showBubble: Boolean = false
         set(value) { field = value; invalidate() }
 
-    var unit: String = ""
+    var isEditMode: Boolean = false
+        set(value) {
+            field = value
+            if (value) {
+                animator?.cancel()
+                currentAnimValue = this.value
+                invalidate()
+            }
+        }
+
+    var unit: String = "%"
         set(value) { field = value; invalidate() }
 
     var minValue: Float = 0f
@@ -85,6 +95,7 @@ class ScaleMeterView @JvmOverloads constructor(
 
     init {
         currentAnimValue = value
+        setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
     override fun onAttachedToWindow() {
@@ -107,6 +118,11 @@ class ScaleMeterView @JvmOverloads constructor(
 
     private fun animateValue(from: Float, to: Float) {
         animator?.cancel()
+        if (isEditMode || !isAttachedToWindow) {
+            currentAnimValue = to
+            invalidate()
+            return
+        }
         animator = ValueAnimator.ofFloat(from, to).apply {
             duration = 300
             addUpdateListener { 
@@ -152,7 +168,7 @@ class ScaleMeterView @JvmOverloads constructor(
         var leftNeed = if (meterOrientation == Orientation.VERTICAL && showBubble) bubbleRadius * 2.5f + gap + 4f * density else 8f * density
         var rightNeed = if (meterOrientation == Orientation.VERTICAL && showTicks) majorTickLen + gap + maxTextWidth + 4f * density else 8f * density
         var topNeed = if (meterOrientation == Orientation.HORIZONTAL && showBubble) bubbleRadius * 2.5f + gap + 4f * density else 8f * density
-        var bottomNeed = if (meterOrientation == Orientation.HORIZONTAL && showTicks) majorTickLen + gap + paintText.textSize + 4f * density else 8f * density
+        var bottomNeed = if (meterOrientation == Orientation.HORIZONTAL && showTicks) majorTickLen + gap + paintText.textSize + 14f * density else 8f * density
         
         // 防裁切：如果所需總寬度超過畫布，強制等比壓縮 vScale
         if (meterOrientation == Orientation.VERTICAL) {
@@ -175,7 +191,7 @@ class ScaleMeterView @JvmOverloads constructor(
                 majorTickLen = (8f * density) * vScale
                 paintText.textSize = 10f * density * vScale
                 topNeed = if (showBubble) bubbleRadius * 2.5f + gap + 4f * density else 8f * density
-                bottomNeed = if (showTicks) majorTickLen + gap + paintText.textSize + 4f * density else 8f * density
+                bottomNeed = if (showTicks) majorTickLen + gap + paintText.textSize + 14f * density else 8f * density
             }
         }
 
@@ -437,7 +453,8 @@ class ScaleMeterView @JvmOverloads constructor(
                     val v = minValue + (maxValue - minValue) * (i.toFloat() / (count - 1))
                     val label = v.toInt().toString()
                     paintText.textAlign = Paint.Align.CENTER
-                    canvas.drawText(label, tx, ty + len + 4f * density + paintText.textSize, paintText)
+                    val labelTx = if (i == 0) tx + (5f * density) else if (i == count - 1) tx - (5f * density) else tx
+                    canvas.drawText(label, labelTx, ty + len + 4f * density + paintText.textSize, paintText)
                 }
             }
         }

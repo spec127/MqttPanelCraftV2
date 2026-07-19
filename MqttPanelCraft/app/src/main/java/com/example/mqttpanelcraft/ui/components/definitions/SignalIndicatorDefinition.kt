@@ -28,7 +28,12 @@ object SignalIndicatorDefinition : IComponentDefinition {
     override val group: String = "SENSOR"
     override val propertiesLayoutId: Int = R.layout.layout_prop_signal_indicator
 
-    // Remove getDefaultProps since it is not part of IComponentDefinition
+    override fun getDefaultProps(): Map<String, String> = mapOf(
+        "value_mapping" to "ABSOLUTE",
+        "value" to "2",
+        "color_mode" to "SOLID",
+        "theme_color" to "#FF9800"
+    )
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)

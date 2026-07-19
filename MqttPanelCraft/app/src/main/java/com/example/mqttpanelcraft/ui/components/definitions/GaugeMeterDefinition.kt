@@ -28,6 +28,13 @@ object GaugeMeterDefinition : IComponentDefinition {
     override val group: String = "SENSOR"
     override val propertiesLayoutId: Int = R.layout.layout_prop_gauge_meter
 
+    override fun getDefaultProps(): Map<String, String> = mapOf(
+        "value" to "75",
+        "unit" to "%",
+        "style" to "NEEDLE",
+        "theme_color" to "#FF9800"
+    )
+
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
         val meter = GaugeMeterView(context).apply {
@@ -36,6 +43,7 @@ object GaugeMeterDefinition : IComponentDefinition {
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
             tag = "target"
+            this.isEditMode = isEditMode
         }
         container.addView(meter)
         return container

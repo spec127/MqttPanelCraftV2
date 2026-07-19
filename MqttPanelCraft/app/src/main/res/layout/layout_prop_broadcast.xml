@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <!-- SECTION 1: INTERACTION & TTS CONFIG -->
+    <!-- Section 1: INTERACTION & LOGIC (互動功能與模式) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
             app:tint="@color/props_primary"
             android:layout_marginEnd="6dp"/>
         <TextView
-            android:text="@string/properties_section_interaction"
+            android:text="@string/prop_section_interaction"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/prop_text_secondary"
@@ -27,36 +27,260 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
-    <!-- Speech Rate Input -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilSpeechRate"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/prop_broadcast_mode_label"
+        android:textSize="12sp"
+        android:textColor="@color/prop_text_primary"
+        android:layout_marginBottom="6dp"/>
+
+    <!-- 廣播模式切換 (TTS / 警報 / 雙重) -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleBroadcastMode"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginBottom="8dp"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        app:checkedButton="@+id/btnModeTts">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnModeTts"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/prop_broadcast_mode_tts"
+            android:textSize="11sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnModeAlert"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/prop_broadcast_mode_alert"
+            android:textSize="11sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnModeBoth"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/prop_broadcast_mode_both"
+            android:textSize="11sp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- 雙重模式說明提示 -->
+    <TextView
+        android:id="@+id/tvModeTip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="播報語速 (例如 1.0 標準, 1.2 稍快)"
+        android:text="@string/prop_broadcast_mode_tip"
+        android:textSize="11sp"
+        android:textColor="#FFAB00"
         android:layout_marginBottom="12dp"
-        style="@style/Widget.App.TextInputLayout.Properties">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etSpeechRate"
+        android:visibility="gone"/>
+
+    <!-- 警報音源選擇 -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilAlertType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/prop_broadcast_alert_type"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_marginBottom="16dp">
+        <AutoCompleteTextView
+            android:id="@+id/spAlertType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:textSize="14sp"/>
+            android:inputType="none"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:maxLines="1"
+            android:textSize="13sp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Speech Pitch Input -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilSpeechPitch"
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Section 2: TTS PARAMETERS (語音調整：音調預設按鈕與語速輸入) -->
+    <LinearLayout
+        android:id="@+id/sectionTtsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="聲音音調 (例如 1.0 標準, 1.1 高音)"
-        android:layout_marginBottom="16dp"
-        style="@style/Widget.App.TextInputLayout.Properties">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etSpeechPitch"
+        android:orientation="vertical">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:textSize="14sp"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="10dp">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_btn_tune"
+                app:tint="@color/props_primary"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="@string/prop_section_visual"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/prop_broadcast_voice_label"
+            android:textSize="12sp"
+            android:textColor="@color/prop_text_primary"
+            android:layout_marginBottom="6dp"/>
+
+        <!-- 4 個音調預設按鈕 (男1, 女1, 男2, 女2) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:weightSum="4"
+            android:layout_marginBottom="14dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPitchM1"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/val_voice_m1"
+                android:textSize="11sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:layout_marginEnd="4dp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPitchF1"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/val_voice_f1"
+                android:textSize="11sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:layout_marginEnd="4dp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPitchM2"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/val_voice_m2"
+                android:textSize="11sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:layout_marginEnd="4dp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPitchF2"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/val_voice_f2"
+                android:textSize="11sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+        </LinearLayout>
+
+        <!-- 語速保留單行輸入框 -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilSpeechRate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prop_broadcast_rate_label"
+            style="@style/Widget.App.TextInputLayout.Properties"
+            android:layout_marginBottom="16dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSpeechRate"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <!-- Section 3: LINKED TARGET COMPONENTS (與接收框同步聯動，接收到內容立刻觸發播報) -->
+    <LinearLayout
+        android:id="@+id/sectionLinkedComponents"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_marginBottom="12dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="6dp">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_touch_app"
+                app:tint="@color/props_primary"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="@string/prop_broadcast_linked_tip"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/containerLinkedComponents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="@drawable/bg_prop_item_premium"
+            android:layout_marginBottom="12dp"/>
+    </LinearLayout>
 
 </LinearLayout>

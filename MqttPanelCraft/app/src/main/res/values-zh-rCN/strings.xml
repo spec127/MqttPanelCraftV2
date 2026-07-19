@@ -129,4 +129,83 @@
     <string name="msg_limit_reached">免费版限制只能创建 1 个项目。</string>
     <string name="title_limit_reached">达到上限</string>
     <string name="dialog_btn_upgrade">升级高级版</string>
+
+    <!-- ImageSensor (Cam), LineChart, Broadcast I18n -->
+    <string name="prop_section_interaction">互动功能</string>
+    <string name="prop_cb_auto_collapse">MQTT 日志图片洗版时自动折叠收纳</string>
+    <string name="prop_section_visual">视觉外观</string>
+    <string name="prop_style_label">显示样式</string>
+    <string name="prop_style_glass">毛玻璃外框</string>
+    <string name="prop_style_solid">极简实体</string>
+    <string name="prop_style_cyberpunk">电竞科技</string>
+    <string name="prop_fit_label">缩放对齐模式</string>
+    <string name="prop_fit_contain">等比缩放留边 (Contain)</string>
+    <string name="prop_fit_cover">裁切填满 (Cover)</string>
+    <string name="prop_fit_fill">拉伸填满 (Fill)</string>
+
+    <string name="prop_chart_y_max">上限</string>
+    <string name="prop_chart_y_min">下限</string>
+    <string name="prop_chart_unit">单位</string>
+    <string name="prop_chart_max_points">数据数上限 (10~1000 笔)</string>
+    <string name="prop_chart_mode_single">单线数据</string>
+    <string name="prop_chart_mode_multi">多线数据</string>
+    <string name="prop_chart_multi_legend">显示多线图例底栏 (附删除按钮)</string>
+    <string name="prop_chart_series_key_hint">序列键名 (Key)</string>
+    <string name="prop_chart_style_label">曲线与填充风格</string>
+    <string name="prop_chart_style_solid">实线连接</string>
+    <string name="prop_chart_style_area">渐变面积</string>
+    <string name="prop_chart_style_smooth">圆滑贝塞尔曲线</string>
+    <string name="prop_chart_grid_color">网格线条颜色</string>
+    <string name="prop_chart_cb_phone_time">时间戳记仅采用手机当下时间 (不采用设备 JSON 传送时间)</string>
+    <string name="prop_chart_cb_show_dots">显示数据标记点</string>
+    <string name="prop_chart_cb_show_values">标注数值标签 (同线条颜色)</string>
+
+    <string name="prop_broadcast_mode_label">播报切换模式</string>
+    <string name="prop_broadcast_mode_tts">TTS 语音播报</string>
+    <string name="prop_broadcast_mode_alert">单纯警报声</string>
+    <string name="prop_broadcast_mode_both">事前提示+TTS</string>
+    <string name="prop_broadcast_mode_tip">提示：收讯时将先播发警报提示音，随后进行语音播送文字。</string>
+    <string name="prop_broadcast_alert_type">警报音效 (Alert Sound Tone)</string>
+    <string name="val_alert_alarm_classic">经典警铃 (Classic Alarm)</string>
+    <string name="val_alert_siren">双重警报巡逻 (Siren)</string>
+    <string name="val_alert_beep_long">高频连续哔声 (Beep)</string>
+    <string name="val_alert_warning_pulse">急促脉冲警告 (Warning Pulse)</string>
+    <string name="val_alert_synthesizer">电子合成升频音 (Synthesizer)</string>
+    <string name="prop_broadcast_voice_label">语音声线</string>
+    <string name="val_voice_m1">男声 1 (自然温和)</string>
+    <string name="val_voice_f1">女声 1 (清晰明净)</string>
+    <string name="val_voice_m2">男声 2 (浑厚播报)</string>
+    <string name="val_voice_f2">女声 2 (快节奏提醒)</string>
+    <string name="prop_broadcast_rate_label">语速调整</string>
+    <string name="val_rate_slow">慢速 (0.8x)</string>
+    <string name="val_rate_normal">正常 (1.0x)</string>
+    <string name="val_rate_fast">快速 (1.3x)</string>
+    <string name="prop_broadcast_test_input_hint">输入测试播报文字...</string>
+    <string name="prop_broadcast_linked_tip">挂勾接收对象 (与接收框同步联动，接收到内容立刻触发播报)</string>
+
+    <!-- Image Stream (cam) description and options -->
+    <string name="prop_image_gesture_zoom_desc">支持双击或双指手势缩放与拖拽平移影像</string>
+    <string name="prop_image_quick_save_desc">点击右下角按钮一键保存画面至手机相册</string>
+    <string name="prop_image_show_info_desc">显示接收时间标记与像素分辨率信息状态栏</string>
+    <string name="val_fps_1">1 FPS</string>
+    <string name="val_fps_2">2 FPS</string>
+    <string name="val_fps_3">3 FPS</string>
+    <string name="val_fps_5">5 FPS</string>
+    <string name="val_rot_0">0°</string>
+    <string name="val_rot_90">90°</string>
+    <string name="val_rot_180">180°</string>
+    <string name="val_rot_270">270°</string>
+
+    <!-- LineChart Error Logs -->
+    <string name="chart_err_format">%1$s (ERROR): JSON 格式不符或找不到有效序列键值 [%2$s]</string>
+    <string name="chart_err_parse">%1$s (ERROR): JSON 解析失败 - %2$s</string>
+    <string name="chart_err_number">%1$s (ERROR): 无法将纯文本转为数值 [%2$s]</string>
+
+    <!-- Broadcast View & Linked strings -->
+    <string name="broadcast_title">语音警报广播</string>
+    <string name="broadcast_mode_pure_tts">纯语音</string>
+    <string name="broadcast_mode_pure_alert">纯警报</string>
+    <string name="broadcast_mode_alert_tts">警报+语音</string>
+    <string name="broadcast_waiting_text">等待语音广播文字...</string>
+    <string name="broadcast_no_linked">无其他可连接的接收元件</string>
 </resources>

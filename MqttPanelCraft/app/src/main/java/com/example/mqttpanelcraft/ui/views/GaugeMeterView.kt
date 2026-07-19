@@ -30,7 +30,17 @@ class GaugeMeterView @JvmOverloads constructor(
         set(value) { field = value; invalidate() }
 
     // --- 資料與數值 ---
-    var unit: String = ""
+    var isEditMode: Boolean = false
+        set(value) {
+            field = value
+            if (value) {
+                animator?.cancel()
+                currentAnimValue = this.value
+                invalidate()
+            }
+        }
+
+    var unit: String = "%"
         set(value) { field = value; invalidate() }
 
     var minValue: Float = 0f
@@ -103,6 +113,11 @@ class GaugeMeterView @JvmOverloads constructor(
 
     private fun animateValue(from: Float, to: Float) {
         animator?.cancel()
+        if (isEditMode || !isAttachedToWindow) {
+            currentAnimValue = to
+            invalidate()
+            return
+        }
         animator = ValueAnimator.ofFloat(from, to).apply {
             duration = 300
             addUpdateListener {
@@ -383,17 +398,22 @@ class GaugeMeterView @JvmOverloads constructor(
             canvas.drawText(String.format("%.0f", maxValue), maxX, maxY + minMaxTextPaint.textSize / 3, minMaxTextPaint)
         }
 
-        // --- 5. 繪製中央資訊面板
-        val centerTextSize = radius * 0.4f
+        // --- 5. 繪製中央資訊面板 (稍微縮小預設字體，限制寬度上限以免蓋到其他元件或頭尾刻度)
+        val centerTextSize = radius * 0.32f
         var textSize = centerTextSize
         textPaint.textSize = textSize
         
-        val valueStr = String.format("%.1f", currentAnimValue)
+        // 若數值為整數，不顯示小數點 .0
+        val valueStr = if (currentAnimValue % 1f == 0f) {
+            String.format("%.0f", currentAnimValue)
+        } else {
+            String.format("%.1f", currentAnimValue)
+        }
         val textToDraw = if (unit.isNotEmpty()) "$valueStr $unit" else valueStr
         
-        // 文字太長時自動縮小字體 (防止單位過長爆出邊界)
+        // 嚴格限制最大寬度為半徑的 1.05 倍，確保文字一定在內部弧線中不會溢出或遮擋
         var textWidth = textPaint.measureText(textToDraw)
-        val maxWidth = radius * 1.6f
+        val maxWidth = radius * 1.05f
         while (textWidth > maxWidth && textSize > centerTextSize * 0.3f) {
             textSize -= 2f
             textPaint.textSize = textSize

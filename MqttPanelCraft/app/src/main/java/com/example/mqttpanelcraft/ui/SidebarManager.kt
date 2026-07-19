@@ -428,57 +428,18 @@ class SidebarManager(
                                         ) // isPreview/EditMode = false for clean look
                                 previewView.background = null // Card has border, component does not
 
-                                // Init Dummy Data from Definition defaults
+                                // Init Dummy Data from Definition defaults (Single Source of Truth matching dragged instances)
                                 val dummyProps = def.getDefaultProps().toMutableMap()
                                 if (!dummyProps.containsKey("color")) dummyProps["color"] = "#2196F3"
-                                dummyProps["colorOn"] = dummyProps["color"] ?: "#2196F3"
-                                dummyProps["colorOff"] = "#BDBDBD"
+                                if (!dummyProps.containsKey("colorOn")) dummyProps["colorOn"] = dummyProps["color"] ?: "#2196F3"
+                                if (!dummyProps.containsKey("colorOff")) dummyProps["colorOff"] = "#BDBDBD"
 
-                                // Special handling for specific component types
-                                when (def.type) {
-                                        "BUTTON" -> {
-                                                dummyProps["text"] = "" // Remove text, icon only
-                                                dummyProps["label"] = ""
-                                        }
-                                        "SWITCH" -> {
-                                                dummyProps["state"] = "2" // ON state (solid track)
-                                        }
-                                        "SLIDER" -> {
-                                                dummyProps["value"] = "35"
-                                        }
-                                        "SELECTOR" -> {
-                                                dummyProps["segments"] =
-                                                        "[{\"label\":\"S1\",\"val\":\"1\"},{\"label\":\"S2\",\"val\":\"2\"},{\"label\":\"S3\",\"val\":\"3\"}]"
-                                                dummyProps["style"] = "rounded"
-                                        }
-                                        "LED" -> {
-                                                dummyProps["style"] = "ORB"
-                                                dummyProps["icon"] = "ic_btn_lighting"
-                                                dummyProps["appearance_mode"] = "icon"
-                                                dummyProps["active_color"] = "#FF9800"
-                                                dummyProps["idle_color"] = "#9E9E9E"
-                                        }
-                                        "SCALE_METER" -> {
-                                                dummyProps["value"] = "70"
-                                                dummyProps["style"] = "SEGMENTED"
-                                                dummyProps["orientation"] = "HORIZONTAL"
-                                                dummyProps["feedback"] = "Ticks"
-                                                dummyProps["show_ticks"] = "true"
-                                                dummyProps["show_bubble"] = "false"
-                                                dummyProps["show_value"] = "false"
-                                                dummyProps["theme_color"] = "#FF9800"
-                                        }
-                                        "GAUGE_METER" -> {
-                                                dummyProps["value"] = "75"
-                                                dummyProps["style"] = "NEEDLE"
-                                                dummyProps["theme_color"] = "#FF9800"
-                                        }
-                                        "SIGNAL_INDICATOR" -> {
-                                                dummyProps["value_mapping"] = "ABSOLUTE"
-                                                dummyProps["value"] = "2"
-                                                dummyProps["color_mode"] = "SOLID"
-                                                dummyProps["theme_color"] = "#FF9800"
-                                        }
+                                // Special handling for preview look only
+                                if (def.type == "BUTTON") {
+                                        dummyProps["text"] = "" // Remove text in small thumbnail
+                                        dummyProps["label"] = ""
+                                } else if (def.type == "SWITCH") {
+                                        dummyProps["state"] = "2" // Show solid ON color in thumbnail
                                 }
 
                                 val dummyData =
@@ -563,7 +524,7 @@ class SidebarManager(
                                                 "THERMOMETER", "LEVEL" ->
                                                         Pair(dpToPx(32), dpToPx(40))
                                                 "TEXT" -> Pair(dpToPx(96), dpToPx(30))
-                                                "IMAGE" -> Pair(dpToPx(56), dpToPx(42))
+                                                "IMAGE", "IMAGE_SENSOR" -> Pair(dpToPx(56), dpToPx(42))
                                                 "TEXT_DISPLAY" -> Pair(dpToPx(96), dpToPx(34))
                                                 "STEPPER" -> Pair(dpToPx(60), dpToPx(26))
                                                 "CHART" ->

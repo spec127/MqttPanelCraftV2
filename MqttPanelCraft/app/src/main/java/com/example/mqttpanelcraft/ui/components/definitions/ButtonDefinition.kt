@@ -37,6 +37,12 @@ object ButtonDefinition : IComponentDefinition {
     override val iconResId = R.drawable.ic_btn_power
     override val group = "CONTROL"
 
+    override fun getDefaultProps(): Map<String, String> = mapOf(
+        "color" to "#2196F3",
+        "colorOn" to "#2196F3",
+        "colorOff" to "#BDBDBD"
+    )
+
     override fun createView(context: Context, isEditMode: Boolean): View {
         // Set default blue color if not set
         // Note: data is not available here, will be set in onUpdateView

@@ -49,6 +49,14 @@ object SwitchDefinition : IComponentDefinition {
     override val iconResId = R.drawable.ic_toggle_on
     override val group = "CONTROL"
 
+    override fun getDefaultProps(): Map<String, String> = mapOf(
+        "state" to "2",
+        "colorOn" to "#2196F3",
+        "colorOff" to "#BDBDBD",
+        "payloadLeft" to "OFF",
+        "payloadRight" to "ON"
+    )
+
     override fun createView(
             context: android.content.Context,
             isEditMode: Boolean

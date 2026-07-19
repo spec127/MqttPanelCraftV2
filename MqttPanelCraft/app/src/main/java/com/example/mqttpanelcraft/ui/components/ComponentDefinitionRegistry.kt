@@ -30,7 +30,6 @@ object ComponentDefinitionRegistry {
         register(LineChartDefinition)
         register(BroadcastDefinition) // 廣播(TTS文字轉語音)
         register(ShapeDefinition)
-        register(ImageDisplayDefinition)
         register(TextDefinition)
         register(CalendarClockDefinition)
         register(WebBoxDefinition)

@@ -118,7 +118,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="支援雙擊或雙指手勢縮放與拖曳平移影像"
+                    android:text="@string/prop_image_gesture_zoom_desc"
                     android:textColor="@color/prop_text_secondary"
                     android:textSize="11sp"/>
             </LinearLayout>
@@ -154,7 +154,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="點擊右下角按鈕一鍵保存畫面至手機相簿"
+                    android:text="@string/prop_image_quick_save_desc"
                     android:textColor="@color/prop_text_secondary"
                     android:textSize="11sp"/>
             </LinearLayout>
@@ -259,7 +259,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="顯示接收時間標記與像素解析度資訊狀態列"
+                    android:text="@string/prop_image_show_info_desc"
                     android:textColor="@color/prop_text_secondary"
                     android:textSize="11sp"/>
             </LinearLayout>

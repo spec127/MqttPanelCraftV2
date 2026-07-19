@@ -31,6 +31,14 @@ object LedDefinition : IComponentDefinition {
     override val iconResId: Int = R.drawable.ic_led_orb
     override val group: String = "SENSOR"
 
+    override fun getDefaultProps(): Map<String, String> = mapOf(
+        "style" to "ORB",
+        "icon" to "ic_btn_lighting",
+        "appearance_mode" to "icon",
+        "active_color" to "#FF9800",
+        "idle_color" to "#9E9E9E"
+    )
+
     private val timerMap = mutableMapOf<String, Runnable>()
 
     private fun getLed(view: View): LedView? {
@@ -540,7 +548,11 @@ object LedDefinition : IComponentDefinition {
         val currentRgbStates = data.props["rgb_states"] ?: ""
         val oldActive = led.activeColor
         
-        led.activeColor = try { Color.parseColor(data.props["active_color"] ?: "#FF9800") } catch (e: Exception) { Color.parseColor("#FF9800") }
+        val isActiveSaved = (data.props["value"] ?: "false") == "true"
+        led.isActive = isActiveSaved
+        
+        val savedActiveColor = data.props["active_color_current"] ?: data.props["active_color"] ?: "#FF9800"
+        led.activeColor = try { Color.parseColor(savedActiveColor) } catch (e: Exception) { Color.parseColor("#FF9800") }
         led.idleColor = try { Color.parseColor(data.props["idle_color"] ?: "#808080") } catch (e: Exception) { Color.parseColor("#808080") }
 
         // V21.12: Refined Preview Flash logic
@@ -632,7 +644,11 @@ object LedDefinition : IComponentDefinition {
         val actionMode = data.props["action_mode"] ?: "LATCH"
         val timerMs = (data.props["timer_ms"] ?: "3000").toLongOrNull() ?: 3000L
         val idStr = data.id.toString()
-        val offRunnable = Runnable { led.isActive = false; view.invalidate() }
+        val offRunnable = Runnable { 
+            led.isActive = false
+            onUpdateProp("value", "false")
+            view.invalidate() 
+        }
 
         var isMatched = false
         var matchedKwColor = data.props["active_color"] ?: "#FF9800"
@@ -671,6 +687,8 @@ object LedDefinition : IComponentDefinition {
         if (isMatched) {
             led.activeColor = try { Color.parseColor(matchedKwColor) } catch (e: Exception) { Color.parseColor("#FF9800") }
             led.isActive = true
+            onUpdateProp("value", "true")
+            onUpdateProp("active_color_current", matchedKwColor)
             if (actionMode == "TIMER") {
                 timerMap[idStr]?.let { view.removeCallbacks(it) }
                 view.postDelayed(offRunnable, timerMs)
@@ -686,7 +704,9 @@ object LedDefinition : IComponentDefinition {
                         val matchType = parts.getOrElse(1) { "EXACT" }
                         if (kw.isEmpty()) continue
                         if (if (matchType == "CONTAINS") payload.contains(kw) else payload == kw) {
-                            led.isActive = false; break
+                            led.isActive = false
+                            onUpdateProp("value", "false")
+                            break
                         }
                     }
                 }

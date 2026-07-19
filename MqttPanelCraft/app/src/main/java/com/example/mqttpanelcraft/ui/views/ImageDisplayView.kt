@@ -8,6 +8,8 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.PointF
 import android.os.Build
+import android.os.Environment
+import android.media.MediaScannerConnection
 import android.provider.MediaStore
 import android.util.AttributeSet
 import android.util.Base64
@@ -20,6 +22,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.example.mqttpanelcraft.R
+import java.io.File
+import java.io.FileOutputStream
 import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -79,6 +83,16 @@ class ImageDisplayView @JvmOverloads constructor(
             imageView.rotation = value.toFloat()
         }
 
+    var lastReceivedTime: String = ""
+
+    var placeholderIconResId: Int = R.drawable.ic_image_placeholder
+        set(value) {
+            field = value
+            (placeholderView.getChildAt(0) as? androidx.appcompat.widget.AppCompatImageView)?.setImageDrawable(
+                androidx.appcompat.content.res.AppCompatResources.getDrawable(context, value)
+            )
+        }
+
     // Touch Zoom & Pan State
     private var scaleFactor = 1.0f
     private var mode = NONE
@@ -115,16 +129,17 @@ class ImageDisplayView @JvmOverloads constructor(
         }
         canvasContainer.addView(imageView)
 
-        // 未收到相片前：顯示大的灰色 image icon
+        // 未收到相片前：顯示清晰的 image vector icon 預設圖 (適配元件庫縮圖與畫布，支援 API 25 向量圖解析)
         placeholderView = LinearLayout(context).apply {
             layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER)
             orientation = VERTICAL
             gravity = Gravity.CENTER
 
-            val bigImageIcon = ImageView(context).apply {
-                layoutParams = LayoutParams(76, 76)
-                setImageResource(android.R.drawable.ic_menu_gallery)
-                setColorFilter(if (isDarkMode) Color.parseColor("#78869B") else Color.parseColor("#94A3B8"))
+            val iconSize = (40 * resources.displayMetrics.density).toInt()
+            val bigImageIcon = androidx.appcompat.widget.AppCompatImageView(context).apply {
+                layoutParams = LayoutParams(iconSize, iconSize)
+                scaleType = ImageView.ScaleType.FIT_CENTER
+                setImageDrawable(androidx.appcompat.content.res.AppCompatResources.getDrawable(context, placeholderIconResId))
             }
             addView(bigImageIcon)
         }
@@ -193,14 +208,19 @@ class ImageDisplayView @JvmOverloads constructor(
         }
     }
 
-    private fun clearCurrentBitmap() {
+    fun clearCurrentBitmap() {
+        val hadData = (currentBitmap != null || chunkBuffer.isNotEmpty() || placeholderView.visibility != View.VISIBLE)
         currentBitmap = null
+        chunkBuffer.clear()
         imageView.setImageDrawable(null)
         placeholderView.visibility = View.VISIBLE
         infoTextView.text = "無圖片 | 等待傳送"
+        if (hadData) {
+            onImageCleared?.invoke()
+        }
     }
 
-    fun updatePayload(base64OrData: String) {
+    fun updatePayload(base64OrData: String, isNewArrival: Boolean = true) {
         val payload = base64OrData.trim()
         if (payload.startsWith("CHUNK:")) {
             try {
@@ -218,16 +238,19 @@ class ImageDisplayView @JvmOverloads constructor(
                 chunkBuffer.append(dataPart)
                 receivedChunks++
                 if (receivedChunks >= expectedChunks) {
-                    decodeAndShowImage(chunkBuffer.toString())
+                    decodeAndShowImage(chunkBuffer.toString(), isNewArrival)
                     chunkBuffer.clear()
                 }
                 return
             } catch (_: Exception) {}
         }
-        decodeAndShowImage(payload)
+        decodeAndShowImage(payload, isNewArrival)
     }
 
-    private fun decodeAndShowImage(rawPayload: String) {
+    var onImageReassembled: ((String, String) -> Unit)? = null
+    var onImageCleared: (() -> Unit)? = null
+
+    private fun decodeAndShowImage(rawPayload: String, isNewArrival: Boolean = true) {
         try {
             val cleanStr = if (rawPayload.contains(",")) {
                 rawPayload.substringAfter(",")
@@ -241,8 +264,15 @@ class ImageDisplayView @JvmOverloads constructor(
                 placeholderView.visibility = View.GONE
                 imageView.colorFilter = null
                 imageView.setImageBitmap(bitmap)
-                val timeStr = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+                val timeStr = if (isNewArrival || lastReceivedTime.isEmpty()) {
+                    val cur = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+                    lastReceivedTime = cur
+                    cur
+                } else {
+                    lastReceivedTime
+                }
                 infoTextView.text = "$timeStr | ${bitmap.width}x${bitmap.height}px"
+                onImageReassembled?.invoke(rawPayload, timeStr)
             }
         } catch (_: Exception) {}
     }
@@ -251,23 +281,66 @@ class ImageDisplayView @JvmOverloads constructor(
         val bmp = currentBitmap ?: return
         try {
             val filename = "MQTT_IMG_${System.currentTimeMillis()}.jpg"
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            var savedPath: String? = null
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
                     put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/MqttPanelCraft")
                 }
-            }
-            val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-            if (uri != null) {
-                val outStream: OutputStream? = context.contentResolver.openOutputStream(uri)
-                outStream?.use {
+                val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                if (uri != null) {
+                    context.contentResolver.openOutputStream(uri)?.use {
+                        bmp.compress(Bitmap.CompressFormat.JPEG, 95, it)
+                    }
+                    savedPath = "相簿 (Pictures/MqttPanelCraft)"
+                }
+            } else {
+                // Android 9 (API 28) 及以下 (包含使用者的 Android 7.1.2)
+                val hasPerm = androidx.core.content.ContextCompat.checkSelfPermission(
+                    context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+                val targetDir = if (hasPerm) {
+                    val publicDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "MqttPanelCraft")
+                    if (!publicDir.exists()) publicDir.mkdirs()
+                    publicDir
+                } else {
+                    // 若無外部儲存權限，自動降級至應用程式專屬圖片目錄 (API 19+ 免權限)
+                    val appDir = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "MqttPanelCraft")
+                    if (!appDir.exists()) appDir.mkdirs()
+                    appDir
+                }
+
+                val file = File(targetDir, filename)
+                FileOutputStream(file).use {
                     bmp.compress(Bitmap.CompressFormat.JPEG, 95, it)
                 }
-                Toast.makeText(context, "已保存快照至相簿 (${bmp.width}x${bmp.height})", Toast.LENGTH_SHORT).show()
+                savedPath = file.absolutePath
+
+                try {
+                    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), arrayOf("image/jpeg"), null)
+                } catch (_: Exception) {}
+
+                if (!hasPerm && context is android.app.Activity) {
+                    try {
+                        androidx.core.app.ActivityCompat.requestPermissions(
+                            context as android.app.Activity,
+                            arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                            1002
+                        )
+                    } catch (_: Exception) {}
+                }
+            }
+
+            if (savedPath != null) {
+                Toast.makeText(context, "已保存快照至: $savedPath (${bmp.width}x${bmp.height})", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(context, "快照保存失敗: 無法建立檔案 (請檢查儲存權限)", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            Toast.makeText(context, "快照保存失敗: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "快照保存失敗: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -307,5 +380,52 @@ class ImageDisplayView @JvmOverloads constructor(
         val x = event.getX(0) - event.getX(1)
         val y = event.getY(0) - event.getY(1)
         return sqrt((x * x + y * y).toDouble()).toFloat()
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val h = MeasureSpec.getSize(heightMeasureSpec)
+        val density = resources.displayMetrics.density
+        if (h > 0 && h < 80 * density) {
+            if (bottomBar.visibility != View.GONE) bottomBar.visibility = View.GONE
+            val iconSize = (h * 0.65f).toInt().coerceAtLeast((24 * density).toInt())
+            (placeholderView.getChildAt(0) as? androidx.appcompat.widget.AppCompatImageView)?.let {
+                if (it.layoutParams.width != iconSize) {
+                    it.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+                    it.scaleType = ImageView.ScaleType.FIT_CENTER
+                }
+            }
+        } else if (h >= 80 * density) {
+            if (bottomBar.visibility != View.VISIBLE) bottomBar.visibility = View.VISIBLE
+            val iconSize = (56 * density).toInt()
+            (placeholderView.getChildAt(0) as? androidx.appcompat.widget.AppCompatImageView)?.let {
+                if (it.layoutParams.width != iconSize) {
+                    it.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+                    it.scaleType = ImageView.ScaleType.FIT_CENTER
+                }
+            }
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        val density = resources.displayMetrics.density
+        if (h < 80 * density) {
+            bottomBar.visibility = View.GONE
+            val iconSize = (h * 0.65f).toInt().coerceAtLeast((24 * density).toInt())
+            (placeholderView.getChildAt(0) as? androidx.appcompat.widget.AppCompatImageView)?.let {
+                it.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+                it.scaleType = ImageView.ScaleType.FIT_CENTER
+                it.setImageDrawable(androidx.appcompat.content.res.AppCompatResources.getDrawable(context, placeholderIconResId))
+            }
+        } else {
+            bottomBar.visibility = View.VISIBLE
+            val iconSize = (56 * density).toInt()
+            (placeholderView.getChildAt(0) as? androidx.appcompat.widget.AppCompatImageView)?.let {
+                it.layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+                it.scaleType = ImageView.ScaleType.FIT_CENTER
+                it.setImageDrawable(androidx.appcompat.content.res.AppCompatResources.getDrawable(context, placeholderIconResId))
+            }
+        }
     }
 }
