@@ -508,12 +508,15 @@ object LineChartDefinition : IComponentDefinition {
         }
 
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-            bottomBar.visibility = View.VISIBLE
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         }
 
         fun updateLegendVisibility() {
-            bottomBar.visibility = View.VISIBLE
+            if (chartCanvas.isPreviewMode) {
+                bottomBar.visibility = View.GONE
+            } else {
+                bottomBar.visibility = if (showLegend) View.VISIBLE else View.GONE
+            }
         }
 
         fun updateSeriesLabels(count: Int, keys: List<String>, colors: List<Int>, listMode: String = "KEY") {
