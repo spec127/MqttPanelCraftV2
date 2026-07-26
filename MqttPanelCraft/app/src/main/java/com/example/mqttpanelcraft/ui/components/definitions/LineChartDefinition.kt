@@ -27,8 +27,8 @@ object LineChartDefinition : IComponentDefinition {
     override val type: String = "CHART"
     override val defaultSize: Size = Size(280, 180)
     override val labelPrefix: String = "chart"
-    override val iconResId: Int = android.R.drawable.ic_menu_sort_by_size
-    override val group: String = "DISPLAY"
+    override val iconResId: Int = android.R.drawable.ic_menu_report_image
+    override val group: String = "SENSOR"
 
     override val propertiesLayoutId: Int = R.layout.layout_prop_line_chart
 
@@ -67,17 +67,31 @@ object LineChartDefinition : IComponentDefinition {
         val compositeView = (if (view is LineChartCompositeView) view else view.findViewWithTag<LineChartCompositeView>("target_chart")) ?: return
         compositeView.isEditMode = false
         val mode = data.props["series_mode"] ?: "SINGLE"
-        val count = if (mode == "SINGLE") 1 else ((data.props["series_count"] ?: "1").toIntOrNull()?.coerceIn(1, 8) ?: 1)
+        val isPreview = data.props["is_preview"] == "true"
+        compositeView.bottomBar.visibility = if (isPreview) View.GONE else View.VISIBLE
+        val count = if (isPreview || mode == "SINGLE") 1 else ((data.props["series_count"] ?: "1").toIntOrNull()?.coerceIn(1, 8) ?: 1)
         val colors = mutableListOf<Int>()
         val keys = mutableListOf<String>()
         for (i in 1..count) {
-            val cHex = data.props["series_color_$i"] ?: "#00BCD4"
-            colors.add(try { Color.parseColor(cHex) } catch (_: Exception) { Color.parseColor("#00BCD4") })
+            val cHex = data.props["series_color_$i"] ?: when(i) {
+                1 -> "#00E5FF"
+                2 -> "#00E676"
+                3 -> "#FFAB00"
+                4 -> "#F50057"
+                5 -> "#D500F9"
+                6 -> "#3D5AFE"
+                7 -> "#FFEA00"
+                else -> "#00E5FF"
+            }
+            colors.add(try { Color.parseColor(cHex) } catch (_: Exception) { Color.parseColor("#00E5FF") })
             keys.add(data.props["series_key_$i"] ?: "value$i")
         }
-        compositeView.updateSeriesLabels(count, keys, colors)
-        compositeView.showLegend = (data.props["show_multi_legend"] != "false")
-        compositeView.updateLegendVisibility()
+        val listMode = data.props["series_list_mode"] ?: "KEY"
+        if (!isPreview) {
+            compositeView.updateSeriesLabels(count, keys, colors, listMode)
+            compositeView.showLegend = (data.props["show_multi_legend"] != "false")
+            compositeView.updateLegendVisibility()
+        }
 
         val chartView = compositeView.chartCanvas
         chartView.setSeriesCountAndColors(count, colors)
@@ -90,6 +104,16 @@ object LineChartDefinition : IComponentDefinition {
         chartView.usePhoneTime = (data.props["has_timestamp"] ?: "false") == "true"
         chartView.yMaxCustom = data.props["y_max"]?.toFloatOrNull()
         chartView.yMinCustom = data.props["y_min"]?.toFloatOrNull()
+        chartView.isPreviewMode = isPreview
+        
+        if (isPreview) {
+            chartView.addPoint(0, 10f, "0", 0L)
+            chartView.addPoint(0, 30f, "1", 1L)
+            chartView.addPoint(0, 20f, "2", 2L)
+            chartView.addPoint(0, 40f, "3", 3L)
+            chartView.addPoint(0, 25f, "4", 4L)
+        }
+        
         chartView.invalidate()
     }
 
@@ -121,13 +145,16 @@ object LineChartDefinition : IComponentDefinition {
         val curMode = data.props["series_mode"] ?: "SINGLE"
         toggleMode?.check(if (curMode == "MULTI") R.id.btnModeMulti else R.id.btnModeSingle)
 
-        val switchLegend = panelView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switchMultiLegend)
-        switchLegend?.isChecked = (data.props["show_multi_legend"] != "false")
-        switchLegend?.setOnCheckedChangeListener { _, isChecked ->
-            onUpdate("show_multi_legend", isChecked.toString())
+        // 3. 序列數量與顯示模式切換邏輯
+        val toggleListMode = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleSeriesListMode)
+        val listMode = data.props["series_list_mode"] ?: "KEY"
+        toggleListMode?.check(if (listMode == "COLOR_ONLY") R.id.btnListModeColorOnly else R.id.btnListModeKey)
+        toggleListMode?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                onUpdate("series_list_mode", if (checkedId == R.id.btnListModeColorOnly) "COLOR_ONLY" else "KEY")
+            }
         }
-
-        // 3. 序列數量切換顯示邏輯
+        
         val containerSeriesCount = panelView.findViewById<View>(R.id.containerSeriesCount)
         containerSeriesCount?.visibility = if (curMode == "MULTI") View.VISIBLE else View.GONE
 
@@ -233,12 +260,22 @@ object LineChartDefinition : IComponentDefinition {
                 rowLayout.addView(paletteContainer)
                 rowLayout.addView(divider)
                 rowLayout.addView(etKey)
+                
+                paletteContainer.layoutParams = LinearLayout.LayoutParams(0, rowHeightPx, 0.6f)
                 llSeries?.addView(rowLayout)
             }
         }
 
         tvCount?.text = "$sCount"
         renderSeriesRows()
+
+        toggleListMode?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val newMode = if (checkedId == R.id.btnListModeColorOnly) "COLOR_ONLY" else "KEY"
+                onUpdate("series_list_mode", newMode)
+                renderSeriesRows()
+            }
+        }
 
         panelView.findViewById<View>(R.id.btnSeriesDec)?.setOnClickListener {
             if (sCount > 1) {
@@ -436,8 +473,8 @@ object LineChartDefinition : IComponentDefinition {
                 gravity = android.view.Gravity.CENTER_VERTICAL
                 val isDark = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
                 setBackgroundColor(if (isDark) Color.parseColor("#331E293B") else Color.parseColor("#4DE2E8F0"))
-                val padH = (12 * resources.displayMetrics.density).toInt()
-                val padV = (4 * resources.displayMetrics.density).toInt()
+                val padH = (6 * resources.displayMetrics.density).toInt()
+                val padV = (2 * resources.displayMetrics.density).toInt()
                 setPadding(padH, padV, padH, padV)
             }
 
@@ -454,13 +491,13 @@ object LineChartDefinition : IComponentDefinition {
             bottomBar.addView(scrollView)
 
             deleteButton = ImageView(context).apply {
-                val w = (48 * resources.displayMetrics.density).toInt()
-                val h = (28 * resources.displayMetrics.density).toInt()
-                layoutParams = LayoutParams(w, h).apply { marginStart = (8 * resources.displayMetrics.density).toInt() }
+                val w = (36 * resources.displayMetrics.density).toInt()
+                val h = (20 * resources.displayMetrics.density).toInt()
+                layoutParams = LayoutParams(w, h).apply { marginStart = (4 * resources.displayMetrics.density).toInt() }
                 setImageResource(android.R.drawable.ic_menu_delete)
                 setColorFilter(Color.parseColor("#EF5350"))
                 setBackgroundResource(R.drawable.bg_card_unselected)
-                val p = (4 * resources.displayMetrics.density).toInt()
+                val p = (2 * resources.displayMetrics.density).toInt()
                 setPadding(p, p, p, p)
                 setOnClickListener {
                     chartCanvas.clearAllPoints()
@@ -471,34 +508,46 @@ object LineChartDefinition : IComponentDefinition {
         }
 
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-            val h = MeasureSpec.getSize(heightMeasureSpec)
-            val density = resources.displayMetrics.density
-            if (h > 0 && h < (80 * density)) {
-                if (bottomBar.visibility != View.GONE) bottomBar.visibility = View.GONE
-            } else {
-                updateLegendVisibility()
-            }
+            bottomBar.visibility = View.VISIBLE
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         }
 
         fun updateLegendVisibility() {
-            bottomBar.visibility = if (showLegend && chartCanvas.seriesCount > 1) View.VISIBLE else View.GONE
+            bottomBar.visibility = View.VISIBLE
         }
 
-        fun updateSeriesLabels(count: Int, keys: List<String>, colors: List<Int>) {
+        fun updateSeriesLabels(count: Int, keys: List<String>, colors: List<Int>, listMode: String = "KEY") {
             seriesLabelsContainer.removeAllViews()
             val density = resources.displayMetrics.density
             for (i in 0 until count) {
-                val keyName = if (i < keys.size && keys[i].isNotBlank()) keys[i] else "Series ${i+1}"
+                val keyName = if (i < keys.size && keys[i].isNotBlank()) keys[i] else "value${i+1}"
                 val c = if (i < colors.size) colors[i] else Color.parseColor("#00BCD4")
+                val itemLayout = LinearLayout(context).apply {
+                    orientation = HORIZONTAL
+                    gravity = android.view.Gravity.CENTER_VERTICAL
+                    setPadding((6 * density).toInt(), (2 * density).toInt(), (6 * density).toInt(), (2 * density).toInt())
+                }
+                val colorBlock = View(context).apply {
+                    val bs = (10 * density).toInt()
+                    layoutParams = LinearLayout.LayoutParams(bs, bs).apply {
+                        marginEnd = (6 * density).toInt()
+                    }
+                    setBackgroundColor(c)
+                }
                 val chip = TextView(context).apply {
                     text = keyName
                     textSize = 11f
                     typeface = android.graphics.Typeface.DEFAULT_BOLD
-                    setTextColor(c)
-                    setPadding((6 * density).toInt(), (2 * density).toInt(), (6 * density).toInt(), (2 * density).toInt())
+                    setTextColor(c) // Use the same color as the series
                 }
-                seriesLabelsContainer.addView(chip)
+                
+                if (listMode == "COLOR_ONLY") {
+                    itemLayout.addView(colorBlock)
+                } else {
+                    itemLayout.addView(chip)
+                }
+                
+                seriesLabelsContainer.addView(itemLayout)
                 if (i < count - 1) {
                     val sep = TextView(context).apply {
                         text = " | "
@@ -525,6 +574,7 @@ object LineChartDefinition : IComponentDefinition {
         var usePhoneTime: Boolean = false
         var yMaxCustom: Float? = null
         var yMinCustom: Float? = null
+        var isPreviewMode: Boolean = false
 
         private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = 4f }
         private val areaPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
@@ -599,55 +649,57 @@ object LineChartDefinition : IComponentDefinition {
 
             try {
                 gridPaint.color = gridColor
-                val leftMargin = 48f * density
-                val bottomMargin = 22f * density
-                val chartW = w - leftMargin - (12f * density)
-                val chartH = h - bottomMargin - (12f * density)
-                val topMargin = 12f * density
-
-                // 繪製網格與縱座標數值 (恆縱坐標需要在畫布上)
-                axisPaint.textAlign = Paint.Align.RIGHT
-                axisPaint.textSize = 9f * density
-                axisPaint.color = Color.parseColor("#B0B8C4")
+                val leftMargin = if (isPreviewMode) 4f * density else 48f * density
+                val bottomMargin = if (isPreviewMode) 4f * density else 22f * density
+                val chartW = w - leftMargin - (if (isPreviewMode) 4f * density else 12f * density)
+                val chartH = h - bottomMargin - (if (isPreviewMode) 4f * density else 12f * density)
+                val topMargin = if (isPreviewMode) 4f * density else 12f * density
 
                 val allPts = seriesPoints.entries.filter { it.key < seriesCount }.flatMap { it.value.map { p -> p.first } }
                 val minVal = yMinCustom ?: (if (allPts.isEmpty()) 0f else (allPts.minOrNull() ?: 0f) - 2f)
                 val maxVal = yMaxCustom ?: (if (allPts.isEmpty()) 100f else (allPts.maxOrNull() ?: 100f) + 2f)
                 val range = if (maxVal == minVal) 100f else maxVal - minVal
 
-                for (i in 0..4) {
-                    val y = topMargin + chartH * i / 4f
-                    if (i > 0 && i < 4) {
-                        canvas.drawLine(leftMargin, y, leftMargin + chartW, y, gridPaint)
-                    }
-                    val valAtTick = maxVal - (range * (i / 4f))
-                    val label = String.format("%.1f", valAtTick)
-                    canvas.drawText(label, leftMargin - (6f * density), y + (3f * density), axisPaint)
-                }
+                if (!isPreviewMode) {
+                    // 繪製網格與縱座標數值
+                    axisPaint.textAlign = Paint.Align.RIGHT
+                    axisPaint.textSize = 9f * density
+                    axisPaint.color = Color.parseColor("#B0B8C4")
 
-                // 縱坐標單位標籤
-                if (unitStr.isNotEmpty()) {
-                    axisPaint.textAlign = Paint.Align.LEFT
-                    canvas.drawText(unitStr, 8f * density, topMargin + (10f * density), axisPaint)
-                }
-
-                // 繪製橫坐標軸與時間戳 (從 0s 開始至最多秒/毫秒數)
-                canvas.drawLine(leftMargin, topMargin + chartH, leftMargin + chartW, topMargin + chartH, gridPaint)
-                val maxPtsCount = seriesPoints.entries.filter { it.key < seriesCount }.maxOfOrNull { it.value.size } ?: 0
-                if (maxPtsCount > 0) {
-                    axisPaint.textAlign = Paint.Align.CENTER
-                    val firstPt = seriesPoints.entries.filter { it.key < seriesCount }.mapNotNull { it.value.firstOrNull() }.minByOrNull { it.third }
-                    val lastPt = seriesPoints.entries.filter { it.key < seriesCount }.mapNotNull { it.value.lastOrNull() }.maxByOrNull { it.third }
-                    val startStr = "0s"
-                    val endStr = if (firstPt != null && lastPt != null && lastPt.third > firstPt.third) {
-                        val diffMs = lastPt.third - firstPt.third
-                        if (diffMs >= 1000) String.format("%.1fs", diffMs / 1000f) else "${diffMs}ms"
-                    } else {
-                        lastPt?.second ?: "0s"
+                    for (i in 0..4) {
+                        val y = topMargin + chartH * i / 4f
+                        if (i > 0 && i < 4) {
+                            canvas.drawLine(leftMargin, y, leftMargin + chartW, y, gridPaint)
+                        }
+                        val valAtTick = maxVal - (range * (i / 4f))
+                        val label = String.format("%.1f", valAtTick)
+                        canvas.drawText(label, leftMargin - (6f * density), y + (3f * density), axisPaint)
                     }
-                    canvas.drawText(startStr, leftMargin, h - (4f * density), axisPaint)
-                    if (maxPtsCount > 1) {
-                        canvas.drawText(endStr, leftMargin + chartW, h - (4f * density), axisPaint)
+
+                    // 縱坐標單位標籤
+                    if (unitStr.isNotEmpty()) {
+                        axisPaint.textAlign = Paint.Align.LEFT
+                        canvas.drawText(unitStr, 8f * density, topMargin + (10f * density), axisPaint)
+                    }
+
+                    // 繪製橫坐標軸與時間戳 (從 0s 開始至最多秒/毫秒數)
+                    canvas.drawLine(leftMargin, topMargin + chartH, leftMargin + chartW, topMargin + chartH, gridPaint)
+                    val maxPtsCount = seriesPoints.entries.filter { it.key < seriesCount }.maxOfOrNull { it.value.size } ?: 0
+                    if (maxPtsCount > 0) {
+                        axisPaint.textAlign = Paint.Align.CENTER
+                        val firstPt = seriesPoints.entries.filter { it.key < seriesCount }.mapNotNull { it.value.firstOrNull() }.minByOrNull { it.third }
+                        val lastPt = seriesPoints.entries.filter { it.key < seriesCount }.mapNotNull { it.value.lastOrNull() }.maxByOrNull { it.third }
+                        val startStr = "0s"
+                        val endStr = if (firstPt != null && lastPt != null && lastPt.third > firstPt.third) {
+                            val diffMs = lastPt.third - firstPt.third
+                            if (diffMs >= 1000) String.format("%.1fs", diffMs / 1000f) else "${diffMs}ms"
+                        } else {
+                            lastPt?.second ?: "0s"
+                        }
+                        canvas.drawText(startStr, leftMargin, h - (4f * density), axisPaint)
+                        if (maxPtsCount > 1) {
+                            canvas.drawText(endStr, leftMargin + chartW, h - (4f * density), axisPaint)
+                        }
                     }
                 }
 
@@ -694,7 +746,7 @@ object LineChartDefinition : IComponentDefinition {
 
                     canvas.drawPath(path, linePaint)
 
-                    if (showDots) {
+                    if (showDots && !isPreviewMode) {
                         pts.forEachIndexed { i, valTrip ->
                             val valPoint = valTrip.first
                             val x = if (pts.size == 1) leftMargin + chartW / 2f else leftMargin + i * chartW / (pts.size - 1)
@@ -703,7 +755,7 @@ object LineChartDefinition : IComponentDefinition {
                         }
                     }
 
-                    if (showValues) {
+                    if (showValues && !isPreviewMode) {
                         textPaint.color = c
                         pts.forEachIndexed { i, valTrip ->
                             val valPoint = valTrip.first

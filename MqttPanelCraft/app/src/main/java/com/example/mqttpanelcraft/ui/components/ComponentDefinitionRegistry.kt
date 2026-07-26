@@ -33,6 +33,9 @@ object ComponentDefinitionRegistry {
         register(TextDefinition)
         register(CalendarClockDefinition)
         register(WebBoxDefinition)
+        
+        // 媒體組件
+        register(GraphicDefinition) // 圖式元件
     }
 
     fun register(def: IComponentDefinition) {

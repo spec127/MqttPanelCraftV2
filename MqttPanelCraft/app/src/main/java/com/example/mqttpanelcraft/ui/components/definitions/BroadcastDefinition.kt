@@ -29,10 +29,10 @@ import com.google.android.material.button.MaterialButtonToggleGroup
  */
 object BroadcastDefinition : IComponentDefinition {
     override val type: String = "BROADCAST"
-    override val defaultSize: Size = Size(200, 80)
+    override val defaultSize: Size = Size(150, 50)
     override val labelPrefix: String = "broadcast"
     override val iconResId: Int = android.R.drawable.ic_lock_silent_mode_off
-    override val group: String = "DISPLAY"
+    override val group: String = "SENSOR"
     override val propertiesLayoutId: Int = R.layout.layout_prop_broadcast
 
     private fun getActivity(context: Context): Activity? {
@@ -50,8 +50,11 @@ object BroadcastDefinition : IComponentDefinition {
         "broadcast_mode" to "TTS_ONLY",
         "alert_type" to "Chime",
         "speech_rate" to "1.0",
-        "speech_pitch" to "1.05",
-        "speech_voice_preset" to "F1"
+        "speech_pitch" to "1.0",
+        "speech_voice_preset" to "NATURAL",
+        "chart_style" to "Solid",
+        "color" to "#00BCD4",
+        "show_text" to "true"
     )
 
     override fun createView(
@@ -69,17 +72,15 @@ object BroadcastDefinition : IComponentDefinition {
 
     override fun onUpdateView(view: View, data: ComponentData) {
         val broadcastView = view.findViewWithTag<BroadcastView>("target_broadcast") ?: return
-        val rate = (data.props["speech_rate"] ?: "1.0").toFloatOrNull() ?: 1.0f
+        val rate = ((data.props["speech_rate"] ?: "1.0").toFloatOrNull() ?: 1.0f).coerceIn(0.1f, 3.0f)
         val pitch = (data.props["speech_pitch"] ?: "1.05").toFloatOrNull() ?: 1.05f
-        val preset = data.props["speech_voice_preset"] ?: when (data.props["speech_pitch"]) {
-            "0.8" -> "M1"
-            "0.95" -> "M2"
-            "1.3" -> "F2"
-            else -> "F1"
-        }
+        val preset = data.props["speech_voice_preset"] ?: "NATURAL"
         broadcastView.setVoiceSettings(preset, pitch, rate)
         broadcastView.broadcastMode = data.props["broadcast_mode"] ?: "TTS_ONLY"
         broadcastView.alertType = data.props["alert_type"] ?: "Chime"
+        broadcastView.chartStyle = data.props["chart_style"] ?: "Solid"
+        broadcastView.colorStr = data.props["color"] ?: "#00BCD4"
+        broadcastView.showText = (data.props["show_text"] ?: "true") == "true"
         
         val savedText = data.props["value"]
         if (!savedText.isNullOrEmpty()) {
@@ -94,12 +95,9 @@ object BroadcastDefinition : IComponentDefinition {
     ) {
         val context = panelView.context
 
-        val tilAlert = panelView.findViewById<View>(R.id.tilAlertType)
-        val sectionTts = panelView.findViewById<View>(R.id.sectionTtsContainer)
-
         fun updateSectionVisibility(mode: String) {
+            val tilAlert = panelView.findViewById<View>(R.id.tilAlertType)
             tilAlert?.visibility = if (mode == "ALERT_ONLY" || mode == "ALERT_AND_TTS") View.VISIBLE else View.GONE
-            sectionTts?.visibility = if (mode == "TTS_ONLY" || mode == "ALERT_AND_TTS") View.VISIBLE else View.GONE
         }
 
         // 1. Broadcast Mode Toggle
@@ -129,11 +127,9 @@ object BroadcastDefinition : IComponentDefinition {
 
         // 2. Alert Type Dropdown
         val spAlert = panelView.findViewById<AutoCompleteTextView>(R.id.spAlertType)
-        val alertList = listOf("Chime", "Beep", "Emergency", "Siren", "Buzzer")
+        val alertList = listOf("Chime", "Siren", "Buzzer")
         val alertNames = listOf(
             context.getString(R.string.val_alert_alarm_classic),
-            context.getString(R.string.val_alert_beep_long),
-            context.getString(R.string.val_alert_warning_pulse),
             context.getString(R.string.val_alert_siren),
             context.getString(R.string.val_alert_synthesizer)
         )
@@ -141,58 +137,63 @@ object BroadcastDefinition : IComponentDefinition {
         val curAlert = data.props["alert_type"] ?: "Chime"
         val aIdx = alertList.indexOf(curAlert).coerceAtLeast(0)
         spAlert?.setText(alertNames[aIdx], false)
-        spAlert?.setOnClickListener { spAlert.showDropDown() }
-        tilAlert?.setOnClickListener { spAlert?.showDropDown() }
         spAlert?.setOnItemClickListener { _, _, pos, _ ->
             onUpdate("alert_type", alertList[pos])
         }
 
-        // 3. Voice Pitch Presets (4 buttons: btnPitchM1 男1, btnPitchF1 女1, btnPitchM2 男2, btnPitchF2 女2)
-        fun updatePitchUI(preset: String) {
-            val btnM1 = panelView.findViewById<MaterialButton>(R.id.btnPitchM1)
-            val btnF1 = panelView.findViewById<MaterialButton>(R.id.btnPitchF1)
-            val btnM2 = panelView.findViewById<MaterialButton>(R.id.btnPitchM2)
-            val btnF2 = panelView.findViewById<MaterialButton>(R.id.btnPitchF2)
-            listOf(btnM1, btnF1, btnM2, btnF2).forEach {
-                it?.setBackgroundColor(Color.TRANSPARENT)
-                it?.setTextColor(Color.parseColor("#4CAF50"))
+        val togglePitch = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleVoicePitch)
+        val curPreset = data.props["speech_voice_preset"] ?: "NATURAL"
+        togglePitch?.check(when(curPreset) {
+            "LOW" -> R.id.btnVoiceLow
+            "BRISK" -> R.id.btnVoiceBrisk
+            else -> R.id.btnVoiceNatural
+        })
+        togglePitch?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val preset = when (checkedId) {
+                    R.id.btnVoiceLow -> "LOW"
+                    R.id.btnVoiceBrisk -> "BRISK"
+                    else -> "NATURAL"
+                }
+                onUpdate("speech_voice_preset", preset)
+                val pitch = when (preset) {
+                    "LOW" -> "0.8"
+                    "BRISK" -> "1.3"
+                    else -> "1.0"
+                }
+                onUpdate("speech_pitch", pitch)
             }
-            val activeBtn = when (preset) {
-                "M1" -> btnM1
-                "M2" -> btnM2
-                "F2" -> btnF2
-                else -> btnF1
-            }
-            activeBtn?.setBackgroundColor(Color.parseColor("#334CAF50"))
-            activeBtn?.setTextColor(Color.WHITE)
         }
-        val curPreset = data.props["speech_voice_preset"] ?: when (data.props["speech_pitch"]) {
-            "0.8" -> "M1"
-            "0.95" -> "M2"
-            "1.3" -> "F2"
-            else -> "F1"
-        }
-        updatePitchUI(curPreset)
 
-        panelView.findViewById<View>(R.id.btnPitchM1)?.setOnClickListener {
-            onUpdate("speech_voice_preset", "M1")
-            onUpdate("speech_pitch", "0.8")
-            updatePitchUI("M1")
-        }
-        panelView.findViewById<View>(R.id.btnPitchF1)?.setOnClickListener {
-            onUpdate("speech_voice_preset", "F1")
-            onUpdate("speech_pitch", "1.05")
-            updatePitchUI("F1")
-        }
-        panelView.findViewById<View>(R.id.btnPitchM2)?.setOnClickListener {
-            onUpdate("speech_voice_preset", "M2")
-            onUpdate("speech_pitch", "0.95")
-            updatePitchUI("M2")
-        }
-        panelView.findViewById<View>(R.id.btnPitchF2)?.setOnClickListener {
-            onUpdate("speech_voice_preset", "F2")
-            onUpdate("speech_pitch", "1.3")
-            updatePitchUI("F2")
+        val styleLabels = listOf(context.getString(R.string.prop_chart_style_solid), "邊框")
+        val styleMap = mapOf(
+            context.getString(R.string.prop_chart_style_solid) to "Solid",
+            "邊框" to "Outline"
+        )
+        CommonPropBinder.bindDropdown(
+            panelView,
+            R.id.spStyle,
+            "chart_style",
+            data,
+            onUpdate,
+            styleLabels,
+            styleMap
+        )
+
+        CommonPropBinder.bindColorPalette(
+            panelView,
+            R.id.containerColor,
+            "color",
+            data,
+            onUpdate,
+            label = "色表",
+            defaultColor = "#00BCD4"
+        )
+        
+        val cbShowText = panelView.findViewById<CheckBox>(R.id.cbShowText)
+        cbShowText?.isChecked = (data.props["show_text"] ?: "true") == "true"
+        cbShowText?.setOnCheckedChangeListener { _, isChecked ->
+            onUpdate("show_text", isChecked.toString())
         }
 
         // 4. Speech Rate Input

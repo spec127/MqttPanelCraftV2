@@ -66,7 +66,7 @@
     <string name="hint_paste_json">Paste JSON here...</string>
 
     <!-- Project Editor & Sidebar -->
-    <string name="project_sidebar_category_display">Display</string>
+    <string name="project_sidebar_category_display">Media</string>
     <string name="project_cat_control">Control</string>
     <string name="component_label_inputbox">Sendbox</string>
     <string name="component_label_text_display">Receivebox</string>
@@ -445,14 +445,17 @@
     <string name="prop_chart_mode_multi">Multi Lines</string>
     <string name="prop_chart_multi_legend">Show Legend Bar (With Delete Button)</string>
     <string name="prop_chart_series_key_hint">Series Key Name</string>
-    <string name="prop_chart_style_label">Chart Style</string>
-    <string name="prop_chart_style_solid">Solid Line</string>
-    <string name="prop_chart_style_area">Area Gradient</string>
-    <string name="prop_chart_style_smooth">Smooth Curve</string>
+    <string name="prop_chart_style_label">Style</string>
+    <string name="prop_chart_style_solid">Line</string>
+    <string name="prop_chart_style_area">Area</string>
+    <string name="prop_chart_style_smooth">Curve</string>
     <string name="prop_chart_grid_color">Grid Line Color</string>
-    <string name="prop_chart_cb_phone_time">Use local phone timestamp only (ignore device JSON time)</string>
-    <string name="prop_chart_cb_show_dots">Show Data Points</string>
-    <string name="prop_chart_cb_show_values">Show Point Values (Matching Series Color)</string>
+    <string name="prop_chart_cb_phone_time">Use Phone Time Only</string>
+    <string name="prop_chart_cb_phone_time_desc">Ignore JSON time, use current phone time</string>
+    <string name="prop_chart_cb_show_dots">Show Data Dots</string>
+    <string name="prop_chart_cb_show_dots_desc">Show dot markers on chart points</string>
+    <string name="prop_chart_cb_show_values">Show Value Labels (Match line color)</string>
+    <string name="prop_chart_cb_show_values_desc">Show specific values above data points</string>
 
     <string name="prop_broadcast_mode_label">Broadcast Mode</string>
     <string name="prop_broadcast_mode_tts">TTS Speech</string>
@@ -465,15 +468,12 @@
     <string name="val_alert_beep_long">High Beep</string>
     <string name="val_alert_warning_pulse">Warning Pulse</string>
     <string name="val_alert_synthesizer">Synthesizer Up</string>
-    <string name="prop_broadcast_voice_label">Voice Preset</string>
-    <string name="val_voice_m1">Male 1 (Natural Warm)</string>
-    <string name="val_voice_f1">Female 1 (Clear Bright)</string>
-    <string name="val_voice_m2">Male 2 (Authoritative)</string>
-    <string name="val_voice_f2">Female 2 (Brisk Alert)</string>
+    <string name="prop_broadcast_voice_label">Voice Pitch</string>
+    <string name="prop_broadcast_voice_low">Male</string>
+    <string name="prop_broadcast_voice_natural">Natural</string>
+    <string name="prop_broadcast_voice_brisk">Brisk</string>
     <string name="prop_broadcast_rate_label">Speech Rate</string>
-    <string name="val_rate_slow">Slow (0.8x)</string>
-    <string name="val_rate_normal">Normal (1.0x)</string>
-    <string name="val_rate_fast">Fast (1.3x)</string>
+    <string name="prop_broadcast_show_text">Show Text</string>
     <string name="prop_broadcast_test_input_hint">Enter test speech text...</string>
     <string name="prop_broadcast_btn_test">Test Play</string>
     <string name="prop_broadcast_linked_tip">Linked Target Components (Trigger when selected components receive data)</string>
@@ -501,6 +501,30 @@
     <string name="broadcast_mode_pure_tts">純語音</string>
     <string name="broadcast_mode_pure_alert">純警報</string>
     <string name="broadcast_mode_alert_tts">警報+語音</string>
-    <string name="broadcast_waiting_text">等待語音廣播文字...</string>
-    <string name="broadcast_no_linked">無其他可連結的接收元件</string>
+    <string name="broadcast_waiting_text">Waiting for text...</string>
+    <string name="broadcast_no_linked">No linked targets</string>
+
+    <!-- Graphic (Shape) Component Properties -->
+    <string name="component_graphic">Graphic</string>
+    <string name="prop_graphic_type">Shape Type</string>
+    <string name="val_graphic_type_rect">Rectangle</string>
+    <string name="val_graphic_type_circle">Circle/Oval</string>
+    <string name="val_graphic_type_line">Line</string>
+    <string name="val_graphic_type_image">Image</string>
+    <string name="prop_graphic_fill_color">Fill Color</string>
+    <string name="prop_graphic_stroke_color">Stroke Color</string>
+    <string name="prop_graphic_stroke_width">Stroke Width</string>
+    <string name="prop_graphic_corner_radius">Corner Radius</string>
+    <string name="prop_graphic_line_direction">Direction</string>
+    <string name="val_line_horizontal">Horizontal</string>
+    <string name="val_line_vertical">Vertical</string>
+    <string name="prop_graphic_line_style">Line Style</string>
+    <string name="val_line_solid">Solid</string>
+    <string name="val_line_dashed">Dashed</string>
+    <string name="val_line_dotted">Dotted</string>
+    <string name="prop_graphic_image_source">Image Source</string>
+    <string name="prop_graphic_scale_type">Scale Type</string>
+    <string name="val_scale_center_crop">Center Crop</string>
+    <string name="val_scale_fit_center">Fit Center</string>
+    <string name="prop_graphic_opacity">Opacity</string>
 </resources>

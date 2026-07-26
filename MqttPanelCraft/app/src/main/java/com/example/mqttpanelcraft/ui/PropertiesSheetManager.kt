@@ -372,6 +372,14 @@ class PropertiesSheetManager(
                 android.util.Log.w("PropsManager", "No definition or layout for type: $typeClean")
             }
 
+            // Hide topic row for DISPLAY (Media/Decoration) components
+            val containerTopicRow = propertyContainer.findViewById<View>(R.id.containerTopicRow)
+            if (def?.group == "DISPLAY") {
+                containerTopicRow?.visibility = View.GONE
+            } else {
+                containerTopicRow?.visibility = View.VISIBLE
+            }
+
             // Generic Payload Logic
             if (def != null && def.group == "CONTROL") {
                 tilGenericPayload?.visibility = View.VISIBLE

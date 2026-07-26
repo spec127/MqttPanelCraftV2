@@ -84,11 +84,7 @@ object ShapeDefinition : IComponentDefinition {
         payload: String,
         onUpdateProp: (key: String, value: String) -> Unit
     ) {
-        val shapeView = (view as? FrameLayout)?.findViewWithTag<ShapeView>("target_shape") ?: return
-        try {
-            shapeView.shapeColor = Color.parseColor(payload.trim())
-            shapeView.invalidate()
-        } catch (_: Exception) {}
+        // Graphic components no longer have MQ functionality
     }
 
     private class ShapeView(context: Context) : View(context) {

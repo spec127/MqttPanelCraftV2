@@ -115,39 +115,7 @@
             android:textSize="13sp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
-        android:layout_marginBottom="12dp"/>
-
-    <!-- Section 2: TTS PARAMETERS (語音調整：音調預設按鈕與語速輸入) -->
-    <LinearLayout
-        android:id="@+id/sectionTtsContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="start|center_vertical"
-            android:layout_marginBottom="10dp">
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_btn_tune"
-                app:tint="@color/props_primary"
-                android:layout_marginEnd="6dp"/>
-            <TextView
-                android:text="@string/prop_section_visual"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/prop_text_secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+        <!-- Remove Section 2 Divider & Header -->
 
         <TextView
             android:layout_width="wrap_content"
@@ -157,69 +125,54 @@
             android:textColor="@color/prop_text_primary"
             android:layout_marginBottom="6dp"/>
 
-        <!-- 4 個音調預設按鈕 (男1, 女1, 男2, 女2) -->
-        <LinearLayout
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleVoicePitch"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:orientation="horizontal"
-            android:weightSum="4"
-            android:layout_marginBottom="14dp">
+            android:layout_marginBottom="14dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@+id/btnVoiceNatural">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPitchM1"
+                android:id="@+id/btnVoiceLow"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/val_voice_m1"
-                android:textSize="11sp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:padding="0dp"
-                android:layout_marginEnd="4dp"
-                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPitchF1"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="@string/val_voice_f1"
-                android:textSize="11sp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:padding="0dp"
-                android:layout_marginEnd="4dp"
-                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPitchM2"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="@string/val_voice_m2"
-                android:textSize="11sp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:padding="0dp"
-                android:layout_marginEnd="4dp"
-                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPitchF2"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="@string/val_voice_f2"
+                android:text="@string/prop_broadcast_voice_low"
                 android:textSize="11sp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:padding="0dp"
                 app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
-        </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVoiceNatural"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/prop_broadcast_voice_natural"
+                android:textSize="11sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVoiceBrisk"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/prop_broadcast_voice_brisk"
+                android:textSize="11sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <!-- 語速保留單行輸入框 -->
         <com.google.android.material.textfield.TextInputLayout
@@ -237,50 +190,91 @@
                 android:maxLines="1"
                 android:textSize="13sp"/>
         </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
 
-    <!-- Section 3: LINKED TARGET COMPONENTS (與接收框同步聯動，接收到內容立刻觸發播報) -->
+    <!-- 掛勾接收對象 (與接收框同步聯動) -->
+    <TextView
+        android:text="@string/prop_broadcast_linked_tip"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/prop_text_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"/>
+
     <LinearLayout
-        android:id="@+id/sectionLinkedComponents"
+        android:id="@+id/containerLinkedComponents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:layout_marginBottom="12dp"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider"
-            android:layout_marginBottom="12dp"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="start|center_vertical"
-            android:layout_marginBottom="6dp">
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_touch_app"
-                app:tint="@color/props_primary"
-                android:layout_marginEnd="6dp"/>
-            <TextView
-                android:text="@string/prop_broadcast_linked_tip"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/prop_text_secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/containerLinkedComponents"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp"
-            android:background="@drawable/bg_prop_item_premium"
-            android:layout_marginBottom="12dp"/>
+    <!-- Section: VISUAL APPEARANCE (視覺外觀) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="8dp">
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/props_primary"
+            android:layout_marginEnd="6dp"/>
+        <TextView
+            android:text="@string/prop_section_visual"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10"
+        android:layout_marginBottom="12dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:hint="風格"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_marginEnd="12dp">
+            <AutoCompleteTextView
+                android:id="@+id/spStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:maxLines="1"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <FrameLayout
+            android:id="@+id/containerColor"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="6">
+            <include layout="@layout/layout_prop_generic_color" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/cbShowText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/prop_broadcast_show_text"
+        android:textColor="@color/prop_text_primary"
+        android:textSize="13sp"
+        android:layout_marginBottom="12dp"/>
 
 </LinearLayout>

@@ -438,6 +438,9 @@ class SidebarManager(
                                 if (def.type == "BUTTON") {
                                         dummyProps["text"] = "" // Remove text in small thumbnail
                                         dummyProps["label"] = ""
+                                }
+                                if (def.type == "CHART") {
+                                        dummyProps["is_preview"] = "true"
                                 } else if (def.type == "SWITCH") {
                                         dummyProps["state"] = "2" // Show solid ON color in thumbnail
                                 }

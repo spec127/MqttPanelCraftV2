@@ -16,8 +16,8 @@ android {
     defaultConfig {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
-        versionCode = 182
-        versionName = "0.12.0" // v0.12.0：實作語音廣播（四組聲線與純警報掛勾連動）、折線圖互動優化及全元件多語系適配
+        versionCode = 186
+        versionName = "0.12.6" // v0.12.6：修正折線圖預覽、多線顏色、圖例排版，修復廣播屬性報錯及排版、縮放，圖式元件預覽修正
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -63,7 +63,7 @@
     <string name="hint_paste_json">在此貼上 JSON...</string>
 
     <!-- Project Editor & Sidebar -->
-    <string name="project_sidebar_category_display">多媒體組件</string>
+    <string name="project_sidebar_category_display">媒體組件</string>
     <string name="project_cat_control">控制組件</string>
     <string name="project_cat_sensor">感測器組件</string>
 
@@ -423,39 +423,28 @@
     <string name="prop_chart_y_min">下限</string>
     <string name="prop_chart_unit">單位</string>
     <string name="prop_chart_max_points">資料數上限 (10~1000 筆)</string>
-    <string name="prop_chart_mode_single">單線資料</string>
-    <string name="prop_chart_mode_multi">多線資料</string>
+    <string name="prop_chart_mode_single">單資料模式</string>
+    <string name="prop_chart_mode_multi">多資料模式</string>
     <string name="prop_chart_multi_legend">顯示多線圖例底欄 (附刪除按鈕)</string>
     <string name="prop_chart_series_key_hint">序列鍵名 (Key)</string>
-    <string name="prop_chart_style_label">曲線與填充風格</string>
-    <string name="prop_chart_style_solid">實線連接</string>
-    <string name="prop_chart_style_area">漸層面積</string>
-    <string name="prop_chart_style_smooth">圓滑貝茲曲線</string>
+    <string name="prop_chart_style_label">風格</string>
+    <string name="prop_chart_style_solid">折線</string>
+    <string name="prop_chart_style_area">面積</string>
+    <string name="prop_chart_style_smooth">曲線</string>
     <string name="prop_chart_grid_color">網格線條顏色</string>
-    <string name="prop_chart_cb_phone_time">時間戳記僅採用手機當下時間 (不採用裝置 JSON 傳送時間)</string>
+    <string name="prop_chart_cb_phone_time">僅採用手機當下時間</string>
+    <string name="prop_chart_cb_phone_time_desc">忽略 JSON 時間，僅顯示手機當下時間</string>
     <string name="prop_chart_cb_show_dots">顯示資料標記點</string>
+    <string name="prop_chart_cb_show_dots_desc">在折線圖上顯示資料點的圓點</string>
     <string name="prop_chart_cb_show_values">標註數值標籤 (同線條顏色)</string>
+    <string name="prop_chart_cb_show_values_desc">在資料點上方顯示具體數值</string>
 
-    <string name="prop_broadcast_mode_label">播報切換模式</string>
-    <string name="prop_broadcast_mode_tts">TTS 語音播報</string>
-    <string name="prop_broadcast_mode_alert">單純警報聲</string>
-    <string name="prop_broadcast_mode_both">事前提示+TTS</string>
-    <string name="prop_broadcast_mode_tip">提示：收訊時將先播發警報提示音，隨後進行語音播送文字。</string>
-    <string name="prop_broadcast_alert_type">警報音效 (Alert Sound Tone)</string>
-    <string name="val_alert_alarm_classic">經典警鈴 (Classic Alarm)</string>
-    <string name="val_alert_siren">雙重警報巡邏 (Siren)</string>
-    <string name="val_alert_beep_long">高頻連續嗶聲 (Beep)</string>
-    <string name="val_alert_warning_pulse">急促脈衝警告 (Warning Pulse)</string>
-    <string name="val_alert_synthesizer">電子合成升頻音 (Synthesizer)</string>
     <string name="prop_broadcast_voice_label">語音聲線</string>
-    <string name="val_voice_m1">男聲 1 (自然溫和)</string>
-    <string name="val_voice_f1">女聲 1 (清晰明亮)</string>
-    <string name="val_voice_m2">男聲 2 (渾厚播報)</string>
-    <string name="val_voice_f2">女聲 2 (快節奏提醒)</string>
+    <string name="prop_broadcast_voice_low">男聲</string>
+    <string name="prop_broadcast_voice_natural">自然</string>
+    <string name="prop_broadcast_voice_brisk">輕快</string>
     <string name="prop_broadcast_rate_label">語速調整</string>
-    <string name="val_rate_slow">慢速 (0.8x)</string>
-    <string name="val_rate_normal">正常 (1.0x)</string>
-    <string name="val_rate_fast">快速 (1.3x)</string>
+    <string name="prop_broadcast_show_text">顯示文字</string>
     <string name="prop_broadcast_test_input_hint">輸入測試播報文字...</string>
     <string name="prop_broadcast_linked_tip">掛勾接收對象 (與接收框同步聯動，接收到內容立刻觸發播報)</string>
 
@@ -483,5 +472,27 @@
     <string name="broadcast_mode_pure_alert">純警報</string>
     <string name="broadcast_mode_alert_tts">警報+語音</string>
     <string name="broadcast_waiting_text">等待語音廣播文字...</string>
-    <string name="broadcast_no_linked">無其他可連結的接收元件</string>
+    <string name="broadcast_no_linked">無其他可連結的接收元件</string>    <!-- Graphic (Shape) Component Properties -->
+    <string name="component_graphic">圖式</string>
+    <string name="prop_graphic_type">圖形種類</string>
+    <string name="val_graphic_type_rect">矩形</string>
+    <string name="val_graphic_type_circle">圓形/橢圓</string>
+    <string name="val_graphic_type_line">線條</string>
+    <string name="val_graphic_type_image">圖片</string>
+    <string name="prop_graphic_fill_color">填滿顏色</string>
+    <string name="prop_graphic_stroke_color">邊框顏色</string>
+    <string name="prop_graphic_stroke_width">邊框粗細</string>
+    <string name="prop_graphic_corner_radius">圓角半徑</string>
+    <string name="prop_graphic_line_direction">線條方向</string>
+    <string name="val_line_horizontal">水平線</string>
+    <string name="val_line_vertical">垂直線</string>
+    <string name="prop_graphic_line_style">線條樣式</string>
+    <string name="val_line_solid">實線</string>
+    <string name="val_line_dashed">虛線</string>
+    <string name="val_line_dotted">點狀線</string>
+    <string name="prop_graphic_image_source">圖片來源</string>
+    <string name="prop_graphic_scale_type">縮放模式</string>
+    <string name="val_scale_center_crop">填滿</string>
+    <string name="val_scale_fit_center">適應</string>
+    <string name="prop_graphic_opacity">透明度</string>
 </resources>

@@ -53,7 +53,7 @@
     <string name="setup_error_name_exists">项目名称已存在</string>
 
     <!-- Project View Activity -->
-    <string name="project_sidebar_category_display">显示</string>
+    <string name="project_sidebar_category_display">媒体组件</string>
     <string name="project_console_title">MQTT/系统日志</string>
     <string name="project_hint_payload">消息内容</string>
     <string name="project_hint_topic_target">Topic (目标)</string>
@@ -151,14 +151,17 @@
     <string name="prop_chart_mode_multi">多线数据</string>
     <string name="prop_chart_multi_legend">显示多线图例底栏 (附删除按钮)</string>
     <string name="prop_chart_series_key_hint">序列键名 (Key)</string>
-    <string name="prop_chart_style_label">曲线与填充风格</string>
-    <string name="prop_chart_style_solid">实线连接</string>
-    <string name="prop_chart_style_area">渐变面积</string>
-    <string name="prop_chart_style_smooth">圆滑贝塞尔曲线</string>
+    <string name="prop_chart_style_label">风格</string>
+    <string name="prop_chart_style_solid">折线</string>
+    <string name="prop_chart_style_area">面积</string>
+    <string name="prop_chart_style_smooth">曲线</string>
     <string name="prop_chart_grid_color">网格线条颜色</string>
-    <string name="prop_chart_cb_phone_time">时间戳记仅采用手机当下时间 (不采用设备 JSON 传送时间)</string>
+    <string name="prop_chart_cb_phone_time">仅采用手机当下时间</string>
+    <string name="prop_chart_cb_phone_time_desc">忽略 JSON 时间，仅显示手机当下时间</string>
     <string name="prop_chart_cb_show_dots">显示数据标记点</string>
+    <string name="prop_chart_cb_show_dots_desc">在折线图上显示数据点的圆点</string>
     <string name="prop_chart_cb_show_values">标注数值标签 (同线条颜色)</string>
+    <string name="prop_chart_cb_show_values_desc">在数据点上方显示具体数值</string>
 
     <string name="prop_broadcast_mode_label">播报切换模式</string>
     <string name="prop_broadcast_mode_tts">TTS 语音播报</string>

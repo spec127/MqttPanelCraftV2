@@ -64,11 +64,63 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
 
     var voicePreset: String = "F1"
 
+    var chartStyle: String = "Solid"
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var colorStr: String = "#00BCD4"
+        set(value) {
+            field = value
+            try {
+                val c = Color.parseColor(value)
+                speakButton.backgroundTintList = android.content.res.ColorStateList.valueOf(c)
+                if (chartStyle == "Solid") {
+                    speakButton.setColorFilter(Color.WHITE)
+                } else {
+                    speakButton.setColorFilter(c)
+                    speakButton.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#1A000000")) // faint dark
+                }
+            } catch (e: Exception) {}
+            invalidate()
+        }
+
+    var showText: Boolean = true
+        set(value) {
+            field = value
+            contentText.visibility = if (value) View.VISIBLE else View.GONE
+        }
+
     fun setVoiceSettings(preset: String, pitch: Float, rate: Float) {
         voicePreset = preset
         speechPitch = pitch
         speechRate = rate
         applyVoiceSettings()
+    }
+
+    private val bgPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+    override fun dispatchDraw(canvas: android.graphics.Canvas) {
+        val w = width.toFloat()
+        val h = height.toFloat()
+        val r = 16f * resources.displayMetrics.density
+        
+        try {
+            val c = Color.parseColor(colorStr)
+            if (chartStyle == "Solid") {
+                bgPaint.style = android.graphics.Paint.Style.FILL
+                bgPaint.color = c
+                bgPaint.alpha = 25 // approx 10% opacity for background
+                canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
+            } else if (chartStyle == "Outline") {
+                bgPaint.style = android.graphics.Paint.Style.STROKE
+                bgPaint.strokeWidth = 4f * resources.displayMetrics.density
+                bgPaint.color = c
+                canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
+            }
+        } catch(e: Exception) {}
+        
+        super.dispatchDraw(canvas)
     }
 
     init {
@@ -95,6 +147,7 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
             gravity = Gravity.CENTER_VERTICAL
         }
 
+
         val icon = ImageView(context).apply {
             layoutParams = LinearLayout.LayoutParams((24 * density).toInt(), (24 * density).toInt()).apply {
                 marginEnd = (8 * density).toInt()
@@ -110,6 +163,7 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
             textSize = 13f
             typeface = android.graphics.Typeface.DEFAULT_BOLD
             setTextColor(Color.parseColor("#E0E0E0"))
+            gravity = Gravity.CENTER
         }
         headerRow.addView(titleText)
 
@@ -149,19 +203,46 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
         contentText = TextView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                0,
+                1f
             ).apply {
                 topMargin = (8 * density).toInt()
             }
             text = lastMessage
             textSize = 13f
             setTextColor(Color.parseColor("#B0B8C4"))
-            maxLines = 3
+            maxLines = 10
             ellipsize = android.text.TextUtils.TruncateAt.END
         }
         container.addView(contentText)
 
         addView(container)
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        val density = resources.displayMetrics.density
+        // Base width is 150dp
+        val baseWidth = 150f * density
+        val scale = (w / baseWidth).coerceIn(0.5f, 2.0f)
+
+        titleText.textSize = 13f * scale
+        contentText.textSize = 13f * scale
+        modeChip.textSize = 10f * scale
+        val padChipH = (6 * density * scale).toInt()
+        val padChipV = (2 * density * scale).toInt()
+        modeChip.setPadding(padChipH, padChipV, padChipH, padChipV)
+        
+        val btnSize = (36 * density * scale).toInt()
+        speakButton.layoutParams = LinearLayout.LayoutParams(btnSize, btnSize)
+        val padP = (8 * density * scale).toInt()
+        speakButton.setPadding(padP, padP, padP, padP)
+        
+        val headerRow = (getChildAt(0) as? LinearLayout)?.getChildAt(0) as? LinearLayout
+        val icon = headerRow?.getChildAt(0) as? ImageView
+        icon?.layoutParams = LinearLayout.LayoutParams((24 * density * scale).toInt(), (24 * density * scale).toInt()).apply {
+            marginEnd = (8 * density * scale).toInt()
+        }
     }
 
     override fun onInit(status: Int) {
@@ -186,7 +267,7 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
                 }.sortedByDescending { 
                     (if (it.locale.country == curLocale.country) 10 else 0) + 
                     (if (it.quality >= android.speech.tts.Voice.QUALITY_HIGH) 5 else 0) +
-                    (if (!it.isNetworkConnectionRequired) 2 else 0)
+                    (if (it.isNetworkConnectionRequired) 3 else 0) // Prefer network voices for natural sound
                 }
 
                 if (matchingVoices.isNotEmpty()) {
@@ -198,11 +279,9 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
                     }
 
                     val selectedVoice = when (voicePreset) {
-                        "M1" -> maleCandidates.firstOrNull() ?: matchingVoices.getOrNull(0)
-                        "M2" -> maleCandidates.getOrNull(1) ?: maleCandidates.firstOrNull() ?: matchingVoices.getOrNull(1) ?: matchingVoices.getOrNull(0)
-                        "F1" -> femaleCandidates.firstOrNull() ?: matchingVoices.getOrNull(0)
-                        "F2" -> femaleCandidates.getOrNull(1) ?: femaleCandidates.firstOrNull() ?: matchingVoices.getOrNull(2) ?: matchingVoices.getOrNull(0)
-                        else -> matchingVoices.firstOrNull()
+                        "LOW" -> maleCandidates.lastOrNull() ?: maleCandidates.firstOrNull() ?: matchingVoices.firstOrNull()
+                        "BRISK" -> femaleCandidates.firstOrNull() ?: matchingVoices.firstOrNull()
+                        else -> femaleCandidates.lastOrNull() ?: matchingVoices.firstOrNull()
                     }
 
                     if (selectedVoice != null) {
@@ -211,10 +290,10 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
                 }
             }
             val naturalPitch = when (voicePreset) {
-                "M1" -> 0.92f
-                "M2" -> 0.86f
-                "F1" -> 1.08f
-                "F2" -> 1.15f
+                "M1" -> 0.82f
+                "M2" -> 0.70f
+                "F1" -> 1.18f
+                "F2" -> 1.35f
                 else -> speechPitch
             }
             tts?.setPitch(naturalPitch)

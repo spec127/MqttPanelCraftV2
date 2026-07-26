@@ -31,55 +31,70 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="3"
+        android:orientation="vertical"
         android:layout_marginBottom="10dp">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="0dp"
+        
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/prop_chart_y_max"
-            style="@style/Widget.App.TextInputLayout.Properties"
-            android:layout_marginEnd="6dp">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etYMax"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:inputType="numberDecimal|numberSigned"
-                android:maxLines="1"
-                android:textSize="13sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="horizontal"
+            android:weightSum="3">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/prop_chart_y_min"
-            style="@style/Widget.App.TextInputLayout.Properties"
-            android:layout_marginEnd="6dp">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etYMin"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:inputType="numberDecimal|numberSigned"
-                android:maxLines="1"
-                android:textSize="13sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/prop_chart_y_max"
+                style="@style/Widget.App.TextInputLayout.Properties"
+                android:layout_marginEnd="6dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etYMax"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:inputType="numberDecimal|numberSigned"
+                    android:maxLines="1"
+                    android:textSize="13sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="0dp"
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/prop_chart_y_min"
+                style="@style/Widget.App.TextInputLayout.Properties"
+                android:layout_marginEnd="6dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etYMin"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:inputType="numberDecimal|numberSigned"
+                    android:maxLines="1"
+                    android:textSize="13sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/prop_chart_unit"
+                style="@style/Widget.App.TextInputLayout.Properties">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etChartUnit"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:maxLines="1"
+                    android:textSize="13sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+        
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/prop_chart_unit"
-            style="@style/Widget.App.TextInputLayout.Properties">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etChartUnit"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:maxLines="1"
-                android:textSize="13sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
+            android:text="未輸入上下限則自動適配"
+            android:textColor="@color/prop_text_secondary"
+            android:textSize="11sp"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="4dp"/>
     </LinearLayout>
 
     <!-- 2. 資料數上限 (單行輸入框 10~1000 筆) -->
@@ -145,37 +160,53 @@
         android:weightSum="10"
         android:layout_marginBottom="10dp">
 
-        <LinearLayout
-            android:id="@+id/itemMultiLegend"
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleSeriesListMode"
             android:layout_width="0dp"
-            android:layout_weight="6"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginEnd="8dp"
-            android:paddingVertical="4dp">
-            <TextView
+            android:layout_weight="7"
+            android:layout_height="32dp"
+            android:layout_marginEnd="12dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@+id/btnListModeKey">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnListModeKey"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/prop_chart_multi_legend"
+                android:layout_height="match_parent"
+                android:text="資料標籤"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
                 android:textSize="11sp"
-                android:textColor="@color/prop_text_primary"/>
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switchMultiLegend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"/>
-        </LinearLayout>
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnListModeColorOnly"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="色塊"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                android:textSize="11sp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <!-- 加減數量操作鈕 (減少高度) -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="32dp"
-            android:layout_weight="4"
+            android:layout_weight="3"
             android:orientation="horizontal"
             android:gravity="center"
-            android:background="@drawable/bg_prop_item_premium">
+            android:background="@drawable/bg_input_outline">
 
             <ImageView
                 android:id="@+id/btnSeriesDec"
@@ -262,6 +293,13 @@
                 android:textColor="@color/prop_text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prop_chart_cb_phone_time_desc"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"/>
         </LinearLayout>
         <ImageView
             android:id="@+id/checkHasTimestamp"
@@ -355,6 +393,13 @@
                 android:textColor="@color/prop_text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prop_chart_cb_show_dots_desc"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"/>
         </LinearLayout>
         <ImageView
             android:id="@+id/checkShowDots"
@@ -386,6 +431,13 @@
                 android:textColor="@color/prop_text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prop_chart_cb_show_values_desc"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"/>
         </LinearLayout>
         <ImageView
             android:id="@+id/checkShowValues"
