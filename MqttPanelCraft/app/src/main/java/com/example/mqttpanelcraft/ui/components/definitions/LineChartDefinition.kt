@@ -25,7 +25,7 @@ import org.json.JSONObject
 object LineChartDefinition : IComponentDefinition {
 
     override val type: String = "CHART"
-    override val defaultSize: Size = Size(280, 180)
+    override val defaultSize: Size = Size(260, 170)
     override val labelPrefix: String = "chart"
     override val iconResId: Int = android.R.drawable.ic_menu_report_image
     override val group: String = "SENSOR"

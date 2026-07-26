@@ -532,8 +532,7 @@ class SidebarManager(
                                                 "STEPPER" -> Pair(dpToPx(60), dpToPx(26))
                                                 "CHART" ->
                                                         Pair(
-                                                                android.widget.FrameLayout
-                                                                        .LayoutParams.MATCH_PARENT,
+                                                                dpToPx(72),
                                                                 dpToPx(36)
                                                         )
                                                 else ->
