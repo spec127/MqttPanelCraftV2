@@ -245,7 +245,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="4"
-            android:hint="風格"
+            android:hint="@string/prop_chart_style_label"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_marginEnd="12dp">
             <AutoCompleteTextView
@@ -262,19 +262,47 @@
         <FrameLayout
             android:id="@+id/containerColor"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="6">
             <include layout="@layout/layout_prop_generic_color" />
         </FrameLayout>
     </LinearLayout>
 
-    <CheckBox
-        android:id="@+id/cbShowText"
+    <LinearLayout
+        android:id="@+id/itemShowText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/prop_broadcast_show_text"
-        android:textColor="@color/prop_text_primary"
-        android:textSize="13sp"
-        android:layout_marginBottom="12dp"/>
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prop_broadcast_show_text"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prop_broadcast_show_text_desc"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/checkShowText"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_check_circle_premium"
+            android:visibility="invisible"/>
+    </LinearLayout>
 
 </LinearLayout>

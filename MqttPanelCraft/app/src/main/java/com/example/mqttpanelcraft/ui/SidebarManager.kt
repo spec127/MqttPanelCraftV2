@@ -441,6 +441,7 @@ class SidebarManager(
                                 }
                                 if (def.type == "CHART") {
                                         dummyProps["is_preview"] = "true"
+                                        dummyProps["series_color_1"] = "#FF9800"
                                 } else if (def.type == "SWITCH") {
                                         dummyProps["state"] = "2" // Show solid ON color in thumbnail
                                 }
@@ -528,6 +529,7 @@ class SidebarManager(
                                                         Pair(dpToPx(32), dpToPx(40))
                                                 "TEXT" -> Pair(dpToPx(96), dpToPx(30))
                                                 "IMAGE", "IMAGE_SENSOR" -> Pair(dpToPx(56), dpToPx(42))
+                                                "GRAPHIC" -> Pair(dpToPx(56), dpToPx(56))
                                                 "TEXT_DISPLAY" -> Pair(dpToPx(96), dpToPx(34))
                                                 "STEPPER" -> Pair(dpToPx(60), dpToPx(26))
                                                 "CHART" ->

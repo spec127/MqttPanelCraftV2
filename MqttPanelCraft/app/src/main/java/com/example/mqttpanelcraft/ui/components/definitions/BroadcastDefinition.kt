@@ -11,6 +11,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.ImageView
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.example.mqttpanelcraft.ProjectViewModel
@@ -165,10 +166,15 @@ object BroadcastDefinition : IComponentDefinition {
             }
         }
 
-        val styleLabels = listOf(context.getString(R.string.prop_chart_style_solid), "邊框")
+        val styleLabels = listOf(
+            context.getString(R.string.val_style_text_capsule),
+            context.getString(R.string.val_style_text_infinity),
+            context.getString(R.string.val_style_text_glass)
+        )
         val styleMap = mapOf(
-            context.getString(R.string.prop_chart_style_solid) to "Solid",
-            "邊框" to "Outline"
+            context.getString(R.string.val_style_text_capsule) to "Capsule",
+            context.getString(R.string.val_style_text_infinity) to "Infinity",
+            context.getString(R.string.val_style_text_glass) to "Glass"
         )
         CommonPropBinder.bindDropdown(
             panelView,
@@ -190,10 +196,14 @@ object BroadcastDefinition : IComponentDefinition {
             defaultColor = "#00BCD4"
         )
         
-        val cbShowText = panelView.findViewById<CheckBox>(R.id.cbShowText)
-        cbShowText?.isChecked = (data.props["show_text"] ?: "true") == "true"
-        cbShowText?.setOnCheckedChangeListener { _, isChecked ->
-            onUpdate("show_text", isChecked.toString())
+        val itemShowText = panelView.findViewById<LinearLayout>(R.id.itemShowText)
+        val checkShowText = panelView.findViewById<ImageView>(R.id.checkShowText)
+        val isShowText = (data.props["show_text"] ?: "true") == "true"
+        checkShowText?.visibility = if (isShowText) View.VISIBLE else View.INVISIBLE
+        itemShowText?.setOnClickListener {
+            val newState = !((data.props["show_text"] ?: "true") == "true")
+            onUpdate("show_text", newState.toString())
+            checkShowText?.visibility = if (newState) View.VISIBLE else View.INVISIBLE
         }
 
         // 4. Speech Rate Input

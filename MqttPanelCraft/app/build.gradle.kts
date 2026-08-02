@@ -16,8 +16,8 @@ android {
     defaultConfig {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
-        versionCode = 186
-        versionName = "0.12.6" // v0.12.6：修正折線圖預覽、多線顏色、圖例排版，修復廣播屬性報錯及排版、縮放，圖式元件預覽修正
+        versionCode = 187
+        versionName = "0.12.7" // v0.12.7：折線圖上限6筆、廣播外觀更新為膠囊/無極/玻璃、修復圖式元件渲染空白問題
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

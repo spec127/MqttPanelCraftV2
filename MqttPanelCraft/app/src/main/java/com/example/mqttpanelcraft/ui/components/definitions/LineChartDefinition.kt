@@ -45,8 +45,12 @@ object LineChartDefinition : IComponentDefinition {
         "show_values" to "false",
         "series_key_1" to "value1",
         "series_key_2" to "value2",
-        "series_color_1" to "#00BCD4",
-        "series_color_2" to "#00E676"
+        "series_color_1" to "#FF9800",
+        "series_color_2" to "#F44336",
+        "series_color_3" to "#4CAF50",
+        "series_color_4" to "#2196F3",
+        "series_color_5" to "#9C27B0",
+        "series_color_6" to "#FFEB3B"
     )
 
     override fun createView(context: Context, isEditMode: Boolean): View {
@@ -158,7 +162,7 @@ object LineChartDefinition : IComponentDefinition {
         val containerSeriesCount = panelView.findViewById<View>(R.id.containerSeriesCount)
         containerSeriesCount?.visibility = if (curMode == "MULTI") View.VISIBLE else View.GONE
 
-        var sCount = (data.props["series_count"] ?: "1").toIntOrNull()?.coerceIn(1, 8) ?: 1
+        var sCount = (data.props["series_count"] ?: "1").toIntOrNull()?.coerceIn(1, 6) ?: 1
         val tvCount = panelView.findViewById<TextView>(R.id.tvSeriesCount)
         val llSeries = panelView.findViewById<LinearLayout>(R.id.llSeriesContainer)
 
@@ -286,7 +290,7 @@ object LineChartDefinition : IComponentDefinition {
             }
         }
         panelView.findViewById<View>(R.id.btnSeriesInc)?.setOnClickListener {
-            if (sCount < 8) {
+            if (sCount < 6) {
                 sCount++
                 tvCount?.text = "$sCount"
                 onUpdate("series_count", sCount.toString())
@@ -592,6 +596,15 @@ object LineChartDefinition : IComponentDefinition {
         init {
             val nowStr = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
             val nowMs = System.currentTimeMillis()
+            // 預設多色表顏色：橘、紅、綠、藍、紫、黃
+            seriesColors = listOf(
+                Color.parseColor("#FF9800"),
+                Color.parseColor("#F44336"),
+                Color.parseColor("#4CAF50"),
+                Color.parseColor("#2196F3"),
+                Color.parseColor("#9C27B0"),
+                Color.parseColor("#FFEB3B")
+            )
             seriesPoints[0] = mutableListOf(
                 Triple(22f, nowStr, nowMs - 4000),
                 Triple(26f, nowStr, nowMs - 3000),

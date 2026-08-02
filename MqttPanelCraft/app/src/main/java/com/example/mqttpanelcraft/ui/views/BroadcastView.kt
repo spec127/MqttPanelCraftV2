@@ -18,7 +18,6 @@ import java.util.Locale
  */
 class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnInitListener {
 
-    private val titleText: TextView
     private val modeChip: TextView
     private val contentText: TextView
     private val speakButton: ImageView
@@ -103,20 +102,52 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
         val w = width.toFloat()
         val h = height.toFloat()
-        val r = 16f * resources.displayMetrics.density
+        val r = 12f * resources.displayMetrics.density
         
         try {
             val c = Color.parseColor(colorStr)
-            if (chartStyle == "Solid") {
-                bgPaint.style = android.graphics.Paint.Style.FILL
-                bgPaint.color = c
-                bgPaint.alpha = 25 // approx 10% opacity for background
-                canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
-            } else if (chartStyle == "Outline") {
-                bgPaint.style = android.graphics.Paint.Style.STROKE
-                bgPaint.strokeWidth = 4f * resources.displayMetrics.density
-                bgPaint.color = c
-                canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
+            val density = resources.displayMetrics.density
+            when (chartStyle) {
+                "Capsule" -> {
+                    val r = h / 2f
+                    bgPaint.style = android.graphics.Paint.Style.FILL
+                    bgPaint.color = c
+                    bgPaint.alpha = 30
+                    canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
+                    
+                    bgPaint.style = android.graphics.Paint.Style.STROKE
+                    bgPaint.strokeWidth = 2f * density
+                    bgPaint.color = c
+                    bgPaint.alpha = 200
+                    canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
+                }
+                "Infinity" -> {
+                    // Minimal background, no border
+                    val r = 8f * density
+                    bgPaint.style = android.graphics.Paint.Style.FILL
+                    bgPaint.color = c
+                    bgPaint.alpha = 15
+                    canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
+                }
+                "Glass" -> {
+                    val r = 16f * density
+                    bgPaint.style = android.graphics.Paint.Style.FILL
+                    bgPaint.color = c
+                    bgPaint.alpha = 25
+                    canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
+                    
+                    bgPaint.style = android.graphics.Paint.Style.STROKE
+                    bgPaint.strokeWidth = 1.5f * density
+                    bgPaint.color = Color.parseColor("#50FFFFFF")
+                    canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
+                }
+                else -> { 
+                    val r = 12f * density
+                    bgPaint.style = android.graphics.Paint.Style.FILL
+                    bgPaint.color = c
+                    bgPaint.alpha = 40
+                    canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
+                }
             }
         } catch(e: Exception) {}
         
@@ -124,10 +155,9 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
     }
 
     init {
-        setBackgroundResource(R.drawable.bg_card_unselected)
         val density = resources.displayMetrics.density
-        val padH = (14 * density).toInt()
-        val padV = (12 * density).toInt()
+        val padH = (16 * density).toInt()
+        val padV = (14 * density).toInt()
         setPadding(padH, padV, padH, padV)
 
         tts = TextToSpeech(context, this)
@@ -135,9 +165,10 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
         val container = LinearLayout(context).apply {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
             orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
         }
 
-        // Header
+        // Header (Icon & Mode Chip & Speaker Button)
         val headerRow = LinearLayout(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -147,25 +178,22 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
             gravity = Gravity.CENTER_VERTICAL
         }
 
-
         val icon = ImageView(context).apply {
-            layoutParams = LinearLayout.LayoutParams((24 * density).toInt(), (24 * density).toInt()).apply {
-                marginEnd = (8 * density).toInt()
+            layoutParams = LinearLayout.LayoutParams((28 * density).toInt(), (28 * density).toInt()).apply {
+                marginEnd = (10 * density).toInt()
             }
             setImageResource(android.R.drawable.ic_lock_silent_mode_off)
-            setColorFilter(Color.parseColor("#4CAF50"))
+            setColorFilter(Color.parseColor("#E0E0E0")) // Use neutral color, rely on glow background
         }
         headerRow.addView(icon)
 
-        titleText = TextView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-            text = context.getString(R.string.broadcast_title)
-            textSize = 13f
-            typeface = android.graphics.Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#E0E0E0"))
-            gravity = Gravity.CENTER
+        // Using a Space to push the mode chip and button to the right
+        val space = android.widget.Space(context).apply {
+            layoutParams = LinearLayout.LayoutParams(0, 1, 1f)
         }
-        headerRow.addView(titleText)
+        headerRow.addView(space)
+
+
 
         modeChip = TextView(context).apply {
             text = context.getString(R.string.broadcast_mode_pure_tts)
@@ -188,9 +216,10 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
             setImageResource(android.R.drawable.ic_media_play)
             setColorFilter(Color.WHITE)
             setBackgroundResource(R.drawable.shape_circle_color)
-            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#2E3846"))
+            backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#4CAF50"))
             val padP = (8 * density).toInt()
             setPadding(padP, padP, padP, padP)
+            elevation = 4f * density
             setOnClickListener {
                 speak(lastMessage)
             }
@@ -203,15 +232,14 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
         contentText = TextView(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                0,
-                1f
+                LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                topMargin = (8 * density).toInt()
+                topMargin = (6 * density).toInt()
             }
             text = lastMessage
             textSize = 13f
-            setTextColor(Color.parseColor("#B0B8C4"))
-            maxLines = 10
+            setTextColor(Color.parseColor("#90A4AE"))
+            maxLines = 3
             ellipsize = android.text.TextUtils.TruncateAt.END
         }
         container.addView(contentText)
@@ -226,7 +254,6 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
         val baseWidth = 150f * density
         val scale = (w / baseWidth).coerceIn(0.5f, 2.0f)
 
-        titleText.textSize = 13f * scale
         contentText.textSize = 13f * scale
         modeChip.textSize = 10f * scale
         val padChipH = (6 * density * scale).toInt()
@@ -241,7 +268,7 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
         val headerRow = (getChildAt(0) as? LinearLayout)?.getChildAt(0) as? LinearLayout
         val icon = headerRow?.getChildAt(0) as? ImageView
         icon?.layoutParams = LinearLayout.LayoutParams((24 * density * scale).toInt(), (24 * density * scale).toInt()).apply {
-            marginEnd = (8 * density * scale).toInt()
+            marginEnd = (10 * density * scale).toInt()
         }
     }
 

@@ -215,7 +215,6 @@ object GraphicDefinition : IComponentDefinition {
         private var loadedImageSrc = ""
 
         init {
-            setWillNotDraw(false)
             addView(imageView)
         }
 
@@ -251,8 +250,8 @@ object GraphicDefinition : IComponentDefinition {
             invalidate()
         }
 
-        override fun onDraw(canvas: Canvas) {
-            super.onDraw(canvas)
+        override fun dispatchDraw(canvas: Canvas) {
+            super.dispatchDraw(canvas)
             val density = resources.displayMetrics.density
             
             when (graphicType) {
