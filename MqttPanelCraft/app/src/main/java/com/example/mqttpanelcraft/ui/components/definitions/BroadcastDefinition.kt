@@ -53,8 +53,8 @@ object BroadcastDefinition : IComponentDefinition {
         "speech_rate" to "1.0",
         "speech_pitch" to "1.0",
         "speech_voice_preset" to "NATURAL",
-        "chart_style" to "Solid",
-        "color" to "#00BCD4",
+        "chart_style" to "Capsule",
+        "color" to "#FF9800",
         "show_text" to "true"
     )
 
@@ -79,8 +79,8 @@ object BroadcastDefinition : IComponentDefinition {
         broadcastView.setVoiceSettings(preset, pitch, rate)
         broadcastView.broadcastMode = data.props["broadcast_mode"] ?: "TTS_ONLY"
         broadcastView.alertType = data.props["alert_type"] ?: "Chime"
-        broadcastView.chartStyle = data.props["chart_style"] ?: "Solid"
-        broadcastView.colorStr = data.props["color"] ?: "#00BCD4"
+        broadcastView.chartStyle = data.props["chart_style"] ?: "Capsule"
+        broadcastView.colorStr = data.props["color"] ?: "#FF9800"
         broadcastView.showText = (data.props["show_text"] ?: "true") == "true"
         
         val savedText = data.props["value"]
@@ -193,7 +193,7 @@ object BroadcastDefinition : IComponentDefinition {
             data,
             onUpdate,
             label = "色表",
-            defaultColor = "#00BCD4"
+            defaultColor = "#FF9800"
         )
         
         val itemShowText = panelView.findViewById<LinearLayout>(R.id.itemShowText)

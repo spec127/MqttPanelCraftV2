@@ -476,7 +476,7 @@
     <string name="prop_broadcast_voice_brisk">輕快</string>
     <string name="prop_broadcast_rate_label">語速</string>
     <string name="prop_broadcast_show_text">顯示文字</string>
-    <string name="prop_broadcast_show_text_desc">在元件上顯示最新播放的語音內容。若關閉，訊息僅會在接收時播放一次且無法手動重播。</string>
+    <string name="prop_broadcast_show_text_desc">顯示文字，並提供手動重播按鈕</string>
     <string name="prop_broadcast_test_input_hint">Enter test speech text...</string>
     <string name="prop_broadcast_btn_test">Test Play</string>
     <string name="prop_broadcast_linked_tip">Linked Target Components (Trigger when selected components receive data)</string>

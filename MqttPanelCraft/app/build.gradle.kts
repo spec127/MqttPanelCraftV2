@@ -16,8 +16,8 @@ android {
     defaultConfig {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
-        versionCode = 188
-        versionName = "0.12.8" // v0.12.8: 文字元件實作、相機元件屬性調整、廣播元件無限風格對比色修復、刪除圖形元件白問題
+        versionCode = 189
+        versionName = "0.12.9" // v0.12.9: 廣播播放鍵排版限制、預設樣式橘色膠囊、圖像色表移至角度右側
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

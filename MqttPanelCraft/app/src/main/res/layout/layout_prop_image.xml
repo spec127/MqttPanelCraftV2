@@ -32,16 +32,7 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <!-- Color Palette (Replaces Mode Selection) -->
-        <FrameLayout
-            android:id="@+id/containerColorPalette"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
-            <include layout="@layout/layout_prop_generic_color" />
-        </FrameLayout>
-        
-        <!-- Move Scale Mode here, below Color Palette / Interaction -->
+        <!-- Scale Mode moved here -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.App.TextInputLayout.Properties.Compact"
             android:layout_width="match_parent"
@@ -159,7 +150,7 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <!-- Row: Rotation Angle (100%) -->
+        <!-- Row: Rotation Angle (4) & Color Palette (6) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -169,8 +160,10 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.App.TextInputLayout.Properties.Compact"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="4"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:hint="@string/prop_image_rotation">
                 <AutoCompleteTextView
                     android:id="@+id/spImageRot"
@@ -179,6 +172,16 @@
                     android:inputType="none"
                     android:textSize="12sp"/>
             </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Color Palette -->
+            <FrameLayout
+                android:id="@+id/containerColorPalette"
+                android:layout_width="0dp"
+                android:layout_weight="6"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical">
+                <include layout="@layout/layout_prop_generic_color" />
+            </FrameLayout>
         </LinearLayout>
 
         <!-- Premium Check Row: Show Info (在視覺外觀的最下面) -->

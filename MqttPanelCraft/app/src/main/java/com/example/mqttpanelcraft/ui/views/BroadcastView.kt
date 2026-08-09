@@ -281,9 +281,14 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
         val padChipV = (2 * density * scale).toInt()
         modeChip.setPadding(padChipH, padChipV, padChipH, padChipV)
         
-        val btnSize = (32 * density * scale).toInt()
+        var btnSize = (32 * density * scale).toInt()
+        val maxBtnSize = (h - (40 * density)).toInt() // safe vertical margin approximation
+        if (maxBtnSize > 0 && btnSize > maxBtnSize) {
+            btnSize = maxBtnSize
+        }
+        
         speakButton.layoutParams = LinearLayout.LayoutParams(btnSize, btnSize)
-        val padP = (6 * density * scale).toInt()
+        val padP = (btnSize * 0.18f).toInt()
         speakButton.setPadding(padP, padP, padP, padP)
         
         iconView.layoutParams = LinearLayout.LayoutParams((24 * density * scale).toInt(), (24 * density * scale).toInt()).apply {
