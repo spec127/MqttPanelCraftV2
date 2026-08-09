@@ -102,7 +102,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/prop_broadcast_alert_type"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        style="@style/Widget.App.TextInputLayout.Properties.Compact"
         android:layout_marginBottom="16dp">
         <AutoCompleteTextView
             android:id="@+id/spAlertType"
@@ -246,7 +246,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="4"
             android:hint="@string/prop_chart_style_label"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.App.TextInputLayout.Properties.Compact"
             android:layout_marginEnd="12dp">
             <AutoCompleteTextView
                 android:id="@+id/spStyle"

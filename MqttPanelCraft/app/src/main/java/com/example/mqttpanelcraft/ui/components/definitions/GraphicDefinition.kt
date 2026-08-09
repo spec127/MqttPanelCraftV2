@@ -25,7 +25,7 @@ object GraphicDefinition : IComponentDefinition {
     override val type: String = "GRAPHIC"
     override val defaultSize: Size = Size(200, 100)
     override val labelPrefix: String = "graphic"
-    override val iconResId: Int = android.R.drawable.ic_menu_gallery
+    override val iconResId: Int = R.drawable.ic_palette
     override val group: String = "DISPLAY"
 
     override val propertiesLayoutId: Int = R.layout.layout_prop_graphic

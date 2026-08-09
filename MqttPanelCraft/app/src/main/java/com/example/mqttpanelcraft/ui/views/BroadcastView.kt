@@ -250,7 +250,9 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
 
         speakButton = ImageView(context).apply {
             val btnSize = (32 * density).toInt()
-            layoutParams = LinearLayout.LayoutParams(btnSize, btnSize)
+            layoutParams = LinearLayout.LayoutParams(btnSize, btnSize).apply {
+                marginStart = (12 * density).toInt()
+            }
             setImageResource(android.R.drawable.ic_media_play)
             setColorFilter(Color.WHITE)
             setBackgroundResource(R.drawable.shape_circle_color)
@@ -287,7 +289,9 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
             btnSize = maxBtnSize
         }
         
-        speakButton.layoutParams = LinearLayout.LayoutParams(btnSize, btnSize)
+        speakButton.layoutParams = LinearLayout.LayoutParams(btnSize, btnSize).apply {
+            marginStart = (12 * density * scale).toInt()
+        }
         val padP = (btnSize * 0.18f).toInt()
         speakButton.setPadding(padP, padP, padP, padP)
         

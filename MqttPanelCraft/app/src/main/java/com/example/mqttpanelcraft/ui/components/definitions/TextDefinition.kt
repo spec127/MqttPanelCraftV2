@@ -25,8 +25,8 @@ object TextDefinition : IComponentDefinition {
 
     override val type = "TEXT"
     override val defaultSize = Size(180, 80)
-    override val labelPrefix = "txt"
-    override val iconResId = android.R.drawable.ic_menu_sort_by_size
+    override val labelPrefix = "text"
+    override val iconResId = R.drawable.ic_text_fields
     override val group = "DISPLAY"
 
     override val propertiesLayoutId = R.layout.layout_prop_text
