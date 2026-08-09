@@ -26,15 +26,13 @@ object ComponentDefinitionRegistry {
         register(TextDisplayDefinition)
         register(ImageSensorDefinition) // 影像(圖片與串流)
 
-        // --- DISPLAY 多媒體分類 ---
+        // --- DISPLAY 多媒體顯示 ---
+        register(GraphicDefinition) // 圖形組件
         register(LineChartDefinition)
-        register(BroadcastDefinition) // 廣播(TTS文字轉語音)
+        register(BroadcastDefinition) // 廣播(TTS語音轉文字)
         register(TextDefinition)
         register(CalendarClockDefinition)
         register(WebBoxDefinition)
-        
-        // 媒體組件
-        register(GraphicDefinition) // 圖式元件
     }
 
     fun register(def: IComponentDefinition) {

@@ -139,27 +139,38 @@ object ImageDisplayDefinition : IComponentDefinition {
             }
         }
 
-        // 4. Scale Mode Dropdown (視覺外觀)
-        val scaleAuto = panelView.findViewById<AutoCompleteTextView>(R.id.spImageScale)
-        if (scaleAuto != null) {
-            val scaleItems = listOf(
-                context.getString(R.string.val_image_scale_fit) to "FIT_CENTER",
-                context.getString(R.string.val_image_scale_crop) to "CENTER_CROP",
-                context.getString(R.string.val_image_scale_xy) to "FIT_XY"
+        // 4. Scale Mode (Left-Right Cycler)
+        val tvScale = panelView.findViewById<android.widget.TextView>(R.id.tvScaleValue)
+        val btnScalePrev = panelView.findViewById<android.view.View>(R.id.btnScalePrev)
+        val btnScaleNext = panelView.findViewById<android.view.View>(R.id.btnScaleNext)
+        if (tvScale != null && btnScalePrev != null && btnScaleNext != null) {
+            val scaleLabels = listOf(
+                context.getString(R.string.val_image_scale_fit),
+                context.getString(R.string.val_image_scale_crop),
+                context.getString(R.string.val_image_scale_xy)
             )
-            val scaleAdapter = ArrayAdapter(
-                context,
-                android.R.layout.simple_dropdown_item_1line,
-                scaleItems.map { it.first }
-            )
-            scaleAuto.setAdapter(scaleAdapter)
+            val scaleValues = listOf("FIT_CENTER", "CENTER_CROP", "FIT_XY")
 
-            val currentScaleVal = data.props["scale_mode"] ?: "FIT_CENTER"
-            val matchScaleLabel = scaleItems.find { it.second == currentScaleVal }?.first ?: context.getString(R.string.val_image_scale_fit)
-            scaleAuto.setText(matchScaleLabel, false)
+            fun updateScaleUI() {
+                val curScale = data.props["scale_mode"] ?: "FIT_CENTER"
+                val idx = scaleValues.indexOf(curScale).coerceAtLeast(0)
+                tvScale.text = scaleLabels[idx]
+            }
+            updateScaleUI()
 
-            scaleAuto.setOnItemClickListener { _, _, position, _ ->
-                onUpdate("scale_mode", scaleItems[position].second)
+            btnScalePrev.setOnClickListener {
+                val curScale = data.props["scale_mode"] ?: "FIT_CENTER"
+                var idx = scaleValues.indexOf(curScale)
+                idx = if (idx - 1 < 0) scaleValues.size - 1 else idx - 1
+                onUpdate("scale_mode", scaleValues[idx])
+                updateScaleUI()
+            }
+            btnScaleNext.setOnClickListener {
+                val curScale = data.props["scale_mode"] ?: "FIT_CENTER"
+                var idx = scaleValues.indexOf(curScale)
+                idx = (idx + 1) % scaleValues.size
+                onUpdate("scale_mode", scaleValues[idx])
+                updateScaleUI()
             }
         }
 

@@ -151,21 +151,38 @@ object ImageSensorDefinition : IComponentDefinition {
             }
         }
 
-        // Scale Mode (在地化多語系支援)
-        val spScale = panelView.findViewById<AutoCompleteTextView>(R.id.spImageScale)
-        if (spScale != null) {
+        // Scale Mode (Left-Right Cycler)
+        val tvScale = panelView.findViewById<android.widget.TextView>(R.id.tvScaleValue)
+        val btnScalePrev = panelView.findViewById<android.view.View>(R.id.btnScalePrev)
+        val btnScaleNext = panelView.findViewById<android.view.View>(R.id.btnScaleNext)
+        if (tvScale != null && btnScalePrev != null && btnScaleNext != null) {
             val scaleLabels = listOf(
                 context.getString(R.string.val_image_scale_fit),
                 context.getString(R.string.val_image_scale_crop),
                 context.getString(R.string.val_image_scale_xy)
             )
             val scaleValues = listOf("FIT_CENTER", "CENTER_CROP", "FIT_XY")
-            spScale.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, scaleLabels))
-            val curScale = data.props["scale_type"] ?: "FIT_CENTER"
-            val idx = scaleValues.indexOf(curScale).coerceAtLeast(0)
-            spScale.setText(scaleLabels[idx], false)
-            spScale.setOnItemClickListener { _, _, pos, _ ->
-                onUpdate("scale_type", scaleValues[pos])
+            
+            fun updateScaleUI() {
+                val curScale = data.props["scale_type"] ?: "FIT_CENTER"
+                val idx = scaleValues.indexOf(curScale).coerceAtLeast(0)
+                tvScale.text = scaleLabels[idx]
+            }
+            updateScaleUI()
+
+            btnScalePrev.setOnClickListener {
+                val curScale = data.props["scale_type"] ?: "FIT_CENTER"
+                var idx = scaleValues.indexOf(curScale)
+                idx = if (idx - 1 < 0) scaleValues.size - 1 else idx - 1
+                onUpdate("scale_type", scaleValues[idx])
+                updateScaleUI()
+            }
+            btnScaleNext.setOnClickListener {
+                val curScale = data.props["scale_type"] ?: "FIT_CENTER"
+                var idx = scaleValues.indexOf(curScale)
+                idx = (idx + 1) % scaleValues.size
+                onUpdate("scale_type", scaleValues[idx])
+                updateScaleUI()
             }
         }
     }

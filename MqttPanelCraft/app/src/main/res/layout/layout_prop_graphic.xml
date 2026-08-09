@@ -35,7 +35,7 @@
         android:hint="@string/prop_graphic_type"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_marginBottom="12dp">
-        <AutoCompleteTextView
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/spGraphicType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -147,7 +147,7 @@
             android:hint="@string/prop_graphic_line_direction"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_marginBottom="12dp">
-            <AutoCompleteTextView
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/spLineDirection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -165,7 +165,7 @@
             android:hint="@string/prop_graphic_line_style"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_marginBottom="12dp">
-            <AutoCompleteTextView
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/spLineStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -244,7 +244,7 @@
             android:hint="@string/prop_graphic_scale_type"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_marginBottom="12dp">
-            <AutoCompleteTextView
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/spScaleType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
