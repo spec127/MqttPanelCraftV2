@@ -16,8 +16,8 @@ android {
     defaultConfig {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
-        versionCode = 189
-        versionName = "0.12.9" // v0.12.9: 廣播播放鍵排版限制、預設樣式橘色膠囊、圖像色表移至角度右側
+        versionCode = 190
+        versionName = "0.12.10" // v0.12.10: 修復縮圖、相機按鈕與廣播版面微調
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
