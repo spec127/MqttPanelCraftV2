@@ -100,6 +100,7 @@ object ImageSensorDefinition : IComponentDefinition {
             "color",
             data,
             onUpdate,
+            label = "整體顏色",
             defaultColor = "#FF9800"
         )
 

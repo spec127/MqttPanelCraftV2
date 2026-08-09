@@ -69,7 +69,7 @@ class ImageDisplayView @JvmOverloads constructor(
     var showQuickSave: Boolean = true
         set(value) {
             field = value
-            saveButton.visibility = if (value && !isEditMode) View.VISIBLE else View.INVISIBLE
+            saveButton.visibility = if (value) View.VISIBLE else View.INVISIBLE
         }
 
     var showInfo: Boolean = true
