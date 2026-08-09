@@ -39,7 +39,8 @@ object ImageSensorDefinition : IComponentDefinition {
         "stream_mode" to "SINGLE",
         "stream_fps" to "2",
         "trigger_type" to "TIMER",
-        "timer_interval" to "3000"
+        "timer_interval" to "3000",
+        "color" to "#FF9800"
     )
 
     override fun createView(context: Context, isEditMode: Boolean): View {
@@ -77,6 +78,12 @@ object ImageSensorDefinition : IComponentDefinition {
         } else {
             imgView.clearCurrentBitmap()
         }
+
+        // Apply theme color
+        val colorHex = data.props["color"] ?: "#FF9800"
+        try {
+            imgView.setThemeColor(android.graphics.Color.parseColor(colorHex))
+        } catch (_: Exception) {}
     }
 
     override fun bindPropertiesPanel(
@@ -86,48 +93,15 @@ object ImageSensorDefinition : IComponentDefinition {
     ) {
         val context = panelView.context
 
-        // Stream Mode vs Single Snapshot Mode
-        val toggleMode = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleImageMode)
-        val containerStream = panelView.findViewById<LinearLayout>(R.id.containerStreamConfig)
-        val curMode = data.props["stream_mode"] ?: "SINGLE"
-        if (curMode == "SINGLE") {
-            toggleMode?.check(R.id.btnModeSingle)
-            containerStream?.visibility = View.GONE
-        } else {
-            toggleMode?.check(R.id.btnModeStream)
-            containerStream?.visibility = View.VISIBLE
-        }
-
-        toggleMode?.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked) {
-                if (checkedId == R.id.btnModeSingle) {
-                    onUpdate("stream_mode", "SINGLE")
-                    containerStream?.visibility = View.GONE
-                } else {
-                    onUpdate("stream_mode", "STREAM")
-                    containerStream?.visibility = View.VISIBLE
-                }
-            }
-        }
-
-        // FPS Selection (1~5 FPS 適合 MQTT 即時影像極限穩定傳輸)
-        val spFps = panelView.findViewById<AutoCompleteTextView>(R.id.spImageFps)
-        if (spFps != null) {
-            val fpsOptions = listOf(
-                context.getString(R.string.val_fps_1),
-                context.getString(R.string.val_fps_2),
-                context.getString(R.string.val_fps_3),
-                context.getString(R.string.val_fps_5)
-            )
-            val fpsVals = listOf("1", "2", "3", "5")
-            spFps.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, fpsOptions))
-            val curFps = data.props["stream_fps"] ?: "2"
-            val idx = fpsVals.indexOf(curFps).coerceAtLeast(0)
-            spFps.setText(fpsOptions[idx], false)
-            spFps.setOnItemClickListener { _, _, pos, _ ->
-                onUpdate("stream_fps", fpsVals[pos])
-            }
-        }
+        // Color Palette binding
+        CommonPropBinder.bindColorPalette(
+            panelView,
+            R.id.containerColorPalette,
+            "color",
+            data,
+            onUpdate,
+            defaultColor = "#FF9800"
+        )
 
         // Premium Check Rows: Gesture Zoom, Quick Save, Show Info
         var hasGesture = (data.props["gesture_zoom"] ?: "true") == "true"

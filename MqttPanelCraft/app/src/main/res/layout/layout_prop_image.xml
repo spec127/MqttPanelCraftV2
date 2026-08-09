@@ -32,65 +32,29 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <!-- Single Snapshot vs Stream Toggle (預設單次快照在左) -->
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/toggleImageMode"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginBottom="12dp"
-            app:singleSelection="true"
-            app:selectionRequired="true"
-            app:checkedButton="@+id/btnModeSingle">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnModeSingle"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:text="@string/prop_image_mode_single"
-                android:textSize="12sp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:padding="0dp"
-                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnModeStream"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:text="@string/prop_image_mode_stream"
-                android:textSize="12sp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:padding="0dp"
-                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
-        </com.google.android.material.button.MaterialButtonToggleGroup>
-
-        <!-- Container for Stream FPS (Visible when Mode == Stream) -->
-        <LinearLayout
-            android:id="@+id/containerStreamConfig"
+        <!-- Color Palette (Replaces Mode Selection) -->
+        <FrameLayout
+            android:id="@+id/containerColorPalette"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
             android:layout_marginBottom="12dp">
-
-            <com.google.android.material.textfield.TextInputLayout
+            <include layout="@layout/layout_prop_generic_color" />
+        </FrameLayout>
+        
+        <!-- Move Scale Mode here, below Color Palette / Interaction -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.App.TextInputLayout.Properties.Compact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:hint="@string/prop_image_scale_mode">
+            <AutoCompleteTextView
+                android:id="@+id/spImageScale"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/prop_image_fps"
-                style="@style/Widget.App.TextInputLayout.Properties.Compact">
-                <AutoCompleteTextView
-                    android:id="@+id/spImageFps"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:inputType="none"
-                    android:textSize="12sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
+                android:layout_height="52dp"
+                android:inputType="none"
+                android:textSize="12sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
 
         <!-- Premium Check Rows: Gesture Zoom & Quick Save -->
@@ -195,7 +159,7 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <!-- Row: Rotation Angle (4) & Scale Mode (6) -->
+        <!-- Row: Rotation Angle (100%) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -205,28 +169,11 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.App.TextInputLayout.Properties.Compact"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:layout_marginEnd="6dp"
                 android:hint="@string/prop_image_rotation">
                 <AutoCompleteTextView
                     android:id="@+id/spImageRot"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:inputType="none"
-                    android:textSize="12sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.App.TextInputLayout.Properties.Compact"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="6"
-                android:layout_marginStart="6dp"
-                android:hint="@string/prop_image_scale_mode">
-                <AutoCompleteTextView
-                    android:id="@+id/spImageScale"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:inputType="none"

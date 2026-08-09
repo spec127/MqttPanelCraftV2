@@ -29,13 +29,17 @@ object TextDefinition : IComponentDefinition {
     override val iconResId = android.R.drawable.ic_menu_sort_by_size
     override val group = "DISPLAY"
 
-    override val propertiesLayoutId = R.layout.layout_prop_generic_color
+    override val propertiesLayoutId = R.layout.layout_prop_text
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
-        "color" to "#FFFFFF",
-        "theme_color" to "#FFFFFF",
+        "default_text" to "Text Display",
         "text_size" to "18",
-        "default_text" to "Text Display"
+        "text_align" to "CENTER",
+        "text_weight" to "NORMAL",
+        "color" to "#FFFFFF",
+        "text_effect" to "NONE",
+        "show_background" to "false",
+        "bg_color" to "#33000000"
     )
 
     override fun createView(context: Context, isEditMode: Boolean): View {
@@ -59,18 +63,50 @@ object TextDefinition : IComponentDefinition {
         val container = view as? FrameLayout ?: return
         val tv = container.findViewWithTag<TextView>("target_text") ?: return
 
+        // 1. Text Content
         data.props["default_text"]?.let {
             if (it.isNotEmpty()) tv.text = it
         }
 
-        data.props["color"]?.let { colorCode ->
-            try {
-                tv.setTextColor(Color.parseColor(colorCode))
-            } catch (_: Exception) {}
-        }
-
+        // 2. Typography
         data.props["text_size"]?.toFloatOrNull()?.let { size ->
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, size)
+        }
+        
+        val align = data.props["text_align"] ?: "CENTER"
+        tv.gravity = when (align) {
+            "LEFT" -> Gravity.START or Gravity.CENTER_VERTICAL
+            "RIGHT" -> Gravity.END or Gravity.CENTER_VERTICAL
+            else -> Gravity.CENTER
+        }
+        
+        val isBold = (data.props["text_weight"] ?: "NORMAL") == "BOLD"
+        tv.setTypeface(null, if (isBold) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
+
+        // 3. Colors & Effects
+        val textColorHex = data.props["color"] ?: "#FFFFFF"
+        val textColor = try { Color.parseColor(textColorHex) } catch (e: Exception) { Color.WHITE }
+        tv.setTextColor(textColor)
+        
+        val effect = data.props["text_effect"] ?: "NONE"
+        when (effect) {
+            "NEON" -> tv.setShadowLayer(15f, 0f, 0f, textColor)
+            "SHADOW" -> tv.setShadowLayer(6f, 3f, 3f, Color.parseColor("#80000000"))
+            else -> tv.setShadowLayer(0f, 0f, 0f, Color.TRANSPARENT)
+        }
+
+        // 4. Background
+        val showBg = (data.props["show_background"] ?: "false") == "true"
+        if (showBg) {
+            val bgColorHex = data.props["bg_color"] ?: "#33000000"
+            val bgColor = try { Color.parseColor(bgColorHex) } catch (e: Exception) { Color.parseColor("#33000000") }
+            val drawable = android.graphics.drawable.GradientDrawable().apply {
+                setColor(bgColor)
+                cornerRadius = 8f * container.resources.displayMetrics.density
+            }
+            tv.background = drawable
+        } else {
+            tv.background = null
         }
     }
 
@@ -80,40 +116,57 @@ object TextDefinition : IComponentDefinition {
         onUpdate: (String, String) -> Unit
     ) {
         val context = panelView.context
-        val colorViews = listOf(R.id.vColor1, R.id.vColor2, R.id.vColor3, R.id.vColor4, R.id.vColor5).map {
-            panelView.findViewById<View>(it)
-        }
-        fun refreshColors() {
-            val recent = ColorHistoryManager.load(context)
-            colorViews.forEachIndexed { i, v ->
-                if (i < recent.size) {
-                    val c = Color.parseColor(recent[i])
-                    v?.backgroundTintList = android.content.res.ColorStateList.valueOf(c)
-                    v?.setOnClickListener { onUpdate("color", recent[i]) }
-                }
-            }
-        }
-        refreshColors()
+        val binder = com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 
-        panelView.findViewById<View>(R.id.btnColorCustom)?.setOnClickListener { anchor ->
-            val cur = data.props["color"] ?: "#FFFFFF"
-            var temp = cur
-            ColorPickerDialog(
-                context,
-                cur,
-                true,
-                {
-                    temp = it
-                    onUpdate("color", it)
-                },
-                {
-                    if (temp != cur) {
-                        ColorHistoryManager.save(context, temp)
-                        refreshColors()
-                    }
-                }
-            ).show(anchor)
+        // Content
+        binder.bindEditText(panelView, R.id.etTextContent, "default_text", data, onUpdate, "Text Display")
+
+        // Typography
+        binder.bindDropdown(
+            panelView, R.id.spTextSize, "text_size", data, onUpdate,
+            listOf("12", "14", "16", "18", "24", "32", "48", "64"),
+            defaultValue = "18"
+        )
+        binder.bindDropdown(
+            panelView, R.id.spTextAlign, "text_align", data, onUpdate,
+            listOf("靠左", "置中", "靠右"),
+            mapOf("靠左" to "LEFT", "置中" to "CENTER", "靠右" to "RIGHT"),
+            defaultValue = "CENTER"
+        )
+        binder.bindToggleGroup(
+            panelView, R.id.toggleTextWeight, "text_weight", data, onUpdate,
+            mapOf(R.id.btnWeightNormal to "NORMAL", R.id.btnWeightBold to "BOLD")
+        )
+
+        // Color & Effects
+        binder.bindColorPalette(panelView, R.id.containerTextColorPalette, "color", data, onUpdate, defaultColor = "#FFFFFF")
+        
+        binder.bindDropdown(
+            panelView, R.id.spTextEffect, "text_effect", data, onUpdate,
+            listOf("無特效", "霓虹發光", "柔和陰影"),
+            mapOf("無特效" to "NONE", "霓虹發光" to "NEON", "柔和陰影" to "SHADOW"),
+            defaultValue = "NONE"
+        )
+
+        // Background
+        var showBg = (data.props["show_background"] ?: "false") == "true"
+        val checkShowBg = panelView.findViewById<android.widget.ImageView>(R.id.checkShowBackground)
+        val bgPaletteContainer = panelView.findViewById<View>(R.id.containerBgColorPalette)
+        
+        checkShowBg?.visibility = if (showBg) View.VISIBLE else View.INVISIBLE
+        bgPaletteContainer?.visibility = if (showBg) View.VISIBLE else View.GONE
+        
+        panelView.findViewById<View>(R.id.itemShowBackground)?.setOnClickListener {
+            showBg = !showBg
+            checkShowBg?.visibility = if (showBg) View.VISIBLE else View.INVISIBLE
+            bgPaletteContainer?.visibility = if (showBg) View.VISIBLE else View.GONE
+            onUpdate("show_background", showBg.toString())
         }
+
+        binder.bindColorPalette(
+            panelView, R.id.containerBgColorPalette, "bg_color", data, onUpdate,
+            label = "背景顏色", defaultColor = "#33000000"
+        )
     }
 
     override fun attachBehavior(

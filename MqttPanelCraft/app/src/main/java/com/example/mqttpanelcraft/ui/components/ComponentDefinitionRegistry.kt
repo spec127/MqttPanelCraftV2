@@ -29,7 +29,6 @@ object ComponentDefinitionRegistry {
         // --- DISPLAY 多媒體分類 ---
         register(LineChartDefinition)
         register(BroadcastDefinition) // 廣播(TTS文字轉語音)
-        register(ShapeDefinition)
         register(TextDefinition)
         register(CalendarClockDefinition)
         register(WebBoxDefinition)

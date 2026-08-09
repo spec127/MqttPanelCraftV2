@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- CONTENT SECTION -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_touch_app"
+                app:tint="@color/props_primary"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="內容 Content"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.App.TextInputLayout.Properties.Compact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:hint="顯示文字 (支援變數 ${var})">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etTextContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minLines="3"
+                android:gravity="top|start"
+                android:inputType="textMultiLine"
+                android:textSize="14sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_line"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- TYPOGRAPHY SECTION -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_text_fields"
+                app:tint="@color/props_primary"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="字體 Typography"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.App.TextInputLayout.Properties.Compact"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:hint="大小">
+                <AutoCompleteTextView
+                    android:id="@+id/spTextSize"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:inputType="none"
+                    android:textSize="12sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.App.TextInputLayout.Properties.Compact"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:hint="對齊">
+                <AutoCompleteTextView
+                    android:id="@+id/spTextAlign"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:inputType="none"
+                    android:textSize="12sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+        
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleTextWeight"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="12dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@+id/btnWeightNormal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnWeightNormal"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="標準"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnWeightBold"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="粗體"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!-- Text Color -->
+        <FrameLayout
+            android:id="@+id/containerTextColorPalette"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+        </FrameLayout>
+        
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.App.TextInputLayout.Properties.Compact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:hint="特效 (霓虹/陰影)">
+            <AutoCompleteTextView
+                android:id="@+id/spTextEffect"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:inputType="none"
+                android:textSize="12sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_line"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- BACKGROUND SECTION -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_palette"
+                app:tint="@color/props_primary"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="背景 Background"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/itemShowBackground"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:background="@drawable/bg_prop_item_premium"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="顯示背景"
+                    android:textColor="@color/prop_text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/checkShowBackground"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle_premium"
+                android:visibility="visible"/>
+        </LinearLayout>
+
+        <!-- Background Color -->
+        <FrameLayout
+            android:id="@+id/containerBgColorPalette"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:visibility="gone">
+        </FrameLayout>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

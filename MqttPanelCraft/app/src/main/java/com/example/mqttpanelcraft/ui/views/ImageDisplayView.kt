@@ -48,6 +48,7 @@ class ImageDisplayView @JvmOverloads constructor(
     private val infoTextView: TextView
     private val deleteButton: ImageView
     private val saveButton: ImageView
+    private val dividerView: View
 
     private var currentBitmap: Bitmap? = null
     var isEditMode: Boolean = false
@@ -144,6 +145,12 @@ class ImageDisplayView @JvmOverloads constructor(
             addView(bigImageIcon)
         }
         canvasContainer.addView(placeholderView)
+        
+        dividerView = View(context).apply {
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, (1 * resources.displayMetrics.density).toInt())
+            setBackgroundColor(Color.parseColor("#FF9800"))
+        }
+        addView(dividerView)
 
         // 2. Bottom Bar (適配日夜模式的高質感半透明磨砂控制條)
         bottomBar = LinearLayout(context).apply {
@@ -189,6 +196,16 @@ class ImageDisplayView @JvmOverloads constructor(
             visibility = View.VISIBLE
         }
         bottomBar.addView(saveButton)
+    }
+
+    fun setThemeColor(color: Int) {
+        val drawable = android.graphics.drawable.GradientDrawable()
+        drawable.setStroke((2 * resources.displayMetrics.density).toInt(), color)
+        drawable.setColor(Color.argb(20, Color.red(color), Color.green(color), Color.blue(color)))
+        drawable.cornerRadius = 8f * resources.displayMetrics.density
+        this.background = drawable
+        
+        dividerView.setBackgroundColor(color)
     }
 
     fun setScaleMode(modeStr: String) {

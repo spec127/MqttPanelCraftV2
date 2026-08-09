@@ -18,9 +18,13 @@ import java.util.Locale
  */
 class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnInitListener {
 
-    private val modeChip: TextView
     private val contentText: TextView
+    private val modeChip: TextView
     private val speakButton: ImageView
+    private val iconView: ImageView
+    private val contentRow: LinearLayout
+    private val headerRow: LinearLayout
+    
     private var tts: TextToSpeech? = null
     private var isTtsReady = false
     private var lastMessage: String = context.getString(R.string.broadcast_waiting_text)
@@ -88,7 +92,7 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
     var showText: Boolean = true
         set(value) {
             field = value
-            contentText.visibility = if (value) View.VISIBLE else View.GONE
+            contentRow.visibility = if (value) View.VISIBLE else View.GONE
         }
 
     fun setVoiceSettings(preset: String, pitch: Float, rate: Float) {
@@ -149,6 +153,20 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
                     canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
                 }
             }
+
+            // Calculate luminance for contrast
+            val luminance = (0.299 * Color.red(c) + 0.587 * Color.green(c) + 0.114 * Color.blue(c)) / 255
+            val isDarkBackground = luminance < 0.5 && (chartStyle != "Infinity" || bgPaint.alpha > 0)
+            
+            // For Infinity style with low alpha, we just treat it as light background since canvas is usually light
+            val isLightBg = if (chartStyle == "Infinity") true else !isDarkBackground
+            
+            val contrastColor = if (isLightBg) Color.parseColor("#424242") else Color.parseColor("#E0E0E0")
+            val contrastTextColor = if (isLightBg) Color.parseColor("#616161") else Color.parseColor("#B0BEC5")
+            
+            iconView.setColorFilter(contrastColor)
+            contentText.setTextColor(contrastTextColor)
+            
         } catch(e: Exception) {}
         
         super.dispatchDraw(canvas)
@@ -168,8 +186,8 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
             gravity = Gravity.CENTER
         }
 
-        // Header (Icon & Mode Chip & Speaker Button)
-        val headerRow = LinearLayout(context).apply {
+        // Header (Icon & Mode Chip)
+        headerRow = LinearLayout(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -178,71 +196,74 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
             gravity = Gravity.CENTER_VERTICAL
         }
 
-        val icon = ImageView(context).apply {
-            layoutParams = LinearLayout.LayoutParams((28 * density).toInt(), (28 * density).toInt()).apply {
-                marginEnd = (10 * density).toInt()
+        iconView = ImageView(context).apply {
+            layoutParams = LinearLayout.LayoutParams((24 * density).toInt(), (24 * density).toInt()).apply {
+                marginEnd = (8 * density).toInt()
             }
             setImageResource(android.R.drawable.ic_lock_silent_mode_off)
-            setColorFilter(Color.parseColor("#E0E0E0")) // Use neutral color, rely on glow background
         }
-        headerRow.addView(icon)
+        headerRow.addView(iconView)
 
-        // Using a Space to push the mode chip and button to the right
         val space = android.widget.Space(context).apply {
             layoutParams = LinearLayout.LayoutParams(0, 1, 1f)
         }
         headerRow.addView(space)
 
-
-
         modeChip = TextView(context).apply {
             text = context.getString(R.string.broadcast_mode_pure_tts)
             textSize = 10f
             typeface = android.graphics.Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#4CAF50"))
-            setBackgroundColor(Color.parseColor("#334CAF50"))
-            val padChipH = (6 * density).toInt()
+            
+            // Modern chip design: outlined
+            setBackgroundResource(R.drawable.bg_input_outline) // we'll use stroke instead
+            
+            val padChipH = (8 * density).toInt()
             val padChipV = (2 * density).toInt()
             setPadding(padChipH, padChipV, padChipH, padChipV)
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
-                marginEnd = (8 * density).toInt()
-            }
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         }
         headerRow.addView(modeChip)
+        container.addView(headerRow)
+
+        // Content Row (Text + Button)
+        contentRow = LinearLayout(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                topMargin = (4 * density).toInt()
+            }
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+
+        contentText = TextView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                marginEnd = (8 * density).toInt()
+            }
+            text = lastMessage
+            textSize = 13f
+            maxLines = 3
+            ellipsize = android.text.TextUtils.TruncateAt.END
+        }
+        contentRow.addView(contentText)
 
         speakButton = ImageView(context).apply {
-            val btnSize = (36 * density).toInt()
+            val btnSize = (32 * density).toInt()
             layoutParams = LinearLayout.LayoutParams(btnSize, btnSize)
             setImageResource(android.R.drawable.ic_media_play)
             setColorFilter(Color.WHITE)
             setBackgroundResource(R.drawable.shape_circle_color)
             backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#4CAF50"))
-            val padP = (8 * density).toInt()
+            val padP = (6 * density).toInt()
             setPadding(padP, padP, padP, padP)
             elevation = 4f * density
             setOnClickListener {
                 speak(lastMessage)
             }
         }
-        headerRow.addView(speakButton)
-
-        container.addView(headerRow)
-
-        // Content
-        contentText = TextView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                topMargin = (6 * density).toInt()
-            }
-            text = lastMessage
-            textSize = 13f
-            setTextColor(Color.parseColor("#90A4AE"))
-            maxLines = 3
-            ellipsize = android.text.TextUtils.TruncateAt.END
-        }
-        container.addView(contentText)
+        contentRow.addView(speakButton)
+        container.addView(contentRow)
 
         addView(container)
     }
@@ -256,19 +277,17 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
 
         contentText.textSize = 13f * scale
         modeChip.textSize = 10f * scale
-        val padChipH = (6 * density * scale).toInt()
+        val padChipH = (8 * density * scale).toInt()
         val padChipV = (2 * density * scale).toInt()
         modeChip.setPadding(padChipH, padChipV, padChipH, padChipV)
         
-        val btnSize = (36 * density * scale).toInt()
+        val btnSize = (32 * density * scale).toInt()
         speakButton.layoutParams = LinearLayout.LayoutParams(btnSize, btnSize)
-        val padP = (8 * density * scale).toInt()
+        val padP = (6 * density * scale).toInt()
         speakButton.setPadding(padP, padP, padP, padP)
         
-        val headerRow = (getChildAt(0) as? LinearLayout)?.getChildAt(0) as? LinearLayout
-        val icon = headerRow?.getChildAt(0) as? ImageView
-        icon?.layoutParams = LinearLayout.LayoutParams((24 * density * scale).toInt(), (24 * density * scale).toInt()).apply {
-            marginEnd = (10 * density * scale).toInt()
+        iconView.layoutParams = LinearLayout.LayoutParams((24 * density * scale).toInt(), (24 * density * scale).toInt()).apply {
+            marginEnd = (8 * density * scale).toInt()
         }
     }
 

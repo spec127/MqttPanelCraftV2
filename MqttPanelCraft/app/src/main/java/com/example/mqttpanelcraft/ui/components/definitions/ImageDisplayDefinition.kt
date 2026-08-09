@@ -36,7 +36,8 @@ object ImageDisplayDefinition : IComponentDefinition {
         "quick_save" to "true",
         "rotation" to "0",
         "scale_mode" to "FIT_CENTER",
-        "show_info" to "true"
+        "show_info" to "true",
+        "color" to "#FF9800"
     )
 
     override fun createView(context: Context, isEditMode: Boolean): View {
@@ -68,6 +69,12 @@ object ImageDisplayDefinition : IComponentDefinition {
         } else {
             imgView.clearCurrentBitmap()
         }
+
+        // Apply theme color
+        val colorHex = data.props["color"] ?: "#FF9800"
+        try {
+            imgView.setThemeColor(android.graphics.Color.parseColor(colorHex))
+        } catch (_: Exception) {}
     }
 
     override fun bindPropertiesPanel(
@@ -97,9 +104,15 @@ object ImageDisplayDefinition : IComponentDefinition {
             onUpdate("quick_save", hasSave.toString())
         }
 
-        // Hide stream sensor controls for standard ImageDisplay
-        panelView.findViewById<View>(R.id.toggleImageMode)?.visibility = View.GONE
-        panelView.findViewById<View>(R.id.containerStreamConfig)?.visibility = View.GONE
+        // Color Palette binding
+        com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder.bindColorPalette(
+            panelView,
+            R.id.containerColorPalette,
+            "color",
+            data,
+            onUpdate,
+            defaultColor = "#FF9800"
+        )
 
         // 3. Rotation Angle Dropdown (視覺外觀)
         val rotAuto = panelView.findViewById<AutoCompleteTextView>(R.id.spImageRot)
