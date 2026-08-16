@@ -16,8 +16,8 @@ android {
     defaultConfig {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
-        versionCode = 194
-        versionName = "0.13.1" // v0.13.1: Web component implementation & bug fixes
+        versionCode = 195
+        versionName = "0.13.2" // v0.13.2: Graphic component visual updates & custom editors
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
