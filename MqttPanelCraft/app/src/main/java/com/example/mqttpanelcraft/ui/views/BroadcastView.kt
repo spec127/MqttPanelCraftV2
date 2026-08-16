@@ -125,14 +125,6 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
                     bgPaint.alpha = 200
                     canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
                 }
-                "Infinity" -> {
-                    // Minimal background, no border
-                    val r = 8f * density
-                    bgPaint.style = android.graphics.Paint.Style.FILL
-                    bgPaint.color = c
-                    bgPaint.alpha = 15
-                    canvas.drawRoundRect(0f, 0f, w, h, r, r, bgPaint)
-                }
                 "Glass" -> {
                     val r = 16f * density
                     bgPaint.style = android.graphics.Paint.Style.FILL
@@ -156,10 +148,8 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
 
             // Calculate luminance for contrast
             val luminance = (0.299 * Color.red(c) + 0.587 * Color.green(c) + 0.114 * Color.blue(c)) / 255
-            val isDarkBackground = luminance < 0.5 && (chartStyle != "Infinity" || bgPaint.alpha > 0)
-            
-            // For Infinity style with low alpha, we just treat it as light background since canvas is usually light
-            val isLightBg = if (chartStyle == "Infinity") true else !isDarkBackground
+            val isDarkBackground = luminance < 0.5
+            val isLightBg = !isDarkBackground
             
             val contrastColor = if (isLightBg) Color.parseColor("#424242") else Color.parseColor("#E0E0E0")
             val contrastTextColor = if (isLightBg) Color.parseColor("#616161") else Color.parseColor("#B0BEC5")
@@ -229,7 +219,8 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
         contentRow = LinearLayout(context).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                0,
+                1f
             ).apply {
                 topMargin = (4 * density).toInt()
             }

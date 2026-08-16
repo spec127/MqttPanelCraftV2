@@ -33,11 +33,11 @@
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.App.TextInputLayout.Properties.Compact"
+            style="@style/Widget.App.TextInputLayout.Properties"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="顯示文字 (支援變數 ${var})">
+            android:hint="預設文字 (支援變數 ${var})">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etTextContent"
                 android:layout_width="match_parent"
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:hint="大小">
-                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                <AutoCompleteTextView
                     android:id="@+id/spTextSize"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
@@ -106,7 +106,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:hint="對齊">
-                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                <AutoCompleteTextView
                     android:id="@+id/spTextAlign"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
@@ -166,7 +166,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="特效 (霓虹/陰影)">
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            <AutoCompleteTextView
                 android:id="@+id/spTextEffect"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"

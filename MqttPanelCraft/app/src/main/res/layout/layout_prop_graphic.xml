@@ -35,7 +35,7 @@
         android:hint="@string/prop_graphic_type"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_marginBottom="12dp">
-        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+        <AutoCompleteTextView
             android:id="@+id/spGraphicType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -61,24 +61,22 @@
             android:weightSum="10"
             android:layout_marginBottom="12dp">
             
-            <LinearLayout
+            <FrameLayout
                 android:id="@+id/containerFillColor"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="5"
-                android:layout_marginEnd="8dp"
-                android:orientation="vertical">
+                android:layout_marginEnd="8dp">
                 <include layout="@layout/layout_prop_generic_color" />
-            </LinearLayout>
+            </FrameLayout>
 
-            <LinearLayout
+            <FrameLayout
                 android:id="@+id/containerStrokeColor"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="5"
-                android:orientation="vertical">
+                android:layout_weight="5">
                 <include layout="@layout/layout_prop_generic_color" />
-            </LinearLayout>
+            </FrameLayout>
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -124,21 +122,13 @@
         android:orientation="vertical"
         android:visibility="gone">
 
-        <LinearLayout
+        <FrameLayout
+            android:id="@+id/containerLineColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="10"
             android:layout_marginBottom="12dp">
-            <LinearLayout
-                android:id="@+id/containerLineColor"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="10"
-                android:orientation="vertical">
-                <include layout="@layout/layout_prop_generic_color" />
-            </LinearLayout>
-        </LinearLayout>
+            <include layout="@layout/layout_prop_generic_color" />
+        </FrameLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilLineDirection"
@@ -147,7 +137,7 @@
             android:hint="@string/prop_graphic_line_direction"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_marginBottom="12dp">
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            <AutoCompleteTextView
                 android:id="@+id/spLineDirection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -165,7 +155,7 @@
             android:hint="@string/prop_graphic_line_style"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_marginBottom="12dp">
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            <AutoCompleteTextView
                 android:id="@+id/spLineStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -244,7 +234,7 @@
             android:hint="@string/prop_graphic_scale_type"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_marginBottom="12dp">
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            <AutoCompleteTextView
                 android:id="@+id/spScaleType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -168,12 +168,10 @@ object BroadcastDefinition : IComponentDefinition {
 
         val styleLabels = listOf(
             context.getString(R.string.val_style_text_capsule),
-            context.getString(R.string.val_style_text_infinity),
             context.getString(R.string.val_style_text_glass)
         )
         val styleMap = mapOf(
             context.getString(R.string.val_style_text_capsule) to "Capsule",
-            context.getString(R.string.val_style_text_infinity) to "Infinity",
             context.getString(R.string.val_style_text_glass) to "Glass"
         )
         CommonPropBinder.bindDropdown(

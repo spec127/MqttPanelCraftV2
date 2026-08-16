@@ -16,8 +16,8 @@ android {
     defaultConfig {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
-        versionCode = 192
-        versionName = "0.12.12" // v0.12.11: 修復相機按鈕與色表標題未生效的問題
+        versionCode = 193
+        versionName = "0.13.0" // v0.13.0: 日曆元件實作、UI 修復與網頁元件企劃
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

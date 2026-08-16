@@ -1,0 +1,5 @@
+$utf8NoBom = New-Object System.Text.UTF8Encoding($False)
+$content1 = [System.IO.File]::ReadAllText("app\src\main\res\layout\layout_prop_graphic.xml")
+[System.IO.File]::WriteAllText("app\src\main\res\layout\layout_prop_graphic.xml", $content1, $utf8NoBom)
+$content2 = [System.IO.File]::ReadAllText("app\src\main\res\layout\layout_prop_text.xml")
+[System.IO.File]::WriteAllText("app\src\main\res\layout\layout_prop_text.xml", $content2, $utf8NoBom)

@@ -201,4 +201,22 @@ object CommonPropBinder {
             onUpdate(propKey, selectedValue)
         }
     }
+    
+    fun bindSwitch(
+        panelView: View,
+        switchId: Int,
+        propKey: String,
+        data: ComponentData,
+        onUpdate: (String, String) -> Unit,
+        defaultChecked: Boolean = false
+    ) {
+        val switchView = panelView.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(switchId) ?: return
+        val currentStr = data.props[propKey]
+        val isChecked = if (currentStr != null) currentStr.toBoolean() else defaultChecked
+        
+        switchView.isChecked = isChecked
+        switchView.setOnCheckedChangeListener { _, isCheckedNow ->
+            onUpdate(propKey, isCheckedNow.toString())
+        }
+    }
 }
