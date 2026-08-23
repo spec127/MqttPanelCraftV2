@@ -1,155 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
-    <!-- Section 1: Display Mode (顯示模式) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="start|center_vertical"
-        android:layout_marginBottom="10dp">
-        <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_panel_mode"
-            app:tint="@color/props_primary"
-            android:layout_marginEnd="6dp"/>
-        <TextView
-            android:text="顯示模式"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="@color/prop_text_secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
+        android:orientation="vertical">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilCalendarMode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="模式選擇"
-        style="@style/Widget.App.TextInputLayout.Properties.Compact"
-        android:layout_marginBottom="16dp">
-        <AutoCompleteTextView
-            android:id="@+id/spCalendarMode"
+        <!-- 互動 Interaction -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:inputType="none"
-            android:textSize="12sp"/>
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Section 2: Format (格式設定) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="start|center_vertical"
-        android:layout_marginBottom="10dp">
-        <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_text_fields"
-            app:tint="@color/props_primary"
-            android:layout_marginEnd="6dp"/>
-        <TextView
-            android:text="格式設定"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="@color/prop_text_secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:baselineAligned="false"
-        android:layout_marginBottom="12dp">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="@dimen/prop_section_icon_size"
+                android:layout_height="@dimen/prop_section_icon_size"
+                android:src="@drawable/ic_touch_app"
+                app:tint="@color/props_primary"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="@string/properties_section_interaction"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:letterSpacing="0.05"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.App.TextInputLayout.Properties.Compact"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
+            android:layout_marginBottom="12dp"
+            android:hint="顯示模式">
+            <AutoCompleteTextView
+                android:id="@+id/spCalendarMode"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/prop_input_height_inner"
+                android:inputType="none"
+                android:background="@null"
+                android:paddingStart="16dp"
+                android:paddingEnd="12dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/containerDateFormat"
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
             android:hint="日期格式">
             <AutoCompleteTextView
                 android:id="@+id/spDateFormat"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="none"
-                android:textSize="12sp"/>
+                android:background="@null"
+                android:paddingStart="16dp"
+                android:paddingEnd="12dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.App.TextInputLayout.Properties.Compact"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:id="@+id/containerTimeFormat"
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
+            android:layout_marginBottom="12dp"
             android:hint="時間格式">
             <AutoCompleteTextView
                 android:id="@+id/spTimeFormat"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="none"
-                android:textSize="12sp"/>
+                android:background="@null"
+                android:paddingStart="16dp"
+                android:paddingEnd="12dp"/>
         </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.App.TextInputLayout.Properties.Compact"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:hint="文字大小">
-        <AutoCompleteTextView
-            android:id="@+id/spTextSize"
+        <!-- Divider -->
+        <View
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:inputType="none"
-            android:textSize="12sp"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_height="1dp"
+            android:background="@color/divider_line"
+            android:layout_marginBottom="12dp"/>
 
-    <!-- Section 3: Visual Style (視覺外觀) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="start|center_vertical"
-        android:layout_marginBottom="10dp">
-        <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_btn_tune"
-            app:tint="@color/props_primary"
-            android:layout_marginEnd="6dp"/>
-        <TextView
-            android:text="視覺外觀"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="@color/prop_text_secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+        <!-- 視覺外觀 Visual Appearance -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="@dimen/prop_section_icon_size"
+                android:layout_height="@dimen/prop_section_icon_size"
+                android:src="@drawable/ic_palette"
+                app:tint="@color/props_primary"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="@string/properties_section_appearance"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:letterSpacing="0.05"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:hint="外觀風格">
+            <AutoCompleteTextView
+                android:id="@+id/spVisualStyle"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/prop_input_height_inner"
+                android:inputType="none"
+                android:background="@null"
+                android:paddingStart="16dp"
+                android:paddingEnd="12dp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Row: Dummy (Left 0.4) + Color (Right 0.6) for consistent layout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:baselineAligned="false">
+
+            <Space android:layout_width="0dp" android:layout_weight="0.4" android:layout_height="wrap_content"/>
+            <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+
+            <include
+                android:id="@+id/propColor"
+                layout="@layout/layout_prop_generic_color"
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
     </LinearLayout>
-
-    <!-- Text Color -->
-    <FrameLayout
-        android:id="@+id/containerTextColorPalette"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"/>
-
-    <!-- Background Color -->
-    <FrameLayout
-        android:id="@+id/containerBgColorPalette"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"/>
-
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

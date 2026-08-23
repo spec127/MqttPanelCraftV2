@@ -1,4 +1,4 @@
-package com.example.mqttpanelcraft.ui.components.definitions
+﻿package com.example.mqttpanelcraft.ui.components.definitions
 
 import android.content.Context
 import android.graphics.*
@@ -21,14 +21,14 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 
 /**
- * 圖形元件 (Graphic Component)
+ * ?耦?辣 (Graphic Component)
  */
 object GraphicDefinition : IComponentDefinition {
 
     override val type: String = "GRAPHIC"
     override val defaultSize: Size = Size(200, 200)
     override val labelPrefix: String = "graphic"
-    override val iconResId: Int = R.drawable.ic_square
+    override val iconResId: Int = R.drawable.ic_palette
     override val group: String = "DISPLAY"
 
     override val propertiesLayoutId: Int = R.layout.layout_prop_graphic
@@ -154,9 +154,9 @@ object GraphicDefinition : IComponentDefinition {
         }
 
         // Shape Section
-        val edgeLabels = listOf("3", "4", "5", "6", "7", "8", "圓形")
+        val edgeLabels = listOf("3", "4", "5", "6", "7", "8", "?耦")
         val edgeMap = mapOf(
-            "3" to "3", "4" to "4", "5" to "5", "6" to "6", "7" to "7", "8" to "8", "圓形" to "0"
+            "3" to "3", "4" to "4", "5" to "5", "6" to "6", "7" to "7", "8" to "8", "?耦" to "0"
         )
         CommonPropBinder.bindDropdown(panelView, R.id.spPolygonEdges, "polygon_edges", data, { k, v ->
             onUpdate(k, v)
@@ -181,7 +181,7 @@ object GraphicDefinition : IComponentDefinition {
         // Image Section
         val btnUpload = panelView.findViewById<Button>(R.id.btnUploadImage)
         btnUpload?.setOnClickListener {
-            Toast.makeText(context, "本地圖片上傳即將推出，目前可透過屬性編輯器手動貼入Base64", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "?砍??銝?喳??典嚗???撅祆抒楊頛臬??鞎澆Base64", Toast.LENGTH_SHORT).show()
         }
         imageCropper?.setImageSrc(data.props["image_src"], data.props["image_matrix"])
         imageCropper?.onMatrixChanged = { matStr ->
@@ -240,7 +240,7 @@ object GraphicDefinition : IComponentDefinition {
             strokePaint.strokeWidth = strokeWidth * resources.displayMetrics.density
             
             if (enableCorner) {
-                val radius = 20f * resources.displayMetrics.density
+                val radius = 10f * resources.displayMetrics.density
                 pathPaint.pathEffect = CornerPathEffect(radius)
                 strokePaint.pathEffect = CornerPathEffect(radius)
             } else {

@@ -92,7 +92,7 @@
     <string name="component_label_switch">開關</string>
     <string name="component_label_slider">滑桿</string>
     <string name="component_label_selector">選擇器</string>
-    <string name="component_label_image">影像</string>
+    <string name="component_label_image">靜態圖片</string>
     <string name="component_label_led">LED 狀態</string>
     <string name="component_label_chart">折線圖</string>
     <string name="component_label_joystick">搖桿</string>
@@ -106,12 +106,12 @@
     <string name="component_label_signal_indicator">信號面板</string>
     <string name="component_label_stepper">加減鍵</string>
     <string name="component_label_dpad">方向鍵</string>
-    <string name="component_label_image_sensor">影像</string>
+    <string name="component_label_image_sensor">即時影像</string>
     <string name="component_label_audio_sensor">聲音警示</string>
     <string name="component_label_shape">圖形裝飾</string>
     <string name="component_label_image_display">圖片展示</string>
     <string name="component_label_calendar_clock">日曆時鐘</string>
-    <string name="component_label_web_box">內嵌網頁</string>
+    <string name="component_label_web">網頁容器</string>
 
     <!-- Signal Indicator Properties -->
     <string name="prop_label_icon_style">圖示風格</string>
@@ -263,6 +263,24 @@
     <string name="properties_section_general">一般設定</string>
     <string name="properties_section_interaction">互動功能</string>
     <string name="properties_section_appearance">視覺外觀</string>
+    <string name="font_sans">無襯線體</string>
+    <string name="font_serif">襯線體</string>
+    <string name="font_mono">等寬體</string>
+    <string name="font_cursive">手寫體</string>
+    <string name="prop_text_align">對齊方式</string>
+    <string name="prop_align_left">靠左</string>
+    <string name="prop_align_center">置中</string>
+    <string name="prop_align_right">靠右</string>
+    <string name="prop_text_content">文字內容 (支援變數 \${var})</string>
+    <string name="prop_text_font">字型</string>
+    <string name="prop_text_size">字體大小</string>
+    <string name="prop_text_bold">粗體</string>
+    <string name="prop_text_bold_desc">加粗文字顯示</string>
+    <string name="prop_text_italic">斜體</string>
+    <string name="prop_text_italic_desc">傾斜文字樣式</string>
+    <string name="prop_text_show_bg">啟用背景</string>
+    <string name="prop_text_show_bg_desc">為文字元件加上底色方塊</string>
+    <string name="prop_text_effect">文字特效</string>
     <string name="properties_label_topic">MQTT 主題</string>
     <string name="properties_label_width">寬度</string>
     <string name="properties_label_height">高度</string>
@@ -310,7 +328,7 @@
     <string name="prop_image_trigger_type">單次快照更新方式</string>
     <string name="prop_image_trigger_timer">定時自動刷新</string>
     <string name="prop_image_trigger_btn">手動點擊按鈕</string>
-    <string name="component_label_broadcast">廣播</string>
+    <string name="component_label_broadcast">語音播報</string>
     <string name="val_image_rot_0">0°</string>
     <string name="val_image_rot_90">90°</string>
     <string name="val_image_rot_180">180°</string>
@@ -495,4 +513,6 @@
     <string name="val_scale_center_crop">填滿</string>
     <string name="val_scale_fit_center">適應</string>
     <string name="prop_graphic_opacity">透明度</string>
+    <string name="component_label_text">純文字</string>
+    <string name="component_label_graphic">圖形裝飾</string>
 </resources>

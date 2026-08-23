@@ -27,7 +27,7 @@ object WebBoxDefinition : IComponentDefinition {
         "html" to "<h1>Hello World</h1>",
         "enable_interaction" to "true",
         "transparent_bg" to "false",
-        "refresh_interval" to "0"
+        "refresh_interval" to "0", "show_border" to "false"
     )
 
     override fun createView(context: Context, isEditMode: Boolean): View {
@@ -50,6 +50,7 @@ object WebBoxDefinition : IComponentDefinition {
         webView.enableInteraction = (data.props["enable_interaction"] ?: "true").toBoolean()
         webView.transparentBg = (data.props["transparent_bg"] ?: "false").toBoolean()
         webView.refreshIntervalSec = (data.props["refresh_interval"] ?: "0").toIntOrNull() ?: 0
+        webView.showBorder = (data.props["show_border"] ?: "false").toBoolean()
     }
 
     override fun bindPropertiesPanel(
@@ -62,8 +63,8 @@ object WebBoxDefinition : IComponentDefinition {
         // 1. Source Type Dropdown
         binder.bindDropdown(
             panelView, R.id.spSourceType, "source_type", data, onUpdate,
-            listOf("外部網址 (URL)", "靜態代碼 (HTML)"),
-            mapOf("外部網址 (URL)" to "URL", "靜態代碼 (HTML)" to "HTML"),
+            listOf("憭蝬脣? (URL)", "??隞?Ⅳ (HTML)"),
+            mapOf("憭蝬脣? (URL)" to "URL", "??隞?Ⅳ (HTML)" to "HTML"),
             defaultValue = "URL"
         )
         
@@ -103,6 +104,22 @@ object WebBoxDefinition : IComponentDefinition {
 
         // 6. Refresh Interval Input
         binder.bindEditText(panelView, R.id.etRefreshInterval, "refresh_interval", data, onUpdate)
+
+        // 7. Show Border Toggle
+        val itemShowBorder = panelView.findViewById<View>(R.id.itemShowBorder)
+        val vShowBorderEnabled = panelView.findViewById<View>(R.id.vShowBorderEnabled)
+        val updateBorderUI = {
+            val showBorder = data.props["show_border"] == "true"
+            vShowBorderEnabled?.visibility = if (showBorder) View.VISIBLE else View.INVISIBLE
+        }
+        updateBorderUI()
+        itemShowBorder?.setOnClickListener {
+            val showBorder = data.props["show_border"] == "true"
+            val newVal = if (showBorder) "false" else "true"
+            data.props["show_border"] = newVal
+            updateBorderUI()
+            onUpdate("show_border", newVal)
+        }
     }
 
     override fun attachBehavior(

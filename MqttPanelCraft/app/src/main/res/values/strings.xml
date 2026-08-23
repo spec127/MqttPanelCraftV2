@@ -99,7 +99,7 @@
     <string name="component_label_switch">Switch</string>
     <string name="component_label_slider">Slider</string>
     <string name="component_label_selector">Selector</string>
-    <string name="component_label_image">Image</string>
+    <string name="component_label_image">Static Image</string>
     <string name="component_label_led">LED Status</string>
     <string name="component_label_chart">Chart</string>
     <string name="component_label_joystick">Joystick</string>
@@ -113,12 +113,12 @@
     <string name="component_label_signal_indicator">Signal Indicator</string>
     <string name="component_label_stepper">Stepper</string>
     <string name="component_label_dpad">D-Pad</string>
-    <string name="component_label_image_sensor">Image</string>
+    <string name="component_label_image_sensor">Live Stream</string>
     <string name="component_label_audio_sensor">Audio Alarm</string>
     <string name="component_label_shape">Shape</string>
     <string name="component_label_image_display">Image Display</string>
     <string name="component_label_calendar_clock">Calendar Clock</string>
-    <string name="component_label_web_box">Web Box</string>
+    <string name="component_label_web">Web View</string>
 
     <!-- Signal Indicator Properties -->
     <string name="prop_label_icon_style">Icon Style</string>
@@ -272,6 +272,24 @@
     <string name="properties_section_general">General</string>
     <string name="properties_section_interaction">Interaction</string>
     <string name="properties_section_appearance">Appearance</string>
+    <string name="font_sans">Sans Serif</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_mono">Monospace</string>
+    <string name="font_cursive">Cursive</string>
+    <string name="prop_text_align">Text Alignment</string>
+    <string name="prop_align_left">Left</string>
+    <string name="prop_align_center">Center</string>
+    <string name="prop_align_right">Right</string>
+    <string name="prop_text_content">Text Content (supports \${var})</string>
+    <string name="prop_text_font">Font</string>
+    <string name="prop_text_size">Font Size</string>
+    <string name="prop_text_bold">Bold</string>
+    <string name="prop_text_bold_desc">Make text heavier</string>
+    <string name="prop_text_italic">Italic</string>
+    <string name="prop_text_italic_desc">Tilt text style</string>
+    <string name="prop_text_show_bg">Enable Background</string>
+    <string name="prop_text_show_bg_desc">Add a color block behind text</string>
+    <string name="prop_text_effect">Text Effect</string>
     <string name="properties_label_topic">MQTT Topic</string>
     <string name="properties_label_width">Width</string>
     <string name="properties_label_height">Height</string>
@@ -320,7 +338,7 @@
     <string name="prop_image_trigger_type">Snapshot Trigger Type</string>
     <string name="prop_image_trigger_timer">Auto Interval Timer</string>
     <string name="prop_image_trigger_btn">Manual Refresh Button</string>
-    <string name="component_label_broadcast">Broadcast / TTS</string>
+    <string name="component_label_broadcast">TTS Broadcast</string>
     <string name="val_image_rot_0">0°</string>
     <string name="val_image_rot_90">90°</string>
     <string name="val_image_rot_180">180°</string>
@@ -530,4 +548,6 @@
     <string name="val_scale_center_crop">Center Crop</string>
     <string name="val_scale_fit_center">Fit Center</string>
     <string name="prop_graphic_opacity">Opacity</string>
+    <string name="component_label_text">Text Display</string>
+    <string name="component_label_graphic">Graphic</string>
 </resources>

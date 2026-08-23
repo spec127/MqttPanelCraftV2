@@ -51,41 +51,55 @@ class PolygonEditorView @JvmOverloads constructor(
             return
         }
         isCircle = false
-        edges = edgeCount
+        this.edges = edgeCount
+        this.points.clear()
         
-        // Try parsing existing points if they match the edge count
         if (!existingPointsStr.isNullOrEmpty()) {
             val parsed = parsePoints(existingPointsStr)
-            if (parsed.size == edges) {
-                points.clear()
-                points.addAll(parsed)
-                invalidate()
-                return
+            if (parsed.size == edgeCount) {
+                this.points.addAll(parsed)
+            } else {
+                generateRegularPolygon(edgeCount)
             }
+        } else {
+            generateRegularPolygon(edgeCount)
         }
-
-        // Generate regular polygon points as default
-        generateRegularPolygon()
+        
+        notifyPointsChanged()
+        invalidate()
     }
 
-    private fun generateRegularPolygon() {
-        points.clear()
+    private fun generateRegularPolygon(edges: Int) {
+        if (edges == 0) return // Circle, no points needed here for editing
+        
         val centerX = 0.5f
         val centerY = 0.5f
-        val radius = 0.4f // keep some margin for nodes
+        val radius = 0.48f // keep some margin for nodes
         
         // Start from top (-PI/2)
-        val startAngle = -Math.PI / 2.0
+        var startAngle = -Math.PI / 2.0
+        if (edges % 2 == 0) startAngle += Math.PI / edges
         val angleStep = 2.0 * Math.PI / edges
+
+        var minY = Float.MAX_VALUE
+        var maxY = Float.MIN_VALUE
 
         for (i in 0 until edges) {
             val angle = startAngle + i * angleStep
-            val px = centerX + (radius * cos(angle)).toFloat()
-            val py = centerY + (radius * sin(angle)).toFloat()
+            val px = centerX + (radius * Math.cos(angle)).toFloat()
+            val py = centerY + (radius * Math.sin(angle)).toFloat()
             points.add(PointF(px, py))
+            if (py < minY) minY = py
+            if (py > maxY) maxY = py
         }
-        notifyPointsChanged()
-        invalidate()
+        
+        val boxCenterY = (minY + maxY) / 2f
+        val offsetY = centerY - boxCenterY
+        if (offsetY != 0f) {
+            for (p in points) {
+                p.y += offsetY
+            }
+        }
     }
 
     private fun notifyPointsChanged() {
@@ -148,7 +162,6 @@ class PolygonEditorView @JvmOverloads constructor(
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (isCircle || points.isEmpty()) return false
-
         val x = event.x
         val y = event.y
         val w = width.toFloat()
@@ -156,30 +169,33 @@ class PolygonEditorView @JvmOverloads constructor(
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                // Find nearest node
-                var nearestDist = Float.MAX_VALUE
                 var nearestIdx = -1
-                for (i in points.indices) {
-                    val px = points[i].x * w
-                    val py = points[i].y * h
-                    val dx = x - px
-                    val dy = y - py
-                    val dist = Math.hypot(dx.toDouble(), dy.toDouble()).toFloat()
-                    if (dist < touchSlop && dist < nearestDist) {
-                        nearestDist = dist
-                        nearestIdx = i
+                var minDist = Float.MAX_VALUE
+                val touchRadius = 40f * resources.displayMetrics.density
+
+                points.forEachIndexed { index, p ->
+                    val px = p.x * w
+                    val py = p.y * h
+                    val dist = Math.hypot((x - px).toDouble(), (y - py).toDouble()).toFloat()
+                    if (dist < touchRadius && dist < minDist) {
+                        minDist = dist
+                        nearestIdx = index
                     }
                 }
+
                 if (nearestIdx != -1) {
                     draggingIndex = nearestIdx
+                    parent?.requestDisallowInterceptTouchEvent(true)
                     return true
                 }
             }
             MotionEvent.ACTION_MOVE -> {
                 if (draggingIndex != -1) {
-                    val newX = (x / w).coerceIn(0f, 1f)
-                    val newY = (y / h).coerceIn(0f, 1f)
-                    points[draggingIndex] = PointF(newX, newY)
+                    var nx = x / w
+                    var ny = y / h
+                    nx = Math.max(0f, Math.min(1f, nx))
+                    ny = Math.max(0f, Math.min(1f, ny))
+                    points[draggingIndex].set(nx, ny)
                     invalidate()
                     return true
                 }
@@ -189,6 +205,7 @@ class PolygonEditorView @JvmOverloads constructor(
                     draggingIndex = -1
                     notifyPointsChanged()
                     invalidate()
+                    parent?.requestDisallowInterceptTouchEvent(false)
                     return true
                 }
             }

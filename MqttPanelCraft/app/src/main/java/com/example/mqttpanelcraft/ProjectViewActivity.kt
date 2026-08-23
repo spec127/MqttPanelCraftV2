@@ -47,6 +47,41 @@ class ProjectViewActivity : BaseActivity() {
     // Manager
     private lateinit var projectUIManager: ProjectUIManager
 
+    private var imagePickCallback: ((String?) -> Unit)? = null
+
+    private val imagePickerLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            try {
+                val inputStream = contentResolver.openInputStream(uri)
+                val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
+                // limit size
+                var width = bitmap.width
+                var height = bitmap.height
+                if (width > 800 || height > 800) {
+                    val scale = Math.min(800f / width, 800f / height)
+                    width = (width * scale).toInt()
+                    height = (height * scale).toInt()
+                }
+                val resized = android.graphics.Bitmap.createScaledBitmap(bitmap, width, height, true)
+                val outputStream = java.io.ByteArrayOutputStream()
+                resized.compress(android.graphics.Bitmap.CompressFormat.WEBP, 80, outputStream)
+                val base64 = android.util.Base64.encodeToString(outputStream.toByteArray(), android.util.Base64.DEFAULT)
+                imagePickCallback?.invoke("data:image/webp;base64,$base64")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                imagePickCallback?.invoke(null)
+            }
+        } else {
+            imagePickCallback?.invoke(null)
+        }
+        imagePickCallback = null
+    }
+
+    fun pickImage(callback: (String?) -> Unit) {
+        imagePickCallback = callback
+        imagePickerLauncher.launch("image/*")
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {

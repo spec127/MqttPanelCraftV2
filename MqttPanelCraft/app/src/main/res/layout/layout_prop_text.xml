@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- CONTENT SECTION -->
+        <!-- 互動 Interaction -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -18,26 +18,80 @@
             android:gravity="start|center_vertical"
             android:layout_marginBottom="12dp">
             <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="@dimen/prop_section_icon_size"
+                android:layout_height="@dimen/prop_section_icon_size"
                 android:src="@drawable/ic_touch_app"
                 app:tint="@color/props_primary"
                 android:layout_marginEnd="6dp"/>
             <TextView
-                android:text="內容 Content"
+                android:text="@string/properties_section_interaction"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/prop_text_secondary"
+                android:letterSpacing="0.05"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
+        <!-- 對齊 Align (label above as small text, like button trigger mode) -->
+        <TextView
+            android:text="@string/prop_text_align"
+            android:textSize="12sp"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"/>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/tgTextAlign"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/prop_toggle_height"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAlignLeft"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/prop_align_left"
+                android:padding="0dp"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAlignCenter"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/prop_align_center"
+                android:padding="0dp"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAlignRight"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/prop_align_right"
+                android:padding="0dp"
+                android:textSize="12sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!-- 內容 Content -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.App.TextInputLayout.Properties"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="預設文字 (支援變數 ${var})">
+            android:hint="@string/prop_text_content">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etTextContent"
                 android:layout_width="match_parent"
@@ -48,161 +102,88 @@
                 android:textSize="14sp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/divider_line"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- TYPOGRAPHY SECTION -->
+        <!-- 字形與大小 Font & Size -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="start|center_vertical"
-            android:layout_marginBottom="12dp">
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_text_fields"
-                app:tint="@color/props_primary"
-                android:layout_marginEnd="6dp"/>
-            <TextView
-                android:text="字體 Typography"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/prop_text_secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false"
-            android:layout_marginBottom="12dp">
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.App.TextInputLayout.Properties.Compact"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:hint="大小">
-                <AutoCompleteTextView
-                    android:id="@+id/spTextSize"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:inputType="none"
-                    android:textSize="12sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.App.TextInputLayout.Properties.Compact"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:hint="對齊">
-                <AutoCompleteTextView
-                    android:id="@+id/spTextAlign"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:inputType="none"
-                    android:textSize="12sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
-        
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/toggleTextWeight"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
             android:layout_marginBottom="12dp"
-            app:singleSelection="true"
-            app:selectionRequired="true"
-            app:checkedButton="@+id/btnWeightNormal">
+            android:baselineAligned="false">
 
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:hint="@string/prop_text_font">
+                <AutoCompleteTextView
+                    android:id="@+id/spFontFamily"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/prop_input_height_inner"
+                    android:inputType="none"
+                    android:background="@null"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="12dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.App.TextInputLayout.Properties"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.6"
+                android:hint="@string/prop_text_size">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etTextSize"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:textSize="14sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- 文字樣式 Style -->
+        <TextView
+            android:text="文字樣式"
+            android:textSize="12sp"
+            android:textColor="@color/prop_text_secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"/>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/tgTextStyle"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/prop_toggle_height"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            app:singleSelection="false">
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnWeightNormal"
+                android:id="@+id/btnStyleBold"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:text="標準"
+                android:text="@string/prop_text_bold"
+                android:padding="0dp"
                 android:textSize="12sp"
                 android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:padding="0dp"
-                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
-
+                android:insetBottom="0dp"/>
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnWeightBold"
+                android:id="@+id/btnStyleItalic"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:text="粗體"
-                android:textStyle="bold"
+                android:text="@string/prop_text_italic"
+                android:padding="0dp"
                 android:textSize="12sp"
                 android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:padding="0dp"
-                app:cornerRadius="@dimen/prop_toggle_corner_radius"/>
+                android:insetBottom="0dp"/>
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
-        <!-- Text Color -->
-        <FrameLayout
-            android:id="@+id/containerTextColorPalette"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
-        </FrameLayout>
-        
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.App.TextInputLayout.Properties.Compact"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:hint="特效 (霓虹/陰影)">
-            <AutoCompleteTextView
-                android:id="@+id/spTextEffect"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:inputType="none"
-                android:textSize="12sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/divider_line"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- BACKGROUND SECTION -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="start|center_vertical"
-            android:layout_marginBottom="12dp">
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_palette"
-                app:tint="@color/props_primary"
-                android:layout_marginEnd="6dp"/>
-            <TextView
-                android:text="背景 Background"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/prop_text_secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-
+        <!-- 啟用背景 Background Toggle (Premium Card) -->
         <LinearLayout
             android:id="@+id/itemShowBackground"
             android:layout_width="match_parent"
@@ -211,7 +192,7 @@
             android:padding="12dp"
             android:background="@drawable/bg_prop_item_premium"
             android:gravity="center_vertical"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="16dp">
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -220,27 +201,108 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="顯示背景"
+                    android:text="@string/prop_text_show_bg"
                     android:textColor="@color/prop_text_primary"
                     android:textSize="14sp"
                     android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/prop_text_show_bg_desc"
+                    android:textColor="@color/prop_text_secondary"
+                    android:textSize="11sp"/>
             </LinearLayout>
             <ImageView
-                android:id="@+id/checkShowBackground"
+                android:id="@+id/vShowBgEnabled"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:src="@drawable/ic_check_circle_premium"
-                android:visibility="visible"/>
+                android:visibility="invisible"/>
         </LinearLayout>
 
-        <!-- Background Color -->
-        <FrameLayout
-            android:id="@+id/containerBgColorPalette"
+        <!-- 分隔線 Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_line"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- 視覺外觀 Visual Appearance -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="@dimen/prop_section_icon_size"
+                android:layout_height="@dimen/prop_section_icon_size"
+                android:src="@drawable/ic_palette"
+                app:tint="@color/props_primary"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="@string/properties_section_appearance"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:letterSpacing="0.05"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <!-- Row: Effect (Left 0.4) + Text Color (Right 0.6) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginBottom="12dp"
-            android:visibility="gone">
-        </FrameLayout>
+            android:baselineAligned="false">
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:hint="@string/prop_text_effect">
+                <AutoCompleteTextView
+                    android:id="@+id/spTextEffect"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/prop_input_height_inner"
+                    android:inputType="none"
+                    android:background="@null"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="12dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+
+            <include
+                android:id="@+id/propTextColor"
+                layout="@layout/layout_prop_generic_color"
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- Row: Dummy (Left 0.4) + Bg Color (Right 0.6) -->
+        <LinearLayout
+            android:id="@+id/containerBgColorRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:baselineAligned="false">
+
+            <Space android:layout_width="0dp" android:layout_weight="0.4" android:layout_height="wrap_content"/>
+            <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+
+            <include
+                android:id="@+id/propBgColor"
+                layout="@layout/layout_prop_generic_color"
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -33,7 +33,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilSourceType"
-            style="@style/Widget.App.TextInputLayout.Properties.Compact"
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -41,8 +41,11 @@
             <AutoCompleteTextView
                 android:id="@+id/spSourceType"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="none"
+                android:background="@null"
+                android:paddingStart="16dp"
+                android:paddingEnd="12dp"
                 android:textSize="12sp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -70,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:visibility="gone"
-            android:hint="HTML 代碼">
+            android:hint="HTML 程式碼">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etHtml"
                 android:layout_width="match_parent"
@@ -96,7 +99,7 @@
                 app:tint="@color/props_primary"
                 android:layout_marginEnd="6dp"/>
             <TextView
-                android:text="行為設定"
+                android:text="互動功能"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/prop_text_secondary"
@@ -108,7 +111,7 @@
             android:id="@+id/swEnableInteraction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="允許點擊與滑動 (互動)"
+            android:text="允許互動操作"
             android:textColor="@color/prop_text_primary"
             android:textSize="14sp"
             android:layout_marginBottom="12dp"/>
@@ -127,7 +130,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="自動重新整理間隔 (秒，0代表關閉)">
+            android:hint="自動更新間隔 (秒，0代表不更新)">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etRefreshInterval"
                 android:layout_width="match_parent"
@@ -135,6 +138,72 @@
                 android:inputType="number"
                 android:textSize="14sp"/>
         </com.google.android.material.textfield.TextInputLayout>
+        
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_line"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- 視覺外觀 Visual Appearance -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginBottom="12dp">
+            <ImageView
+                android:layout_width="@dimen/prop_section_icon_size"
+                android:layout_height="@dimen/prop_section_icon_size"
+                android:src="@drawable/ic_palette"
+                app:tint="@color/props_primary"
+                android:layout_marginEnd="6dp"/>
+            <TextView
+                android:text="視覺外觀"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/prop_text_secondary"
+                android:letterSpacing="0.05"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        
+        <LinearLayout
+            android:id="@+id/itemShowBorder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:background="@drawable/bg_prop_item_premium"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="顯示邊框"
+                    android:textColor="@color/prop_text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="為網頁元件加上裝飾邊框"
+                    android:textColor="@color/prop_text_secondary"
+                    android:textSize="11sp"/>
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/vShowBorderEnabled"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle_premium"
+                android:visibility="invisible"/>
+        </LinearLayout>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

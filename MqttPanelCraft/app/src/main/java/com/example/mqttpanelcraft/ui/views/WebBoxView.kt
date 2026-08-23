@@ -108,16 +108,50 @@ class WebBoxView(context: Context) : FrameLayout(context) {
         }
     }
     
+        var showBorder: Boolean = false
+        set(value) {
+            field = value
+            updateBorder()
+        }
+
+    private fun updateBorder() {
+        if (showBorder) {
+            val drawable = android.graphics.drawable.GradientDrawable().apply {
+                setStroke((2f * resources.displayMetrics.density).toInt(), android.graphics.Color.parseColor("#7B1FA2"))
+                cornerRadius = 8f * resources.displayMetrics.density
+                if (!transparentBg) {
+                    setColor(android.graphics.Color.WHITE)
+                } else {
+                    setColor(android.graphics.Color.TRANSPARENT)
+                }
+            }
+            background = drawable
+            
+            // Adjust margin for webview to not overlap border
+            val p = (2f * resources.displayMetrics.density).toInt()
+            webView.setPadding(p, p, p, p)
+            val lp = webView.layoutParams as LayoutParams
+            lp.setMargins(p, p, p, p)
+            webView.layoutParams = lp
+        } else {
+            updateBackground() // Reset to normal
+            webView.setPadding(0, 0, 0, 0)
+            val lp = webView.layoutParams as LayoutParams
+            lp.setMargins(0, 0, 0, 0)
+            webView.layoutParams = lp
+        }
+    }
+
     private fun updateInteraction() {
         if (isEditMode) {
             // In edit mode, intercept all touches so it can be dragged
-            webView.setOnTouchListener { _, _ -> true }
+            webView.setOnTouchListener { _, event -> if(event.action == MotionEvent.ACTION_DOWN) { parent.requestDisallowInterceptTouchEvent(false) }; true }
         } else {
             // In run mode, allow interaction if enabled, else intercept
             if (enableInteraction) {
-                webView.setOnTouchListener(null)
+                webView.setOnTouchListener { _, event -> if(event.action == MotionEvent.ACTION_DOWN) { parent.requestDisallowInterceptTouchEvent(true) }; false }
             } else {
-                webView.setOnTouchListener { _, _ -> true }
+                webView.setOnTouchListener { _, event -> if(event.action == MotionEvent.ACTION_DOWN) { parent.requestDisallowInterceptTouchEvent(false) }; true }
             }
         }
     }
