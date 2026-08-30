@@ -68,16 +68,12 @@ object ImageSensorDefinition : IComponentDefinition {
         imgView.streamMode = data.props["stream_mode"] ?: "SINGLE"
         imgView.fps = data.props["stream_fps"] ?: "2"
 
-        // Restore cached image from properties
+        // MQTT frames are runtime-only; never restore Base64 payloads from project JSON.
         imgView.placeholderIconResId = R.drawable.ic_camera_placeholder
-        val savedTime = data.props["image_time"] ?: ""
-        imgView.lastReceivedTime = savedTime
-        val cachedImage = data.props["value"]
-        if (!cachedImage.isNullOrEmpty()) {
-            imgView.updatePayload(cachedImage, isNewArrival = false)
-        } else {
-            imgView.clearCurrentBitmap()
-        }
+        imgView.onImageReassembled = null
+        imgView.onImageCleared = null
+        imgView.lastReceivedTime = ""
+        imgView.clearCurrentBitmap()
 
         // Apply theme color
         val colorHex = data.props["color"] ?: "#FF9800"
@@ -195,15 +191,8 @@ object ImageSensorDefinition : IComponentDefinition {
     ) {
         val imageDisplayView = view.findViewWithTag<ImageDisplayView>("target_img_view") ?: return
         imageDisplayView.isEditMode = false
-        // Persist reassembled image string and timestamp when a full frame is decoded
-        imageDisplayView.onImageReassembled = { fullB64, timeStr ->
-            onUpdateProp("value", fullB64)
-            onUpdateProp("image_time", timeStr)
-        }
-        imageDisplayView.onImageCleared = {
-            onUpdateProp("value", "")
-            onUpdateProp("image_time", "")
-        }
+        imageDisplayView.onImageReassembled = null
+        imageDisplayView.onImageCleared = null
     }
 
     override fun onMqttMessage(

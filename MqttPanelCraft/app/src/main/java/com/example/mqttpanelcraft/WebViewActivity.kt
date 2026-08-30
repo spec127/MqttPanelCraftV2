@@ -12,6 +12,7 @@ import com.example.mqttpanelcraft.data.ProjectRepository
 import com.example.mqttpanelcraft.model.Project
 import com.example.mqttpanelcraft.service.MqttService
 import com.example.mqttpanelcraft.utils.HtmlTemplates
+import com.example.mqttpanelcraft.utils.TopicHelper
 
 class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
 
@@ -19,6 +20,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
     private lateinit var codeEditor: EditText
     private var projectId: String? = null
     private var project: Project? = null
+    private var mqttListenerRegistered = false
 
     @SuppressLint("SetJavaScriptEnabled", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -221,7 +223,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
                  - `function mqttOnMessage(topic, payload)`: Handle incoming data.
                  
                  **Topics**: All topics must start with: 
-                 `${project?.name ?: "Project"}/${projectId ?: "ID"}/`
+                 `${project?.let { TopicHelper.formatBaseTopic(it.name, it.id) } ?: "project/ID"}/`
                  
                  **Tip**: The default template penguin is hardcoded with pure CSS/JS for reference.
              """.trimIndent()
@@ -240,9 +242,6 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
             builder.setNegativeButton("Close", null)
             builder.show()
         }
-
-        // Register Listener
-        MqttRepository.registerListener(this)
 
         // Update Initial Status
         updateStatusIndicator(MqttRepository.connectionStatus.value ?: 0)
@@ -274,13 +273,14 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
 
                 // Fix: Subscribe ONLY when connected to ensure the Service is ready
                 if (!hasSubscribed && project != null) {
-                    val baseTopic = "${project!!.name}/${project!!.id}/#"
-                    val subIntent =
-                            Intent(this, MqttService::class.java).apply {
-                                action = "SUBSCRIBE"
-                                putExtra("TOPIC", baseTopic)
-                            }
-                    startService(subIntent)
+                    TopicHelper.collectSubscriptionTopics(project!!).forEach { topic ->
+                        val subIntent =
+                                Intent(this, MqttService::class.java).apply {
+                                    action = "SUBSCRIBE"
+                                    putExtra("TOPIC", topic)
+                                }
+                        startService(subIntent)
+                    }
                     hasSubscribed = true
                 }
             }
@@ -310,9 +310,21 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        MqttRepository.unregisterListener(this)
+    override fun onStart() {
+        super.onStart()
+        if (!mqttListenerRegistered) {
+            MqttRepository.registerListener(this)
+            mqttListenerRegistered = true
+        }
+    }
+
+    override fun onStop() {
+        if (mqttListenerRegistered) {
+            MqttRepository.unregisterListener(this)
+            mqttListenerRegistered = false
+        }
+        hasSubscribed = false
+        super.onStop()
     }
 
     // Idle Ads
@@ -333,6 +345,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         val currentProject = ProjectRepository.getProjectById(projectId!!)
         if (currentProject != null) {
             project = currentProject
+            hasSubscribed = false
             findViewById<android.widget.TextView>(R.id.tvToolbarTitle).text = currentProject.name
 
             // Apply Orientation
@@ -346,6 +359,10 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
 
             if (requestedOrientation != targetOrientation) {
                 requestedOrientation = targetOrientation
+            }
+
+            if (MqttRepository.connectionStatus.value == 1) {
+                updateStatusIndicator(1)
             }
         }
     }

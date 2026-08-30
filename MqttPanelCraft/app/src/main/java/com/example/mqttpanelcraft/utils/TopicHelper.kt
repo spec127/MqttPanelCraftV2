@@ -5,6 +5,14 @@ import java.util.Locale
 
 object TopicHelper {
 
+    private fun normalizeProjectName(projectName: String): String {
+        return projectName
+                .trim()
+                .lowercase(Locale.ROOT)
+                .replace("\\s".toRegex(), "_")
+                .replace("[^a-z0-9_]".toRegex(), "")
+    }
+
     /**
      * Maps UI tags to standard component types.
      */
@@ -24,11 +32,24 @@ object TopicHelper {
      * Formats the base topic: {projectNameLower}/{projectId}
      */
     fun formatBaseTopic(projectName: String, projectId: String): String {
-        val nameLower = projectName.lowercase(Locale.ROOT).replace("\\s".toRegex(), "_")
-        // Ensure name only contains allowed chars, though SetupActivity enforces this.
-        // We assume valid input here but extra safety doesn't hurt.
-        val cleanName = nameLower.replace("[^a-z0-9_]".toRegex(), "")
-        return "$cleanName/$projectId"
+        return "${normalizeProjectName(projectName)}/${projectId.trim()}"
+    }
+
+    fun formatProjectWildcard(project: Project): String {
+        return "${formatBaseTopic(project.name, project.id)}/#"
+    }
+
+    fun collectSubscriptionTopics(project: Project): Set<String> {
+        val wildcard = formatProjectWildcard(project)
+        val coveredPrefix = wildcard.dropLast(1)
+        return linkedSetOf(wildcard).apply {
+            project.components
+                    .asSequence()
+                    .map { it.topicConfig.trim() }
+                    .filter { it.isNotEmpty() }
+                    .filterNot { it.startsWith(coveredPrefix) }
+                    .forEach(::add)
+        }
     }
 
     /**
