@@ -5,6 +5,8 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.ContextCompat
+import com.example.mqttpanelcraft.R
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -18,15 +20,21 @@ class PolygonEditorView @JvmOverloads constructor(
     private var edges: Int = 4
     private val points = mutableListOf<PointF>()
     private var isCircle = false
+    private val propertyAccentColor = ContextCompat.getColor(context, R.color.props_primary)
 
     // Paints
     private val pathPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = Color.parseColor("#807B1FA2")
+        color = Color.argb(
+            128,
+            Color.red(propertyAccentColor),
+            Color.green(propertyAccentColor),
+            Color.blue(propertyAccentColor)
+        )
     }
     private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        color = Color.parseColor("#7B1FA2")
+        color = propertyAccentColor
         strokeWidth = 4f
     }
     private val nodePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -35,7 +43,7 @@ class PolygonEditorView @JvmOverloads constructor(
     }
     private val nodeStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        color = Color.parseColor("#7B1FA2")
+        color = propertyAccentColor
         strokeWidth = 2f
     }
 

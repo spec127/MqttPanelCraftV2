@@ -18,7 +18,7 @@ object WebBoxDefinition : IComponentDefinition {
     override val type: String = "WEB_BOX"
     override val defaultSize: Size = Size(300, 200)
     override val labelPrefix: String = "web"
-    override val iconResId: Int = android.R.drawable.ic_menu_mapmode
+    override val iconResId: Int = R.drawable.ic_globe
     override val group: String = "DISPLAY"
     override val propertiesLayoutId: Int = R.layout.layout_prop_web
 

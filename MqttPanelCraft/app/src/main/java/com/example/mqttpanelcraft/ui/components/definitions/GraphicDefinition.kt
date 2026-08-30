@@ -43,8 +43,8 @@ internal fun swapGraphicDimensions(width: Int, height: Int): Pair<Int, Int> = he
  */
 object GraphicDefinition : IComponentDefinition {
 
-    private const val MULTIMEDIA_FILL_COLOR = "#FF9800"
-    private const val MULTIMEDIA_STROKE_COLOR = "#F57C00"
+    // Keep Graphic defaults aligned with TextDefinition's default text color.
+    private const val DEFAULT_GRAPHIC_COLOR = "#7B1FA2"
 
     private fun getActivity(context: Context): Activity? {
         var current = context
@@ -78,8 +78,8 @@ object GraphicDefinition : IComponentDefinition {
         "direction" to "HORIZONTAL", // HORIZONTAL, VERTICAL
         "opacity" to "100",
         "stroke_width" to "0",
-        "fill_color" to MULTIMEDIA_FILL_COLOR,
-        "stroke_color" to MULTIMEDIA_STROKE_COLOR,
+        "fill_color" to DEFAULT_GRAPHIC_COLOR,
+        "stroke_color" to DEFAULT_GRAPHIC_COLOR,
         "enable_corner" to "false"
     )
 
@@ -131,8 +131,8 @@ object GraphicDefinition : IComponentDefinition {
         compositeView.opacity = (data.props["opacity"] ?: "100").toIntOrNull()?.coerceIn(0, 100) ?: 100
         compositeView.strokeWidth = (data.props["stroke_width"] ?: "0").toFloatOrNull()?.coerceAtLeast(0f) ?: 0f
         
-        compositeView.fillColor = try { Color.parseColor(data.props["fill_color"] ?: MULTIMEDIA_FILL_COLOR) } catch (_: Exception) { Color.parseColor(MULTIMEDIA_FILL_COLOR) }
-        compositeView.strokeColor = try { Color.parseColor(data.props["stroke_color"] ?: MULTIMEDIA_STROKE_COLOR) } catch (_: Exception) { Color.parseColor(MULTIMEDIA_STROKE_COLOR) }
+        compositeView.fillColor = try { Color.parseColor(data.props["fill_color"] ?: DEFAULT_GRAPHIC_COLOR) } catch (_: Exception) { Color.parseColor(DEFAULT_GRAPHIC_COLOR) }
+        compositeView.strokeColor = try { Color.parseColor(data.props["stroke_color"] ?: DEFAULT_GRAPHIC_COLOR) } catch (_: Exception) { Color.parseColor(DEFAULT_GRAPHIC_COLOR) }
         
         compositeView.enableCorner = (data.props["enable_corner"] == "true")
         
@@ -253,8 +253,8 @@ object GraphicDefinition : IComponentDefinition {
 
         CommonPropBinder.bindEditText(panelView, R.id.etOpacity, "opacity", data, onUpdate, "100")
         CommonPropBinder.bindEditText(panelView, R.id.etStrokeWidth, "stroke_width", data, onUpdate, "0")
-        CommonPropBinder.bindColorPalette(panelView, R.id.containerFillColor, "fill_color", data, onUpdate, context.getString(R.string.prop_graphic_fill_color), MULTIMEDIA_FILL_COLOR)
-        CommonPropBinder.bindColorPalette(panelView, R.id.containerStrokeColor, "stroke_color", data, onUpdate, context.getString(R.string.prop_graphic_stroke_color), MULTIMEDIA_STROKE_COLOR)
+        CommonPropBinder.bindColorPalette(panelView, R.id.containerFillColor, "fill_color", data, onUpdate, context.getString(R.string.prop_graphic_fill_color), DEFAULT_GRAPHIC_COLOR)
+        CommonPropBinder.bindColorPalette(panelView, R.id.containerStrokeColor, "stroke_color", data, onUpdate, context.getString(R.string.prop_graphic_stroke_color), DEFAULT_GRAPHIC_COLOR)
 
         val itemCornerRadius = panelView.findViewById<View>(R.id.itemCornerRadius)
         val cornerCheck = panelView.findViewById<ImageView>(R.id.vCornerRadiusEnabled)

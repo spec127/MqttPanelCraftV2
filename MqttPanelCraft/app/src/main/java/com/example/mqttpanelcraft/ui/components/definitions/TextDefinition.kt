@@ -18,7 +18,7 @@ import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 
 object TextDefinition : IComponentDefinition {
     override val type: String = "TEXT"
-    override val defaultSize: Size = Size(120, 40)
+    override val defaultSize: Size = Size(100, 60)
     override val labelPrefix: String = "text"
     override val iconResId: Int = R.drawable.ic_text_fields
     override val group: String = "DISPLAY"

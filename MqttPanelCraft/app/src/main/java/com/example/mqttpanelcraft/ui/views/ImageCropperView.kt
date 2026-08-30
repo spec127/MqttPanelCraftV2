@@ -8,6 +8,8 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import androidx.core.content.ContextCompat
+import com.example.mqttpanelcraft.R
 
 class ImageCropperView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -34,7 +36,7 @@ class ImageCropperView @JvmOverloads constructor(
     }
     private val nodePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = Color.parseColor("#7B1FA2")
+        color = ContextCompat.getColor(context, R.color.props_primary)
     }
 
     private val scaleListener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {

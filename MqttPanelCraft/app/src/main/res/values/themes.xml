@@ -74,23 +74,6 @@
         <item name="android:textColor">@color/props_primary</item>
     </style>
 
-    <style name="Widget.App.Button.Outlined.Properties.Graphic" parent="Widget.App.Button.Outlined.Properties">
-        <item name="backgroundTint">@color/graphic_toggle_background_selector</item>
-        <item name="strokeColor">@color/icy_primary</item>
-        <item name="android:textColor">@color/graphic_toggle_text_selector</item>
-        <item name="iconTint">@color/graphic_toggle_text_selector</item>
-    </style>
-
-    <style name="Widget.App.TextInputLayout.Properties.Graphic" parent="Widget.App.TextInputLayout.Properties">
-        <item name="boxStrokeColor">@color/graphic_prop_input_stroke_selector</item>
-        <item name="hintTextColor">@color/icy_primary</item>
-    </style>
-
-    <style name="Widget.App.TextInputLayout.Properties.GraphicDropdown" parent="Widget.App.TextInputLayout.Properties.DenseDropdown">
-        <item name="boxStrokeColor">@color/graphic_prop_input_stroke_selector</item>
-        <item name="hintTextColor">@color/icy_primary</item>
-    </style>
-
     <style name="PropertyLabel" parent="Widget.MaterialComponents.TextView">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/prop_text_secondary</item>
