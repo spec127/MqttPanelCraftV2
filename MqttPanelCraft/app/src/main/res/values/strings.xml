@@ -119,6 +119,9 @@
     <string name="component_label_image_display">Image Display</string>
     <string name="component_label_calendar_clock">Calendar Clock</string>
     <string name="component_label_web">Web View</string>
+    <string name="component_label_calendar">Calendar</string>
+    <string name="component_label_clock">Clock</string>
+    <string name="component_label_web_box">Web View</string>
 
     <!-- Signal Indicator Properties -->
     <string name="prop_label_icon_style">Icon Style</string>

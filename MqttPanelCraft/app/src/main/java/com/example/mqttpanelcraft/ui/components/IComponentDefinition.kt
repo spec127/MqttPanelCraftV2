@@ -5,6 +5,12 @@ import android.util.Size
 import android.view.View
 import com.example.mqttpanelcraft.model.ComponentData
 
+internal fun resolveLinkedTriggerPayload(data: ComponentData, triggerValue: String): String =
+        data.props["payload"]
+                ?: data.props["payloadRight"]
+                ?: data.props["value"]
+                ?: triggerValue
+
 /**
  * The "Soul" of a component. Encapsulates its Identity (Type, Size), Appearance (Factory),
  * Properties Logic (Binder), and Runtime Behavior (Behavior).
@@ -48,6 +54,21 @@ interface IComponentDefinition {
         )
 
         /**
+         * Handles an in-app trigger from another component. The source component never publishes
+         * MQTT itself; the linked target owns the topic and payload used here.
+         */
+        fun onLinkedTrigger(
+                view: View,
+                data: ComponentData,
+                triggerValue: String,
+                sendMqtt: (topic: String, payload: String) -> Unit,
+                onUpdateProp: (key: String, value: String) -> Unit
+        ) {
+                if (data.topicConfig.isBlank()) return
+                sendMqtt(data.topicConfig, resolveLinkedTriggerPayload(data, triggerValue))
+        }
+
+        /**
          * Returns standard default properties for this component type.
          */
         fun getDefaultProps(): Map<String, String> {
@@ -65,6 +86,15 @@ interface IComponentDefinition {
          * is false (free resizing).
          */
         fun isFixedAspectRatio(data: ComponentData): Boolean = false
+}
+
+/** Implemented by components that emit local trigger events without publishing MQTT directly. */
+interface LocalComponentTriggerSource {
+        fun attachLocalTrigger(
+                view: View,
+                data: ComponentData,
+                onTriggerLinked: (source: ComponentData, value: String) -> Unit
+        )
 }
 
 /**

@@ -420,12 +420,26 @@ class SidebarManager(
                                 val groupColorHex =
                                         String.format("#%06X", (0xFFFFFF and groupColorInt))
 
-                                // Create Real Preview View
+                                val usesPaletteIcon =
+                                        def.type == "WEB_BOX" ||
+                                                def.type == "CALENDAR" ||
+                                                def.type == "CLOCK"
                                 val previewView =
-                                        def.createView(
-                                                rootView.context,
-                                                false
-                                        ) // isPreview/EditMode = false for clean look
+                                        if (usesPaletteIcon) {
+                                                ImageView(rootView.context).apply {
+                                                        setImageResource(def.iconResId)
+                                                        scaleType = ImageView.ScaleType.CENTER_INSIDE
+                                                        setColorFilter(groupColorInt)
+                                                        setPadding(
+                                                                dpToPx(4),
+                                                                dpToPx(4),
+                                                                dpToPx(4),
+                                                                dpToPx(4)
+                                                        )
+                                                }
+                                        } else {
+                                                def.createView(rootView.context, false)
+                                        }
                                 previewView.background = null // Card has border, component does not
 
                                 // Init Dummy Data from Definition defaults (Single Source of Truth matching dragged instances)
@@ -460,7 +474,7 @@ class SidebarManager(
                                         )
 
                                 // Update View Appearance
-                                def.onUpdateView(previewView, dummyData)
+                                if (!usesPaletteIcon) def.onUpdateView(previewView, dummyData)
 
                                 // V21.12: Force LED to be ON in sidebar preview
                                 if (def.type == "LED" && previewView is android.view.ViewGroup) {
@@ -538,6 +552,8 @@ class SidebarManager(
                                                                 dpToPx(72),
                                                                 dpToPx(36)
                                                         )
+                                                "WEB_BOX" -> Pair(dpToPx(34), dpToPx(34))
+                                                "CALENDAR", "CLOCK" -> Pair(dpToPx(30), dpToPx(30))
                                                 else ->
                                                         Pair(
                                                                 android.widget.FrameLayout

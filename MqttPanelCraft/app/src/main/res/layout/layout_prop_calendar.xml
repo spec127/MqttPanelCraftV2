@@ -34,22 +34,6 @@
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:hint="顯示模式">
-            <AutoCompleteTextView
-                android:id="@+id/spCalendarMode"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/prop_input_height_inner"
-                android:inputType="none"
-                android:background="@null"
-                android:paddingStart="16dp"
-                android:paddingEnd="12dp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/containerDateFormat"
             style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
             android:layout_width="match_parent"

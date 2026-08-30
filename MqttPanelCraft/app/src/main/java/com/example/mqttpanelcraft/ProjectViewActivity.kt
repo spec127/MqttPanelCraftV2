@@ -260,6 +260,9 @@ class ProjectViewActivity : BaseActivity() {
                                     viewModel.updateComponent(updated)
                                 }
                             }
+                        },
+                        { source, value ->
+                            dispatchLocalComponentTrigger(source, value)
                         }
                 )
 
@@ -908,6 +911,25 @@ class ProjectViewActivity : BaseActivity() {
                             else -> Unit
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private fun dispatchLocalComponentTrigger(source: com.example.mqttpanelcraft.model.ComponentData, value: String) {
+        val linkedIds =
+                source.props["linked_components"]
+                        .orEmpty()
+                        .split(",")
+                        .mapNotNull { it.trim().toIntOrNull() }
+                        .toSet()
+        if (linkedIds.isEmpty()) return
+
+        viewModel.components.value.orEmpty().forEach { target ->
+            if (target.id in linkedIds) {
+                renderer.getView(target.id)?.let { targetView ->
+                    behaviorManager.triggerLinkedComponent(targetView, target, value)
+                    viewModel.addLog("${source.label} → ${target.label}: $value")
                 }
             }
         }

@@ -32,6 +32,7 @@ object ComponentDefinitionRegistry {
         register(BroadcastDefinition) // 廣播(TTS語音轉文字)
         register(TextDefinition)
         register(CalendarClockDefinition)
+        register(ClockDefinition)
         register(WebBoxDefinition)
     }
 

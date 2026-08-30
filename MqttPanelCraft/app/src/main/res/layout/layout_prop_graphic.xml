@@ -213,7 +213,7 @@
         app:selectionRequired="true">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDirHorizontal"
-            style="@style/Widget.App.Button.Outlined.Properties"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -223,7 +223,7 @@
             android:padding="0dp"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDirVertical"
-            style="@style/Widget.App.Button.Outlined.Properties"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
