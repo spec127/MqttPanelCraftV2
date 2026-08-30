@@ -5,6 +5,7 @@ import android.util.Size
 import android.view.View
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
@@ -26,7 +27,6 @@ object WebBoxDefinition : IComponentDefinition {
         "url" to "https://www.google.com",
         "html" to "<h1>Hello World</h1>",
         "enable_interaction" to "true",
-        "transparent_bg" to "false",
         "refresh_interval" to "0", "show_border" to "false"
     )
 
@@ -51,7 +51,6 @@ object WebBoxDefinition : IComponentDefinition {
         webView.urlContent = data.props["url"] ?: ""
         webView.htmlContent = data.props["html"] ?: ""
         webView.enableInteraction = (data.props["enable_interaction"] ?: "true").toBoolean()
-        webView.transparentBg = (data.props["transparent_bg"] ?: "false").toBoolean()
         webView.refreshIntervalSec = (data.props["refresh_interval"] ?: "0").toIntOrNull() ?: 0
         webView.showBorder = (data.props["show_border"] ?: "false").toBoolean()
     }
@@ -99,29 +98,29 @@ object WebBoxDefinition : IComponentDefinition {
         // 3. HTML Input
         binder.bindEditText(panelView, R.id.etHtml, "html", data, onUpdate)
 
-        // 4. Enable Interaction Switch
-        binder.bindSwitch(panelView, R.id.swEnableInteraction, "enable_interaction", data, onUpdate, defaultChecked = true)
-        
-        // 5. Transparent Background Switch
-        binder.bindSwitch(panelView, R.id.swTransparentBg, "transparent_bg", data, onUpdate, defaultChecked = false)
+        // 4. Enable Interaction Check Row
+        val itemEnableInteraction = panelView.findViewById<View>(R.id.itemEnableInteraction)
+        val interactionCheck = panelView.findViewById<ImageView>(R.id.vEnableInteractionEnabled)
+        var interactionEnabled = data.props["enable_interaction"] != "false"
+        interactionCheck?.visibility = if (interactionEnabled) View.VISIBLE else View.INVISIBLE
+        itemEnableInteraction?.setOnClickListener {
+            interactionEnabled = !interactionEnabled
+            interactionCheck?.visibility = if (interactionEnabled) View.VISIBLE else View.INVISIBLE
+            onUpdate("enable_interaction", interactionEnabled.toString())
+        }
 
-        // 6. Refresh Interval Input
+        // 5. Refresh Interval Input
         binder.bindEditText(panelView, R.id.etRefreshInterval, "refresh_interval", data, onUpdate)
 
-        // 7. Show Border Toggle
+        // 6. Show Border Toggle
         val itemShowBorder = panelView.findViewById<View>(R.id.itemShowBorder)
         val vShowBorderEnabled = panelView.findViewById<View>(R.id.vShowBorderEnabled)
-        val updateBorderUI = {
-            val showBorder = data.props["show_border"] == "true"
-            vShowBorderEnabled?.visibility = if (showBorder) View.VISIBLE else View.INVISIBLE
-        }
-        updateBorderUI()
+        var showBorder = data.props["show_border"] == "true"
+        vShowBorderEnabled?.visibility = if (showBorder) View.VISIBLE else View.INVISIBLE
         itemShowBorder?.setOnClickListener {
-            val showBorder = data.props["show_border"] == "true"
-            val newVal = if (showBorder) "false" else "true"
-            data.props["show_border"] = newVal
-            updateBorderUI()
-            onUpdate("show_border", newVal)
+            showBorder = !showBorder
+            vShowBorderEnabled?.visibility = if (showBorder) View.VISIBLE else View.INVISIBLE
+            onUpdate("show_border", showBorder.toString())
         }
     }
 

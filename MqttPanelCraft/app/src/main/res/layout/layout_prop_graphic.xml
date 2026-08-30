@@ -13,14 +13,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="start|center_vertical"
-        android:layout_marginBottom="10dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:layout_marginBottom="10dp">
         <ImageView
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:src="@drawable/ic_touch_app"
-            app:tint="@color/props_primary"
+            app:tint="@color/icy_primary"
             android:layout_marginEnd="6dp"/>
         <TextView
             android:text="互動功能"
@@ -36,13 +34,11 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/prop_toggle_height"
         android:layout_marginBottom="12dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         app:singleSelection="true"
         app:selectionRequired="true">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTypeShape"
-            style="@style/Widget.App.Button.Outlined.Properties"
+            style="@style/Widget.App.Button.Outlined.Properties.Graphic"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -52,7 +48,7 @@
             android:padding="0dp"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTypeLine"
-            style="@style/Widget.App.Button.Outlined.Properties"
+            style="@style/Widget.App.Button.Outlined.Properties.Graphic"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -62,7 +58,7 @@
             android:padding="0dp"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTypeImage"
-            style="@style/Widget.App.Button.Outlined.Properties"
+            style="@style/Widget.App.Button.Outlined.Properties.Graphic"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -78,8 +74,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
         android:visibility="gone">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -87,7 +81,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="圖形種類"
-            style="@style/Widget.App.TextInputLayout.Properties.DenseDropdown"
+            style="@style/Widget.App.TextInputLayout.Properties.GraphicDropdown"
             android:layout_marginBottom="12dp">
             <AutoCompleteTextView
                 android:id="@+id/spPolygonEdges"
@@ -116,8 +110,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="10"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
         android:visibility="gone">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -126,7 +118,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="4"
             android:hint="樣式"
-            style="@style/Widget.App.TextInputLayout.Properties.DenseDropdown"
+            style="@style/Widget.App.TextInputLayout.Properties.GraphicDropdown"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="12dp">
             <AutoCompleteTextView
@@ -146,7 +138,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="6"
             android:hint="粗細"
-            style="@style/Widget.App.TextInputLayout.Properties"
+            style="@style/Widget.App.TextInputLayout.Properties.Graphic"
             android:layout_marginBottom="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etLineThickness"
@@ -163,8 +155,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
         android:visibility="gone">
 
         <com.google.android.material.button.MaterialButton
@@ -172,7 +162,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="選擇本地圖片"
-            style="@style/Widget.App.Button.Outlined.Properties"
+            style="@style/Widget.App.Button.Outlined.Properties.Graphic"
             app:icon="@android:drawable/ic_menu_gallery"
             android:layout_marginBottom="12dp"/>
 
@@ -198,14 +188,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="start|center_vertical"
-        android:layout_marginBottom="10dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:layout_marginBottom="10dp">
         <ImageView
             android:layout_width="16dp"
             android:layout_height="16dp"
-            android:src="@drawable/ic_btn_tune"
-            app:tint="@color/props_primary"
+            android:src="@drawable/ic_palette"
+            app:tint="@color/icy_primary"
             android:layout_marginEnd="6dp"/>
         <TextView
             android:text="@string/prop_section_visual"
@@ -221,13 +209,11 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/prop_toggle_height"
         android:layout_marginBottom="12dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         app:singleSelection="true"
         app:selectionRequired="true">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDirHorizontal"
-            style="@style/Widget.App.Button.Outlined.Properties"
+            style="@style/Widget.App.Button.Outlined.Properties.Graphic"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -237,7 +223,7 @@
             android:padding="0dp"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDirVertical"
-            style="@style/Widget.App.Button.Outlined.Properties"
+            style="@style/Widget.App.Button.Outlined.Properties.Graphic"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -247,22 +233,22 @@
             android:padding="0dp"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <!-- Row: Opacity (0.4) + Stroke width (0.6) -->
+    <!-- Row 1: Opacity (4) + Fill color (6) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:baselineAligned="false"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:baselineAligned="false">
+        android:weightSum="10">
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.App.TextInputLayout.Properties"
+            style="@style/Widget.App.TextInputLayout.Properties.Graphic"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.4"
-            android:hint="@string/prop_graphic_opacity"
-            android:layout_marginBottom="12dp">
+            android:layout_marginEnd="8dp"
+            android:layout_weight="4"
+            android:hint="@string/prop_graphic_opacity">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etOpacity"
                 android:layout_width="match_parent"
@@ -271,15 +257,30 @@
                 android:textSize="13sp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.App.TextInputLayout.Properties"
+        <include
+            android:id="@+id/containerFillColor"
+            layout="@layout/layout_prop_generic_color"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.6"
-            android:hint="@string/prop_graphic_stroke_width"
-            android:layout_marginBottom="12dp">
+            android:layout_weight="6" />
+    </LinearLayout>
+
+    <!-- Row 2: Stroke width (4) + Stroke color (6) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.App.TextInputLayout.Properties.Graphic"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="4"
+            android:hint="@string/prop_graphic_stroke_width">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etStrokeWidth"
                 android:layout_width="match_parent"
@@ -287,43 +288,53 @@
                 android:inputType="numberDecimal"
                 android:textSize="13sp"/>
         </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
-
-    <!-- Row: Fill color + Stroke color -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:layout_marginBottom="12dp"
-        android:baselineAligned="false">
-
-        <include
-            android:id="@+id/containerFillColor"
-            layout="@layout/layout_prop_generic_color"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
 
         <include
             android:id="@+id/containerStrokeColor"
             layout="@layout/layout_prop_generic_color"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="6" />
     </LinearLayout>
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/swCornerRadius"
+    <LinearLayout
+        android:id="@+id/itemCornerRadius"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="啟用圓角"
-        android:textSize="14sp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_prop_item_premium"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="啟用圓角"
+                android:textColor="@color/prop_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="柔化圖形與邊框的轉角"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="11sp"/>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/vCornerRadiusEnabled"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_check_circle_premium"
+            android:visibility="invisible"/>
+    </LinearLayout>
 
 </LinearLayout>

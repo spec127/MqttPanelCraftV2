@@ -34,7 +34,7 @@ class ImageCropperView @JvmOverloads constructor(
     }
     private val nodePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = Color.parseColor("#9C27B0")
+        color = Color.parseColor("#7B1FA2")
     }
 
     private val scaleListener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {

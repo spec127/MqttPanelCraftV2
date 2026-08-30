@@ -1,14 +1,17 @@
 package com.example.mqttpanelcraft.ui.components.definitions
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.*
 import android.util.Base64
 import android.util.Size
 import android.view.View
-import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.Toast
+import com.example.mqttpanelcraft.ProjectViewActivity
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
@@ -17,8 +20,6 @@ import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.ImageCropperView
 import com.example.mqttpanelcraft.ui.views.PolygonEditorView
 import com.google.android.material.button.MaterialButtonToggleGroup
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textfield.TextInputEditText
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -35,10 +36,24 @@ internal fun createRegularPolygonPoints(edgeCount: Int): String {
     }
 }
 
+internal fun swapGraphicDimensions(width: Int, height: Int): Pair<Int, Int> = height to width
+
 /**
  * 圖形元件 (Graphic Component)
  */
 object GraphicDefinition : IComponentDefinition {
+
+    private const val MULTIMEDIA_FILL_COLOR = "#FF9800"
+    private const val MULTIMEDIA_STROKE_COLOR = "#F57C00"
+
+    private fun getActivity(context: Context): Activity? {
+        var current = context
+        while (current is ContextWrapper) {
+            if (current is Activity) return current
+            current = current.baseContext
+        }
+        return null
+    }
 
     override val type: String = "GRAPHIC"
     override val defaultSize: Size = Size(200, 100)
@@ -58,13 +73,13 @@ object GraphicDefinition : IComponentDefinition {
         "line_thickness" to "2",
         
         "image_src" to "",
-        "image_matrix" to "1.0,0.0,0.0", // scale,transX_pct,transY_pct
+        "image_matrix" to "FIT;1.0,0.0,0.0", // mode;scale,transX_pct,transY_pct
         
         "direction" to "HORIZONTAL", // HORIZONTAL, VERTICAL
         "opacity" to "100",
         "stroke_width" to "0",
-        "fill_color" to "#E0E0E0",
-        "stroke_color" to "#9E9E9E",
+        "fill_color" to MULTIMEDIA_FILL_COLOR,
+        "stroke_color" to MULTIMEDIA_STROKE_COLOR,
         "enable_corner" to "false"
     )
 
@@ -110,14 +125,14 @@ object GraphicDefinition : IComponentDefinition {
         compositeView.lineThickness = (data.props["line_thickness"] ?: "2").toFloatOrNull()?.coerceAtLeast(1f) ?: 2f
         
         compositeView.imageSrc = data.props["image_src"] ?: ""
-        compositeView.imageMatrixStr = data.props["image_matrix"] ?: "1.0,0.0,0.0"
+        compositeView.imageMatrixStr = data.props["image_matrix"] ?: "FIT;1.0,0.0,0.0"
         
         compositeView.direction = data.props["direction"] ?: "HORIZONTAL"
         compositeView.opacity = (data.props["opacity"] ?: "100").toIntOrNull()?.coerceIn(0, 100) ?: 100
         compositeView.strokeWidth = (data.props["stroke_width"] ?: "0").toFloatOrNull()?.coerceAtLeast(0f) ?: 0f
         
-        compositeView.fillColor = try { Color.parseColor(data.props["fill_color"] ?: "#E0E0E0") } catch (_: Exception) { Color.GRAY }
-        compositeView.strokeColor = try { Color.parseColor(data.props["stroke_color"] ?: "#9E9E9E") } catch (_: Exception) { Color.DKGRAY }
+        compositeView.fillColor = try { Color.parseColor(data.props["fill_color"] ?: MULTIMEDIA_FILL_COLOR) } catch (_: Exception) { Color.parseColor(MULTIMEDIA_FILL_COLOR) }
+        compositeView.strokeColor = try { Color.parseColor(data.props["stroke_color"] ?: MULTIMEDIA_STROKE_COLOR) } catch (_: Exception) { Color.parseColor(MULTIMEDIA_STROKE_COLOR) }
         
         compositeView.enableCorner = (data.props["enable_corner"] == "true")
         
@@ -200,7 +215,19 @@ object GraphicDefinition : IComponentDefinition {
         // Image Section
         val btnUpload = panelView.findViewById<Button>(R.id.btnUploadImage)
         btnUpload?.setOnClickListener {
-            Toast.makeText(context, "本地圖片上傳即將推出，目前可透過屬性編輯器手動貼入Base64", Toast.LENGTH_SHORT).show()
+            val activity = getActivity(context) as? ProjectViewActivity
+            if (activity == null) {
+                Toast.makeText(context, "目前無法開啟圖片選擇器", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            activity.pickImage { imageData ->
+                if (imageData != null) {
+                    val resetMatrix = "FIT;1.0,0.0,0.0"
+                    onUpdate("image_src", imageData)
+                    onUpdate("image_matrix", resetMatrix)
+                    imageCropper?.setImageSrc(imageData, resetMatrix)
+                }
+            }
         }
         imageCropper?.setImageSrc(data.props["image_src"], data.props["image_matrix"])
         imageCropper?.onMatrixChanged = { matStr ->
@@ -215,16 +242,29 @@ object GraphicDefinition : IComponentDefinition {
         tgDirection?.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 val newDir = if (checkedId == R.id.btnDirVertical) "VERTICAL" else "HORIZONTAL"
-                onUpdate("direction", newDir)
+                if (newDir != (data.props["direction"] ?: "HORIZONTAL")) {
+                    val (newWidth, newHeight) = swapGraphicDimensions(data.width, data.height)
+                    onUpdate("direction", newDir)
+                    onUpdate("w", newWidth.toString())
+                    onUpdate("h", newHeight.toString())
+                }
             }
         }
 
         CommonPropBinder.bindEditText(panelView, R.id.etOpacity, "opacity", data, onUpdate, "100")
         CommonPropBinder.bindEditText(panelView, R.id.etStrokeWidth, "stroke_width", data, onUpdate, "0")
-        CommonPropBinder.bindColorPalette(panelView, R.id.containerFillColor, "fill_color", data, onUpdate, context.getString(R.string.prop_graphic_fill_color), "#E0E0E0")
-        CommonPropBinder.bindColorPalette(panelView, R.id.containerStrokeColor, "stroke_color", data, onUpdate, context.getString(R.string.prop_graphic_stroke_color), "#9E9E9E")
+        CommonPropBinder.bindColorPalette(panelView, R.id.containerFillColor, "fill_color", data, onUpdate, context.getString(R.string.prop_graphic_fill_color), MULTIMEDIA_FILL_COLOR)
+        CommonPropBinder.bindColorPalette(panelView, R.id.containerStrokeColor, "stroke_color", data, onUpdate, context.getString(R.string.prop_graphic_stroke_color), MULTIMEDIA_STROKE_COLOR)
 
-        CommonPropBinder.bindSwitch(panelView, R.id.swCornerRadius, "enable_corner", data, onUpdate, false)
+        val itemCornerRadius = panelView.findViewById<View>(R.id.itemCornerRadius)
+        val cornerCheck = panelView.findViewById<ImageView>(R.id.vCornerRadiusEnabled)
+        var cornerEnabled = data.props["enable_corner"] == "true"
+        cornerCheck?.visibility = if (cornerEnabled) View.VISIBLE else View.INVISIBLE
+        itemCornerRadius?.setOnClickListener {
+            cornerEnabled = !cornerEnabled
+            cornerCheck?.visibility = if (cornerEnabled) View.VISIBLE else View.INVISIBLE
+            onUpdate("enable_corner", cornerEnabled.toString())
+        }
     }
 
     private class GraphicCompositeView(context: Context) : FrameLayout(context) {
@@ -236,7 +276,7 @@ object GraphicDefinition : IComponentDefinition {
         var lineThickness: Float = 2f
         
         var imageSrc: String = ""
-        var imageMatrixStr: String = "1.0,0.0,0.0"
+        var imageMatrixStr: String = "FIT;1.0,0.0,0.0"
         
         var direction: String = "HORIZONTAL"
         var opacity: Int = 100
@@ -334,7 +374,9 @@ object GraphicDefinition : IComponentDefinition {
                 }
                 "IMAGE" -> {
                     bitmap?.let { bmp ->
-                        val parts = imageMatrixStr.split(",")
+                        val hasMode = imageMatrixStr.contains(";")
+                        val mode = if (hasMode) imageMatrixStr.substringBefore(";") else "CUSTOM"
+                        val parts = imageMatrixStr.substringAfter(";", imageMatrixStr).split(",")
                         val scale = parts.getOrNull(0)?.toFloatOrNull() ?: 1f
                         val txPct = parts.getOrNull(1)?.toFloatOrNull() ?: 0f
                         val tyPct = parts.getOrNull(2)?.toFloatOrNull() ?: 0f
@@ -342,14 +384,16 @@ object GraphicDefinition : IComponentDefinition {
                         imageMatrix.reset()
                         val bw = bmp.width.toFloat()
                         val bh = bmp.height.toFloat()
-                        val initialScale = Math.min(w / bw, h / bh)
+                        val initialScale = if (mode == "FILL") Math.max(w / bw, h / bh) else Math.min(w / bw, h / bh)
                         val dx = (w - bw * initialScale) / 2f
                         val dy = (h - bh * initialScale) / 2f
                         
                         imageMatrix.postScale(initialScale, initialScale)
                         imageMatrix.postTranslate(dx, dy)
-                        imageMatrix.postScale(scale, scale, w/2f, h/2f)
-                        imageMatrix.postTranslate(txPct * w, tyPct * h)
+                        if (mode == "CUSTOM") {
+                            imageMatrix.postScale(scale, scale, w/2f, h/2f)
+                            imageMatrix.postTranslate(txPct * w, tyPct * h)
+                        }
                         
                         canvas.drawBitmap(bmp, imageMatrix, pathPaint) // pathPaint has alpha and cornereffect
                     }

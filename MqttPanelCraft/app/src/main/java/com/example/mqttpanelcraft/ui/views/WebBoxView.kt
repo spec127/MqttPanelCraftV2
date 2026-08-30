@@ -3,9 +3,12 @@ package com.example.mqttpanelcraft.ui.views
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
+import android.view.ViewOutlineProvider
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -48,11 +51,11 @@ class WebBoxView(context: Context) : FrameLayout(context) {
             field = value
             updateInteraction()
         }
-        
-    var transparentBg: Boolean = false
+
+    var showBorder: Boolean = false
         set(value) {
             field = value
-            updateBackground()
+            updateBorder()
         }
         
     var refreshIntervalSec: Int = 0
@@ -89,7 +92,7 @@ class WebBoxView(context: Context) : FrameLayout(context) {
         }
         
         updateInteraction()
-        updateBackground()
+        updateBorder()
     }
 
     private fun loadContent() {
@@ -112,38 +115,34 @@ class WebBoxView(context: Context) : FrameLayout(context) {
             }
         }
     }
-    
-        var showBorder: Boolean = false
-        set(value) {
-            field = value
-            updateBorder()
-        }
-
     private fun updateBorder() {
         if (showBorder) {
-            val drawable = android.graphics.drawable.GradientDrawable().apply {
-                setStroke((2f * resources.displayMetrics.density).toInt(), android.graphics.Color.parseColor("#7B1FA2"))
-                cornerRadius = 8f * resources.displayMetrics.density
-                if (!transparentBg) {
-                    setColor(android.graphics.Color.WHITE)
-                } else {
-                    setColor(android.graphics.Color.TRANSPARENT)
-                }
+            val density = resources.displayMetrics.density
+            val borderWidth = (3f * density).toInt().coerceAtLeast(1)
+            val outerRadius = 12f * density
+            background = GradientDrawable().apply {
+                setStroke(borderWidth, Color.parseColor("#7B1FA2"))
+                cornerRadius = outerRadius
+                setColor(Color.WHITE)
             }
-            background = drawable
-            
-            // Adjust margin for webview to not overlap border
-            val p = (2f * resources.displayMetrics.density).toInt()
-            webView.setPadding(p, p, p, p)
-            val lp = webView.layoutParams as LayoutParams
-            lp.setMargins(p, p, p, p)
-            webView.layoutParams = lp
+            outlineProvider = ViewOutlineProvider.BACKGROUND
+            clipToOutline = true
+            setPadding(borderWidth, borderWidth, borderWidth, borderWidth)
+
+            webView.background = GradientDrawable().apply {
+                cornerRadius = (outerRadius - borderWidth).coerceAtLeast(0f)
+                setColor(Color.WHITE)
+            }
+            webView.outlineProvider = ViewOutlineProvider.BACKGROUND
+            webView.clipToOutline = true
         } else {
-            updateBackground() // Reset to normal
-            webView.setPadding(0, 0, 0, 0)
-            val lp = webView.layoutParams as LayoutParams
-            lp.setMargins(0, 0, 0, 0)
-            webView.layoutParams = lp
+            setPadding(0, 0, 0, 0)
+            background = null
+            outlineProvider = null
+            clipToOutline = false
+            webView.background = ColorDrawable(Color.WHITE)
+            webView.outlineProvider = null
+            webView.clipToOutline = false
         }
     }
 
@@ -167,16 +166,6 @@ class WebBoxView(context: Context) : FrameLayout(context) {
             } else {
                 webView.setOnTouchListener { _, event -> if(event.action == MotionEvent.ACTION_DOWN) { parent.requestDisallowInterceptTouchEvent(false) }; true }
             }
-        }
-    }
-    
-    private fun updateBackground() {
-        if (transparentBg) {
-            webView.setBackgroundColor(Color.TRANSPARENT)
-            setBackgroundColor(Color.TRANSPARENT)
-        } else {
-            webView.setBackgroundColor(Color.WHITE) // Default web view background
-            setBackgroundColor(Color.TRANSPARENT) // Parent is transparent
         }
     }
     

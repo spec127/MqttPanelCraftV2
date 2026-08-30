@@ -107,23 +107,45 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/swEnableInteraction"
+        <LinearLayout
+            android:id="@+id/itemEnableInteraction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="允許互動操作"
-            android:textColor="@color/prop_text_primary"
-            android:textSize="14sp"
-            android:layout_marginBottom="12dp"/>
-            
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/swTransparentBg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="背景透明"
-            android:textColor="@color/prop_text_primary"
-            android:textSize="14sp"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_prop_item_premium"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="允許互動操作"
+                    android:textColor="@color/prop_text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="在執行模式中點擊與捲動網頁"
+                    android:textColor="@color/prop_text_secondary"
+                    android:textSize="11sp"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/vEnableInteractionEnabled"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_check_circle_premium"
+                android:visibility="visible"/>
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.App.TextInputLayout.Properties"

@@ -15,4 +15,9 @@ class GraphicDefinitionTest {
         assertEquals(4, points.size)
         assertTrue(points.flatten().all { it in 0f..1f })
     }
+
+    @Test
+    fun directionChangeSwapsWidthAndHeight() {
+        assertEquals(100 to 200, swapGraphicDimensions(200, 100))
+    }
 }

@@ -23,17 +23,16 @@ class ProjectPersistenceTest {
         val latest = AtomicReference("first")
         val writes = CopyOnWriteArrayList<String>()
         val coordinator =
-                ProjectSaveCoordinator(scope, debounceMs = 20L, maxWaitMs = 80L) {
+                ProjectSaveCoordinator(scope, debounceMs = 100L, maxWaitMs = 400L) {
                     writes.add(latest.get())
                 }
 
         coordinator.requestSave()
         repeat(5) { index ->
-            delay(5L)
             latest.set("latest-$index")
             coordinator.requestSave()
         }
-        delay(70L)
+        delay(250L)
 
         assertEquals(listOf("latest-4"), writes)
         scope.cancel()

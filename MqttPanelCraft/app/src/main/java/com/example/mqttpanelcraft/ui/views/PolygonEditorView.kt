@@ -22,11 +22,11 @@ class PolygonEditorView @JvmOverloads constructor(
     // Paints
     private val pathPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = Color.parseColor("#802196F3") // Semi-transparent blue
+        color = Color.parseColor("#807B1FA2")
     }
     private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        color = Color.parseColor("#2196F3")
+        color = Color.parseColor("#7B1FA2")
         strokeWidth = 4f
     }
     private val nodePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -35,7 +35,7 @@ class PolygonEditorView @JvmOverloads constructor(
     }
     private val nodeStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        color = Color.BLACK
+        color = Color.parseColor("#7B1FA2")
         strokeWidth = 2f
     }
 
