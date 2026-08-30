@@ -111,7 +111,7 @@
             android:baselineAligned="false">
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+                style="@style/Widget.App.TextInputLayout.Properties.DenseDropdown"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.4"
@@ -119,7 +119,7 @@
                 <AutoCompleteTextView
                     android:id="@+id/spFontFamily"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/prop_input_height_inner"
+                    android:layout_height="@dimen/prop_input_height_compact_inner"
                     android:inputType="none"
                     android:background="@null"
                     android:paddingStart="16dp"
@@ -137,7 +137,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etTextSize"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_compact_inner"
                     android:inputType="number"
                     android:textSize="14sp"/>
             </com.google.android.material.textfield.TextInputLayout>

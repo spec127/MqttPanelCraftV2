@@ -18,6 +18,11 @@ class WebBoxView(context: Context) : FrameLayout(context) {
     private val refreshHandler = Handler(Looper.getMainLooper())
 
     var isEditMode: Boolean = false
+        set(value) {
+            field = value
+            updateInteraction()
+            updateRefreshTimer()
+        }
     
     // Properties
     var sourceType: String = "URL" // "URL" or "HTML"
@@ -143,13 +148,22 @@ class WebBoxView(context: Context) : FrameLayout(context) {
     }
 
     private fun updateInteraction() {
+        webView.isEnabled = !isEditMode && enableInteraction
         if (isEditMode) {
             // In edit mode, intercept all touches so it can be dragged
             webView.setOnTouchListener { _, event -> if(event.action == MotionEvent.ACTION_DOWN) { parent.requestDisallowInterceptTouchEvent(false) }; true }
         } else {
             // In run mode, allow interaction if enabled, else intercept
             if (enableInteraction) {
-                webView.setOnTouchListener { _, event -> if(event.action == MotionEvent.ACTION_DOWN) { parent.requestDisallowInterceptTouchEvent(true) }; false }
+                webView.setOnTouchListener { _, event ->
+                    when (event.actionMasked) {
+                        MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE ->
+                                parent?.requestDisallowInterceptTouchEvent(true)
+                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL ->
+                                parent?.requestDisallowInterceptTouchEvent(false)
+                    }
+                    false
+                }
             } else {
                 webView.setOnTouchListener { _, event -> if(event.action == MotionEvent.ACTION_DOWN) { parent.requestDisallowInterceptTouchEvent(false) }; true }
             }

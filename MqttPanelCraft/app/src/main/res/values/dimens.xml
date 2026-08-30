@@ -19,6 +19,9 @@
          配合 TextInputLayout 在 wrap_content 下展開後的整體高度約 56dp -->
     <dimen name="prop_input_height_inner">52dp</dimen>
 
+    <!-- 成對緊湊欄位的內部高度，讓下拉與數字輸入保持等高 -->
+    <dimen name="prop_input_height_compact_inner">48dp</dimen>
+
     <!-- MaterialButtonToggleGroup 切換列高度 (全局預設 = 36dp) -->
     <dimen name="prop_toggle_height">36dp</dimen>
 

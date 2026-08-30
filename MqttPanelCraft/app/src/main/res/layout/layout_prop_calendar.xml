@@ -113,23 +113,7 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:hint="外觀風格">
-            <AutoCompleteTextView
-                android:id="@+id/spVisualStyle"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/prop_input_height_inner"
-                android:inputType="none"
-                android:background="@null"
-                android:paddingStart="16dp"
-                android:paddingEnd="12dp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Row: Dummy (Left 0.4) + Color (Right 0.6) for consistent layout -->
+        <!-- Row: Visual style (Left 0.4) + Color (Right 0.6) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -137,7 +121,22 @@
             android:layout_marginBottom="16dp"
             android:baselineAligned="false">
 
-            <Space android:layout_width="0dp" android:layout_weight="0.4" android:layout_height="wrap_content"/>
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.App.TextInputLayout.Properties.DenseDropdown"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:hint="外觀風格">
+                <AutoCompleteTextView
+                    android:id="@+id/spVisualStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/prop_input_height_compact_inner"
+                    android:inputType="none"
+                    android:background="@null"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="12dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
             <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
 
             <include

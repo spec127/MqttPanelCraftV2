@@ -34,7 +34,7 @@
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/tgGraphicType"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/prop_toggle_height"
         android:layout_marginBottom="12dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
@@ -42,25 +42,34 @@
         app:selectionRequired="true">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTypeShape"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Outlined.Properties"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="圖形"/>
+            android:text="圖形"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTypeLine"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Outlined.Properties"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="線條"/>
+            android:text="線條"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTypeImage"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Outlined.Properties"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="圖片"/>
+            android:text="圖片"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <!-- Dynamic Shape Area -->
@@ -78,15 +87,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="圖形種類"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.App.TextInputLayout.Properties.DenseDropdown"
             android:layout_marginBottom="12dp">
             <AutoCompleteTextView
                 android:id="@+id/spPolygonEdges"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_compact_inner"
                 android:inputType="none"
-                android:paddingTop="14dp"
-                android:paddingBottom="14dp"
+                android:background="@null"
+                android:paddingStart="16dp"
+                android:paddingEnd="12dp"
                 android:maxLines="1"
                 android:textSize="13sp"/>
         </com.google.android.material.textfield.TextInputLayout>
@@ -95,7 +105,7 @@
             android:id="@+id/polygonEditor"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="#1A000000"
+            android:background="@drawable/bg_prop_editor_surface"
             android:layout_marginBottom="12dp"/>
     </LinearLayout>
 
@@ -116,16 +126,17 @@
             android:layout_height="wrap_content"
             android:layout_weight="4"
             android:hint="樣式"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.App.TextInputLayout.Properties.DenseDropdown"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="12dp">
             <AutoCompleteTextView
                 android:id="@+id/spLineStyle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_compact_inner"
                 android:inputType="none"
-                android:paddingTop="14dp"
-                android:paddingBottom="14dp"
+                android:background="@null"
+                android:paddingStart="16dp"
+                android:paddingEnd="12dp"
                 android:maxLines="1"
                 android:textSize="13sp"/>
         </com.google.android.material.textfield.TextInputLayout>
@@ -135,15 +146,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="6"
             android:hint="粗細"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.App.TextInputLayout.Properties"
             android:layout_marginBottom="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etLineThickness"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_compact_inner"
                 android:inputType="numberDecimal"
-                android:paddingTop="14dp"
-                android:paddingBottom="14dp"
                 android:textSize="13sp"/>
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
@@ -163,7 +172,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="選擇本地圖片"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Outlined.Properties"
             app:icon="@android:drawable/ic_menu_gallery"
             android:layout_marginBottom="12dp"/>
 
@@ -171,7 +180,7 @@
             android:id="@+id/imageCropper"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="#1A000000"
+            android:background="@drawable/bg_prop_editor_surface"
             android:layout_marginBottom="12dp"/>
     </LinearLayout>
 
@@ -179,7 +188,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#E0E0E0"
+        android:background="@color/divider_line"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"/>
 
@@ -210,7 +219,7 @@
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/tgDirection"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/prop_toggle_height"
         android:layout_marginBottom="12dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
@@ -218,21 +227,27 @@
         app:selectionRequired="true">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDirHorizontal"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Outlined.Properties"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="水平"/>
+            android:text="水平"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDirVertical"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Outlined.Properties"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="垂直"/>
+            android:text="垂直"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <!-- Two columns for visual details -->
+    <!-- Row: Opacity (0.4) + Stroke width (0.6) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -241,69 +256,64 @@
         android:paddingEnd="16dp"
         android:baselineAligned="false">
 
-        <!-- Left Column: Opacity -->
-        <LinearLayout
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.App.TextInputLayout.Properties"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginEnd="8dp">
-
-            <com.google.android.material.textfield.TextInputLayout
+            android:layout_weight="0.4"
+            android:hint="@string/prop_graphic_opacity"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etOpacity"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/prop_graphic_opacity"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_marginBottom="12dp">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etOpacity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp"
-                    android:textSize="13sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
+                android:layout_height="@dimen/prop_input_height_compact_inner"
+                android:inputType="number"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Right Column: Stroke Width, Fill Color, Stroke Color -->
-        <LinearLayout
+        <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.App.TextInputLayout.Properties"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <com.google.android.material.textfield.TextInputLayout
+            android:layout_weight="0.6"
+            android:hint="@string/prop_graphic_stroke_width"
+            android:layout_marginBottom="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etStrokeWidth"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/prop_graphic_stroke_width"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_marginBottom="12dp">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etStrokeWidth"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp"
-                    android:textSize="13sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                android:layout_height="@dimen/prop_input_height_compact_inner"
+                android:inputType="numberDecimal"
+                android:textSize="13sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 
-            <FrameLayout
-                android:id="@+id/containerFillColor"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp">
-                <include layout="@layout/layout_prop_generic_color" />
-            </FrameLayout>
+    <!-- Row: Fill color + Stroke color -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:baselineAligned="false">
 
-            <FrameLayout
-                android:id="@+id/containerStrokeColor"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <include layout="@layout/layout_prop_generic_color" />
-            </FrameLayout>
-        </LinearLayout>
+        <include
+            android:id="@+id/containerFillColor"
+            layout="@layout/layout_prop_generic_color"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+
+        <include
+            android:id="@+id/containerStrokeColor"
+            layout="@layout/layout_prop_generic_color"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
     </LinearLayout>
 
     <com.google.android.material.switchmaterial.SwitchMaterial

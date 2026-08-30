@@ -20,7 +20,7 @@ object TextDefinition : IComponentDefinition {
     override val type: String = "TEXT"
     override val defaultSize: Size = Size(120, 40)
     override val labelPrefix: String = "text"
-    override val iconResId: Int = android.R.drawable.ic_menu_edit
+    override val iconResId: Int = R.drawable.ic_text_fields
     override val group: String = "DISPLAY"
     override val propertiesLayoutId: Int = R.layout.layout_prop_text
 
@@ -33,7 +33,7 @@ object TextDefinition : IComponentDefinition {
         "font_family" to "sans-serif",
         "color" to "#7B1FA2",
         "bg_color" to "#E1BEE7",
-        "show_background" to "true",
+        "show_background" to "false",
         "text_effect" to "NONE"
     )
 
@@ -90,7 +90,7 @@ object TextDefinition : IComponentDefinition {
             tv.setTextColor(Color.BLACK)
         }
         
-        val showBg = (data.props["show_background"] ?: "true") == "true"
+        val showBg = (data.props["show_background"] ?: "false") == "true"
         if (showBg) {
             val bgColorHex = data.props["bg_color"] ?: "#E1BEE7"
             try {

@@ -514,7 +514,7 @@ class SidebarManager(
                                                 "DPAD", "JOYSTICK" -> Pair(dpToPx(52), dpToPx(52))
                                                 "PALETTE" -> Pair(dpToPx(46), dpToPx(46))
                                                 "BUTTON" -> Pair(dpToPx(50), dpToPx(38))
-                                                "BROADCAST" -> Pair(dpToPx(120), dpToPx(56))
+                                                "BROADCAST" -> Pair(dpToPx(88), dpToPx(40))
                                                 "SWITCH" -> Pair(dpToPx(40), dpToPx(38))
                                                 "CAMERA" ->
                                                         Pair(

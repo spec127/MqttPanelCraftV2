@@ -44,6 +44,9 @@ object WebBoxDefinition : IComponentDefinition {
         val container = view as? FrameLayout ?: return
         val webView = container.findViewWithTag<WebBoxView>("target_web") ?: return
 
+        webView.isEditMode =
+            (container as? com.example.mqttpanelcraft.ui.components.InterceptableFrameLayout)
+                ?.isEditMode ?: false
         webView.sourceType = data.props["source_type"] ?: "URL"
         webView.urlContent = data.props["url"] ?: ""
         webView.htmlContent = data.props["html"] ?: ""
@@ -63,8 +66,8 @@ object WebBoxDefinition : IComponentDefinition {
         // 1. Source Type Dropdown
         binder.bindDropdown(
             panelView, R.id.spSourceType, "source_type", data, onUpdate,
-            listOf("憭蝬脣? (URL)", "??隞?Ⅳ (HTML)"),
-            mapOf("憭蝬脣? (URL)" to "URL", "??隞?Ⅳ (HTML)" to "HTML"),
+            listOf("外部網址 (URL)", "靜態代碼 (HTML)"),
+            mapOf("外部網址 (URL)" to "URL", "靜態代碼 (HTML)" to "HTML"),
             defaultValue = "URL"
         )
         

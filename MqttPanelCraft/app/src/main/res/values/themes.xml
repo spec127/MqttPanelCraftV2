@@ -53,6 +53,19 @@
         <item name="boxCornerRadiusBottomStart">@dimen/prop_input_corner_radius_compact</item>
         <item name="boxCornerRadiusBottomEnd">@dimen/prop_input_corner_radius_compact</item>
     </style>
+
+    <!-- 本輪需要固定 48dp 高度的緊湊下拉框；獨立樣式避免影響既有元件。 -->
+    <style name="Widget.App.TextInputLayout.Properties.DenseDropdown" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu">
+        <item name="boxCornerRadiusTopStart">@dimen/prop_input_corner_radius_compact</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/prop_input_corner_radius_compact</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/prop_input_corner_radius_compact</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/prop_input_corner_radius_compact</item>
+        <item name="boxStrokeColor">@color/prop_input_stroke_selector</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="hintTextColor">@color/props_primary</item>
+        <item name="android:textColorHint">@color/prop_text_secondary</item>
+        <item name="android:popupBackground">@drawable/bg_popup_rounded</item>
+    </style>
     
     <!-- 屬性視窗 - 動作按鈕樣式 (圓角加 12dp，透過令牌統一) -->
     <style name="Widget.App.Button.Outlined.Properties" parent="Widget.MaterialComponents.Button.OutlinedButton">
