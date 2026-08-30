@@ -152,13 +152,17 @@ class CalendarDisplayView(context: Context) : FrameLayout(context) {
         text = value
         gravity = Gravity.CENTER
         includeFontPadding = false
+        isSingleLine = true
+        maxLines = 1
         setTextColor(color)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeSp)
         setTypeface(null, style)
     }
 
     private fun safeFormat(pattern: String, date: java.util.Date): String =
-        try { SimpleDateFormat(pattern, Locale.getDefault()).format(date) } catch (_: Exception) { "" }
+        try {
+            SimpleDateFormat(pattern, Locale.getDefault()).format(date).replace(" ", "\u00A0")
+        } catch (_: Exception) { "" }
 
     private fun normalizeDatePattern(pattern: String): String =
         pattern.replace("YYYY", "yyyy").replace("DD", "dd")

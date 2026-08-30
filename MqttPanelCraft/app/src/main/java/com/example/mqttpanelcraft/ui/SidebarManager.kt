@@ -420,10 +420,7 @@ class SidebarManager(
                                 val groupColorHex =
                                         String.format("#%06X", (0xFFFFFF and groupColorInt))
 
-                                val usesPaletteIcon =
-                                        def.type == "WEB_BOX" ||
-                                                def.type == "CALENDAR" ||
-                                                def.type == "CLOCK"
+                                val usesPaletteIcon = def.type == "WEB_BOX"
                                 val previewView =
                                         if (usesPaletteIcon) {
                                                 ImageView(rootView.context).apply {
@@ -458,6 +455,12 @@ class SidebarManager(
                                         dummyProps["series_color_1"] = "#FF9800"
                                 } else if (def.type == "SWITCH") {
                                         dummyProps["state"] = "2" // Show solid ON color in thumbnail
+                                } else if (def.type == "CALENDAR") {
+                                        dummyProps["visual_style"] = "BIG_DATE"
+                                } else if (def.type == "CLOCK") {
+                                        dummyProps["clock_mode"] = "TIME"
+                                        dummyProps["visual_style"] = "DIGITAL"
+                                        dummyProps["time_format"] = "HH:mm"
                                 }
 
                                 val dummyData =
@@ -552,8 +555,9 @@ class SidebarManager(
                                                                 dpToPx(72),
                                                                 dpToPx(36)
                                                         )
-                                                "WEB_BOX" -> Pair(dpToPx(34), dpToPx(34))
-                                                "CALENDAR", "CLOCK" -> Pair(dpToPx(30), dpToPx(30))
+                                                "WEB_BOX" -> Pair(dpToPx(46), dpToPx(46))
+                                                "CALENDAR" -> Pair(dpToPx(48), dpToPx(48))
+                                                "CLOCK" -> Pair(dpToPx(76), dpToPx(42))
                                                 else ->
                                                         Pair(
                                                                 android.widget.FrameLayout

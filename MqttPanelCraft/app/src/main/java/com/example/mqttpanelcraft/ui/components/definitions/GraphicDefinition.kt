@@ -155,6 +155,29 @@ object GraphicDefinition : IComponentDefinition {
         val polygonEditor = panelView.findViewById<PolygonEditorView>(R.id.polygonEditor)
         val imageCropper = panelView.findViewById<ImageCropperView>(R.id.imageCropper)
 
+        fun updatePreviewDirection(direction: String) {
+            listOfNotNull<View>(polygonEditor, imageCropper).forEach { preview ->
+                preview.post {
+                    if (direction == "VERTICAL") {
+                        val fitScale =
+                            if (preview.width > 0 && preview.height > 0) {
+                                minOf(
+                                    preview.width.toFloat() / preview.height,
+                                    preview.height.toFloat() / preview.width
+                                )
+                            } else 1f
+                        preview.rotation = 90f
+                        preview.scaleX = fitScale
+                        preview.scaleY = fitScale
+                    } else {
+                        preview.rotation = 0f
+                        preview.scaleX = 1f
+                        preview.scaleY = 1f
+                    }
+                }
+            }
+        }
+
         // Type Setup
         fun updateSections(type: String) {
             sectionShape?.visibility = if (type == "SHAPE") View.VISIBLE else View.GONE
@@ -237,11 +260,13 @@ object GraphicDefinition : IComponentDefinition {
         // Visual Appearance
         val tgDirection = panelView.findViewById<MaterialButtonToggleGroup>(R.id.tgDirection)
         val initialDir = data.props["direction"] ?: "HORIZONTAL"
+        updatePreviewDirection(initialDir)
         val dirBtnId = if (initialDir == "VERTICAL") R.id.btnDirVertical else R.id.btnDirHorizontal
         tgDirection?.check(dirBtnId)
         tgDirection?.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 val newDir = if (checkedId == R.id.btnDirVertical) "VERTICAL" else "HORIZONTAL"
+                updatePreviewDirection(newDir)
                 if (newDir != (data.props["direction"] ?: "HORIZONTAL")) {
                     val (newWidth, newHeight) = swapGraphicDimensions(data.width, data.height)
                     onUpdate("direction", newDir)
@@ -291,6 +316,8 @@ object GraphicDefinition : IComponentDefinition {
         private val imageMatrix = Matrix()
 
         fun applyUpdates() {
+            clipChildren = true
+            clipToPadding = true
             alpha = opacity / 100f
             
             // Setup paints
@@ -330,25 +357,31 @@ object GraphicDefinition : IComponentDefinition {
             if (w == 0f || h == 0f) return
 
             canvas.save()
+            canvas.clipRect(0f, 0f, w, h)
+            var drawWidth = w
+            var drawHeight = h
             if (direction == "VERTICAL") {
-                canvas.rotate(90f, w / 2f, h / 2f)
+                canvas.translate(w, 0f)
+                canvas.rotate(90f)
+                drawWidth = h
+                drawHeight = w
             }
 
             when (graphicType) {
                 "SHAPE" -> {
                     if (edges == 0) {
                         // Circle
-                        val r = Math.min(w, h) / 2f
-                        canvas.drawCircle(w/2f, h/2f, r, pathPaint)
-                        if (strokeWidth > 0) canvas.drawCircle(w/2f, h/2f, r - strokePaint.strokeWidth/2f, strokePaint)
+                        val r = Math.min(drawWidth, drawHeight) / 2f
+                        canvas.drawCircle(drawWidth/2f, drawHeight/2f, r, pathPaint)
+                        if (strokeWidth > 0) canvas.drawCircle(drawWidth/2f, drawHeight/2f, r - strokePaint.strokeWidth/2f, strokePaint)
                     } else {
                         // Custom Polygon
                         val pts = parsePoints(pointsStr)
                         if (pts.isNotEmpty()) {
                             val path = Path()
                             pts.forEachIndexed { index, p ->
-                                val px = p.x * w
-                                val py = p.y * h
+                                val px = p.x * drawWidth
+                                val py = p.y * drawHeight
                                 if (index == 0) path.moveTo(px, py) else path.lineTo(px, py)
                             }
                             path.close()
@@ -369,8 +402,8 @@ object GraphicDefinition : IComponentDefinition {
                         strokePaint.strokeCap = Paint.Cap.BUTT
                         strokePaint.pathEffect = null
                     }
-                    val cy = h / 2f
-                    canvas.drawLine(0f, cy, w, cy, strokePaint)
+                    val cy = drawHeight / 2f
+                    canvas.drawLine(0f, cy, drawWidth, cy, strokePaint)
                 }
                 "IMAGE" -> {
                     bitmap?.let { bmp ->
@@ -384,15 +417,15 @@ object GraphicDefinition : IComponentDefinition {
                         imageMatrix.reset()
                         val bw = bmp.width.toFloat()
                         val bh = bmp.height.toFloat()
-                        val initialScale = if (mode == "FILL") Math.max(w / bw, h / bh) else Math.min(w / bw, h / bh)
-                        val dx = (w - bw * initialScale) / 2f
-                        val dy = (h - bh * initialScale) / 2f
+                        val initialScale = if (mode == "FILL") Math.max(drawWidth / bw, drawHeight / bh) else Math.min(drawWidth / bw, drawHeight / bh)
+                        val dx = (drawWidth - bw * initialScale) / 2f
+                        val dy = (drawHeight - bh * initialScale) / 2f
                         
                         imageMatrix.postScale(initialScale, initialScale)
                         imageMatrix.postTranslate(dx, dy)
                         if (mode == "CUSTOM") {
-                            imageMatrix.postScale(scale, scale, w/2f, h/2f)
-                            imageMatrix.postTranslate(txPct * w, tyPct * h)
+                            imageMatrix.postScale(scale, scale, drawWidth/2f, drawHeight/2f)
+                            imageMatrix.postTranslate(txPct * drawWidth, tyPct * drawHeight)
                         }
                         
                         canvas.drawBitmap(bmp, imageMatrix, pathPaint) // pathPaint has alpha and cornereffect

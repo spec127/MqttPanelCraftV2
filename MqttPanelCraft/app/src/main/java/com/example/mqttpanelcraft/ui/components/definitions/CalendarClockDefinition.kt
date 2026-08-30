@@ -1,9 +1,12 @@
 package com.example.mqttpanelcraft.ui.components.definitions
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Size
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.TextView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
@@ -78,6 +81,20 @@ object CalendarClockDefinition : IComponentDefinition {
             allStyles,
             styleMap,
             defaultValue = "MONTH"
+        )
+        val timeFormatContainer = panelView.findViewById<View>(R.id.containerTimeFormat)
+        fun updateTimeFormatVisibility(style: String) {
+            timeFormatContainer?.visibility = if (style == "DATE_TIME") View.VISIBLE else View.GONE
+        }
+        updateTimeFormatVisibility(normalizedStyle)
+        panelView.findViewById<TextView>(R.id.spVisualStyle)?.addTextChangedListener(
+            object : TextWatcher {
+                override fun afterTextChanged(value: Editable?) {
+                    updateTimeFormatVisibility(if (value?.toString() == "日期+時間") "DATE_TIME" else "")
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            }
         )
         CommonPropBinder.bindColorPalette(
             panelView, R.id.propColor, "color", data, onUpdate,

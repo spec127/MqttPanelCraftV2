@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Color
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Size
 import android.view.View
 import android.widget.CheckBox
@@ -23,6 +21,7 @@ import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.LocalComponentTriggerSource
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.ClockTriggerView
+import com.google.android.material.button.MaterialButtonToggleGroup
 
 object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
     override val type: String = "CLOCK"
@@ -39,6 +38,7 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
         "schedule_time" to "07:30",
         "trigger_value" to "TRIGGER",
         "linked_components" to "",
+        "visual_style" to "DIGITAL",
         "color" to "#7B1FA2"
     )
 
@@ -59,16 +59,20 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
             data.props["countdown_seconds"]?.toLongOrNull() ?: 60L,
             data.props["schedule_time"] ?: "07:30",
             data.props["trigger_value"] ?: "TRIGGER",
+            data.props["visual_style"] ?: "DIGITAL",
             data.props["color"] ?: "#7B1FA2"
         )
     }
 
     override fun bindPropertiesPanel(panelView: View, data: ComponentData, onUpdate: (String, String) -> Unit) {
-        CommonPropBinder.bindDropdown(
-            panelView, R.id.spClockMode, "clock_mode", data, onUpdate,
-            listOf("目前時間", "倒數計時", "定時觸發"),
-            mapOf("目前時間" to "TIME", "倒數計時" to "COUNTDOWN", "定時觸發" to "SCHEDULE"),
-            defaultValue = "TIME"
+        val modeToggle = panelView.findViewById<MaterialButtonToggleGroup>(R.id.tgClockMode)
+        val initialMode = data.props["clock_mode"] ?: "TIME"
+        modeToggle?.check(
+            when (initialMode) {
+                "COUNTDOWN" -> R.id.btnClockModeCountdown
+                "SCHEDULE" -> R.id.btnClockModeSchedule
+                else -> R.id.btnClockModeTime
+            }
         )
         CommonPropBinder.bindDropdown(
             panelView, R.id.spClockTimeFormat, "time_format", data, onUpdate,
@@ -91,18 +95,25 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
             scheduleContainer?.visibility = if (mode == "SCHEDULE") View.VISIBLE else View.GONE
             triggerContainer?.visibility = if (mode == "TIME") View.GONE else View.VISIBLE
         }
-        updateVisibility(data.props["clock_mode"] ?: "TIME")
-        panelView.findViewById<TextView>(R.id.spClockMode)?.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(value: Editable?) {
-                updateVisibility(when (value?.toString()) {
-                    "倒數計時" -> "COUNTDOWN"
-                    "定時觸發" -> "SCHEDULE"
+        updateVisibility(initialMode)
+        modeToggle?.addOnButtonCheckedListener { _, checkedId, checked ->
+            if (checked) {
+                val mode = when (checkedId) {
+                    R.id.btnClockModeCountdown -> "COUNTDOWN"
+                    R.id.btnClockModeSchedule -> "SCHEDULE"
                     else -> "TIME"
-                })
+                }
+                updateVisibility(mode)
+                onUpdate("clock_mode", mode)
             }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
-        })
+        }
+
+        CommonPropBinder.bindDropdown(
+            panelView, R.id.spClockVisualStyle, "visual_style", data, onUpdate,
+            listOf("數字鐘", "類比時鐘"),
+            mapOf("數字鐘" to "DIGITAL", "類比時鐘" to "ANALOG"),
+            defaultValue = "DIGITAL"
+        )
 
         bindLinkedComponents(panelView, data, onUpdate)
     }
@@ -116,6 +127,12 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
         val targets = components.filter { component ->
             component.id != data.id && ComponentDefinitionRegistry.get(component.type)?.group == "CONTROL"
         }
+        container.addView(CheckBox(panelView.context).apply {
+            text = "${data.label}（時鐘本身不發送）"
+            isChecked = true
+            isEnabled = false
+            alpha = 0.5f
+        })
         targets.forEach { component ->
             container.addView(CheckBox(panelView.context).apply {
                 text = component.label

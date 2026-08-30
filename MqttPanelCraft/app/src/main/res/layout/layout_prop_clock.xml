@@ -32,21 +32,55 @@
                 android:textStyle="bold"/>
         </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="功能模式"
+            android:textColor="@color/prop_text_secondary"
+            android:textSize="12sp"/>
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/tgClockMode"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/prop_toggle_height"
             android:layout_marginBottom="12dp"
-            android:hint="功能模式">
-            <AutoCompleteTextView
-                android:id="@+id/spClockMode"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/prop_input_height_inner"
-                android:background="@null"
-                android:inputType="none"
-                android:paddingStart="16dp"
-                android:paddingEnd="12dp"/>
-        </com.google.android.material.textfield.TextInputLayout>
+            app:selectionRequired="true"
+            app:singleSelection="true">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClockModeTime"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:text="時間"
+                android:textSize="11sp"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClockModeCountdown"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:text="倒數"
+                android:textSize="11sp"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClockModeSchedule"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:text="定時"
+                android:textSize="11sp"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
@@ -114,15 +148,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:text="觸發其他元件"
-                android:textColor="@color/prop_text_primary"
-                android:textSize="13sp"
+                android:text="連動元件"
+                android:textColor="@color/prop_text_secondary"
+                android:textSize="12sp"
                 android:textStyle="bold"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp"
-                android:text="時鐘不發送 MQTT；到點後由勾選的控制元件發送"
+                android:text="勾選接收時鐘事件的元件；MQTT 由目標元件發送"
                 android:textColor="@color/prop_text_secondary"
                 android:textSize="11sp"/>
             <LinearLayout
@@ -130,6 +164,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_prop_item_premium"
+                android:padding="8dp"
                 android:orientation="vertical"/>
         </LinearLayout>
 
@@ -160,9 +196,33 @@
                 android:textStyle="bold"/>
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/propClockColor"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:weightSum="10">
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.App.TextInputLayout.Properties.DenseDropdown"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="4"
+                android:hint="時鐘風格">
+                <AutoCompleteTextView
+                    android:id="@+id/spClockVisualStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/prop_input_height_compact_inner"
+                    android:background="@null"
+                    android:inputType="none"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="12dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <FrameLayout
+                android:id="@+id/propClockColor"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="6"/>
+        </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
