@@ -43,6 +43,15 @@ class ProjectViewActivity : BaseActivity() {
     private var selectedComponentId: Int? = null
     private var isEditMode = false
     private var lastResizeUpdate = 0L
+    private var mqttListenerRegistered = false
+    private var hasSubscribed = false
+
+    private val mqttMessageListener =
+            object : MqttRepository.MessageListener {
+                override fun onMessageReceived(topic: String, payload: String) {
+                    handleMqttMessage(topic, payload)
+                }
+            }
 
     // Manager
     private lateinit var projectUIManager: ProjectUIManager
@@ -822,105 +831,79 @@ class ProjectViewActivity : BaseActivity() {
     }
 
     private fun subscribeToMqtt() {
-        // 1. Message Listener
-        com.example.mqttpanelcraft.MqttRepository.registerListener(
-                object : com.example.mqttpanelcraft.MqttRepository.MessageListener {
-                    override fun onMessageReceived(topic: String, payload: String) {
-                        runOnUiThread {
-                            // Log Logic: Filter System? (Only clean messages here)
-                            // Match Component Label
-                            val matched =
-                                    viewModel.components.value?.find {
-                                        // Exact match or wildcard match
-                                        it.topicConfig == topic ||
-                                                (it.topicConfig.endsWith("/#") &&
-                                                        topic.startsWith(
-                                                                it.topicConfig.dropLast(2)
-                                                        ))
-                                    }
+        MqttRepository.connectionStatus.observe(this) { status ->
+            if (status == 1) {
+                subscribeToCurrentProject("Auto-Subscribing to")
+            } else {
+                hasSubscribed = false
+            }
+        }
+    }
 
-                            val logMsg =
-                                    if (matched != null) {
-                                        "${matched.label}: $payload"
-                                    } else {
-                                        "$topic: $payload"
-                                    }
+    private fun handleMqttMessage(topic: String, payload: String) {
+        runOnUiThread {
+            val components = viewModel.components.value ?: emptyList()
+            val matchingComponents =
+                    components.filter { comp ->
+                        comp.topicConfig == topic ||
+                                (comp.topicConfig.endsWith("/#") &&
+                                        topic.startsWith(comp.topicConfig.dropLast(2)))
+                    }
+            val matched = matchingComponents.firstOrNull()
+            viewModel.addLog(if (matched != null) "${matched.label}: $payload" else "$topic: $payload")
 
-                            // Send to VM instead of Manager
-                            viewModel.addLog(logMsg)
+            matchingComponents.forEach { comp ->
+                renderer.getView(comp.id)?.let { view ->
+                    behaviorManager.onMqttMessageReceived(view, comp, payload)
+                }
+            }
 
-                            val components = viewModel.components.value ?: emptyList()
-
-                            // Find all components that match the topic exactly or via wildcard
-                            val matchingComponents = components.filter { comp ->
-                                comp.topicConfig == topic ||
-                                (comp.topicConfig.endsWith("/#") && topic.startsWith(comp.topicConfig.dropLast(2)))
-                            }
-
-                            // 1. Send to matching components
-                            matchingComponents.forEach { comp ->
-                                val view = renderer.getView(comp.id)
-                                if (view != null) {
-                                    behaviorManager.onMqttMessageReceived(view, comp, payload)
-                                }
-                            }
-                            
-                            // 2. Send to any TEXT_DISPLAY components that link to the matching components
-                            components.forEach { comp ->
-                                if (comp.type == "TEXT_DISPLAY") {
-                                    val linkedStr = comp.props["linked_components"] ?: ""
-                                    if (linkedStr.isNotEmpty()) {
-                                        val linkedIds = linkedStr.split(",")
-                                        // If this TEXT_DISPLAY is linked to any of the matching components
-                                        val sourceComp = matchingComponents.find { linkedIds.contains(it.id.toString()) }
-                                        if (sourceComp != null) {
-                                            val view = renderer.getView(comp.id)
-                                            if (view != null) {
-                                                com.example.mqttpanelcraft.ui.components.definitions.TextDisplayDefinition.onLinkedMqttMessage(
-                                                    view, comp, payload, sourceComp
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+            components.forEach { comp ->
+                if (comp.type == "TEXT_DISPLAY") {
+                    val linkedIds = comp.props["linked_components"].orEmpty().split(",")
+                    val sourceComp =
+                            matchingComponents.find { linkedIds.contains(it.id.toString()) }
+                    if (sourceComp != null) {
+                        renderer.getView(comp.id)?.let { view ->
+                            com.example.mqttpanelcraft.ui.components.definitions.TextDisplayDefinition
+                                    .onLinkedMqttMessage(view, comp, payload, sourceComp)
                         }
                     }
                 }
-        )
-
-        // 2. Default Subscription on Connect
-        var hasSubscribed = false
-        // Observe Repository Connection Status directly or via VM
-        com.example.mqttpanelcraft.MqttRepository.connectionStatus.observe(this) { status ->
-            if (status == 1) { // Connected
-                if (!hasSubscribed) {
-                    val proj = viewModel.project.value
-                    if (proj != null) {
-                        val defaultTopic = "${proj.name}/${proj.id}/#"
-                        val context = applicationContext
-                        val intent =
-                                android.content.Intent(
-                                                context,
-                                                com.example.mqttpanelcraft.service
-                                                                .MqttService::class
-                                                        .java
-                                        )
-                                        .apply {
-                                            action = "SUBSCRIBE"
-                                            putExtra("TOPIC", defaultTopic)
-                                        }
-                        context.startService(intent)
-                        // Log Subscription
-                        viewModel.addLog("Auto-Subscribing to: $defaultTopic")
-                        hasSubscribed = true
-                    }
-                }
-            } else if (status != 1) { // Disconnected, Failed, or Connecting
-                hasSubscribed = false
             }
-            // v44.4: Ignore status 0 (Connecting) to avoid redundant subscription triggers
         }
+    }
+
+    private fun subscribeToCurrentProject(logPrefix: String) {
+        if (hasSubscribed) return
+        val proj = viewModel.project.value ?: return
+        com.example.mqttpanelcraft.utils.TopicHelper.collectSubscriptionTopics(proj).forEach {
+                topic ->
+            val intent = Intent(this, MqttService::class.java).apply {
+                action = "SUBSCRIBE"
+                putExtra("TOPIC", topic)
+            }
+            startService(intent)
+            viewModel.addLog("$logPrefix: $topic")
+        }
+        hasSubscribed = true
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (!mqttListenerRegistered) {
+            MqttRepository.registerListener(mqttMessageListener)
+            mqttListenerRegistered = true
+        }
+    }
+
+    override fun onStop() {
+        if (mqttListenerRegistered) {
+            MqttRepository.unregisterListener(mqttMessageListener)
+            mqttListenerRegistered = false
+        }
+        hasSubscribed = false
+        super.onStop()
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
@@ -964,13 +947,7 @@ class ProjectViewActivity : BaseActivity() {
         val proj = viewModel.project.value ?: return
         val status = com.example.mqttpanelcraft.MqttRepository.connectionStatus.value
         if (status == 1) {
-            val defaultTopic = "${proj.name}/${proj.id}/#"
-            val intent = android.content.Intent(this, com.example.mqttpanelcraft.service.MqttService::class.java).apply {
-                action = "SUBSCRIBE"
-                putExtra("TOPIC", defaultTopic)
-            }
-            startService(intent)
-            viewModel.addLog("Re-subscribing to: $defaultTopic")
+            subscribeToCurrentProject("Re-subscribing to")
         } else if (status != 0) {
             viewModel.retryMqtt()
         }

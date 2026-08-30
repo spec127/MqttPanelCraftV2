@@ -1,13 +1,14 @@
 package com.example.mqttpanelcraft.data
 
 import android.content.Context
+import android.util.AtomicFile
 import com.example.mqttpanelcraft.model.Project
 import com.example.mqttpanelcraft.model.ProjectType
 import com.example.mqttpanelcraft.model.ComponentData
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
-import kotlinx.coroutines.launch
+import java.io.FileOutputStream
 
 object ProjectRepository {
     // Thread-Unsafe List guarded by @Synchronized
@@ -17,6 +18,8 @@ object ProjectRepository {
     
     // Coroutine Scope for I/O - Kept for load but save is synced now
     private val repoScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO + kotlinx.coroutines.Job())
+    private var saveCoordinator: ProjectSaveCoordinator? = null
+    private var textWriter: DeduplicatingTextWriter? = null
     
     // LiveData for UI Observation
     private val _projectsLiveData = androidx.lifecycle.MutableLiveData<List<Project>>()
@@ -27,6 +30,10 @@ object ProjectRepository {
     @Synchronized
     fun initialize(context: Context) {
         file = File(context.filesDir, FILE_NAME)
+        if (saveCoordinator == null) {
+            textWriter = DeduplicatingTextWriter(::writeAtomically)
+            saveCoordinator = ProjectSaveCoordinator(repoScope) { persistLatestProjects() }
+        }
         com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Initialize. File: ${file?.absolutePath}")
         if (!isInitialized) {
             loadProjects()
@@ -52,7 +59,8 @@ object ProjectRepository {
 
         try {
             com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Reading from file...")
-            val jsonStr = file!!.readText()
+            val jsonStr = AtomicFile(file!!).openRead().bufferedReader().use { it.readText() }
+            textWriter?.seed(jsonStr)
             com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Read ${jsonStr.length} chars. Header: ${jsonStr.take(50)}...")
             
             val jsonArray = JSONArray(jsonStr)
@@ -126,68 +134,77 @@ object ProjectRepository {
             com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Save failed: File is null")
             return
         }
+        saveCoordinator?.requestSave()
+    }
 
-        repoScope.launch {
-            try {
-                // Create Snapshot in Sync Block
-                val projectsSnapshot = synchronized(this@ProjectRepository) {
-                    projects.toList()
-                }
-
-                com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Saving ${projectsSnapshot.size} projects...")
-                
-                // Log snapshot state (First project only)
-                if (projectsSnapshot.isNotEmpty()) {
-                     val p1 = projectsSnapshot[0]
-                     com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Saving P1[${p1.name}]: ${p1.components.size} components. C1 Pos: ${if (p1.components.isNotEmpty()) "${p1.components[0].x},${p1.components[0].y}" else "N/A"}")
-                }
-    
-                val jsonArray = JSONArray()
-                
-                for (p in projectsSnapshot) {
-                    val obj = JSONObject()
-                    obj.put("id", p.id)
-                    obj.put("name", p.name)
-                    obj.put("broker", p.broker)
-                    obj.put("port", p.port)
-                    obj.put("username", p.username)
-                    obj.put("password", p.password)
-                    obj.put("clientId", p.clientId)
-                    obj.put("type", p.type.name)
-                    obj.put("customCode", p.customCode)
-                    obj.put("orientation", p.orientation)
-                    obj.put("createdAt", p.createdAt)
-                    obj.put("lastOpenedAt", p.lastOpenedAt)
-    
-                    val compsArray = JSONArray()
-                    for (c in p.components) {
-                        val cObj = JSONObject()
-                        cObj.put("id", c.id)
-                        cObj.put("type", c.type)
-                        cObj.put("x", c.x)
-                        cObj.put("y", c.y)
-                        cObj.put("width", c.width)
-                        cObj.put("height", c.height)
-                        cObj.put("label", c.label)
-                        cObj.put("topicConfig", c.topicConfig)
-                        val propsObj = JSONObject()
-                        for ((k, v) in c.props) {
-                            propsObj.put(k, v)
-                        }
-                        cObj.put("props", propsObj)
-                        compsArray.put(cObj)
-                    }
-                    obj.put("components", compsArray)
-                    jsonArray.put(obj)
-                }
-                
-                // IO Operation
-                file!!.writeText(jsonArray.toString(2))
-                com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Saved successfully to ${file!!.absolutePath}. Size: ${file!!.length()} bytes.")
-            } catch (e: Exception) {
-                com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Error saving: ${e.message}")
-                android.util.Log.e("ProjectRepo", "Error saving projects", e)
+    private fun persistLatestProjects() {
+        try {
+            val projectsSnapshot = synchronized(this) { snapshotProjects(projects) }
+            val json = serializeProjects(projectsSnapshot)
+            val wroteFile = textWriter?.writeIfChanged(json) == true
+            if (wroteFile) {
+                com.example.mqttpanelcraft.utils.DebugLogger.log(
+                        "ProjectRepo",
+                        "Saved ${projectsSnapshot.size} projects to ${file?.absolutePath}."
+                )
             }
+        } catch (e: Exception) {
+            com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "Error saving: ${e.message}")
+            android.util.Log.e("ProjectRepo", "Error saving projects", e)
+        }
+    }
+
+    private fun serializeProjects(projectsSnapshot: List<Project>): String {
+        val jsonArray = JSONArray()
+        for (p in projectsSnapshot) {
+            val obj = JSONObject()
+            obj.put("id", p.id)
+            obj.put("name", p.name)
+            obj.put("broker", p.broker)
+            obj.put("port", p.port)
+            obj.put("username", p.username)
+            obj.put("password", p.password)
+            obj.put("clientId", p.clientId)
+            obj.put("type", p.type.name)
+            obj.put("customCode", p.customCode)
+            obj.put("orientation", p.orientation)
+            obj.put("createdAt", p.createdAt)
+            obj.put("lastOpenedAt", p.lastOpenedAt)
+
+            val compsArray = JSONArray()
+            for (c in p.components) {
+                val cObj = JSONObject()
+                cObj.put("id", c.id)
+                cObj.put("type", c.type)
+                cObj.put("x", c.x)
+                cObj.put("y", c.y)
+                cObj.put("width", c.width)
+                cObj.put("height", c.height)
+                cObj.put("label", c.label)
+                cObj.put("topicConfig", c.topicConfig)
+                val propsObj = JSONObject()
+                for ((key, value) in c.props) propsObj.put(key, value)
+                cObj.put("props", propsObj)
+                compsArray.put(cObj)
+            }
+            obj.put("components", compsArray)
+            jsonArray.put(obj)
+        }
+        return jsonArray.toString(2)
+    }
+
+    private fun writeAtomically(content: String) {
+        val targetFile = file ?: error("Project file is not initialized")
+        val atomicFile = AtomicFile(targetFile)
+        var output: FileOutputStream? = null
+        try {
+            val stream = atomicFile.startWrite()
+            output = stream
+            stream.write(content.toByteArray(Charsets.UTF_8))
+            atomicFile.finishWrite(stream)
+        } catch (e: Exception) {
+            output?.let { atomicFile.failWrite(it) }
+            throw e
         }
     }
 
@@ -375,6 +392,7 @@ object ProjectRepository {
             return null
         }
     }
+    @Synchronized
     fun swapProjects(fromIndex: Int, toIndex: Int) {
         if (fromIndex in projects.indices && toIndex in projects.indices) {
             java.util.Collections.swap(projects, fromIndex, toIndex)
@@ -383,6 +401,7 @@ object ProjectRepository {
         }
     }
 
+    @Synchronized
     fun sortProjects(comparator: Comparator<Project>) {
         java.util.Collections.sort(projects, comparator)
         updateLiveData()

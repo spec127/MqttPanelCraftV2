@@ -120,7 +120,7 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
             val proj = project.value ?: return
 
             proj.components.clear()
-            proj.components.addAll(previousState)
+            proj.components.addAll(previousState.map { it.deepCopy() })
 
             // Force Observer Notification and Save
             project.value = proj
@@ -145,7 +145,7 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
     fun saveSnapshot() {
         val proj = project.value ?: return
         // Deep copy of the list items to avoid reference issues
-        val snapshot = proj.components.map { it.copy() }
+        val snapshot = proj.components.map { it.deepCopy() }
         undoStack.push(snapshot)
         if (undoStack.size > 20) undoStack.removeAt(0) // Limit stack
         canUndo.value = undoStack.isNotEmpty()
@@ -190,21 +190,19 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
 
         // Topic Generation: All Lowercase
         // Topic Generation: All Lowercase, insert underscore between text and number
-        val safeProjName =
-                proj.name.lowercase().replace("/", "_").replace(" ", "_").replace("+", "")
-
         // safeItemName: "button1" -> "button_1"
-        val safeItemName = newLabel.lowercase().replace(Regex("(?<=[a-z])(?=\\d)"), "_")
+        val safeItemName =
+                newLabel
+                        .lowercase(java.util.Locale.ROOT)
+                        .replace(Regex("(?<=[a-z])(?=\\d)"), "_")
 
         // Topic Config: ProjectName/ProjectID/ItemName
-        return "$safeProjName/${proj.id}/$safeItemName"
+        return "${com.example.mqttpanelcraft.utils.TopicHelper.formatBaseTopic(proj.name, proj.id)}/$safeItemName"
     }
 
     fun getProjectTopicPrefix(): String {
         val proj = project.value ?: return ""
-        val safeProjName =
-                proj.name.lowercase().replace("/", "_").replace(" ", "_").replace("+", "")
-        return "$safeProjName/${proj.id}/"
+        return "${com.example.mqttpanelcraft.utils.TopicHelper.formatBaseTopic(proj.name, proj.id)}/"
     }
 
     // === Log Persistence ===
