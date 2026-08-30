@@ -53,53 +53,61 @@ class CalendarDisplayView(context: Context) : FrameLayout(context) {
         render()
     }
 
+    private fun currentScale(): Float {
+        val h = height
+        return if (h > 0) (h / (180f * resources.displayMetrics.density)).coerceIn(0.2f, 3.0f) else 1f
+    }
+
     private fun render() {
         removeAllViews()
+        val scale = currentScale()
         background = GradientDrawable().apply {
             setColor(if (ColorUtils.calculateLuminance(primaryColor) < 0.45) Color.WHITE else Color.rgb(28, 24, 30))
             setStroke(dp(1), ColorUtils.setAlphaComponent(primaryColor, 135))
-            cornerRadius = dp(10).toFloat()
+            cornerRadius = (dp(10) * scale).coerceAtLeast(dp(3).toFloat())
         }
 
         when (visualStyle) {
-            "BIG_DATE" -> renderBigDate()
-            "DATE_TIME" -> renderDateTime()
-            else -> renderMonth()
+            "BIG_DATE" -> renderBigDate(scale)
+            "DATE_TIME" -> renderDateTime(scale)
+            else -> renderMonth(scale)
         }
     }
 
-    private fun renderBigDate() {
+    private fun renderBigDate(scale: Float) {
         val now = Calendar.getInstance()
         val day = SimpleDateFormat("dd", Locale.getDefault()).format(now.time)
         val monthAndWeekday = SimpleDateFormat("M 月 · EEEE", Locale.getDefault()).format(now.time)
-        addView(verticalContainer().apply {
-            addView(text(day, 58f, primaryColor, Typeface.NORMAL))
-            addView(text(monthAndWeekday, 14f, secondaryColor(), Typeface.NORMAL))
+        addView(verticalContainer(scale).apply {
+            addView(text(day, (54f * scale).coerceAtLeast(13f), primaryColor, Typeface.NORMAL))
+            addView(text(monthAndWeekday, (13f * scale).coerceAtLeast(7f), secondaryColor(), Typeface.NORMAL))
         })
     }
 
-    private fun renderDateTime() {
+    private fun renderDateTime(scale: Float) {
         val now = Calendar.getInstance().time
         val date = safeFormat(dateFormat, now)
         val time = safeFormat(timeFormat, now)
-        addView(verticalContainer().apply {
-            addView(text(time, 38f, primaryColor, Typeface.NORMAL))
-            addView(text(date, 14f, secondaryColor(), Typeface.NORMAL))
+        addView(verticalContainer(scale).apply {
+            addView(text(time, (36f * scale).coerceAtLeast(12f), primaryColor, Typeface.NORMAL))
+            addView(text(date, (13f * scale).coerceAtLeast(7f), secondaryColor(), Typeface.NORMAL))
         })
     }
 
-    private fun renderMonth() {
+    private fun renderMonth(scale: Float) {
         val calendar = Calendar.getInstance()
         val today = calendar.get(Calendar.DAY_OF_MONTH)
         val monthTitle = SimpleDateFormat("yyyy 年 M 月", Locale.getDefault()).format(calendar.time)
+        val padH = (dp(10) * scale).toInt().coerceAtLeast(dp(2))
+        val padV = (dp(8) * scale).toInt().coerceAtLeast(dp(2))
         val content = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
-            setPadding(dp(10), dp(8), dp(10), dp(8))
+            setPadding(padH, padV, padH, padV)
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         }
-        content.addView(text(monthTitle, 15f, primaryColor, Typeface.BOLD).apply {
-            setPadding(0, 0, 0, dp(5))
+        content.addView(text(monthTitle, (14f * scale).coerceAtLeast(8f), primaryColor, Typeface.BOLD).apply {
+            setPadding(0, 0, 0, (dp(4) * scale).toInt().coerceAtLeast(dp(1)))
         })
 
         val grid = GridLayout(context).apply {
@@ -108,44 +116,46 @@ class CalendarDisplayView(context: Context) : FrameLayout(context) {
             layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 1f)
         }
         listOf("日", "一", "二", "三", "四", "五", "六").forEach { label ->
-            grid.addView(dayCell(label, secondaryColor(), false))
+            grid.addView(dayCell(label, (10f * scale).coerceAtLeast(5.5f), secondaryColor(), false, scale))
         }
 
         calendar.set(Calendar.DAY_OF_MONTH, 1)
         val firstColumn = calendar.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        repeat(firstColumn) { grid.addView(dayCell("", secondaryColor(), false)) }
+        repeat(firstColumn) { grid.addView(dayCell("", (10f * scale).coerceAtLeast(5.5f), secondaryColor(), false, scale)) }
         for (day in 1..daysInMonth) {
-            grid.addView(dayCell(day.toString(), if (day == today) Color.WHITE else primaryColor, day == today))
+            grid.addView(dayCell(day.toString(), (10f * scale).coerceAtLeast(5.5f), if (day == today) Color.WHITE else primaryColor, day == today, scale))
         }
         val used = 7 + firstColumn + daysInMonth
-        repeat((49 - used).coerceAtLeast(0)) { grid.addView(dayCell("", secondaryColor(), false)) }
+        repeat((49 - used).coerceAtLeast(0)) { grid.addView(dayCell("", (10f * scale).coerceAtLeast(5.5f), secondaryColor(), false, scale)) }
         content.addView(grid)
         addView(content)
     }
 
-    private fun dayCell(value: String, color: Int, selected: Boolean): TextView =
-        text(value, 11f, color, Typeface.NORMAL).apply {
+    private fun dayCell(value: String, sizeSp: Float, color: Int, selected: Boolean, scale: Float): TextView =
+        text(value, sizeSp, color, Typeface.NORMAL).apply {
             layoutParams = GridLayout.LayoutParams().apply {
                 width = 0
                 height = 0
                 columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
                 rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                setMargins(dp(1), dp(1), dp(1), dp(1))
+                val m = (dp(1) * scale).toInt()
+                setMargins(m, m, m, m)
             }
             if (selected) {
                 background = GradientDrawable().apply {
                     setColor(primaryColor)
-                    cornerRadius = dp(5).toFloat()
+                    cornerRadius = (dp(5) * scale).coerceAtLeast(dp(2).toFloat())
                 }
             }
         }
 
-    private fun verticalContainer() = LinearLayout(context).apply {
+    private fun verticalContainer(scale: Float) = LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
         gravity = Gravity.CENTER
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-        setPadding(dp(10), dp(10), dp(10), dp(10))
+        val pad = (dp(10) * scale).toInt().coerceAtLeast(dp(2))
+        setPadding(pad, pad, pad, pad)
     }
 
     private fun text(value: String, sizeSp: Float, color: Int, style: Int) = TextView(context).apply {
@@ -171,6 +181,11 @@ class CalendarDisplayView(context: Context) : FrameLayout(context) {
         if (ColorUtils.calculateLuminance(primaryColor) < 0.45) Color.DKGRAY else Color.LTGRAY
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        render()
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()

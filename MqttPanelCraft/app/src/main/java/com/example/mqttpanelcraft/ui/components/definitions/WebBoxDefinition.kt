@@ -16,7 +16,7 @@ import com.example.mqttpanelcraft.ui.views.WebBoxView
 
 object WebBoxDefinition : IComponentDefinition {
     override val type: String = "WEB_BOX"
-    override val defaultSize: Size = Size(300, 200)
+    override val defaultSize: Size = Size(250, 330)
     override val labelPrefix: String = "web"
     override val iconResId: Int = R.drawable.ic_globe
     override val group: String = "DISPLAY"
@@ -62,13 +62,14 @@ object WebBoxDefinition : IComponentDefinition {
     ) {
         val binder = CommonPropBinder
         
-        // 1. Source Type Dropdown
-        binder.bindDropdown(
-            panelView, R.id.spSourceType, "source_type", data, onUpdate,
-            listOf("外部網址 (URL)", "靜態代碼 (HTML)"),
-            mapOf("外部網址 (URL)" to "URL", "靜態代碼 (HTML)" to "HTML"),
-            defaultValue = "URL"
-        )
+        // 1. Source Type Toggle Group
+        val tgSourceType = panelView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.tgSourceType)
+        val initialSourceType = data.props["source_type"] ?: "URL"
+        if (initialSourceType == "HTML") {
+            tgSourceType?.check(R.id.btnSourceTypeHtml)
+        } else {
+            tgSourceType?.check(R.id.btnSourceTypeUrl)
+        }
         
         // Setup visibility logic based on Source Type
         val tilUrl = panelView.findViewById<View>(R.id.tilUrl)
@@ -79,18 +80,15 @@ object WebBoxDefinition : IComponentDefinition {
             tilHtml?.visibility = if (type == "HTML") View.VISIBLE else View.GONE
         }
         
-        updateVisibility(data.props["source_type"] ?: "URL")
+        updateVisibility(initialSourceType)
         
-        val spSourceType = panelView.findViewById<TextView>(R.id.spSourceType)
-        spSourceType?.addTextChangedListener(object : android.text.TextWatcher {
-            override fun afterTextChanged(s: android.text.Editable?) {
-                val valStr = s?.toString() ?: ""
-                val type = if (valStr.contains("URL")) "URL" else "HTML"
+        tgSourceType?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val type = if (checkedId == R.id.btnSourceTypeHtml) "HTML" else "URL"
                 updateVisibility(type)
+                onUpdate("source_type", type)
             }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
+        }
 
         // 2. URL Input
         binder.bindEditText(panelView, R.id.etUrl, "url", data, onUpdate)

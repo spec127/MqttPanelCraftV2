@@ -428,10 +428,10 @@ class SidebarManager(
                                                         scaleType = ImageView.ScaleType.CENTER_INSIDE
                                                         setColorFilter(groupColorInt)
                                                         setPadding(
-                                                                dpToPx(4),
-                                                                dpToPx(4),
-                                                                dpToPx(4),
-                                                                dpToPx(4)
+                                                                dpToPx(1),
+                                                                dpToPx(1),
+                                                                dpToPx(1),
+                                                                dpToPx(1)
                                                         )
                                                 }
                                         } else {
@@ -555,9 +555,9 @@ class SidebarManager(
                                                                 dpToPx(72),
                                                                 dpToPx(36)
                                                         )
-                                                "WEB_BOX" -> Pair(dpToPx(46), dpToPx(46))
-                                                "CALENDAR" -> Pair(dpToPx(48), dpToPx(48))
-                                                "CLOCK" -> Pair(dpToPx(76), dpToPx(42))
+                                                "WEB_BOX" -> Pair(dpToPx(56), dpToPx(56))
+                                                "CALENDAR" -> Pair(dpToPx(44), dpToPx(44))
+                                                "CLOCK" -> Pair(dpToPx(68), dpToPx(38))
                                                 else ->
                                                         Pair(
                                                                 android.widget.FrameLayout

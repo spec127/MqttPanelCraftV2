@@ -62,14 +62,7 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
             setTypeface(null, Typeface.NORMAL)
             isSingleLine = true
         }
-        subText.apply {
-            gravity = Gravity.CENTER
-            includeFontPadding = false
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-            setPadding(0, dp(6), 0, 0)
-        }
         content.addView(mainText)
-        content.addView(subText)
         addView(content)
     }
 
@@ -90,7 +83,11 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
         countdownSeconds = safeSeconds
         scheduleTime = newScheduleTime.ifBlank { "07:30" }
         triggerValue = newTriggerValue.ifBlank { "TRIGGER" }
-        visualStyle = if (newVisualStyle == "ANALOG") "ANALOG" else "DIGITAL"
+        visualStyle = when (newVisualStyle) {
+            "ANALOG" -> "ANALOG"
+            "COMBO" -> "COMBO"
+            else -> "DIGITAL"
+        }
         primaryColor = try { Color.parseColor(colorHex) } catch (_: Exception) { Color.parseColor("#7B1FA2") }
         if (shouldResetCountdown && mode == "COUNTDOWN") resetCountdown()
         updateColors()
@@ -102,18 +99,44 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
         countdownTriggered = false
     }
 
+    private fun currentScale(): Float {
+        val h = height
+        return if (h > 0) (h / (100f * resources.displayMetrics.density)).coerceIn(0.2f, 3.0f) else 1f
+    }
+
     private fun updateNow() {
+        val scale = currentScale()
         val runtime = !((parent as? InterceptableFrameLayout)?.isEditMode ?: false)
         if (runtime && !wasRuntime && mode == "COUNTDOWN") resetCountdown()
         wasRuntime = runtime
-        val showAnalog = visualStyle == "ANALOG" && mode == "TIME"
-        content.visibility = if (showAnalog) GONE else VISIBLE
+
+        val isCombo = visualStyle == "COMBO"
+        val isAnalog = visualStyle == "ANALOG"
+
+        if (isAnalog) {
+            content.visibility = GONE
+        } else {
+            content.visibility = VISIBLE
+            if (isCombo) {
+                content.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+                val padH = (dp(8) * scale).toInt().coerceAtLeast(dp(2))
+                val padB = (dp(6) * scale).toInt().coerceAtLeast(dp(2))
+                content.setPadding(padH, 0, padH, padB)
+                mainText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18f * scale).coerceAtLeast(8.5f))
+            } else {
+                content.gravity = Gravity.CENTER
+                val padH = (dp(10) * scale).toInt().coerceAtLeast(dp(2))
+                val padV = (dp(6) * scale).toInt().coerceAtLeast(dp(2))
+                content.setPadding(padH, padV, padH, padV)
+                mainText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (36f * scale).coerceAtLeast(11f))
+            }
+        }
+
         when (mode) {
             "COUNTDOWN" -> updateCountdown(runtime)
             "SCHEDULE" -> updateSchedule(runtime)
             else -> {
                 mainText.text = safeTimeFormat(timeFormat, Date())
-                subText.text = "目前時間"
             }
         }
         invalidate()
@@ -126,7 +149,6 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
         val minutes = (remaining % 3600L) / 60L
         val seconds = remaining % 60L
         mainText.text = String.format(Locale.ROOT, "%02d:%02d:%02d", hours, minutes, seconds)
-        subText.text = if (remaining == 0L) "已觸發連結元件" else "倒數計時"
         if (runtime && remaining == 0L && !countdownTriggered) {
             countdownTriggered = true
             onLocalTrigger?.invoke(triggerValue)
@@ -136,7 +158,6 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
     private fun updateSchedule(runtime: Boolean) {
         val now = Date()
         mainText.text = safeTimeFormat(timeFormat, now)
-        subText.text = "定時 $scheduleTime"
         val currentTime = safeTimeFormat("HH:mm", now)
         val currentDate = safeTimeFormat("yyyy-MM-dd", now)
         if (runtime && currentTime == scheduleTime && currentDate != lastScheduleDate) {
@@ -149,25 +170,28 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
         try { SimpleDateFormat(pattern, Locale.getDefault()).format(date) } catch (_: Exception) { "--:--" }
 
     private fun updateColors() {
+        val scale = currentScale()
         val darkAccent = ColorUtils.calculateLuminance(primaryColor) < 0.45
         background = GradientDrawable().apply {
             setColor(if (darkAccent) Color.WHITE else Color.rgb(28, 24, 30))
             setStroke(dp(1), ColorUtils.setAlphaComponent(primaryColor, 135))
-            cornerRadius = dp(10).toFloat()
+            cornerRadius = (dp(10) * scale).coerceAtLeast(dp(3).toFloat())
         }
         mainText.setTextColor(primaryColor)
-        subText.setTextColor(if (darkAccent) Color.DKGRAY else Color.LTGRAY)
         clockPaint.color = primaryColor
         invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (visualStyle != "ANALOG" || mode != "TIME") return
+        if (visualStyle != "ANALOG" && visualStyle != "COMBO") return
+        if (mode != "TIME") return
 
+        val isCombo = visualStyle == "COMBO"
         val centerX = width / 2f
-        val centerY = height / 2f
-        val radius = minOf(width, height) * 0.36f
+        val centerY = if (isCombo) height * 0.38f else height / 2f
+        val radius = if (isCombo) minOf(width * 0.38f, height * 0.28f) else minOf(width, height) * 0.36f
+
         clockPaint.style = Paint.Style.STROKE
         clockPaint.strokeWidth = dp(2).toFloat()
         canvas.drawCircle(centerX, centerY, radius, clockPaint)
@@ -187,16 +211,24 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
         val now = java.util.Calendar.getInstance()
         val hourAngle = Math.PI * (now.get(java.util.Calendar.HOUR) + now.get(java.util.Calendar.MINUTE) / 60.0) / 6.0
         val minuteAngle = Math.PI * now.get(java.util.Calendar.MINUTE) / 30.0
+        val strokeScale = if (isCombo) 0.75f else 1f
         clockPaint.strokeCap = Paint.Cap.ROUND
-        clockPaint.strokeWidth = dp(4).toFloat()
+        clockPaint.strokeWidth = (dp(4) * strokeScale).toFloat().coerceAtLeast(dp(1.8f).toFloat())
         canvas.drawLine(centerX, centerY, centerX + Math.sin(hourAngle).toFloat() * radius * 0.5f, centerY - Math.cos(hourAngle).toFloat() * radius * 0.5f, clockPaint)
-        clockPaint.strokeWidth = dp(3).toFloat()
+        clockPaint.strokeWidth = (dp(3) * strokeScale).toFloat().coerceAtLeast(dp(1.4f).toFloat())
         canvas.drawLine(centerX, centerY, centerX + Math.sin(minuteAngle).toFloat() * radius * 0.72f, centerY - Math.cos(minuteAngle).toFloat() * radius * 0.72f, clockPaint)
         clockPaint.style = Paint.Style.FILL
-        canvas.drawCircle(centerX, centerY, dp(3).toFloat(), clockPaint)
+        canvas.drawCircle(centerX, centerY, (dp(3) * strokeScale).toFloat().coerceAtLeast(dp(1.5f).toFloat()), clockPaint)
     }
 
+    private fun dp(value: Float): Float = value * resources.displayMetrics.density
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        updateColors()
+        updateNow()
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()

@@ -110,8 +110,14 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
 
         CommonPropBinder.bindDropdown(
             panelView, R.id.spClockVisualStyle, "visual_style", data, onUpdate,
-            listOf("數字鐘", "類比時鐘"),
-            mapOf("數字鐘" to "DIGITAL", "類比時鐘" to "ANALOG"),
+            listOf("數字鐘", "類比時鐘", "雙顯時鐘"),
+            mapOf(
+                "數字鐘" to "DIGITAL",
+                "類比時鐘" to "ANALOG",
+                "雙顯時鐘" to "COMBO",
+                "指針+數字" to "COMBO",
+                "兩者都有" to "COMBO"
+            ),
             defaultValue = "DIGITAL"
         )
 
