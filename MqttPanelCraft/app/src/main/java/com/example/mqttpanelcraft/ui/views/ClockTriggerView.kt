@@ -20,6 +20,7 @@ import java.util.Date
 import java.util.Locale
 
 class ClockTriggerView(context: Context) : FrameLayout(context) {
+    var componentId: Int = android.view.View.NO_ID
     var isEditMode: Boolean = false
     var onLocalTrigger: ((String) -> Unit)? = null
 
@@ -143,6 +144,7 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
     }
 
     private fun updateCountdown(runtime: Boolean) {
+        com.example.mqttpanelcraft.MqttRepository.getClockDeadline(componentId)?.let { countdownEndAt = it }
         if (countdownEndAt == 0L) resetCountdown()
         val remaining = ((countdownEndAt - System.currentTimeMillis() + 999L) / 1000L).coerceAtLeast(0L)
         val hours = remaining / 3600L

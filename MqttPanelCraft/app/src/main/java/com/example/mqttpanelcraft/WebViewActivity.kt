@@ -10,7 +10,7 @@ import android.widget.EditText
 import android.widget.Toast
 import com.example.mqttpanelcraft.data.ProjectRepository
 import com.example.mqttpanelcraft.model.Project
-import com.example.mqttpanelcraft.service.MqttService
+import com.example.mqttpanelcraft.mqtt.MqttSessionClient
 import com.example.mqttpanelcraft.utils.HtmlTemplates
 import com.example.mqttpanelcraft.utils.TopicHelper
 
@@ -90,22 +90,10 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
 
         // MQTT Service Integration
         // Ensure Service is Connected using Project Defaults
-        val brokerUrl = project?.broker ?: "tcp://broker.emqx.io"
-        val port = project?.port ?: 1883
-        val clientId = project?.clientId ?: "webview_client_${System.currentTimeMillis()}"
-        val username = project?.username ?: ""
-        val password = project?.password ?: ""
-
-        val serviceIntent =
-                Intent(this, MqttService::class.java).apply {
-                    action = "CONNECT"
-                    putExtra("BROKER", brokerUrl)
-                    putExtra("PORT", port)
-                    putExtra("USER", username)
-                    putExtra("PASSWORD", password)
-                    putExtra("CLIENT_ID", clientId)
-                }
-        startService(serviceIntent)
+        project?.let {
+            ensureMqttNotificationPermission()
+            MqttSessionClient.activate(this, it.id)
+        }
 
         // Subscribe logic moved to connection observer to prevent race conditions
         // if (project != null) { ... }
@@ -273,14 +261,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
 
                 // Fix: Subscribe ONLY when connected to ensure the Service is ready
                 if (!hasSubscribed && project != null) {
-                    TopicHelper.collectSubscriptionTopics(project!!).forEach { topic ->
-                        val subIntent =
-                                Intent(this, MqttService::class.java).apply {
-                                    action = "SUBSCRIBE"
-                                    putExtra("TOPIC", topic)
-                                }
-                        startService(subIntent)
-                    }
+                        MqttSessionClient.refresh(this, project!!.id)
                     hasSubscribed = true
                 }
             }
@@ -316,9 +297,19 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
             MqttRepository.registerListener(this)
             mqttListenerRegistered = true
         }
+        project?.let { current ->
+            MqttSessionClient.setVisible(this, current.id, true)
+            MqttRepository.consumeBackgroundSnapshots(current.id).forEach { snapshot ->
+                onMessageReceived(snapshot.topic, snapshot.payload)
+            }
+        }
     }
 
     override fun onStop() {
+        project?.let { current ->
+            MqttRepository.markUiDetached(current.id)
+            MqttSessionClient.setVisible(this, current.id, false)
+        }
         if (mqttListenerRegistered) {
             MqttRepository.unregisterListener(this)
             mqttListenerRegistered = false
@@ -428,23 +419,12 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
     inner class MQTTInterface {
         @JavascriptInterface
         fun publish(topic: String, message: String) {
-            val intent =
-                    Intent(this@WebViewActivity, MqttService::class.java).apply {
-                        action = "PUBLISH"
-                        putExtra("TOPIC", topic)
-                        putExtra("PAYLOAD", message)
-                    }
-            startService(intent)
+            MqttSessionClient.publish(this@WebViewActivity, topic, message)
         }
 
         @JavascriptInterface
         fun subscribe(topic: String) {
-            val intent =
-                    Intent(this@WebViewActivity, MqttService::class.java).apply {
-                        action = "SUBSCRIBE"
-                        putExtra("TOPIC", topic)
-                    }
-            startService(intent)
+            MqttSessionClient.subscribe(this@WebViewActivity, topic)
         }
     }
 }

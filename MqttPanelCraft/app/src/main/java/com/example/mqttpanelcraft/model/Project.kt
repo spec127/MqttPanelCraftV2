@@ -14,7 +14,8 @@ data class Project(
     val customCode: String = "",
     val orientation: String = "SENSOR",
     val createdAt: Long = System.currentTimeMillis(),
-    var lastOpenedAt: Long = System.currentTimeMillis()
+    var lastOpenedAt: Long = System.currentTimeMillis(),
+    val keepMqttInBackground: Boolean = false
 )
 
 enum class ProjectType {

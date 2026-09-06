@@ -12,7 +12,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
-import com.example.mqttpanelcraft.service.MqttService
+import com.example.mqttpanelcraft.mqtt.MqttSessionClient
 import com.example.mqttpanelcraft.ui.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.Locale
@@ -145,6 +145,7 @@ class ProjectViewActivity : BaseActivity() {
                     viewModel.saveProject()
                     ensureMqttConnectedAndSubscribed()
                 }
+                viewModel.project.value?.let { MqttSessionClient.setRuntime(this, it.id, !isEditMode) }
             }
 
             // Subscribers
@@ -239,13 +240,7 @@ class ProjectViewActivity : BaseActivity() {
                 ComponentBehaviorManager(
                         { topic, payload ->
                             // Send MQTT
-                            val intent =
-                                    Intent(this, MqttService::class.java).apply {
-                                        action = "PUBLISH"
-                                        putExtra("TOPIC", topic)
-                                        putExtra("PAYLOAD", payload)
-                                    }
-                            startService(intent)
+                            MqttSessionClient.publish(this, topic, payload)
                         },
                         { id, key, value ->
                             // Sync property to ViewModel (and then to disk)
@@ -606,6 +601,7 @@ class ProjectViewActivity : BaseActivity() {
 
         viewModel.project.observe(this) { project ->
             if (project != null) {
+                ensureMqttNotificationPermission()
                 projectUIManager.updateTitle(project.name)
                 when (project.orientation) {
                     "PORTRAIT" ->
@@ -945,15 +941,8 @@ class ProjectViewActivity : BaseActivity() {
     private fun subscribeToCurrentProject(@androidx.annotation.StringRes logResId: Int) {
         if (hasSubscribed) return
         val proj = viewModel.project.value ?: return
-        com.example.mqttpanelcraft.utils.TopicHelper.collectSubscriptionTopics(proj).forEach {
-                topic ->
-            val intent = Intent(this, MqttService::class.java).apply {
-                action = "SUBSCRIBE"
-                putExtra("TOPIC", topic)
-            }
-            startService(intent)
-            viewModel.addLog(getString(logResId, topic))
-        }
+        MqttSessionClient.refresh(this, proj.id)
+        viewModel.addLog(getString(logResId, "project topics"))
         hasSubscribed = true
     }
 
@@ -963,16 +952,36 @@ class ProjectViewActivity : BaseActivity() {
             MqttRepository.registerListener(mqttMessageListener)
             mqttListenerRegistered = true
         }
+        viewModel.project.value?.let { proj ->
+            MqttSessionClient.setVisible(this, proj.id, true)
+            editorCanvas.post { replayBackgroundSnapshots(proj) }
+        }
     }
 
     override fun onStop() {
         interactionManager.cancelInteraction()
+        viewModel.project.value?.let { proj ->
+            MqttRepository.markUiDetached(proj.id)
+            MqttSessionClient.setVisible(this, proj.id, false)
+        }
         if (mqttListenerRegistered) {
             MqttRepository.unregisterListener(mqttMessageListener)
             mqttListenerRegistered = false
         }
         hasSubscribed = false
         super.onStop()
+    }
+
+    private fun replayBackgroundSnapshots(project: com.example.mqttpanelcraft.model.Project) {
+        val components = viewModel.components.value.orEmpty()
+        MqttRepository.consumeBackgroundSnapshots(project.id).forEach { snapshot ->
+            components.filter { comp ->
+                comp.topicConfig == snapshot.topic ||
+                    (comp.topicConfig.endsWith("/#") && snapshot.topic.startsWith(comp.topicConfig.dropLast(1)))
+            }.forEach { comp ->
+                renderer.getView(comp.id)?.let { behaviorManager.applyMqttSnapshot(it, comp, snapshot.payload) }
+            }
+        }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
@@ -1014,12 +1023,8 @@ class ProjectViewActivity : BaseActivity() {
 
     private fun ensureMqttConnectedAndSubscribed() {
         val proj = viewModel.project.value ?: return
-        val status = com.example.mqttpanelcraft.MqttRepository.connectionStatus.value
-        if (status == 1) {
-            subscribeToCurrentProject(R.string.project_log_resubscribing)
-        } else if (status != 0) {
-            viewModel.retryMqtt()
-        }
+        MqttSessionClient.activate(this, proj.id)
+        MqttSessionClient.setRuntime(this, proj.id, !isEditMode)
         viewModel.components.value?.forEach { comp ->
             val view = renderer.getView(comp.id)
             if (view != null) {

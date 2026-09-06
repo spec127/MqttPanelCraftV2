@@ -211,4 +211,11 @@ object ImageSensorDefinition : IComponentDefinition {
         val imageDisplayView = view.findViewWithTag<ImageDisplayView>("target_img_view") ?: return
         imageDisplayView.updatePayload(payload, isNewArrival = true)
     }
+
+    override fun onMqttSnapshot(
+        view: View,
+        data: ComponentData,
+        payload: String,
+        onUpdateProp: (key: String, value: String) -> Unit
+    ) = Unit
 }

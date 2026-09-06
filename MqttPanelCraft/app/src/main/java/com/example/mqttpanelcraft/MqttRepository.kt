@@ -6,6 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import org.eclipse.paho.client.mqttv3.MqttClient
+import com.example.mqttpanelcraft.mqtt.MqttConnectionState
+import com.example.mqttpanelcraft.mqtt.MqttSnapshot
+import com.example.mqttpanelcraft.mqtt.MqttSnapshotCache
 
 object MqttRepository {
     private var applicationContext: Context? = null
@@ -42,6 +45,7 @@ object MqttRepository {
         _logs.postValue(emptyList())
         imageBuffer.clear()
         imageTotals.clear()
+        clearSessionState()
     }
 
     fun addLog(message: String, timestamp: String) {
@@ -61,10 +65,38 @@ object MqttRepository {
     // Multi-Project Support
     var activeProjectId: String? = null
     private val cachedStates = ConcurrentHashMap<String, String>() // Topic -> Payload
+    private val snapshotCache = MqttSnapshotCache()
+    private val uiDetachedAt = ConcurrentHashMap<String, Long>()
+    private val clockDeadlines = ConcurrentHashMap<Int, Long>()
 
     fun getTopicState(topic: String): String? {
         return cachedStates[topic]
     }
+
+    fun markUiDetached(projectId: String) {
+        uiDetachedAt[projectId] = snapshotCache.currentSequence()
+    }
+
+    fun consumeBackgroundSnapshots(projectId: String): List<MqttSnapshot> {
+        val after = uiDetachedAt[projectId] ?: snapshotCache.currentSequence()
+        val result = snapshotCache.since(after)
+        uiDetachedAt[projectId] = snapshotCache.currentSequence()
+        return result
+    }
+
+    fun clearSessionState() {
+        cachedStates.clear()
+        snapshotCache.clear()
+        uiDetachedAt.clear()
+        clockDeadlines.clear()
+    }
+
+    fun updateClockDeadlines(values: Map<Int, Long>) {
+        clockDeadlines.clear()
+        clockDeadlines.putAll(values)
+    }
+
+    fun getClockDeadline(componentId: Int): Long? = clockDeadlines[componentId]
 
     // Listener Interface for Zero-Loss Message Handling
     interface MessageListener {
@@ -97,6 +129,7 @@ object MqttRepository {
 
         // v29: Update Cache
         cachedStates[topic] = payload
+        snapshotCache.put(topic, payload)
 
         // v29: Log Filtering & v36: Relative Path Formatting
         var shouldLog = true
@@ -200,9 +233,28 @@ object MqttRepository {
     private val _connectionStatus =
             MutableLiveData<Int>(0) // 0:Connecting/Gray, 1:Connected/Green, 2:Failed/Red
     val connectionStatus: LiveData<Int> = _connectionStatus
+    private val _connectionState = MutableLiveData(MqttConnectionState.IDLE)
+    val connectionState: LiveData<MqttConnectionState> = _connectionState
+
+    fun setConnectionState(state: MqttConnectionState) {
+        _connectionState.postValue(state)
+        _connectionStatus.postValue(
+            when (state) {
+                MqttConnectionState.CONNECTED -> MqttStatus.CONNECTED
+                MqttConnectionState.FAILED -> MqttStatus.FAILED
+                else -> MqttStatus.CONNECTING
+            }
+        )
+    }
 
     fun setStatus(status: Int) {
-        _connectionStatus.postValue(status)
+        setConnectionState(
+            when (status) {
+                MqttStatus.CONNECTED -> MqttConnectionState.CONNECTED
+                MqttStatus.FAILED -> MqttConnectionState.FAILED
+                else -> MqttConnectionState.CONNECTING
+            }
+        )
     }
 }
 

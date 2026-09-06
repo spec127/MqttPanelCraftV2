@@ -19,13 +19,12 @@ import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry
 import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
-import com.example.mqttpanelcraft.ui.components.LocalComponentTriggerSource
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.ClockTriggerView
 import com.google.android.material.button.MaterialButtonToggleGroup
 
-object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
+object ClockDefinition : IComponentDefinition {
     override val type: String = "CLOCK"
     override val defaultSize: Size = Size(160, 100)
     override val labelPrefix: String = "clock"
@@ -56,6 +55,7 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
 
     override fun onUpdateView(view: View, data: ComponentData) {
         val clock = view.findViewWithTag<ClockTriggerView>("target_clock") ?: return
+        clock.componentId = data.id
         clock.setConfig(
             data.props["clock_mode"] ?: "TIME",
             data.props["time_format"] ?: "HH:mm",
@@ -159,16 +159,6 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
         sendMqtt: (topic: String, payload: String) -> Unit,
         onUpdateProp: (key: String, value: String) -> Unit
     ) = Unit
-
-    override fun attachLocalTrigger(
-        view: View,
-        data: ComponentData,
-        onTriggerLinked: (source: ComponentData, value: String) -> Unit
-    ) {
-        view.findViewWithTag<ClockTriggerView>("target_clock")?.onLocalTrigger = { value ->
-            onTriggerLinked(data, value)
-        }
-    }
 
     override fun onMqttMessage(
         view: View,

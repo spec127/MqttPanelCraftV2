@@ -399,6 +399,9 @@ class DashboardActivity : BaseActivity() {
                                                 _,
                                                 _ ->
                                             try {
+                                                if (MqttRepository.activeProjectId == project.id) {
+                                                    com.example.mqttpanelcraft.mqtt.MqttSessionClient.stop(this)
+                                                }
                                                 // Delete from repository; UI will refresh via
                                                 // projectsLiveData observer
                                                 ProjectRepository.deleteProject(project.id)

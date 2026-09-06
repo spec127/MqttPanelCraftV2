@@ -751,4 +751,11 @@
     <string name="mqtt_log_publish_error">Publish failed: %1$s</string>
     <string name="mqtt_log_image_reassembled">Image reassembled for %1$s</string>
     <string name="mqtt_log_message_processing_error">Message processing failed: %1$s</string>
+    <string name="setup_keep_mqtt_background">Keep MQTT connected in background</string>
+    <string name="setup_keep_mqtt_background_desc">Keeps the last opened project connected and shows a persistent notification. This may use more battery.</string>
+    <string name="mqtt_notification_connecting">Connecting…</string>
+    <string name="mqtt_notification_connected">Connected</string>
+    <string name="mqtt_notification_reconnecting">Reconnecting…</string>
+    <string name="mqtt_notification_stop">Stop MQTT</string>
+    <string name="mqtt_notification_permission_denied">Notifications are disabled. Android may show the MQTT service only in Active apps.</string>
 </resources>

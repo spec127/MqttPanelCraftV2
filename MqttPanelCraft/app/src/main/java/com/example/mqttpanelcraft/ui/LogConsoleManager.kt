@@ -1,6 +1,5 @@
 package com.example.mqttpanelcraft.ui
 
-import android.content.Intent
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -9,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.adapter.LogAdapter
-import com.example.mqttpanelcraft.service.MqttService
+import com.example.mqttpanelcraft.mqtt.MqttSessionClient
 
 class LogConsoleManager(
     private val rootView: View
@@ -88,12 +87,7 @@ class LogConsoleManager(
              val topic = etTopic?.text?.toString() ?: ""
              
              if (topic.isNotEmpty()) {
-                 val intent = Intent(rootView.context, MqttService::class.java).apply {
-                     action = "PUBLISH"
-                     putExtra("TOPIC", topic)
-                     putExtra("PAYLOAD", payload)
-                 }
-                 rootView.context.startService(intent)
+                 MqttSessionClient.publish(rootView.context, topic, payload)
                  // Trigger VM to add log (Will circle back via observation)
                  // But we don't have VM ref here.
                  // We rely on caller or Activity.
