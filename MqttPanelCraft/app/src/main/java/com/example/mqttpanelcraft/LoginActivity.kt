@@ -10,17 +10,14 @@ import java.io.File
 import android.content.ClipboardManager
 import android.content.ClipData
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.switchmaterial.SwitchMaterial
-import java.util.Locale
 import com.example.mqttpanelcraft.utils.CrashLogger
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +45,7 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             } catch (e: Exception) {
-                CrashLogger.logError(this, "Login Failed", e)
+                CrashLogger.logError(this, getString(R.string.crash_login_failed), e)
             }
         }
 
@@ -60,16 +57,16 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             } catch (e: Exception) {
-                CrashLogger.logError(this, "Guest Login Failed", e)
+                CrashLogger.logError(this, getString(R.string.crash_guest_login_failed), e)
             }
         }
 
         // Google -> Mock Toast
         btnGoogle.setOnClickListener {
             try {
-                Toast.makeText(this, "Google Sign In (UI Only)", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, R.string.auth_google_demo, Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
-                CrashLogger.logError(this, "Google Sign In Failed", e)
+                CrashLogger.logError(this, getString(R.string.crash_google_sign_in_failed), e)
             }
         }
 
@@ -79,7 +76,7 @@ class LoginActivity : AppCompatActivity() {
                 val intent = Intent(this, RegisterActivity::class.java)
                 startActivity(intent)
             } catch (e: Exception) {
-                CrashLogger.logError(this, "Register Nav Failed", e)
+                CrashLogger.logError(this, getString(R.string.crash_register_navigation_failed), e)
             }
         }
 
@@ -95,43 +92,34 @@ class LoginActivity : AppCompatActivity() {
         try {
             val file = File(getExternalFilesDir(null), "crash_log.txt")
             if (!file.exists()) {
-                Toast.makeText(this, "No crash logs found.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, R.string.crash_no_logs, Toast.LENGTH_SHORT).show()
                 return
             }
             val content = file.readText()
             
             AlertDialog.Builder(this)
-                .setTitle("Crash Logs")
+                .setTitle(R.string.crash_logs_title)
                 .setMessage(content.takeLast(2000)) // Show last 2000 chars
-                .setPositiveButton("Close", null)
-                .setNeutralButton("Copy") { _, _ ->
+                .setPositiveButton(R.string.common_btn_close, null)
+                .setNeutralButton(R.string.common_btn_copy) { _, _ ->
                     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText("Crash Log", content)
                     clipboard.setPrimaryClip(clip)
-                    Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.crash_logs_copied, Toast.LENGTH_SHORT).show()
                 }
-                .setNegativeButton("Clear") { _, _ -> 
+                .setNegativeButton(R.string.common_btn_clear) { _, _ ->
                     file.delete()
-                    Toast.makeText(this, "Logs cleared", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.crash_logs_cleared, Toast.LENGTH_SHORT).show()
                 }
                 .show()
         } catch (e: Exception) {
-            Toast.makeText(this, "Error reading logs: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                            this,
+                            getString(R.string.crash_logs_error, e.message),
+                            Toast.LENGTH_SHORT
+                    )
+                    .show()
         }
     }
 
-    // showSettingsBottomSheet removed
-    
-    private fun setLocale(languageCode: String, countryCode: String) {
-        val locale = Locale(languageCode, countryCode)
-        Locale.setDefault(locale)
-        val config = resources.configuration
-        config.setLocale(locale)
-        createConfigurationContext(config)
-        resources.updateConfiguration(config, resources.displayMetrics)
-
-        // Restart Activity
-        finish()
-        startActivity(intent)
-    }
 }

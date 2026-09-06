@@ -21,7 +21,7 @@
             app:tint="@color/props_primary"
             android:layout_marginEnd="6dp"/>
         <TextView
-            android:text="互動功能"
+            android:text="@string/properties_section_interaction"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/prop_text_secondary"
@@ -42,7 +42,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="圖形"
+            android:text="@string/val_graphic_type_rect"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:padding="0dp"/>
@@ -52,7 +52,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="線條"
+            android:text="@string/val_graphic_type_line"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:padding="0dp"/>
@@ -62,7 +62,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="圖片"
+            android:text="@string/val_graphic_type_image"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:padding="0dp"/>
@@ -80,7 +80,7 @@
             android:id="@+id/tilPolygonEdges"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="圖形種類"
+            android:hint="@string/prop_graphic_type"
             style="@style/Widget.App.TextInputLayout.Properties.DenseDropdown"
             android:layout_marginBottom="12dp">
             <AutoCompleteTextView
@@ -92,7 +92,7 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="12dp"
                 android:maxLines="1"
-                android:textSize="13sp"/>
+                android:textSize="@dimen/prop_dropdown_text_size"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.example.mqttpanelcraft.ui.views.PolygonEditorView
@@ -117,7 +117,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="4"
-            android:hint="樣式"
+            android:hint="@string/prop_graphic_line_style"
             style="@style/Widget.App.TextInputLayout.Properties.DenseDropdown"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="12dp">
@@ -130,14 +130,14 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="12dp"
                 android:maxLines="1"
-                android:textSize="13sp"/>
+                android:textSize="@dimen/prop_dropdown_text_size"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="6"
-            android:hint="粗細"
+            android:hint="@string/prop_graphic_stroke_width"
             style="@style/Widget.App.TextInputLayout.Properties"
             android:layout_marginBottom="12dp">
             <com.google.android.material.textfield.TextInputEditText
@@ -161,7 +161,7 @@
             android:id="@+id/btnUploadImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="選擇本地圖片"
+            android:text="@string/graphic_select_local_image"
             style="@style/Widget.App.Button.Outlined.Properties"
             app:icon="@android:drawable/ic_menu_gallery"
             android:layout_marginBottom="12dp"/>
@@ -217,7 +217,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="水平"
+            android:text="@string/val_line_horizontal"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:padding="0dp"/>
@@ -227,7 +227,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="垂直"
+            android:text="@string/val_line_vertical"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:padding="0dp"/>
@@ -316,7 +316,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="啟用圓角"
+                android:text="@string/prop_graphic_corner_radius"
                 android:textColor="@color/prop_text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
@@ -324,7 +324,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="柔化圖形與邊框的轉角"
+                android:text="@string/graphic_rounded_desc"
                 android:textColor="@color/prop_text_secondary"
                 android:textSize="11sp"/>
         </LinearLayout>

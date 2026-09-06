@@ -12,15 +12,19 @@
     <!-- 輸入框圓角半徑 (全局預設 = 16dp) -->
     <dimen name="prop_input_corner_radius">16dp</dimen>
 
-    <!-- 緊湊型圓角半徑：供 Slider 的緊湊下拉選單使用 (= 12dp) -->
-    <dimen name="prop_input_corner_radius_compact">12dp</dimen>
+    <!-- 舊版緊湊令牌保留相容；下拉選單已統一為 16dp。 -->
+    <dimen name="prop_input_corner_radius_compact">16dp</dimen>
 
     <!-- 內部 EditText / AutoCompleteTextView 高度 (全局預設 = 52dp)
          配合 TextInputLayout 在 wrap_content 下展開後的整體高度約 56dp -->
     <dimen name="prop_input_height_inner">52dp</dimen>
 
     <!-- 成對緊湊欄位的內部高度，讓下拉與數字輸入保持等高 -->
-    <dimen name="prop_input_height_compact_inner">48dp</dimen>
+    <dimen name="prop_input_height_compact_inner">52dp</dimen>
+
+    <!-- 所有元件屬性下拉選單共用字級與水平內距。 -->
+    <dimen name="prop_dropdown_text_size">13sp</dimen>
+    <dimen name="prop_dropdown_padding_horizontal">16dp</dimen>
 
     <!-- MaterialButtonToggleGroup 切換列高度 (全局預設 = 36dp) -->
     <dimen name="prop_toggle_height">36dp</dimen>

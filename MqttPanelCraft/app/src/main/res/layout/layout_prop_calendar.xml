@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="日期格式">
+            android:hint="@string/calendar_date_format">
             <AutoCompleteTextView
                 android:id="@+id/spDateFormat"
                 android:layout_width="match_parent"
@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="時間格式">
+            android:hint="@string/calendar_time_format">
             <AutoCompleteTextView
                 android:id="@+id/spTimeFormat"
                 android:layout_width="match_parent"
@@ -110,7 +110,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.4"
-                android:hint="外觀風格">
+                android:hint="@string/calendar_style_hint">
                 <AutoCompleteTextView
                     android:id="@+id/spVisualStyle"
                     android:layout_width="match_parent"

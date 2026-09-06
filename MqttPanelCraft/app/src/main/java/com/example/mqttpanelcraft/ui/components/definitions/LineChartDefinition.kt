@@ -13,6 +13,8 @@ import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
+import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.textfield.TextInputEditText
 import org.json.JSONObject
@@ -35,7 +37,7 @@ object LineChartDefinition : IComponentDefinition {
     override val propertiesLayoutId: Int = R.layout.layout_prop_line_chart
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
-        "title" to "折線圖",
+        "title" to "Line Chart",
         "has_timestamp" to "false",
         "max_points" to "50",
         "series_mode" to "SINGLE",
@@ -54,6 +56,11 @@ object LineChartDefinition : IComponentDefinition {
         "series_color_5" to "#9C27B0",
         "series_color_6" to "#FFEB3B"
     )
+
+    override fun getDefaultProps(context: Context): Map<String, String> =
+            getDefaultProps().toMutableMap().apply {
+                put("title", context.getString(R.string.component_label_chart))
+            }
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
@@ -325,23 +332,22 @@ object LineChartDefinition : IComponentDefinition {
         }
 
         // 5. 風格下拉選單
-        val spStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spChartStyle)
-        val styleList = listOf("Solid", "Smooth", "Area")
-        val styleNames = listOf(
-            context.getString(R.string.prop_chart_style_solid),
-            context.getString(R.string.prop_chart_style_smooth),
-            context.getString(R.string.prop_chart_style_area)
+        CommonPropBinder.bindLocalizedDropdown(
+            panelView,
+            R.id.spChartStyle,
+            "chart_style",
+            data,
+            onUpdate,
+            listOf(
+                PropertyOption("Solid", R.string.prop_chart_style_solid),
+                PropertyOption("Smooth", R.string.prop_chart_style_smooth),
+                PropertyOption("Area", R.string.prop_chart_style_area)
+            ),
+            "Solid"
         )
-        spStyle?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, styleNames))
-        val curStyle = data.props["chart_style"] ?: "Solid"
-        val sIdx = styleList.indexOf(curStyle).coerceAtLeast(0)
-        spStyle?.setText(styleNames[sIdx], false)
-        spStyle?.setOnItemClickListener { _, _, pos, _ ->
-            onUpdate("chart_style", styleList[pos])
-        }
 
         // 6. 網格顏色選單
-        com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder.bindColorPalette(
+        CommonPropBinder.bindColorPalette(
             panelView,
             R.id.containerGridColor,
             "grid_color",

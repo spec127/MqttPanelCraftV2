@@ -4,11 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : BaseActivity() {
 
     private var countDownTimer: CountDownTimer? = null
 
@@ -23,13 +22,13 @@ class RegisterActivity : AppCompatActivity() {
         // Send Code -> Mock Countdown
         btnSendCode.setOnClickListener {
             startCountdown(btnSendCode)
-            Toast.makeText(this, "Verification code sent (Mock)", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.auth_code_sent, Toast.LENGTH_SHORT).show()
         }
 
         // Register -> Return to Login (Mock)
         btnRegisterAction.setOnClickListener {
             // Validation logic would go here
-            Toast.makeText(this, "Registration Successful (Mock)", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.auth_registration_success, Toast.LENGTH_SHORT).show()
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
@@ -42,12 +41,12 @@ class RegisterActivity : AppCompatActivity() {
         countDownTimer = object : CountDownTimer(30000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsRemaining = millisUntilFinished / 1000
-                button.text = "${secondsRemaining}s"
+                button.text = getString(R.string.auth_resend_countdown, secondsRemaining)
             }
 
             override fun onFinish() {
                 button.isEnabled = true
-                button.text = "Send"
+                button.setText(R.string.auth_send)
             }
         }.start()
     }

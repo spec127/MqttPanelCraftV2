@@ -181,7 +181,7 @@ class PropertiesSheetManager(
                             ClipboardManager
             val clip = ClipData.newPlainText("Topic", full)
             clipboard.setPrimaryClip(clip)
-            Toast.makeText(propertyContainer.context, "Topic Copied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(propertyContainer.context, R.string.topic_copied, Toast.LENGTH_SHORT).show()
         }
 
         btnTopicCopy?.setOnClickListener {
@@ -191,7 +191,7 @@ class PropertiesSheetManager(
                             ClipboardManager
             val clip = ClipData.newPlainText("Topic", full)
             clipboard.setPrimaryClip(clip)
-            Toast.makeText(propertyContainer.context, "Topic Copied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(propertyContainer.context, R.string.topic_copied, Toast.LENGTH_SHORT).show()
         }
 
         // vPropColorPreview Listener - REMOVED
@@ -366,7 +366,15 @@ class PropertiesSheetManager(
                     }
                 } catch (e: Exception) {
                     android.util.Log.e("PropsManager", "Error inflating/binding specific props", e)
-                    Toast.makeText(propertyContainer.context, "加載專屬屬性失敗: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                                    propertyContainer.context,
+                                    propertyContainer.context.getString(
+                                            R.string.error_property_panel,
+                                            e.message
+                                    ),
+                                    Toast.LENGTH_SHORT
+                            )
+                            .show()
                 }
             } else {
                 android.util.Log.w("PropsManager", "No definition or layout for type: $typeClean")

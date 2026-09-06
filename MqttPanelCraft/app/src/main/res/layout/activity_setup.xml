@@ -332,7 +332,7 @@
                             android:id="@+id/tvHome"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Panel"
+                            android:text="@string/setup_mode_panel"
                             android:textStyle="bold"
                             android:textColor="@color/setup_accent_color"
                             android:textSize="14sp"/>
@@ -364,7 +364,7 @@
                             android:id="@+id/tvWebview"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Webview"
+                            android:text="@string/setup_mode_webview"
                             android:textStyle="bold"
                             android:textColor="#94A3B8"
                             android:textSize="14sp"/>

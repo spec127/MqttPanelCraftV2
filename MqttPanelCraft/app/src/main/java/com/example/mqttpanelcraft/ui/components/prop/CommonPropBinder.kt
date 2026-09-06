@@ -8,9 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.StringRes
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.data.ColorHistoryManager
@@ -261,6 +264,61 @@ object CommonPropBinder {
     fun setVisibleWhen(value: String?, expectedValue: String, vararg views: View?) {
         val visibility = if (value == expectedValue) View.VISIBLE else View.GONE
         views.forEach { it?.visibility = visibility }
+    }
+
+    /**
+     * Binds the linked-component checklist used by receiver and local-trigger components.
+     * Component ids remain the only values persisted in JSON; labels and topics are presentation.
+     */
+    fun bindLinkedComponents(
+        panelView: View,
+        containerId: Int,
+        data: ComponentData,
+        candidates: List<ComponentData>,
+        onUpdate: (String, String) -> Unit,
+        includeOwner: Boolean = true,
+        @StringRes emptyTextResId: Int = 0,
+        itemLabel: (ComponentData) -> String = { "${it.label} (${it.topicConfig})" },
+        ownerLabel: (ComponentData) -> String = itemLabel
+    ) {
+        val container = panelView.findViewById<LinearLayout>(containerId) ?: return
+        val context = panelView.context
+        val linked = data.props["linked_components"]
+            .orEmpty()
+            .split(",")
+            .map(String::trim)
+            .filter(String::isNotEmpty)
+            .toMutableSet()
+        val targets = candidates.filter { it.id != data.id }
+
+        container.removeAllViews()
+        if (includeOwner) {
+            container.addView((LayoutInflater.from(context)
+                .inflate(R.layout.item_prop_linked_component, container, false) as CheckBox).apply {
+                text = ownerLabel(data)
+                isChecked = true
+                isEnabled = false
+                alpha = 0.5f
+            })
+        }
+        targets.forEach { component ->
+            container.addView((LayoutInflater.from(context)
+                .inflate(R.layout.item_prop_linked_component, container, false) as CheckBox).apply {
+                text = itemLabel(component)
+                isChecked = component.id.toString() in linked
+                setOnCheckedChangeListener { _, checked ->
+                    if (checked) linked.add(component.id.toString())
+                    else linked.remove(component.id.toString())
+                    onUpdate("linked_components", linked.joinToString(","))
+                }
+            })
+        }
+        if (targets.isEmpty() && emptyTextResId != 0) {
+            container.addView((LayoutInflater.from(context)
+                .inflate(R.layout.item_prop_linked_empty, container, false) as TextView).apply {
+                setText(emptyTextResId)
+            })
+        }
     }
     
     fun bindSwitch(

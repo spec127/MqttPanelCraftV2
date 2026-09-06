@@ -21,6 +21,7 @@ import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.LocalComponentTriggerSource
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.ClockTriggerView
 import com.google.android.material.button.MaterialButtonToggleGroup
 
@@ -67,15 +68,7 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
     }
 
     override fun bindPropertiesPanel(panelView: View, data: ComponentData, onUpdate: (String, String) -> Unit) {
-        val modeToggle = panelView.findViewById<MaterialButtonToggleGroup>(R.id.tgClockMode)
         val initialMode = data.props["clock_mode"] ?: "TIME"
-        modeToggle?.check(
-            when (initialMode) {
-                "COUNTDOWN" -> R.id.btnClockModeCountdown
-                "SCHEDULE" -> R.id.btnClockModeSchedule
-                else -> R.id.btnClockModeTime
-            }
-        )
         CommonPropBinder.bindDropdown(
             panelView, R.id.spClockTimeFormat, "time_format", data, onUpdate,
             listOf("HH:mm:ss", "HH:mm", "hh:mm a"),
@@ -86,7 +79,8 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
         CommonPropBinder.bindEditText(panelView, R.id.etTriggerValue, "trigger_value", data, onUpdate, "TRIGGER")
         CommonPropBinder.bindColorPalette(
             panelView, R.id.propClockColor, "color", data, onUpdate,
-            label = "主題顏色", defaultColor = "#7B1FA2"
+            label = panelView.context.getString(R.string.properties_label_theme_color),
+            defaultColor = "#7B1FA2"
         )
 
         val countdownContainer = panelView.findViewById<View>(R.id.containerCountdownSeconds)
@@ -98,67 +92,56 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
             triggerContainer?.visibility = if (mode == "TIME") View.GONE else View.VISIBLE
         }
         updateVisibility(initialMode)
-        modeToggle?.addOnButtonCheckedListener { _, checkedId, checked ->
-            if (checked) {
-                val mode = when (checkedId) {
-                    R.id.btnClockModeCountdown -> "COUNTDOWN"
-                    R.id.btnClockModeSchedule -> "SCHEDULE"
-                    else -> "TIME"
-                }
+        CommonPropBinder.bindToggleGroup(
+                panelView,
+                R.id.tgClockMode,
+                "clock_mode",
+                data,
+                { _, mode ->
                 updateVisibility(mode)
                 onUpdate("clock_mode", mode)
-            }
-        }
+                },
+                mapOf(
+                        R.id.btnClockModeTime to "TIME",
+                        R.id.btnClockModeCountdown to "COUNTDOWN",
+                        R.id.btnClockModeSchedule to "SCHEDULE"
+                )
+        )
 
-        CommonPropBinder.bindDropdown(
-            panelView, R.id.spClockVisualStyle, "visual_style", data, onUpdate,
-            listOf("數字鐘", "類比時鐘", "雙顯時鐘"),
-            mapOf(
-                "數字鐘" to "DIGITAL",
-                "類比時鐘" to "ANALOG",
-                "雙顯時鐘" to "COMBO",
-                "指針+數字" to "COMBO",
-                "兩者都有" to "COMBO"
+        CommonPropBinder.bindLocalizedDropdown(
+            panelView,
+            R.id.spClockVisualStyle,
+            "visual_style",
+            data,
+            onUpdate,
+            listOf(
+                PropertyOption("DIGITAL", R.string.clock_style_digital),
+                PropertyOption("ANALOG", R.string.clock_style_analog),
+                PropertyOption("COMBO", R.string.clock_style_combo)
             ),
-            defaultValue = "DIGITAL"
+            "DIGITAL"
         )
 
         bindLinkedComponents(panelView, data, onUpdate)
     }
 
     private fun bindLinkedComponents(panelView: View, data: ComponentData, onUpdate: (String, String) -> Unit) {
-        val container = panelView.findViewById<LinearLayout>(R.id.containerClockLinkedComponents) ?: return
-        container.removeAllViews()
-        val linked = data.props["linked_components"].orEmpty().split(",").filter { it.isNotBlank() }.toMutableSet()
         val owner = findActivity(panelView.context) as? ViewModelStoreOwner
         val components = owner?.let { ViewModelProvider(it)[ProjectViewModel::class.java].components.value }.orEmpty()
         val targets = components.filter { component ->
             component.id != data.id &&
                     ComponentDefinitionRegistry.get(component.type)?.group == ComponentGroup.CONTROL
         }
-        container.addView(CheckBox(panelView.context).apply {
-            text = "${data.label}（時鐘本身不發送）"
-            isChecked = true
-            isEnabled = false
-            alpha = 0.5f
-        })
-        targets.forEach { component ->
-            container.addView(CheckBox(panelView.context).apply {
-                text = component.label
-                isChecked = component.id.toString() in linked
-                setOnCheckedChangeListener { _, checked ->
-                    if (checked) linked.add(component.id.toString()) else linked.remove(component.id.toString())
-                    onUpdate("linked_components", linked.joinToString(","))
-                }
-            })
-        }
-        if (targets.isEmpty()) {
-            container.addView(TextView(panelView.context).apply {
-                text = "目前沒有可連動的控制元件"
-                textSize = 12f
-                setTextColor(Color.parseColor("#7A7080"))
-            })
-        }
+        CommonPropBinder.bindLinkedComponents(
+            panelView,
+            R.id.containerClockLinkedComponents,
+            data,
+            targets,
+            onUpdate,
+            emptyTextResId = R.string.clock_no_linked,
+            itemLabel = { it.label },
+            ownerLabel = { panelView.context.getString(R.string.clock_self_linked, it.label) }
+        )
     }
 
     private fun findActivity(context: Context): Activity? {

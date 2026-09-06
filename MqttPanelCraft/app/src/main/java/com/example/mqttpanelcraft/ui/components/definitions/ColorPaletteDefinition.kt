@@ -14,6 +14,7 @@ import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.ColorPaletteView
 import com.example.mqttpanelcraft.utils.TextWatcherAdapter
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -236,74 +237,54 @@ object ColorPaletteDefinition : IComponentDefinition {
                 }
 
                 // 4. Control Target Dropdown
-                val tvTarget =
-                        panelView.findViewById<android.widget.AutoCompleteTextView>(
-                                R.id.tvControlTarget
-                        )
                 val targetOptions =
                         listOf(
-                                context.getString(R.string.val_palette_target_brightness) to
-                                        "Brightness",
-                                context.getString(R.string.val_palette_target_saturation) to
-                                        "Saturation"
+                                PropertyOption("Brightness", R.string.val_palette_target_brightness),
+                                PropertyOption("Saturation", R.string.val_palette_target_saturation)
                         )
-                val targetAdapter =
-                        android.widget.ArrayAdapter(
-                                context,
-                                android.R.layout.simple_dropdown_item_1line,
-                                targetOptions.map { it.first }
-                        )
-                tvTarget?.setAdapter(targetAdapter)
-                tvTarget?.setText(
-                        targetOptions
-                                .find { it.second == (data.props["target"] ?: "Brightness") }
-                                ?.first,
-                        false
+                CommonPropBinder.bindLocalizedDropdown(
+                        panelView,
+                        R.id.tvControlTarget,
+                        "target",
+                        data,
+                        { key, nextTarget ->
+                                currentTarget = nextTarget
+                                onUpdate(key, nextTarget)
+                                val currentStyle =
+                                        if (toggleStyle?.checkedButtonId == R.id.btnStyleSquare)
+                                                "Square Pad"
+                                        else "Arc Ring"
+                                val currentMode =
+                                        if (toggleMode?.checkedButtonId == R.id.btnModeMono) "Monochrome"
+                                        else "Full Color"
+                                updateSharedVisibility(currentStyle, currentMode, nextTarget)
+                        },
+                        targetOptions,
+                        "Brightness"
                 )
-                tvTarget?.setOnItemClickListener { _, _, position, _ ->
-                        val nextTarget = targetOptions[position].second
-                        currentTarget = nextTarget
-                        onUpdate("target", nextTarget)
-
-                        val currentStyle =
-                                if (toggleStyle?.checkedButtonId == R.id.btnStyleSquare)
-                                        "Square Pad"
-                                else "Arc Ring"
-                        val currentMode =
-                                if (toggleMode?.checkedButtonId == R.id.btnModeMono) "Monochrome"
-                                else "Full Color"
-
-                        updateSharedVisibility(currentStyle, currentMode, nextTarget)
-                }
 
                 // 5. Send Strategy
-                val tvStrategy =
-                        panelView.findViewById<android.widget.AutoCompleteTextView>(
-                                R.id.tvSendStrategy
-                        )
                 val strategyOptions =
                         listOf(
-                                context.getString(R.string.val_strategy_release) to "On Release",
-                                context.getString(R.string.val_strategy_continuous) to "Continuous"
+                                PropertyOption("On Release", R.string.val_strategy_release),
+                                PropertyOption("Continuous", R.string.val_strategy_continuous)
                         )
-                val strategyAdapter =
-                        android.widget.ArrayAdapter(
-                                context,
-                                android.R.layout.simple_dropdown_item_1line,
-                                strategyOptions.map { it.first }
-                        )
-                tvStrategy?.setAdapter(strategyAdapter)
                 val curStrategy = data.props["strategy"] ?: "On Release"
-                tvStrategy?.setText(strategyOptions.find { it.second == curStrategy }?.first, false)
                 containerInterval?.visibility =
                         if (curStrategy == "Continuous") View.VISIBLE else View.GONE
-
-                tvStrategy?.setOnItemClickListener { _, _, position, _ ->
-                        val newStrategy = strategyOptions[position].second
-                        onUpdate("strategy", newStrategy)
-                        containerInterval?.visibility =
-                                if (newStrategy == "Continuous") View.VISIBLE else View.GONE
-                }
+                CommonPropBinder.bindLocalizedDropdown(
+                        panelView,
+                        R.id.tvSendStrategy,
+                        "strategy",
+                        data,
+                        { key, newStrategy ->
+                                onUpdate(key, newStrategy)
+                                containerInterval?.visibility =
+                                        if (newStrategy == "Continuous") View.VISIBLE else View.GONE
+                        },
+                        strategyOptions,
+                        "On Release"
+                )
 
                 // 6. Interval
                 CommonPropBinder.bindEditText(
@@ -316,32 +297,21 @@ object ColorPaletteDefinition : IComponentDefinition {
                 )
 
                 // 7. Data Format
-                val tvFormat =
-                        panelView.findViewById<android.widget.AutoCompleteTextView>(
-                                R.id.tvDataFormat
-                        )
                 val formatOptions =
                         listOf(
-                                context.getString(R.string.val_format_hex) to "Hex String",
-                                context.getString(R.string.val_format_json_hsv) to "JSON (HSV)",
-                                context.getString(R.string.val_format_json_rgb) to "JSON (RGB)"
+                                PropertyOption("Hex String", R.string.val_format_hex),
+                                PropertyOption("JSON (HSV)", R.string.val_format_json_hsv),
+                                PropertyOption("JSON (RGB)", R.string.val_format_json_rgb)
                         )
-                val formatAdapter =
-                        android.widget.ArrayAdapter(
-                                context,
-                                android.R.layout.simple_dropdown_item_1line,
-                                formatOptions.map { it.first }
-                        )
-                tvFormat?.setAdapter(formatAdapter)
-                tvFormat?.setText(
-                        formatOptions
-                                .find { it.second == (data.props["format"] ?: "Hex String") }
-                                ?.first,
-                        false
+                CommonPropBinder.bindLocalizedDropdown(
+                        panelView,
+                        R.id.tvDataFormat,
+                        "format",
+                        data,
+                        onUpdate,
+                        formatOptions,
+                        "Hex String"
                 )
-                tvFormat?.setOnItemClickListener { _, _, position, _ ->
-                        onUpdate("format", formatOptions[position].second)
-                }
         }
 
         override fun attachBehavior(

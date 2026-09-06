@@ -167,7 +167,7 @@ class ImageDisplayView @JvmOverloads constructor(
             layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f)
             textSize = 10f
             setTextColor(if (isDarkMode) Color.parseColor("#E2E8F0") else Color.parseColor("#334155"))
-            text = "無圖片 | 800x600px"
+            text = context.getString(R.string.image_no_image_resolution)
             visibility = View.VISIBLE
         }
         bottomBar.addView(infoTextView)
@@ -219,9 +219,9 @@ class ImageDisplayView @JvmOverloads constructor(
     private fun updatePlaceholderText() {
         val label = placeholderView.findViewById<TextView>(R.id.tvPayloadLabel)
         label?.text = if (streamMode == "SINGLE") {
-            "單次快照 • 等待圖片傳入"
+            context.getString(R.string.image_waiting_snapshot)
         } else {
-            "連續串流 ($fps FPS) • 等待推流"
+            context.getString(R.string.image_waiting_stream, fps)
         }
     }
 
@@ -231,7 +231,7 @@ class ImageDisplayView @JvmOverloads constructor(
         chunkBuffer.clear()
         imageView.setImageDrawable(null)
         placeholderView.visibility = View.VISIBLE
-        infoTextView.text = "無圖片 | 等待傳送"
+        infoTextView.text = context.getString(R.string.image_no_image_waiting)
         if (hadData) {
             onImageCleared?.invoke()
         }
@@ -311,7 +311,7 @@ class ImageDisplayView @JvmOverloads constructor(
                     context.contentResolver.openOutputStream(uri)?.use {
                         bmp.compress(Bitmap.CompressFormat.JPEG, 95, it)
                     }
-                    savedPath = "相簿 (Pictures/MqttPanelCraft)"
+                    savedPath = context.getString(R.string.image_gallery_location)
                 }
             } else {
                 // Android 9 (API 28) 及以下 (包含使用者的 Android 7.1.2)
@@ -352,12 +352,27 @@ class ImageDisplayView @JvmOverloads constructor(
             }
 
             if (savedPath != null) {
-                Toast.makeText(context, "已保存快照至: $savedPath (${bmp.width}x${bmp.height})", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                                context,
+                                context.getString(
+                                        R.string.image_saved,
+                                        savedPath,
+                                        bmp.width,
+                                        bmp.height
+                                ),
+                                Toast.LENGTH_LONG
+                        )
+                        .show()
             } else {
-                Toast.makeText(context, "快照保存失敗: 無法建立檔案 (請檢查儲存權限)", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.image_save_create_failed, Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            Toast.makeText(context, "快照保存失敗: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                            context,
+                            context.getString(R.string.image_save_failed, e.localizedMessage),
+                            Toast.LENGTH_LONG
+                    )
+                    .show()
         }
     }
 

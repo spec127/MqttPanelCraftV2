@@ -13,12 +13,16 @@ android {
         viewBinding = true
     }
 
+    androidResources {
+        generateLocaleConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
-        versionCode = 205
-        versionName = "0.14.7"
+        versionCode = 206
+        versionName = "0.14.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

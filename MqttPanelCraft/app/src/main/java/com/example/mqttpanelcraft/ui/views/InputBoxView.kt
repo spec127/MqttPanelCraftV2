@@ -71,7 +71,7 @@ class InputBoxView(context: Context) : FrameLayout(context) {
         inputField.setBackgroundColor(Color.TRANSPARENT)
         inputField.setTextColor(Color.BLACK)
         inputField.textSize = 14f
-        inputField.hint = "Enter text..."
+        inputField.hint = context.getString(R.string.input_text_hint)
         inputField.maxLines = 1
         inputField.isSingleLine = true
         inputField.setHorizontallyScrolling(true)

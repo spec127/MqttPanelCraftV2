@@ -44,7 +44,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="4"
-        android:hint="序列名稱 (Key)"
+        android:hint="@string/prop_chart_series_key_hint"
         style="@style/Widget.App.TextInputLayout.Properties">
 
         <com.google.android.material.textfield.TextInputEditText

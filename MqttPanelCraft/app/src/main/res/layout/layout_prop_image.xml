@@ -70,7 +70,7 @@
                     android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="適應"
+                    android:text="@string/prop_fit_contain"
                     android:textColor="@color/props_primary"
                     android:textSize="13sp"
                     android:textStyle="bold"/>
@@ -206,9 +206,9 @@
                 <AutoCompleteTextView
                     android:id="@+id/spImageRot"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="none"
-                    android:textSize="12sp"/>
+                    android:textSize="@dimen/prop_dropdown_text_size"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Color Palette -->

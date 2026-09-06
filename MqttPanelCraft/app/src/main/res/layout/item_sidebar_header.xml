@@ -24,7 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="CATEGORY"
+        android:text="@string/preview_category"
         android:textSize="13sp"
         android:textStyle="bold"
         android:textAllCaps="true"

@@ -661,7 +661,7 @@ object SelectorDefinition : IComponentDefinition {
                         btnToggle.setImageResource(R.drawable.ic_emoji_emotions)
                         etLabel.visibility = View.VISIBLE
                         llIconSelector.visibility = View.GONE
-                        etLabel.hint = "Label"
+                        etLabel.hint = context.getString(R.string.prop_label_label_caps)
                     }
                 }
                 updateRefIcon()
@@ -832,7 +832,7 @@ object SelectorDefinition : IComponentDefinition {
                 )
             }
         } catch (e: Exception) {
-            return mutableListOf(Segment("Error", "0"))
+            return mutableListOf(Segment("?", "0"))
         }
         return list
     }

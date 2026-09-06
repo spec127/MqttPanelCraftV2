@@ -15,6 +15,9 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        com.example.mqttpanelcraft.utils.LocaleManager.initialize(this)
+        MqttRepository.initializeContext(this)
+
         // Restore Theme Preference
         val prefs = getSharedPreferences("AppSettings", android.content.Context.MODE_PRIVATE)
         val isDarkMode = prefs.getBoolean("dark_mode", false)
@@ -47,7 +50,12 @@ class MyApplication : Application() {
             // Try to show a toast on UI thread if possible (best effort), mainly for dev loop
             // In a real crash, this might not show if Looper is killed.
             Handler(Looper.getMainLooper()).post {
-                Toast.makeText(this, "CRASHED! Saved to ${file.name}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                                this,
+                                getString(R.string.crash_saved, file.name),
+                                Toast.LENGTH_LONG
+                        )
+                        .show()
             }
             
         } catch (ioe: Exception) {
@@ -59,7 +67,4 @@ class MyApplication : Application() {
         exitProcess(1)
     }
 
-    override fun attachBaseContext(base: android.content.Context) {
-        super.attachBaseContext(com.example.mqttpanelcraft.utils.LocaleManager.onAttach(base))
-    }
 }

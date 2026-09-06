@@ -49,7 +49,7 @@
                     android:layout_toStartOf="@+id/indicatorMqttStatus"
                     android:paddingStart="52dp"
                     android:paddingEnd="8dp"
-                    android:text="Project Title"
+                    android:text="@string/app_name"
                     android:textColor="@color/toolbar_text"
                     android:textSize="20sp"
                     android:textStyle="bold"
@@ -227,7 +227,7 @@
                             android:id="@+id/tvHeaderDelete"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="刪除"
+                            android:text="@string/common_btn_delete"
                             android:textColor="@android:color/white"
                             android:textStyle="bold"
                             android:textSize="18sp"
@@ -292,7 +292,7 @@
                                     android:focusable="true"
                                     app:tint="@color/prop_text_secondary"
                                     android:padding="4dp"
-                                    android:contentDescription="Clear Logs"/> 
+                                    android:contentDescription="@string/content_desc_clear_logs"/>
                             </LinearLayout>
                                 
                             <androidx.recyclerview.widget.RecyclerView

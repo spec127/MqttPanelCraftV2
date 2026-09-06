@@ -1,5 +1,6 @@
 package com.example.mqttpanelcraft
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import java.util.Collections
@@ -7,9 +8,14 @@ import java.util.concurrent.ConcurrentHashMap
 import org.eclipse.paho.client.mqttv3.MqttClient
 
 object MqttRepository {
+    private var applicationContext: Context? = null
     var mqttClient: MqttClient? = null
     var account: String = ""
     var project: String = ""
+
+    fun initializeContext(context: Context) {
+        applicationContext = context.applicationContext
+    }
 
     // Log history (Text only)
     private val _logHistory = Collections.synchronizedList(mutableListOf<String>())
@@ -168,7 +174,11 @@ object MqttRepository {
                                 imageBuffer.remove(topic)
                                 imageTotals.remove(topic)
                                 if (shouldLog) {
-                                    addLog("Image reassembled for $topic", timestamp)
+                                    addLog(
+                                        applicationContext?.getString(R.string.mqtt_log_image_reassembled, topic)
+                                            ?: topic,
+                                        timestamp
+                                    )
                                 }
                             }
                         }
@@ -178,7 +188,11 @@ object MqttRepository {
         } catch (e: Exception) {
             // Only log errors for active project or general errors
             if (shouldLog) {
-                addLog("Error processing message: ${e.message}", timestamp)
+                addLog(
+                    applicationContext?.getString(R.string.mqtt_log_message_processing_error, e.message.orEmpty())
+                        ?: e.message.orEmpty(),
+                    timestamp
+                )
             }
         }
     }

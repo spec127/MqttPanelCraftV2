@@ -1,54 +1,74 @@
 package com.example.mqttpanelcraft.utils
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.os.Build
-import android.os.LocaleList
-import java.util.Locale
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 
 /**
  * Manages App-wide Locale Settings.
- * Supports: "en" (English), "zh" (Traditional Chinese), "auto" (System Default).
+ * Uses AppCompat application locales so Android 13's per-app language setting and the in-app
+ * selector share one source of truth.
  */
 object LocaleManager {
 
     private const val PREFS_NAME = "AppSettings"
     private const val KEY_LANGUAGE = "language_code"
+    private const val KEY_PLATFORM_MIGRATED = "platform_locale_migrated"
     
     // Constant codes
     const val CODE_AUTO = "auto"
     const val CODE_EN = "en"
-    const val CODE_ZH = "zh"
+    const val CODE_ZH = "zh-TW"
     const val CODE_CN = "zh-CN"
+    private const val LEGACY_CODE_ZH = "zh"
 
     /**
      * Set the language and save to preferences.
      * Returns the new Context (though for Activities, recreation is usually needed).
      */
-    fun setLocale(context: Context, languageCode: String): Context {
-        persistLanguage(context, languageCode)
-        return updateResources(context, languageCode)
+    fun setLocale(context: Context, languageCode: String) {
+        val normalizedCode = normalizeCode(languageCode)
+        persistLanguage(context, normalizedCode)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit().putBoolean(KEY_PLATFORM_MIGRATED, true).apply()
+        }
+        AppCompatDelegate.setApplicationLocales(toLocaleList(normalizedCode))
     }
 
     /**
      * Called from BaseActivity.attachBaseContext to apply the persisted language.
      */
-    fun onAttach(context: Context): Context {
-        val lang = getPersistedLanguage(context)
-        return updateResources(context, lang)
+    fun initialize(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val stored = prefs.getString(KEY_LANGUAGE, CODE_AUTO) ?: CODE_AUTO
+        val normalized = normalizeCode(stored)
+        if (stored != normalized) persistLanguage(context, normalized)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val platformCode = codeFromLocaleList(AppCompatDelegate.getApplicationLocales())
+            val migrated = prefs.getBoolean(KEY_PLATFORM_MIGRATED, false)
+            if (!migrated && platformCode == CODE_AUTO && normalized != CODE_AUTO) {
+                AppCompatDelegate.setApplicationLocales(toLocaleList(normalized))
+            } else {
+                persistLanguage(context, platformCode)
+            }
+            prefs.edit().putBoolean(KEY_PLATFORM_MIGRATED, true).apply()
+        } else {
+            AppCompatDelegate.setApplicationLocales(toLocaleList(normalized))
+        }
     }
 
     /**
      * Get the currently selected language code (e.g. "en", "zh", "auto").
      */
     fun getLanguageCode(context: Context): String {
-        return getPersistedLanguage(context)
-    }
-
-    private fun getPersistedLanguage(context: Context): String {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return codeFromLocaleList(AppCompatDelegate.getApplicationLocales())
+        }
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getString(KEY_LANGUAGE, CODE_AUTO) ?: CODE_AUTO
+        return normalizeCode(prefs.getString(KEY_LANGUAGE, CODE_AUTO) ?: CODE_AUTO)
     }
 
     private fun persistLanguage(context: Context, language: String) {
@@ -56,37 +76,26 @@ object LocaleManager {
         prefs.edit().putString(KEY_LANGUAGE, language).apply()
     }
 
-    private fun updateResources(context: Context, language: String): Context {
-        val locale = getLocaleForCode(language)
-        Locale.setDefault(locale)
-
-        val res = context.resources
-        val config = Configuration(res.configuration)
-        
-        // Apply Locale to Configuration
-        config.setLocale(locale)
-        config.setLayoutDirection(locale)
-
-        // For API 24+, we must use createConfigurationContext
-        return context.createConfigurationContext(config)
-    }
-    
-    /**
-     * Resolves the String code to a real Locale object.
-     * Handles "auto" by returning the System's default locale.
-     */
-    private fun getLocaleForCode(code: String): Locale {
+    private fun normalizeCode(code: String): String {
         return when (code) {
-            CODE_ZH -> Locale.TRADITIONAL_CHINESE
-            CODE_CN -> Locale.SIMPLIFIED_CHINESE
-            CODE_EN -> Locale.ENGLISH
-            CODE_AUTO -> getSystemLocale()
-            else -> Locale.ENGLISH // Fallback
+            CODE_AUTO -> CODE_AUTO
+            CODE_EN -> CODE_EN
+            LEGACY_CODE_ZH, CODE_ZH -> CODE_ZH
+            CODE_CN -> CODE_CN
+            else -> CODE_AUTO
         }
     }
 
-    private fun getSystemLocale(): Locale {
-        val localeList = LocaleList.getDefault()
-        return localeList[0]
+    private fun toLocaleList(code: String): LocaleListCompat =
+            if (code == CODE_AUTO) LocaleListCompat.getEmptyLocaleList()
+            else LocaleListCompat.forLanguageTags(code)
+
+    private fun codeFromLocaleList(locales: LocaleListCompat): String {
+        val locale = locales.get(0) ?: return CODE_AUTO
+        return when (locale.language) {
+            "en" -> CODE_EN
+            "zh" -> if (locale.country.equals("CN", true) || locale.script.equals("Hans", true)) CODE_CN else CODE_ZH
+            else -> CODE_AUTO
+        }
     }
 }

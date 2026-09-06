@@ -21,7 +21,7 @@
             android:layout_marginEnd="6dp"/>
             
         <TextView
-            android:text="互動功能"
+            android:text="@string/properties_section_interaction"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/prop_text_secondary"
@@ -77,7 +77,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:hint="單位 (Unit)"
+            android:hint="@string/meter_unit"
             style="@style/Widget.App.TextInputLayout.Properties">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etUnit"
@@ -108,14 +108,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="門檻值變色"
+                android:text="@string/meter_threshold_title"
                 android:textColor="@color/prop_text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="啟用數值分段變色與漸層效果"
+                android:text="@string/meter_threshold_desc"
                 android:textColor="@color/prop_text_secondary"
                 android:textSize="11sp"/>
         </LinearLayout>
@@ -157,7 +157,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
-                    android:text="區段變色"
+                    android:text="@string/meter_effect_step"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
                     android:minHeight="0dp"
@@ -171,7 +171,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
-                    android:text="平滑漸層"
+                    android:text="@string/meter_effect_gradient"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
                     android:minHeight="0dp"
@@ -221,7 +221,7 @@
             android:layout_marginEnd="6dp"/>
             
         <TextView
-            android:text="外觀設定"
+            android:text="@string/meter_appearance"
             android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="@color/prop_text_secondary"
@@ -240,46 +240,38 @@
         <!-- Style Selector -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilMeterStyle"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
             android:layout_width="0dp"
             android:layout_weight="4"
             android:layout_height="wrap_content"
-            android:hint="風格 (Style)"
+            android:hint="@string/meter_style"
             android:layout_marginEnd="8dp"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusBottomEnd="8dp"
             app:hintTextColor="@color/props_primary">
 
             <AutoCompleteTextView
                 android:id="@+id/acMeterStyle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="none"
-                android:textSize="13sp" />
+                android:textSize="@dimen/prop_dropdown_text_size" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Angle Selector -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilTrackAngle"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
             android:layout_width="0dp"
             android:layout_weight="6"
             android:layout_height="wrap_content"
-            android:hint="軌道角度 (Angle)"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusBottomEnd="8dp"
+            android:hint="@string/meter_angle"
             app:hintTextColor="@color/props_primary">
 
             <AutoCompleteTextView
                 android:id="@+id/acTrackAngle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="none"
-                android:textSize="13sp" />
+                android:textSize="@dimen/prop_dropdown_text_size" />
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
@@ -293,24 +285,20 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilGaugeTicks"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
             android:layout_width="0dp"
             android:layout_weight="4"
             android:layout_height="wrap_content"
-            android:hint="刻度"
+            android:hint="@string/meter_ticks"
             android:layout_marginEnd="12dp"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusBottomEnd="8dp"
             app:hintTextColor="@color/props_primary">
             
             <AutoCompleteTextView
                 android:id="@+id/acGaugeTicks"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="none"
-                android:textSize="13sp"/>
+                android:textSize="@dimen/prop_dropdown_text_size"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <FrameLayout

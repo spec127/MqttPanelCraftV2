@@ -102,17 +102,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/prop_broadcast_alert_type"
-        style="@style/Widget.App.TextInputLayout.Properties.Compact"
+        style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
         android:layout_marginBottom="16dp">
         <AutoCompleteTextView
             android:id="@+id/spAlertType"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/prop_input_height_inner"
             android:inputType="none"
-            android:paddingTop="14dp"
-            android:paddingBottom="14dp"
             android:maxLines="1"
-            android:textSize="13sp"/>
+            android:textSize="@dimen/prop_dropdown_text_size"/>
     </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Remove Section 2 Divider & Header -->
@@ -246,17 +244,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="4"
             android:hint="@string/prop_chart_style_label"
-            style="@style/Widget.App.TextInputLayout.Properties.Compact"
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
             android:layout_marginEnd="12dp">
             <AutoCompleteTextView
                 android:id="@+id/spStyle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="none"
-                android:paddingTop="14dp"
-                android:paddingBottom="14dp"
                 android:maxLines="1"
-                android:textSize="13sp"/>
+                android:textSize="@dimen/prop_dropdown_text_size"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <FrameLayout

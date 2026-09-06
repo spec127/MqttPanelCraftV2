@@ -2,6 +2,7 @@ package com.example.mqttpanelcraft.utils
 
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
+import com.example.mqttpanelcraft.R
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -22,11 +23,19 @@ object CrashLogger {
             file.appendText(logContent)
             
             // 2. Show Dialog
-            showErrorDialog(context, errorTitle, "${e.message}\n\nLog saved to: ${file.absolutePath}")
+            showErrorDialog(
+                context,
+                errorTitle,
+                context.getString(R.string.crash_log_saved_to, e.message.orEmpty(), file.absolutePath)
+            )
             
         } catch (ioe: Exception) {
             ioe.printStackTrace()
-            showErrorDialog(context, "Logging Failed", "Could not write to log file.\nOriginal Error: ${e.message}")
+            showErrorDialog(
+                context,
+                context.getString(R.string.crash_logging_failed),
+                context.getString(R.string.crash_log_write_failed, e.message.orEmpty())
+            )
         }
     }
 
@@ -35,7 +44,7 @@ object CrashLogger {
             AlertDialog.Builder(context)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("OK", null)
+                .setPositiveButton(R.string.common_btn_ok, null)
                 .show()
         } catch (dialogEx: Exception) {
             dialogEx.printStackTrace()

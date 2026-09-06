@@ -31,7 +31,7 @@ object ImageSensorDefinition : IComponentDefinition {
     override val propertiesLayoutId: Int = R.layout.layout_prop_image
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
-        "title" to "影像",
+        "title" to "Image",
         "topic" to "home/cam/stream",
         "gesture_zoom" to "true",
         "quick_save" to "true",
@@ -44,6 +44,11 @@ object ImageSensorDefinition : IComponentDefinition {
         "timer_interval" to "3000",
         "color" to "#FF9800"
     )
+
+    override fun getDefaultProps(context: Context): Map<String, String> =
+            getDefaultProps().toMutableMap().apply {
+                put("title", context.getString(R.string.component_label_image_sensor))
+            }
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
@@ -98,7 +103,7 @@ object ImageSensorDefinition : IComponentDefinition {
             "color",
             data,
             onUpdate,
-            label = "整體顏色",
+            label = context.getString(R.string.properties_label_theme_color),
             defaultColor = "#FF9800"
         )
 

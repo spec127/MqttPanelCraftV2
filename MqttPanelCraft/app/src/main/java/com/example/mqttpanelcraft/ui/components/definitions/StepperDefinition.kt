@@ -17,6 +17,7 @@ import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.StepperView
 import com.example.mqttpanelcraft.utils.TextWatcherAdapter
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -137,29 +138,19 @@ object StepperDefinition : IComponentDefinition {
         }
 
         // 3. 外觀風格 (視覺外觀)
-        val styleAuto = panelView.findViewById<AutoCompleteTextView>(R.id.tvStepperStyle)
-        if (styleAuto != null) {
-            val styleItems = listOf(
-                context.getString(R.string.val_stepper_style_standard) to "Standard",
-                context.getString(R.string.val_stepper_style_block) to "Block",
-                context.getString(R.string.val_stepper_style_smooth) to "Smooth"
-            )
-            val styleAdapter = ArrayAdapter(
-                context,
-                android.R.layout.simple_dropdown_item_1line,
-                styleItems.map { it.first }
-            )
-            styleAuto.setAdapter(styleAdapter)
-
-            val curStyle = data.props["style"] ?: "Standard"
-            val displayLabel = styleItems.find { it.second.equals(curStyle, true) }?.first
-                ?: styleItems[0].first
-            styleAuto.setText(displayLabel, false)
-
-            styleAuto.setOnItemClickListener { _, _, position, _ ->
-                onUpdate("style", styleItems[position].second)
-            }
-        }
+        CommonPropBinder.bindLocalizedDropdown(
+            panelView,
+            R.id.tvStepperStyle,
+            "style",
+            data,
+            onUpdate,
+            listOf(
+                PropertyOption("Standard", R.string.val_stepper_style_standard),
+                PropertyOption("Block", R.string.val_stepper_style_block),
+                PropertyOption("Smooth", R.string.val_stepper_style_smooth)
+            ),
+            "Standard"
+        )
 
         // 4. 顏色調色盤
         val colorViews = listOf(

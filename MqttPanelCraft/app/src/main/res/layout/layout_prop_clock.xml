@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:letterSpacing="0.05"
-                android:text="時鐘功能"
+                android:text="@string/clock_section_function"
                 android:textColor="@color/prop_text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"/>
@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
-            android:text="功能模式"
+            android:text="@string/clock_mode_label"
             android:textColor="@color/prop_text_secondary"
             android:textSize="12sp"/>
 
@@ -56,7 +56,7 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:padding="0dp"
-                android:text="時間"
+                android:text="@string/clock_mode_time"
                 android:textSize="11sp"/>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnClockModeCountdown"
@@ -67,7 +67,7 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:padding="0dp"
-                android:text="倒數"
+                android:text="@string/clock_mode_countdown"
                 android:textSize="11sp"/>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnClockModeSchedule"
@@ -78,7 +78,7 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:padding="0dp"
-                android:text="定時"
+                android:text="@string/clock_mode_schedule"
                 android:textSize="11sp"/>
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
@@ -87,7 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="時間格式">
+            android:hint="@string/clock_time_format">
             <AutoCompleteTextView
                 android:id="@+id/spClockTimeFormat"
                 android:layout_width="match_parent"
@@ -104,7 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="倒數秒數">
+            android:hint="@string/clock_countdown_seconds">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etCountdownSeconds"
                 android:layout_width="match_parent"
@@ -118,7 +118,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="觸發時間（HH:mm）">
+            android:hint="@string/clock_schedule_time">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etScheduleTime"
                 android:layout_width="match_parent"
@@ -136,7 +136,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:hint="連動值">
+                android:hint="@string/clock_trigger_value">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etTriggerValue"
                     android:layout_width="match_parent"
@@ -148,7 +148,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:text="連動元件"
+                android:text="@string/clock_linked_components"
                 android:textColor="@color/prop_text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"/>
@@ -156,7 +156,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp"
-                android:text="勾選接收時鐘事件的元件；MQTT 由目標元件發送"
+                android:text="@string/clock_linked_desc"
                 android:textColor="@color/prop_text_secondary"
                 android:textSize="11sp"/>
             <LinearLayout
@@ -190,7 +190,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="視覺外觀"
+                android:text="@string/clock_visual_style"
                 android:textColor="@color/prop_text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold"/>
@@ -208,7 +208,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
                 android:layout_weight="4"
-                android:hint="時鐘風格">
+                android:hint="@string/clock_style_hint">
                 <AutoCompleteTextView
                     android:id="@+id/spClockVisualStyle"
                     android:layout_width="match_parent"

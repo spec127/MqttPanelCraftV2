@@ -169,10 +169,23 @@ class LogAdapter : RecyclerView.Adapter<LogAdapter.LogViewHolder>() {
         when (item) {
             is DisplayItem.Layer1 -> {
                 val g = item.group
+                val context = holder.itemView.context
                 if (g.isExpanded) {
-                    holder.textView.text = "${g.prefix}[影像分片傳輸 ${g.latestIdx}/${g.total} - 點擊收納清單]"
+                    holder.textView.text =
+                            context.getString(
+                                    R.string.log_image_chunk_compact,
+                                    g.prefix,
+                                    g.latestIdx,
+                                    g.total
+                            )
                 } else {
-                    holder.textView.text = "${g.prefix}[影像分片傳輸 ${g.latestIdx}/${g.total} - 點擊展開 ${g.total} 筆分片清單]"
+                    holder.textView.text =
+                            context.getString(
+                                    R.string.log_image_chunk_expand,
+                                    g.prefix,
+                                    g.latestIdx,
+                                    g.total
+                            )
                 }
                 holder.textView.setTextColor(Color.parseColor("#4DD0E1"))
                 holder.itemView.setOnClickListener {
@@ -182,10 +195,23 @@ class LogAdapter : RecyclerView.Adapter<LogAdapter.LogViewHolder>() {
             }
             is DisplayItem.Layer2 -> {
                 val sub = item.sub
+                val context = holder.itemView.context
                 if (sub.isExpanded) {
-                    holder.textView.text = "  [-] [分片 ${sub.idx}/${sub.total} (${sub.dataLen}B) - 點擊收納內容]"
+                    holder.textView.text =
+                            context.getString(
+                                    R.string.log_chunk_compact,
+                                    sub.idx,
+                                    sub.total,
+                                    sub.dataLen
+                            )
                 } else {
-                    holder.textView.text = "  [+] [分片 ${sub.idx}/${sub.total} (${sub.dataLen}B) - 點擊展開內容]"
+                    holder.textView.text =
+                            context.getString(
+                                    R.string.log_chunk_expand,
+                                    sub.idx,
+                                    sub.total,
+                                    sub.dataLen
+                            )
                 }
                 holder.textView.setTextColor(androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.sidebar_text_primary))
                 holder.itemView.setOnClickListener {
@@ -206,10 +232,19 @@ class LogAdapter : RecyclerView.Adapter<LogAdapter.LogViewHolder>() {
                 val entry = item.entry
                 if (entry.isCollapsible) {
                     if (entry.isExpanded) {
-                        holder.textView.text = "${entry.fullText}\n[點擊收納]"
+                        holder.textView.text =
+                                holder.itemView.context.getString(
+                                        R.string.log_long_compact,
+                                        entry.fullText
+                                )
                         holder.textView.setTextColor(androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.sidebar_text_primary))
                     } else {
-                        holder.textView.text = "${entry.prefix}[長篇幅資料 (${entry.fullText.length}B) - 點擊展開]"
+                        holder.textView.text =
+                                holder.itemView.context.getString(
+                                        R.string.log_long_expand,
+                                        entry.prefix,
+                                        entry.fullText.length
+                                )
                         holder.textView.setTextColor(Color.parseColor("#4DD0E1"))
                     }
                     holder.itemView.setOnClickListener {

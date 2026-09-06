@@ -19,6 +19,7 @@ import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.LedView
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.chip.Chip
@@ -166,8 +167,12 @@ object LedDefinition : IComponentDefinition {
         val matchAdapter = ArrayAdapter(context, android.R.layout.simple_dropdown_item_1line, matchOptions)
         spStdMatch?.setAdapter(matchAdapter)
         spStdMatch?.setText(matchOptions[0], false)
+        var selectedMatchKey = "EXACT"
+        spStdMatch?.setOnItemClickListener { _, _, position, _ ->
+            selectedMatchKey = if (position == 1) "CONTAINS" else "EXACT"
+        }
 
-        fun getSelectedMatchKey(): String = if (spStdMatch?.text?.toString() == context.getString(R.string.val_match_contains_alt)) "CONTAINS" else "EXACT"
+        fun getSelectedMatchKey(): String = selectedMatchKey
 
         fun parseKeywords(): List<Pair<String, String>> {
             val raw = data.props["keywords"] ?: "ON|EXACT,1|EXACT,TRUE|EXACT"
@@ -494,7 +499,6 @@ object LedDefinition : IComponentDefinition {
             if (isChecked) onUpdate("effect", if (checkedId == R.id.btnEffectNone) "NONE" else "BLINK")
         }
 
-        val styleOptions = listOf(context.getString(R.string.val_style_orb), context.getString(R.string.val_shape_circle_style), context.getString(R.string.val_shape_rounded_rect), context.getString(R.string.val_joystick_style_neon))
         val containerApprModeRow = panelView.findViewById<View>(R.id.containerApprModeRow)
         val containerNeonLabel = panelView.findViewById<View>(R.id.containerNeonLabel)
         
@@ -504,15 +508,23 @@ object LedDefinition : IComponentDefinition {
             containerNeonLabel?.visibility = if (isNeon) View.VISIBLE else View.GONE
         }
         
-        val styleMap = mapOf(context.getString(R.string.val_style_orb) to "ORB", context.getString(R.string.val_shape_circle_style) to "CONCENTRIC", context.getString(R.string.val_shape_rounded_rect) to "RADIUS_XL", context.getString(R.string.val_joystick_style_neon) to "NEON_TEXT")
-        CommonPropBinder.bindDropdown(panelView, R.id.spLedStyle, "style", data, { k, v -> onUpdate(k, v); if (k == "style") updateStyleVisibility(v) }, styleOptions, styleMap, "ORB")
+        CommonPropBinder.bindLocalizedDropdown(
+            panelView,
+            R.id.spLedStyle,
+            "style",
+            data,
+            { k, v -> onUpdate(k, v); if (k == "style") updateStyleVisibility(v) },
+            listOf(
+                PropertyOption("ORB", R.string.val_style_orb),
+                PropertyOption("CONCENTRIC", R.string.val_shape_circle_style),
+                PropertyOption("RADIUS_XL", R.string.val_shape_rounded_rect),
+                PropertyOption("NEON_TEXT", R.string.val_joystick_style_neon)
+            ),
+            "ORB"
+        )
         updateStyleVisibility(data.props["style"] ?: "ORB")
 
-        val spApprMode = panelView.findViewById<AutoCompleteTextView>(R.id.spPropApprMode)
-        val modeOptions = listOf(context.getString(R.string.val_content_text), context.getString(R.string.val_content_icon), context.getString(R.string.val_content_both))
-        spApprMode?.setAdapter(ArrayAdapter(context, android.R.layout.simple_dropdown_item_1line, modeOptions))
         val curApprMode = data.props["appearance_mode"] ?: "text"
-        spApprMode?.setText(modeOptions[when (curApprMode) { "icon" -> 1; "text_icon" -> 2; else -> 0 }], false)
         val containerText = panelView.findViewById<View>(R.id.containerPropText)
         val containerIcon = panelView.findViewById<View>(R.id.containerPropIcon)
         fun updateApprVisibility(mode: String) {
@@ -525,10 +537,19 @@ object LedDefinition : IComponentDefinition {
             containerIcon?.layoutParams = iconLayout
         }
         updateApprVisibility(curApprMode)
-        spApprMode?.setOnItemClickListener { _, _, position, _ ->
-            val m = when (position) { 1 -> "icon"; 2 -> "text_icon"; else -> "text" }
-            onUpdate("appearance_mode", m); updateApprVisibility(m)
-        }
+        CommonPropBinder.bindLocalizedDropdown(
+            panelView,
+            R.id.spPropApprMode,
+            "appearance_mode",
+            data,
+            { key, value -> onUpdate(key, value); updateApprVisibility(value) },
+            listOf(
+                PropertyOption("text", R.string.val_content_text),
+                PropertyOption("icon", R.string.val_content_icon),
+                PropertyOption("text_icon", R.string.val_content_both)
+            ),
+            "text"
+        )
         CommonPropBinder.bindEditText(panelView, R.id.etLedLabel, "label", data, onUpdate, "")
         CommonPropBinder.bindEditText(panelView, R.id.etNeonLabel, "label", data, onUpdate, "")
         val iconMap = mapOf(R.id.iconPreviewLED1 to "ic_btn_power", R.id.iconPreviewLED2 to "ic_btn_lighting", R.id.iconPreviewLED3 to "ic_btn_fan", R.id.iconPreviewLED4 to "ic_btn_play", R.id.iconPreviewLED5 to "ic_btn_tune", R.id.iconPreviewLED6 to "ic_btn_energy")

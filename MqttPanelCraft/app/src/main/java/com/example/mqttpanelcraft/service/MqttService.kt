@@ -47,8 +47,8 @@ class MqttService : Service() {
         // Always start foreground first
         val notification =
                 NotificationCompat.Builder(this, CHANNEL_ID)
-                        .setContentTitle("MqttPanelCraft")
-                        .setContentText("MQTT Connection Active")
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText(getString(R.string.mqtt_notification_active))
                         .setSmallIcon(R.mipmap.ic_launcher) // Adjust if icon differs
                         .setOngoing(true)
                         .build()
@@ -117,7 +117,7 @@ class MqttService : Service() {
                         port == currentPort
         ) {
             MqttRepository.addLog(
-                    "Service: Already connected to $broker:$port, skipping redundant reset.",
+                    getString(R.string.mqtt_log_already_connected, broker, port),
                     getTime()
             )
             // Ensure status remains CONNECTED (Green)
@@ -139,7 +139,7 @@ class MqttService : Service() {
                         if (mqttClient != null && mqttClient!!.isConnected) {
                             try {
                                 MqttRepository.addLog(
-                                        "Service: Switching connection, disconnecting current...",
+                                        getString(R.string.mqtt_log_switching_connection),
                                         getTime()
                                 )
                                 mqttClient!!.disconnect()
@@ -173,7 +173,7 @@ class MqttService : Service() {
                                 object : MqttCallbackExtended {
                                     override fun connectionLost(cause: Throwable?) {
                                         MqttRepository.addLog(
-                                                "Service: Connection Lost (${cause?.message})",
+                                                getString(R.string.mqtt_log_connection_lost, cause?.message.orEmpty()),
                                                 getTime()
                                         )
                                         MqttRepository.setStatus(
@@ -195,7 +195,7 @@ class MqttService : Service() {
                                             serverURI: String?
                                     ) {
                                         MqttRepository.addLog(
-                                                "Service: Connected to $serverURI (Re: $reconnect)",
+                                                getString(R.string.mqtt_log_connected_to, serverURI.orEmpty(), reconnect.toString()),
                                                 getTime()
                                         )
                                         MqttRepository.setStatus(MqttStatus.CONNECTED) // Green
@@ -212,7 +212,7 @@ class MqttService : Service() {
                                 }
                         )
 
-                        MqttRepository.addLog("Service: Connecting to $uri...", getTime())
+                        MqttRepository.addLog(getString(R.string.mqtt_log_connecting_to, uri), getTime())
 
                         // v43: Limited Retry Logic (3 Attempts)
                         var attempts = 0
@@ -225,25 +225,25 @@ class MqttService : Service() {
                             attempts++
                             try {
                                 MqttRepository.addLog(
-                                        "Service: Connecting ($attempts/$maxAttempts)...",
+                                        getString(R.string.mqtt_log_connecting_attempt, attempts, maxAttempts),
                                         getTime()
                                 )
                                 mqttClient!!.connect(options)
                                 connected = true
                                 MqttRepository.setStatus(MqttStatus.CONNECTED) // Green
                                 MqttRepository.mqttClient = mqttClient
-                                MqttRepository.addLog("Service: Connected!", getTime())
+                                MqttRepository.addLog(getString(R.string.mqtt_log_connected), getTime())
                             } catch (e: Exception) {
                                 if (attempts < maxAttempts) {
                                     MqttRepository.addLog(
-                                            "Connect Fail: ${e.message}. Retrying in 3s...",
+                                            getString(R.string.mqtt_log_connect_retry, e.message.orEmpty()),
                                             getTime()
                                     )
                                     delay(3000) // 3s delay between attempts
                                 } else {
                                     // Final Failure
                                     MqttRepository.addLog(
-                                            "Connection Failed after $maxAttempts attempts.",
+                                            getString(R.string.mqtt_log_connection_failed_attempts, maxAttempts),
                                             getTime()
                                     )
                                     MqttRepository.setStatus(MqttStatus.FAILED)
@@ -252,7 +252,7 @@ class MqttService : Service() {
                         }
                     } catch (e: Exception) {
                         // Setup errors (uri parsing etc)
-                        MqttRepository.addLog("Fatal Connect Error: ${e.message}", getTime())
+                        MqttRepository.addLog(getString(R.string.mqtt_log_fatal_connect_error, e.message.orEmpty()), getTime())
                         MqttRepository.setStatus(MqttStatus.FAILED)
                     }
                 }
@@ -261,7 +261,7 @@ class MqttService : Service() {
     private fun disconnect() {
         try {
             mqttClient?.disconnect()
-            MqttRepository.addLog("Service: Disconnected", getTime())
+            MqttRepository.addLog(getString(R.string.mqtt_log_disconnected), getTime())
             stopForeground(true)
             stopSelf()
         } catch (e: Exception) {
@@ -275,9 +275,9 @@ class MqttService : Service() {
             if (mqttClient == null || !mqttClient!!.isConnected) return@launch
             try {
                 mqttClient!!.subscribe(topic)
-                MqttRepository.addLog("Service: Subscribed to $topic", getTime())
+                MqttRepository.addLog(getString(R.string.mqtt_log_subscribed, topic), getTime())
             } catch (e: Exception) {
-                MqttRepository.addLog("Service: Subscribe Error - ${e.message}", getTime())
+                MqttRepository.addLog(getString(R.string.mqtt_log_subscribe_error, e.message.orEmpty()), getTime())
             }
         }
     }
@@ -288,9 +288,9 @@ class MqttService : Service() {
             if (mqttClient == null || !mqttClient!!.isConnected) return@launch
             try {
                 mqttClient!!.unsubscribe(topic)
-                MqttRepository.addLog("Service: Unsubscribed from $topic", getTime())
+                MqttRepository.addLog(getString(R.string.mqtt_log_unsubscribed, topic), getTime())
             } catch (e: Exception) {
-                MqttRepository.addLog("Service: Unsubscribe Error - ${e.message}", getTime())
+                MqttRepository.addLog(getString(R.string.mqtt_log_unsubscribe_error, e.message.orEmpty()), getTime())
             }
         }
     }
@@ -304,7 +304,7 @@ class MqttService : Service() {
                 mqttClient!!.publish(topic, message)
                 MqttRepository.addLog("Service TX [$topic]: $payload", getTime())
             } catch (e: Exception) {
-                MqttRepository.addLog("Service: Publish Error - ${e.message}", getTime())
+                MqttRepository.addLog(getString(R.string.mqtt_log_publish_error, e.message.orEmpty()), getTime())
             }
         }
     }
@@ -314,7 +314,7 @@ class MqttService : Service() {
             val serviceChannel =
                     NotificationChannel(
                             CHANNEL_ID,
-                            "MQTT Service Channel",
+                            getString(R.string.mqtt_notification_channel),
                             NotificationManager.IMPORTANCE_LOW
                     )
             val manager = getSystemService(NotificationManager::class.java)

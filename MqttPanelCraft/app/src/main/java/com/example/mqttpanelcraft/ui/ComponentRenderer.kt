@@ -52,7 +52,7 @@ class ComponentRenderer(
                 val newView =
                         def?.createView(context, isEditMode)
                                 ?: android.widget.TextView(context).apply {
-                                    text = "Unknown: ${data.type}"
+                                    text = context.getString(R.string.unknown_component, data.type)
                                 }
 
                 newView.id = data.id // Important: View ID matches Data ID

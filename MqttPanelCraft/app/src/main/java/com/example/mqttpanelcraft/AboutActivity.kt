@@ -32,12 +32,12 @@ class AboutActivity : BaseActivity() {
         toolbar.setNavigationOnClickListener { onBackPressed() }
 
         val tvVersion = findViewById<TextView>(R.id.tvVersion)
-        var version = "Unknown"
+        var version = getString(R.string.version_unknown_value)
         var build: Long = 0
         
         try {
             val pInfo = packageManager.getPackageInfo(packageName, 0)
-            version = pInfo.versionName ?: "Unknown"
+            version = pInfo.versionName ?: getString(R.string.version_unknown_value)
             build = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
                 pInfo.longVersionCode
             } else {
@@ -59,13 +59,13 @@ class AboutActivity : BaseActivity() {
              val intent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:") 
                 putExtra(Intent.EXTRA_EMAIL, arrayOf("niceboat919@gmail.com"))
-                putExtra(Intent.EXTRA_SUBJECT, "MqttPanelCraft Support")
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_email_subject))
             }
             if (intent.resolveActivity(packageManager) != null) {
                 startActivity(intent)
             } else {
                  // Fallback for emulator often
-                 android.widget.Toast.makeText(this, "No email client found", android.widget.Toast.LENGTH_SHORT).show()
+                 android.widget.Toast.makeText(this, R.string.error_no_email_client, android.widget.Toast.LENGTH_SHORT).show()
             }
         }
         
@@ -76,14 +76,14 @@ class AboutActivity : BaseActivity() {
         }
 
         val tvContent = findViewById<TextView>(R.id.tvContent)
-        tvContent.text = loadAboutContentFromAssets(version, build.toString())
+        tvContent.text = loadAboutContent(version, build.toString())
     }
     
     // License Dialog replaced by Google OSS Activity
 
     private fun showPrivacyDialog() {
         val privacyText = try {
-            assets.open("privacy_policy.txt").bufferedReader().use { it.readText() }
+            resources.openRawResource(R.raw.privacy_policy).bufferedReader().use { it.readText() }
         } catch (e: Exception) {
             getString(R.string.error_privacy_load)
         }
@@ -95,9 +95,9 @@ class AboutActivity : BaseActivity() {
             .show()
     }
 
-    private fun loadAboutContentFromAssets(version: String, build: String): String {
+    private fun loadAboutContent(version: String, build: String): String {
         return try {
-            val rawContent = assets.open("about_content.txt").bufferedReader().use { it.readText() }
+            val rawContent = resources.openRawResource(R.raw.about_content).bufferedReader().use { it.readText() }
             rawContent
                 .replace("{VERSION_NAME}", version)
                 .replace("{BUILD_NUMBER}", build)
@@ -108,7 +108,7 @@ class AboutActivity : BaseActivity() {
                 .replace("{PRIVACY_POLICY_LINK}", "https://www.google.com/policies/privacy")
         } catch (e: Exception) {
             e.printStackTrace()
-            "Error loading about content. Please contact support."
+            getString(R.string.error_about_load)
         }
     }
 }

@@ -18,6 +18,7 @@ import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.ImageCropperView
 import com.example.mqttpanelcraft.ui.views.PolygonEditorView
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -211,9 +212,10 @@ object GraphicDefinition : IComponentDefinition {
         }
 
         // Shape Section
-        val edgeLabels = listOf("3", "4", "5", "6", "7", "8", "圓形")
+        val circleLabel = context.getString(R.string.val_graphic_type_circle)
+        val edgeLabels = listOf("3", "4", "5", "6", "7", "8", circleLabel)
         val edgeMap = mapOf(
-            "3" to "3", "4" to "4", "5" to "5", "6" to "6", "7" to "7", "8" to "8", "圓形" to "0"
+            "3" to "3", "4" to "4", "5" to "5", "6" to "6", "7" to "7", "8" to "8", circleLabel to "0"
         )
         CommonPropBinder.bindDropdown(panelView, R.id.spPolygonEdges, "polygon_edges", data, { k, v ->
             onUpdate(k, v)
@@ -228,13 +230,19 @@ object GraphicDefinition : IComponentDefinition {
         polygonEditor?.setShape((data.props["polygon_edges"] ?: "4").toIntOrNull() ?: 4, data.props["polygon_points"])
 
         // Line Section
-        val styleLabels = listOf(context.getString(R.string.val_line_solid), context.getString(R.string.val_line_dashed), context.getString(R.string.val_line_dotted))
-        val styleMap = mapOf(
-            context.getString(R.string.val_line_solid) to "SOLID",
-            context.getString(R.string.val_line_dashed) to "DASHED",
-            context.getString(R.string.val_line_dotted) to "DOTTED"
+        CommonPropBinder.bindLocalizedDropdown(
+            panelView,
+            R.id.spLineStyle,
+            "line_style",
+            data,
+            onUpdate,
+            listOf(
+                PropertyOption("SOLID", R.string.val_line_solid),
+                PropertyOption("DASHED", R.string.val_line_dashed),
+                PropertyOption("DOTTED", R.string.val_line_dotted)
+            ),
+            "SOLID"
         )
-        CommonPropBinder.bindDropdown(panelView, R.id.spLineStyle, "line_style", data, onUpdate, styleLabels, styleMap)
         CommonPropBinder.bindEditText(panelView, R.id.etLineThickness, "line_thickness", data, onUpdate, "2")
 
         // Image Section
@@ -242,7 +250,7 @@ object GraphicDefinition : IComponentDefinition {
         btnUpload?.setOnClickListener {
             val activity = getActivity(context) as? ProjectViewActivity
             if (activity == null) {
-                Toast.makeText(context, "目前無法開啟圖片選擇器", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.error_open_image_picker, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             activity.pickImage { imageData ->

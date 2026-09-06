@@ -24,6 +24,7 @@ import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.TextDisplayView
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.textfield.TextInputEditText
@@ -58,6 +59,11 @@ object TextDisplayDefinition : IComponentDefinition {
         "scrollable" to "false",
         "default_text" to "loading ..."
     )
+
+    override fun getDefaultProps(context: Context): Map<String, String> =
+        getDefaultProps().toMutableMap().apply {
+            put("default_text", context.getString(R.string.default_received_text))
+        }
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
@@ -178,25 +184,8 @@ object TextDisplayDefinition : IComponentDefinition {
         }
 
         // Prefix Type / Preview
-        val spinnerPrefixType = panelView.findViewById<AutoCompleteTextView>(R.id.spinnerPrefixType)
         val etPrefixPreview = panelView.findViewById<TextInputEditText>(R.id.etPrefixPreview)
-        
-        val prefixTypes = arrayOf(
-            ctx.getString(R.string.prop_val_prefix_name),
-            ctx.getString(R.string.prop_val_prefix_topic),
-            ctx.getString(R.string.prop_val_prefix_time),
-            ctx.getString(R.string.prop_val_prefix_custom)
-        )
-        val pAdapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, prefixTypes)
-        spinnerPrefixType.setAdapter(pAdapter)
-        
-        val pTypeMap = mapOf(
-            "NAME" to prefixTypes[0], "TOPIC" to prefixTypes[1], 
-            "TIME" to prefixTypes[2], "CUSTOM" to prefixTypes[3]
-        )
-        val pTypeRevMap = pTypeMap.entries.associate { (k, v) -> v to k }
         val currentPType = data.props["prefix_type"] ?: "NAME"
-        spinnerPrefixType.setText(pTypeMap[currentPType], false)
 
         fun updatePrefixPreview(pType: String) {
             when (pType) {
@@ -227,71 +216,50 @@ object TextDisplayDefinition : IComponentDefinition {
             }
         }
 
-        spinnerPrefixType.setOnItemClickListener { _, _, position, _ ->
-            val pKey = pTypeRevMap[prefixTypes[position]] ?: "NAME"
-            onUpdate("prefix_type", pKey)
-            updatePrefixPreview(pKey)
-        }
+        CommonPropBinder.bindLocalizedDropdown(
+            panelView,
+            R.id.spinnerPrefixType,
+            "prefix_type",
+            data,
+            { key, value -> onUpdate(key, value); updatePrefixPreview(value) },
+            listOf(
+                PropertyOption("NAME", R.string.prop_val_prefix_name),
+                PropertyOption("TOPIC", R.string.prop_val_prefix_topic),
+                PropertyOption("TIME", R.string.prop_val_prefix_time),
+                PropertyOption("CUSTOM", R.string.prop_val_prefix_custom)
+            ),
+            "NAME"
+        )
 
         // Linked Components
-        val containerLinked = panelView.findViewById<LinearLayout>(R.id.containerLinkedComponents)
-        containerLinked.removeAllViews()
-        val linkedString = data.props["linked_components"] ?: ""
-        val linkedSet = linkedString.split(",").filter { it.isNotEmpty() }.toMutableSet()
-        
         val activity = getActivity(ctx) as? ViewModelStoreOwner
         val viewModel = activity?.let { ViewModelProvider(it)[ProjectViewModel::class.java] }
         val components = viewModel?.components?.value ?: emptyList()
         
-        // Add self as first item (checked, but intercept click instead of disabled to keep it blue, alpha = 0.5f)
-        val ownCb = CheckBox(ctx).apply {
-            text = "${data.label} (${data.topicConfig})"
-            isChecked = true
-            alpha = 0.5f
-            // Intercept click to prevent unchecking, keeps the visual blue color
-            setOnCheckedChangeListener { buttonView, isChecked ->
-                if (!isChecked) {
-                    buttonView.isChecked = true
-                }
-            }
-        }
-        containerLinked.addView(ownCb)
-        
-        components.filter { it.id != data.id }.forEach { comp ->
-            val cb = CheckBox(ctx).apply {
-                text = "${comp.label} (${comp.topicConfig})"
-                isChecked = linkedSet.contains(comp.id.toString())
-                setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) linkedSet.add(comp.id.toString()) else linkedSet.remove(comp.id.toString())
-                    onUpdate("linked_components", linkedSet.joinToString(","))
-                }
-            }
-            containerLinked.addView(cb)
-        }
-        if (containerLinked.childCount == 0) {
-            containerLinked.addView(TextView(ctx).apply { 
-                text = "No other components found." 
-                textSize = 12f
-            })
-        }
+        CommonPropBinder.bindLinkedComponents(
+            panelView,
+            R.id.containerLinkedComponents,
+            data,
+            components,
+            onUpdate,
+            emptyTextResId = R.string.linked_no_other_components
+        )
 
         // Style
-        val spinnerStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spinnerStyle)
-        val styles = arrayOf(
-            ctx.getString(R.string.val_style_text_capsule),
-            ctx.getString(R.string.val_style_text_infinity),
-            ctx.getString(R.string.val_style_text_glass),
-            ctx.getString(R.string.val_style_text_note)
+        CommonPropBinder.bindLocalizedDropdown(
+            panelView,
+            R.id.spinnerStyle,
+            "style",
+            data,
+            onUpdate,
+            listOf(
+                PropertyOption("CAPSULE", R.string.val_style_text_capsule),
+                PropertyOption("INFINITY", R.string.val_style_text_infinity),
+                PropertyOption("GLASS", R.string.val_style_text_glass),
+                PropertyOption("NOTE", R.string.val_style_text_note)
+            ),
+            "CAPSULE"
         )
-        val sAdapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, styles)
-        spinnerStyle.setAdapter(sAdapter)
-        
-        val sTypeMap = mapOf("CAPSULE" to styles[0], "INFINITY" to styles[1], "GLASS" to styles[2], "NOTE" to styles[3])
-        val sTypeRevMap = sTypeMap.entries.associate { (k, v) -> v to k }
-        spinnerStyle.setText(sTypeMap[data.props["style"]?.uppercase() ?: "CAPSULE"], false)
-        spinnerStyle.setOnItemClickListener { _, _, position, _ ->
-            onUpdate("style", sTypeRevMap[styles[position]] ?: "CAPSULE")
-        }
 
         // Font Toggle (Standard / Handwriting)
         panelView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleFont)?.let { toggleFont ->

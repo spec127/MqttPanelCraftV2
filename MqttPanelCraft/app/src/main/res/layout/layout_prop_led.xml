@@ -126,7 +126,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/prop_input_height_inner"
                         android:inputType="none"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/prop_dropdown_text_size"
                         android:maxLines="1"
                         android:textColor="@color/prop_text_primary"
                         android:gravity="start|center_vertical"
@@ -171,7 +171,7 @@
                     app:tint="@color/props_primary"
                     android:padding="8dp"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:contentDescription="新增關鍵字"/>
+                    android:contentDescription="@string/content_desc_add_keyword"/>
             </LinearLayout>
 
             <!-- 關鍵字 Chip 氣泡列表 -->
@@ -527,7 +527,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="none"
-                android:textSize="11sp"
+                android:textSize="@dimen/prop_dropdown_text_size"
                 android:maxLines="1"
                 android:textColor="@color/prop_text_primary"
                 android:gravity="start|center_vertical"
@@ -582,7 +582,7 @@
                  android:layout_width="match_parent"
                  android:layout_height="@dimen/prop_input_height_inner"
                  android:inputType="none"
-                 android:textSize="11sp"
+                 android:textSize="@dimen/prop_dropdown_text_size"
                  android:maxLines="1"
                  android:textColor="@color/prop_text_primary"
                  android:gravity="start|center_vertical"

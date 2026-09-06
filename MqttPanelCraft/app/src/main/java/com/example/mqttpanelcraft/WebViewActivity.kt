@@ -138,7 +138,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         }
 
         codeEditor.setText(initialCode)
-        codeEditor.hint = "Enter HTML here..."
+        codeEditor.hint = getString(R.string.web_editor_hint)
 
         // Initial Load
         webView.loadDataWithBaseURL(null, initialCode, "text/html", "utf-8", null)
@@ -163,7 +163,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
                     val updatedProject = project!!.copy(customCode = code)
                     ProjectRepository.updateProject(updatedProject)
                     project = updatedProject // Update local Ref
-                    Toast.makeText(this, "Code Saved to Project", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.web_code_saved, Toast.LENGTH_SHORT).show()
                 }
 
                 webView.loadDataWithBaseURL(null, code, "text/html", "utf-8", null)
@@ -187,7 +187,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
                             projectId = newId
                             // Reload data immediately
                             loadProjectConfig()
-                            Toast.makeText(this, "Project ID Updated", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, R.string.project_id_updated, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -229,17 +229,17 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
              """.trimIndent()
 
             val builder = androidx.appcompat.app.AlertDialog.Builder(this)
-            builder.setTitle("AI Assistant & Tutorial")
+            builder.setTitle(R.string.web_ai_tutorial_title)
             builder.setMessage(promptText)
-            builder.setPositiveButton("Copy Prompt") { _, _ ->
+            builder.setPositiveButton(R.string.web_copy_prompt) { _, _ ->
                 val clipboard =
                         getSystemService(android.content.Context.CLIPBOARD_SERVICE) as
                                 android.content.ClipboardManager
                 val clip = android.content.ClipData.newPlainText("AI Prompt", promptText)
                 clipboard.setPrimaryClip(clip)
-                Toast.makeText(this, "Prompt Copied!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, R.string.web_prompt_copied, Toast.LENGTH_SHORT).show()
             }
-            builder.setNegativeButton("Close", null)
+            builder.setNegativeButton(R.string.common_btn_close, null)
             builder.show()
         }
 
@@ -407,12 +407,16 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
                                 ProjectRepository.updateProject(project!!)
                             }
 
-                            Toast.makeText(this, "HTML Imported Successfully", Toast.LENGTH_SHORT)
+                            Toast.makeText(this, R.string.web_import_success, Toast.LENGTH_SHORT)
                                     .show()
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        Toast.makeText(this, "Import Failed: ${e.message}", Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                                        this,
+                                        getString(R.string.web_import_failed, e.message),
+                                        Toast.LENGTH_SHORT
+                                )
                                 .show()
                     }
                 }

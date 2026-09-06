@@ -335,7 +335,7 @@ class SetupActivity : BaseActivity() {
             val tempProject =
                     originalProject
                             ?: run {
-                                val name = etName.text.toString().ifBlank { "Untitled" }
+                                val name = etName.text.toString().ifBlank { getString(R.string.project_default_untitled) }
                                 val broker = etBroker.text.toString().ifBlank { "broker" }
 
                                 Project(
@@ -370,11 +370,7 @@ class SetupActivity : BaseActivity() {
                                 } else {
                                     android.widget.Toast.makeText(
                                                     this,
-                                                    getString(R.string.msg_limit_reached)
-                                                            .replace(
-                                                                    "Project Limit Reached",
-                                                                    "必須完整觀看廣告才能匯出"
-                                                            ),
+                                                    R.string.export_ad_required,
                                                     android.widget.Toast.LENGTH_LONG
                                             )
                                             .show() // Or custom string
@@ -384,7 +380,7 @@ class SetupActivity : BaseActivity() {
                 } else {
                     android.widget.Toast.makeText(
                                     this,
-                                    "廣告載入中...請稍後再試",
+                                    getString(R.string.export_ad_loading),
                                     android.widget.Toast.LENGTH_SHORT
                             )
                             .show()
@@ -508,7 +504,11 @@ class SetupActivity : BaseActivity() {
                     )
                     .show()
         } else {
-            android.widget.Toast.makeText(this, "Invalid JSON", android.widget.Toast.LENGTH_SHORT)
+            android.widget.Toast.makeText(
+                    this,
+                    R.string.error_invalid_json,
+                    android.widget.Toast.LENGTH_SHORT
+            )
                     .show()
         }
     }
@@ -543,7 +543,7 @@ class SetupActivity : BaseActivity() {
         val uri = "tcp://$broker:$port"
 
         btnTest.isEnabled = false
-        btnTest.text = "Connecting..."
+        btnTest.setText(R.string.setup_connecting)
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -562,7 +562,7 @@ class SetupActivity : BaseActivity() {
                 client.connect(options)
 
                 withContext(Dispatchers.Main) {
-                    btnTest.text = "Connected!"
+                    btnTest.setText(R.string.setup_connected)
                     btnTest.isEnabled = true
                     btnTest.setTextColor(Color.GREEN)
                     btnTest.strokeColor = ColorStateList.valueOf(Color.GREEN)
@@ -576,15 +576,15 @@ class SetupActivity : BaseActivity() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     if (!isFinishing && !isDestroyed) {
-                        btnTest.text = "Test Connection"
+                        btnTest.setText(R.string.setup_test_connection)
                         btnTest.isEnabled = true
                         btnTest.setTextColor(Color.RED) // Or default
                         btnTest.strokeColor = ColorStateList.valueOf(Color.RED)
 
                         AlertDialog.Builder(this@SetupActivity)
-                                .setTitle("Connection Failed")
-                                .setMessage(e.message ?: "Unknown Error")
-                                .setPositiveButton("OK", null)
+                                .setTitle(R.string.setup_connection_failed)
+                                .setMessage(e.message ?: getString(R.string.common_unknown_error))
+                                .setPositiveButton(R.string.common_btn_ok, null)
                                 .show()
                     }
                 }
@@ -681,7 +681,7 @@ class SetupActivity : BaseActivity() {
                 if (updatedCount > 0) {
                     android.widget.Toast.makeText(
                                     this,
-                                    "Updated $updatedCount component topics",
+                                    getString(R.string.project_topics_updated, updatedCount),
                                     android.widget.Toast.LENGTH_SHORT
                             )
                             .show()
@@ -732,7 +732,7 @@ class SetupActivity : BaseActivity() {
                         } else {
                             android.widget.Toast.makeText(
                                             this,
-                                            "You must watch the full ad to save/update!",
+                                            getString(R.string.project_save_ad_required),
                                             android.widget.Toast.LENGTH_LONG
                                     )
                                     .show()
@@ -745,11 +745,11 @@ class SetupActivity : BaseActivity() {
             val dialogView = layoutInflater.inflate(R.layout.layout_ad_placeholder_banner, null)
             val dialogBuilder =
                     androidx.appcompat.app.AlertDialog.Builder(this)
-                            .setTitle("Saving Project")
+                            .setTitle(R.string.setup_saving_project)
                             .setView(dialogView)
                             .setCancelable(false)
-                            .setNegativeButton("Cancel", null) // Just dismiss -> No Save
-                            .setPositiveButton("Continue (30)") { _, _ ->
+                            .setNegativeButton(R.string.common_btn_cancel, null)
+                            .setPositiveButton(getString(R.string.setup_continue_countdown, 30)) { _, _ ->
                                 saveAndFinish(newProject, targetProjectId)
                             }
 
@@ -764,14 +764,18 @@ class SetupActivity : BaseActivity() {
             object : android.os.CountDownTimer(30000, 1000) {
                         override fun onTick(millisUntilFinished: Long) {
                             if (dialog.isShowing) {
-                                btnContinue.text = "Continue (${millisUntilFinished / 1000})"
+                                btnContinue.text =
+                                        getString(
+                                                R.string.setup_continue_countdown,
+                                                millisUntilFinished / 1000
+                                        )
                             } else {
                                 cancel()
                             }
                         }
                         override fun onFinish() {
                             if (dialog.isShowing) {
-                                btnContinue.text = "Continue"
+                                btnContinue.setText(R.string.setup_continue)
                                 btnContinue.isEnabled = true
                                 btnContinue.setTextColor(
                                         ContextCompat.getColor(this@SetupActivity, R.color.primary)

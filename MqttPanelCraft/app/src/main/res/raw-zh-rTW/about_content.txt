@@ -1,0 +1,25 @@
+MqttPanelCraft
+版本 {VERSION_NAME}
+Copyright © 2026
+
+隱私與法律資訊
+
+隱私權政策：{PRIVACY_POLICY_LINK}
+聯絡方式：{SUPPORT_EMAIL}
+
+商標聲明：
+所有商標、標誌與品牌名稱均屬其各自所有者。本 App 與 Google 或 Eclipse Foundation 無從屬、贊助或背書關係。
+
+第三方服務
+
+本 App 使用 Google Mobile Ads SDK (AdMob) 提供廣告與營利功能，其使用受 Google 適用條款與政策約束。
+
+開放原始碼聲明
+
+1) AndroidX Libraries — Apache License 2.0
+2) Material Components for Android — Apache License 2.0
+3) Kotlin Coroutines — Apache License 2.0
+4) Eclipse Paho MQTT Client — EPL-2.0 and EDL-1.0
+5) PubSubClient (Arduino) — MIT License
+
+以上第三方產品名稱、授權名稱與出處刻意保留原文。如有遺漏或錯誤，請聯絡 {SUPPORT_EMAIL}。

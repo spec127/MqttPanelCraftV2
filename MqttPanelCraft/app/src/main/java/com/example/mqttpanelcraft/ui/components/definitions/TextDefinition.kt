@@ -15,6 +15,7 @@ import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 
 
 object TextDefinition : IComponentDefinition {
@@ -38,6 +39,11 @@ object TextDefinition : IComponentDefinition {
         "show_background" to "false",
         "text_effect" to "NONE"
     )
+
+    override fun getDefaultProps(context: Context): Map<String, String> =
+        getDefaultProps().toMutableMap().apply {
+            put("default_text", context.getString(R.string.default_text_content))
+        }
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
@@ -151,10 +157,14 @@ object TextDefinition : IComponentDefinition {
         binder.bindEditText(panelView, R.id.etTextContent, "default_text", data, onUpdate)
 
         // Font Family
-        binder.bindDropdown(
+        binder.bindLocalizedDropdown(
             panelView, R.id.spFontFamily, "font_family", data, onUpdate,
-            listOf(ctx.getString(R.string.font_sans), ctx.getString(R.string.font_serif), ctx.getString(R.string.font_mono), ctx.getString(R.string.font_cursive)),
-            mapOf(ctx.getString(R.string.font_sans) to "sans-serif", ctx.getString(R.string.font_serif) to "serif", ctx.getString(R.string.font_mono) to "monospace", ctx.getString(R.string.font_cursive) to "cursive"),
+            listOf(
+                PropertyOption("sans-serif", R.string.font_sans),
+                PropertyOption("serif", R.string.font_serif),
+                PropertyOption("monospace", R.string.font_mono),
+                PropertyOption("cursive", R.string.font_cursive)
+            ),
             defaultValue = "sans-serif"
         )
 
@@ -199,10 +209,14 @@ object TextDefinition : IComponentDefinition {
         binder.bindColorPalette(panelView, R.id.propBgColor, "bg_color", data, onUpdate, label = ctx.getString(R.string.prop_text_show_bg), defaultColor = "#E1BEE7")
 
                 // Effect
-        binder.bindDropdown(
+        binder.bindLocalizedDropdown(
             panelView, R.id.spTextEffect, "text_effect", data, onUpdate,
-            listOf("NONE", "NEON", "SHADOW", "OUTLINE"),
-            mapOf("NONE" to "NONE", "NEON" to "NEON", "SHADOW" to "SHADOW", "OUTLINE" to "OUTLINE"),
+            listOf(
+                PropertyOption("NONE", R.string.val_text_effect_none),
+                PropertyOption("NEON", R.string.val_text_effect_neon),
+                PropertyOption("SHADOW", R.string.val_text_effect_shadow),
+                PropertyOption("OUTLINE", R.string.val_text_effect_outline)
+            ),
             defaultValue = "NONE"
         )
     }

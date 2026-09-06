@@ -145,7 +145,7 @@
 
         <!-- 文字樣式 Style -->
         <TextView
-            android:text="文字樣式"
+            android:text="@string/prop_label_text_style"
             android:textSize="12sp"
             android:textColor="@color/prop_text_secondary"
             android:layout_width="match_parent"
