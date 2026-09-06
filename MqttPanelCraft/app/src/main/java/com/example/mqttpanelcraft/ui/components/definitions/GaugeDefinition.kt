@@ -5,14 +5,16 @@ import android.util.Size
 import android.view.View
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 
 object GaugeDefinition : IComponentDefinition {
     override val type: String = "GAUGE"
     override val defaultSize: Size = Size(150, 150)
     override val labelPrefix: String = "gauge"
+    override val displayNameResId: Int = R.string.component_label_gauge
     override val iconResId: Int = android.R.drawable.ic_menu_compass
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.SENSOR
     override val propertiesLayoutId: Int = 0
 
     override fun createView(context: Context, isEditMode: Boolean): View {

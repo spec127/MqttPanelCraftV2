@@ -11,6 +11,7 @@ import android.widget.*
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.textfield.TextInputEditText
@@ -27,8 +28,9 @@ object LineChartDefinition : IComponentDefinition {
     override val type: String = "CHART"
     override val defaultSize: Size = Size(260, 170)
     override val labelPrefix: String = "chart"
+    override val displayNameResId: Int = R.string.component_label_chart
     override val iconResId: Int = android.R.drawable.ic_menu_report_image
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.DISPLAY
 
     override val propertiesLayoutId: Int = R.layout.layout_prop_line_chart
 

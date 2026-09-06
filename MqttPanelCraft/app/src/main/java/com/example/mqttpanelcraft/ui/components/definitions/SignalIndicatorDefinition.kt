@@ -13,6 +13,7 @@ import android.widget.TextView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.findComponentTarget
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
@@ -24,8 +25,9 @@ object SignalIndicatorDefinition : IComponentDefinition {
     override val type: String = "SIGNAL_INDICATOR"
     override val defaultSize: Size = Size(125, 100)
     override val labelPrefix: String = "signal"
+    override val displayNameResId: Int = R.string.component_label_signal_indicator
     override val iconResId: Int = android.R.drawable.ic_menu_sort_by_size
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.SENSOR
     override val propertiesLayoutId: Int = R.layout.layout_prop_signal_indicator
 
     override fun getDefaultProps(): Map<String, String> = mapOf(

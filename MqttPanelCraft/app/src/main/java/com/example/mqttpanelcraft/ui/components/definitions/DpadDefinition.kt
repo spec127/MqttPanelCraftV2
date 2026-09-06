@@ -13,7 +13,9 @@ import com.example.mqttpanelcraft.data.ColorHistoryManager
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
+import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.JoystickView
 import com.example.mqttpanelcraft.utils.TextWatcherAdapter
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -31,8 +33,9 @@ object DpadDefinition : IComponentDefinition {
     override val type: String = "DPAD"
     override val defaultSize: Size = Size(180, 180)
     override val labelPrefix: String = "dpad"
+    override val displayNameResId: Int = R.string.component_label_dpad
     override val iconResId: Int = R.drawable.ic_joystick
-    override val group: String = "CONTROL"
+    override val group = ComponentGroup.CONTROL
 
     override val propertiesLayoutId: Int = R.layout.layout_prop_joystick
 
@@ -164,12 +167,7 @@ object DpadDefinition : IComponentDefinition {
 
         // 4. 方向指令輸入框設定
         val bindMsg = { id: Int, key: String, defVal: String ->
-            panelView.findViewById<EditText>(id)?.apply {
-                val currentVal = data.props[key]
-                val displayVal = if (currentVal.isNullOrEmpty()) defVal else currentVal
-                setText(displayVal)
-                addTextChangedListener(TextWatcherAdapter { text -> onUpdate(key, text) })
-            }
+            CommonPropBinder.bindEditText(panelView, id, key, data, onUpdate, defVal)
         }
         bindMsg(R.id.etMsgUp, "msg_up", "up")
         bindMsg(R.id.etMsgDown, "msg_down", "down")

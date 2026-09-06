@@ -131,6 +131,7 @@ class ProjectViewActivity : BaseActivity() {
 
             // Wire UI Manager Callbacks
             projectUIManager.onModeToggleCallback = {
+                interactionManager.cancelInteraction()
                 isEditMode = !isEditMode
                 idleAdController.onUserInteraction() // Keep Ad Alive
 
@@ -475,6 +476,7 @@ class ProjectViewActivity : BaseActivity() {
         drawerLayout.addDrawerListener(
                 object : androidx.drawerlayout.widget.DrawerLayout.SimpleDrawerListener() {
                     override fun onDrawerOpened(drawerView: View) {
+                        interactionManager.cancelInteraction()
                         val sheet = findViewById<View>(R.id.bottomSheet)
                         val behavior =
                                 com.google.android.material.bottomsheet.BottomSheetBehavior.from(
@@ -959,6 +961,7 @@ class ProjectViewActivity : BaseActivity() {
     }
 
     override fun onStop() {
+        interactionManager.cancelInteraction()
         if (mqttListenerRegistered) {
             MqttRepository.unregisterListener(mqttMessageListener)
             mqttListenerRegistered = false

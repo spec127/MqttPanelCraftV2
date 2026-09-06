@@ -11,6 +11,7 @@ import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.views.ScaleMeterView
 
@@ -18,8 +19,9 @@ object ScaleMeterDefinition : IComponentDefinition {
     override val type: String = "SCALE_METER"
     override val defaultSize: Size = Size(200, 70)
     override val labelPrefix: String = "meter"
+    override val displayNameResId: Int = R.string.component_label_scale_meter
     override val iconResId: Int = android.R.drawable.ic_menu_sort_by_size
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.SENSOR
     override val propertiesLayoutId: Int = R.layout.layout_prop_scale_meter
 
     override fun getDefaultProps(): Map<String, String> = mapOf(

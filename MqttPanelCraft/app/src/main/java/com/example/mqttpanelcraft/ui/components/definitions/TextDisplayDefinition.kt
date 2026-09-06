@@ -21,6 +21,7 @@ import com.example.mqttpanelcraft.ProjectViewModel
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.TextDisplayView
@@ -35,8 +36,9 @@ object TextDisplayDefinition : IComponentDefinition {
     override val type: String = "TEXT_DISPLAY"
     override val defaultSize: Size = Size(200, 50)
     override val labelPrefix: String = "receivebox"
+    override val displayNameResId: Int = R.string.component_label_text_display
     override val iconResId: Int = android.R.drawable.ic_menu_sort_alphabetically
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.SENSOR
     override val propertiesLayoutId: Int = R.layout.layout_prop_text_display
 
     private fun getActivity(context: Context): Activity? {

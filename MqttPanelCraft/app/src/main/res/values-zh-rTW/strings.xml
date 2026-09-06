@@ -304,6 +304,7 @@
     <string name="val_orient_vertical">垂直</string>
     <string name="val_slider_style_classic">經典</string>
     <string name="val_slider_style_capsule">膠囊</string>
+    <string name="val_slider_style_toggle">撥桿</string>
     <string name="val_stepper_style_standard">標準</string>
     <string name="val_stepper_style_block">方塊</string>
     <string name="val_stepper_style_smooth">圓滑</string>

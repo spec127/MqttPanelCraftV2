@@ -18,6 +18,7 @@ import com.example.mqttpanelcraft.ProjectViewModel
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.BroadcastView
@@ -32,8 +33,9 @@ object BroadcastDefinition : IComponentDefinition {
     override val type: String = "BROADCAST"
     override val defaultSize: Size = Size(150, 50)
     override val labelPrefix: String = "broadcast"
+    override val displayNameResId: Int = R.string.component_label_broadcast
     override val iconResId: Int = android.R.drawable.ic_lock_silent_mode_off
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.DISPLAY
     override val propertiesLayoutId: Int = R.layout.layout_prop_broadcast
 
     private fun getActivity(context: Context): Activity? {

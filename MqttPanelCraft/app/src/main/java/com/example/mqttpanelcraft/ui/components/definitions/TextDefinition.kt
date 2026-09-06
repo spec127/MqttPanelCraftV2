@@ -12,6 +12,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 
@@ -20,8 +21,9 @@ object TextDefinition : IComponentDefinition {
     override val type: String = "TEXT"
     override val defaultSize: Size = Size(100, 60)
     override val labelPrefix: String = "text"
+    override val displayNameResId: Int = R.string.component_label_text
     override val iconResId: Int = R.drawable.ic_text_fields
-    override val group: String = "DISPLAY"
+    override val group = ComponentGroup.DISPLAY
     override val propertiesLayoutId: Int = R.layout.layout_prop_text
 
     override fun getDefaultProps(): Map<String, String> = mapOf(

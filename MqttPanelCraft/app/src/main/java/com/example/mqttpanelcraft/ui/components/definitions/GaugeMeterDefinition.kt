@@ -14,6 +14,7 @@ import android.widget.TextView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.findComponentTarget
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
@@ -24,8 +25,9 @@ object GaugeMeterDefinition : IComponentDefinition {
     override val type: String = "GAUGE_METER"
     override val defaultSize: Size = Size(200, 200)
     override val labelPrefix: String = "gauge"
+    override val displayNameResId: Int = R.string.component_label_gauge_meter
     override val iconResId: Int = android.R.drawable.ic_menu_compass
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.SENSOR
     override val propertiesLayoutId: Int = R.layout.layout_prop_gauge_meter
 
     override fun getDefaultProps(): Map<String, String> = mapOf(

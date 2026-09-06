@@ -12,8 +12,10 @@ import android.widget.LinearLayout
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.InputBoxView
 
 object InputBoxDefinition : IComponentDefinition {
@@ -21,8 +23,9 @@ object InputBoxDefinition : IComponentDefinition {
     override val type = "INPUTBOX"
     override val defaultSize = Size(200, 50)
     override val labelPrefix = "sendbox"
+    override val displayNameResId: Int = R.string.component_label_inputbox
     override val iconResId = R.drawable.ic_edit // Generic edit icon
-    override val group = "CONTROL"
+    override val group = ComponentGroup.CONTROL
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
         "color" to "#FF2196F3",
@@ -72,43 +75,32 @@ object InputBoxDefinition : IComponentDefinition {
         val context = panelView.context
 
         // 1. Style Selector
-        val spStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spPropStyle)
         val styles =
                 listOf(
-                        context.getString(R.string.val_style_text_capsule) to "Capsule",
-                        context.getString(R.string.val_style_text_infinity) to "Infinity",
-                        context.getString(R.string.val_style_text_glass) to "Glass",
-                        context.getString(R.string.val_style_text_note) to "Note"
+                        PropertyOption("Capsule", R.string.val_style_text_capsule),
+                        PropertyOption("Infinity", R.string.val_style_text_infinity),
+                        PropertyOption("Glass", R.string.val_style_text_glass),
+                        PropertyOption("Note", R.string.val_style_text_note)
                 )
-        // Map internal value to display string
-        val currentStyle = data.props["style"] ?: "Capsule"
-        val displayStyle = styles.find { it.second == currentStyle }?.first ?: styles[0].first
-
-        val adapter =
-                android.widget.ArrayAdapter(
-                        context,
-                        R.layout.list_item_dropdown,
-                        styles.map { it.first }
-                )
-        spStyle.setAdapter(adapter)
-        spStyle.setText(displayStyle, false)
-
-        spStyle.setOnItemClickListener { _, _, position, _ ->
-            onUpdate("style", styles[position].second)
-        }
+        CommonPropBinder.bindLocalizedDropdown(
+                panelView,
+                R.id.spPropStyle,
+                "style",
+                data,
+                onUpdate,
+                styles,
+                "Capsule"
+        )
 
         // Font Toggle (Standard / Handwriting)
-        panelView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleFont)?.let { toggleFont ->
-            val fontStyle = data.props["font_style"] ?: "NORMAL"
-            val checkedId = if (fontStyle == "HANDWRITING") R.id.btnFontHandwriting else R.id.btnFontNormal
-            toggleFont.check(checkedId)
-            toggleFont.addOnButtonCheckedListener { _, id, isChecked ->
-                if (isChecked) {
-                    val valStr = if (id == R.id.btnFontHandwriting) "HANDWRITING" else "NORMAL"
-                    onUpdate("font_style", valStr)
-                }
-            }
-        }
+        CommonPropBinder.bindToggleGroup(
+                panelView,
+                R.id.toggleFont,
+                "font_style",
+                data,
+                onUpdate,
+                mapOf(R.id.btnFontNormal to "NORMAL", R.id.btnFontHandwriting to "HANDWRITING")
+        )
 
         // 2. Color Picker (Full Palette)
         CommonPropBinder.bindColorPalette(
@@ -122,32 +114,26 @@ object InputBoxDefinition : IComponentDefinition {
         )
 
         // 3. Toggles (Clear on Send)
-        val itemClear = panelView.findViewById<LinearLayout>(R.id.itemClearOnSend)
-        val checkClear = panelView.findViewById<ImageView>(R.id.checkClearOnSend)
-        var isClear = (data.props["clear_on_send"] ?: "true") == "true"
-        updateCheck(checkClear, isClear)
-
-        itemClear.setOnClickListener {
-            isClear = !isClear
-            onUpdate("clear_on_send", isClear.toString())
-            updateCheck(checkClear, isClear)
-        }
+        CommonPropBinder.bindCheckCard(
+                panelView,
+                R.id.itemClearOnSend,
+                R.id.checkClearOnSend,
+                "clear_on_send",
+                data,
+                onUpdate,
+                true
+        )
 
         // 4. Toggles (Enter as Send)
-        val itemEnter = panelView.findViewById<LinearLayout>(R.id.itemEnterAsSend)
-        val checkEnter = panelView.findViewById<ImageView>(R.id.checkEnterAsSend)
-        var isEnter = (data.props["enter_as_send"] ?: "false") == "true"
-        updateCheck(checkEnter, isEnter)
-
-        itemEnter.setOnClickListener {
-            isEnter = !isEnter
-            onUpdate("enter_as_send", isEnter.toString())
-            updateCheck(checkEnter, isEnter)
-        }
-    }
-
-    private fun updateCheck(view: ImageView, isChecked: Boolean) {
-        view.visibility = if (isChecked) View.VISIBLE else View.INVISIBLE
+        CommonPropBinder.bindCheckCard(
+                panelView,
+                R.id.itemEnterAsSend,
+                R.id.checkEnterAsSend,
+                "enter_as_send",
+                data,
+                onUpdate,
+                false
+        )
     }
 
     override fun attachBehavior(

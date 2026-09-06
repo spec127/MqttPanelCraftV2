@@ -19,6 +19,7 @@ import android.widget.TextView
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.example.mqttpanelcraft.R
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 
 class SidebarManager(
         private val drawerLayout: DrawerLayout?,
@@ -81,7 +82,7 @@ class SidebarManager(
                 val allDefs = registry.getAllTypes().mapNotNull { registry.get(it) }
 
                 // Define Group Order
-                val groupOrder = listOf("CONTROL", "SENSOR", "DISPLAY")
+                val groupOrder = ComponentGroup.entries
                 val grouped = allDefs.groupBy { it.group }
 
                 val inflater = LayoutInflater.from(rootView.context)
@@ -174,7 +175,7 @@ class SidebarManager(
                                                                         height = h,
                                                                         label = def.labelPrefix,
                                                                         topicConfig = "",
-                                                                        props = def.getDefaultProps().toMutableMap()
+                                                                        props = def.getDefaultProps(rootView.context).toMutableMap()
                                                                 )
                                                 def.onUpdateView(previewView, dummyData)
                                         }
@@ -226,33 +227,12 @@ class SidebarManager(
                 // Search List: View, Type, Label
                 val searchList = mutableListOf<Triple<View, String, String>>()
 
-                groupOrder.forEach { groupName ->
-                        val defsInGroup = grouped[groupName] ?: return@forEach
+                groupOrder.forEach { componentGroup ->
+                        val defsInGroup = grouped[componentGroup] ?: return@forEach
 
                         // Determine Group Style (Color & Icon)
-                        val (groupColorRes, headerIconRes) =
-                                when (groupName) {
-                                        "CONTROL" ->
-                                                Pair(
-                                                        R.color.vivid_blue,
-                                                        android.R.drawable.ic_menu_preferences
-                                                ) // Bolt-like
-                                        "SENSOR" ->
-                                                Pair(
-                                                        R.color.warm_amber,
-                                                        android.R.drawable.ic_menu_compass
-                                                ) // Sensor-like
-                                        "DISPLAY" ->
-                                                Pair(
-                                                        R.color.soft_purple,
-                                                        android.R.drawable.ic_menu_gallery
-                                                ) // Media-like
-                                        else ->
-                                                Pair(
-                                                        R.color.sidebar_text_primary,
-                                                        android.R.drawable.ic_menu_help
-                                                )
-                                }
+                        val groupColorRes = componentGroup.colorResId
+                        val headerIconRes = componentGroup.iconResId
                         val groupColor =
                                 androidx.core.content.ContextCompat.getColor(
                                         rootView.context,
@@ -277,25 +257,7 @@ class SidebarManager(
                         ivArrow.setColorFilter(groupColor)
 
                         // Header Text Mapping
-                        val headerText =
-                                when (groupName) {
-                                        "DISPLAY" ->
-                                                rootView.context.getString(
-                                                        R.string.project_sidebar_category_display
-                                                )
-                                        "CONTROL" ->
-                                                rootView.context.getString(
-                                                        R.string.project_cat_control
-                                                )
-                                        "SENSOR" ->
-                                                rootView.context.getString(
-                                                        R.string.project_cat_sensor
-                                                )
-                                        else ->
-                                                groupName.lowercase().replaceFirstChar {
-                                                        it.uppercase()
-                                                }
-                                }
+                        val headerText = rootView.context.getString(componentGroup.titleResId)
                         tvHeader.text = headerText
                         container.addView(headerView)
 
@@ -391,7 +353,7 @@ class SidebarManager(
                         categoryArrowIcons.add(ivArrow)
 
                         // 3. Render All Items in this Group
-                        val allItems = grouped[groupName] ?: emptyList()
+                        val allItems = grouped[componentGroup] ?: emptyList()
                         allItems.forEach { def ->
                                 val card =
                                         inflater.inflate(
@@ -405,13 +367,7 @@ class SidebarManager(
                                         )
 
                                 // Color Tint!
-                                val groupColorRes =
-                                        when (groupName) {
-                                                "CONTROL" -> R.color.vivid_blue
-                                                "SENSOR" -> R.color.warm_amber
-                                                "DISPLAY" -> R.color.soft_purple
-                                                else -> R.color.sidebar_text_primary
-                                        }
+                                val groupColorRes = componentGroup.colorResId
                                 val groupColorInt =
                                         androidx.core.content.ContextCompat.getColor(
                                                 rootView.context,
@@ -440,7 +396,7 @@ class SidebarManager(
                                 previewView.background = null // Card has border, component does not
 
                                 // Init Dummy Data from Definition defaults (Single Source of Truth matching dragged instances)
-                                val dummyProps = def.getDefaultProps().toMutableMap()
+                                val dummyProps = def.getDefaultProps(rootView.context).toMutableMap()
                                 if (!dummyProps.containsKey("color")) dummyProps["color"] = "#2196F3"
                                 if (!dummyProps.containsKey("colorOn")) dummyProps["colorOn"] = dummyProps["color"] ?: "#2196F3"
                                 if (!dummyProps.containsKey("colorOff")) dummyProps["colorOff"] = "#BDBDBD"
@@ -594,21 +550,7 @@ class SidebarManager(
                                 // props)
 
                                 val tv = card.findViewById<android.widget.TextView>(R.id.tvLabel)
-                                val labelResName = "component_label_${def.type.lowercase()}"
-                                val labelId =
-                                        rootView.resources.getIdentifier(
-                                                labelResName,
-                                                "string",
-                                                rootView.context.packageName
-                                        )
-                                val labelText =
-                                        if (labelId != 0) {
-                                                rootView.context.getString(labelId)
-                                        } else {
-                                                def.type.lowercase().replaceFirstChar {
-                                                        it.uppercase()
-                                                }
-                                        }
+                                val labelText = rootView.context.getString(def.displayNameResId)
                                 tv.text = labelText
 
                                 // Card Layout Params for Grid (Square-ish Box)

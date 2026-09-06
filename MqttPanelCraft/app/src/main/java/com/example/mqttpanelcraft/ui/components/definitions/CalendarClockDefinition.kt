@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.CalendarDisplayView
@@ -18,8 +19,9 @@ object CalendarClockDefinition : IComponentDefinition {
     override val type: String = "CALENDAR"
     override val defaultSize: Size = Size(180, 180)
     override val labelPrefix: String = "calendar"
+    override val displayNameResId: Int = R.string.component_label_calendar
     override val iconResId: Int = android.R.drawable.ic_menu_today
-    override val group: String = "DISPLAY"
+    override val group = ComponentGroup.DISPLAY
     override val propertiesLayoutId: Int = R.layout.layout_prop_calendar
 
     override fun getDefaultProps(): Map<String, String> = mapOf(

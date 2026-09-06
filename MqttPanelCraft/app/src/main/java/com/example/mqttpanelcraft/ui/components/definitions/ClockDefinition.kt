@@ -17,6 +17,7 @@ import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
 import com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.LocalComponentTriggerSource
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
@@ -27,8 +28,9 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
     override val type: String = "CLOCK"
     override val defaultSize: Size = Size(160, 100)
     override val labelPrefix: String = "clock"
+    override val displayNameResId: Int = R.string.component_label_clock
     override val iconResId: Int = android.R.drawable.ic_lock_idle_alarm
-    override val group: String = "DISPLAY"
+    override val group = ComponentGroup.DISPLAY
     override val propertiesLayoutId: Int = R.layout.layout_prop_clock
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
@@ -131,7 +133,8 @@ object ClockDefinition : IComponentDefinition, LocalComponentTriggerSource {
         val owner = findActivity(panelView.context) as? ViewModelStoreOwner
         val components = owner?.let { ViewModelProvider(it)[ProjectViewModel::class.java].components.value }.orEmpty()
         val targets = components.filter { component ->
-            component.id != data.id && ComponentDefinitionRegistry.get(component.type)?.group == "CONTROL"
+            component.id != data.id &&
+                    ComponentDefinitionRegistry.get(component.type)?.group == ComponentGroup.CONTROL
         }
         container.addView(CheckBox(panelView.context).apply {
             text = "${data.label}（時鐘本身不發送）"

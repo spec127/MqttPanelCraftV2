@@ -3,6 +3,7 @@ package com.example.mqttpanelcraft.ui.components
 import android.content.Context
 import android.util.Size
 import android.view.View
+import androidx.annotation.StringRes
 import com.example.mqttpanelcraft.model.ComponentData
 
 internal fun resolveLinkedTriggerPayload(data: ComponentData, triggerValue: String): String =
@@ -21,9 +22,12 @@ interface IComponentDefinition {
         val defaultSize: Size // Ensure unify 100x100 if needed
         val labelPrefix: String // e.g. "button"
 
+        @get:StringRes
+        val displayNameResId: Int
+
         // 1.5 Sidebar Presentation
         val iconResId: Int // e.g. R.drawable.ic_button
-        val group: String // e.g. "CONTROL", "DISPLAY", "SENSOR"
+        val group: ComponentGroup
 
         // 2. Appearance (Factory)
         fun createView(context: Context, isEditMode: Boolean): View
@@ -73,13 +77,15 @@ interface IComponentDefinition {
          */
         fun getDefaultProps(): Map<String, String> {
                 val groupColor = when (group) {
-                        "CONTROL" -> "#FF2196F3"
-                        "SENSOR" -> "#FFEB3B"
-                        "DISPLAY" -> "#FF9800"
-                        else -> "#FF7C3AED"
+                        ComponentGroup.CONTROL -> "#FF2196F3"
+                        ComponentGroup.SENSOR -> "#FFEB3B"
+                        ComponentGroup.DISPLAY -> "#FF9800"
                 }
                 return mapOf("color" to groupColor, "theme_color" to groupColor)
         }
+
+        /** Context-aware defaults for user-visible initial content. Persisted values stay user data. */
+        fun getDefaultProps(context: Context): Map<String, String> = getDefaultProps()
 
         /**
          * Returns true if the component should maintain its aspect ratio during resizing. Default

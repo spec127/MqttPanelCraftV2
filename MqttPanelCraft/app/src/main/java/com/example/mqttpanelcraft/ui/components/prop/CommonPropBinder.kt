@@ -10,11 +10,16 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
+import androidx.annotation.StringRes
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.data.ColorHistoryManager
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.google.android.material.button.MaterialButtonToggleGroup
+
+/** A localized label paired with the stable value stored in project JSON. */
+data class PropertyOption(val value: String, @StringRes val labelResId: Int)
 
 /**
  * A utility class to reduce boilerplate code in
@@ -192,7 +197,7 @@ object CommonPropBinder {
                 }
 
         autoComplete.setText(currentLabel, false)
-        val adapter = ArrayAdapter(context, android.R.layout.simple_dropdown_item_1line, options)
+        val adapter = ArrayAdapter(context, R.layout.list_item_dropdown, options)
         autoComplete.setAdapter(adapter)
 
         autoComplete.setOnItemClickListener { _, _, position, _ ->
@@ -200,6 +205,62 @@ object CommonPropBinder {
             val selectedValue = valueMap?.get(selectedLabel) ?: selectedLabel
             onUpdate(propKey, selectedValue)
         }
+    }
+
+    /** Binds a fixed-value dropdown without deriving JSON values from translated labels. */
+    fun bindLocalizedDropdown(
+            panelView: View,
+            autoCompleteId: Int,
+            propKey: String,
+            data: ComponentData,
+            onUpdate: (String, String) -> Unit,
+            options: List<PropertyOption>,
+            defaultValue: String = options.firstOrNull()?.value.orEmpty()
+    ) {
+        if (options.isEmpty()) return
+        val autoComplete = panelView.findViewById<AutoCompleteTextView>(autoCompleteId) ?: return
+        val labels = options.map { panelView.context.getString(it.labelResId) }
+        val currentValue = data.props[propKey] ?: defaultValue
+        val currentIndex = options.indexOfFirst { it.value == currentValue }.coerceAtLeast(0)
+
+        autoComplete.setAdapter(
+                ArrayAdapter(panelView.context, R.layout.list_item_dropdown, labels)
+        )
+        autoComplete.setText(labels[currentIndex], false)
+        autoComplete.setOnItemClickListener { _, _, position, _ ->
+            options.getOrNull(position)?.let { onUpdate(propKey, it.value) }
+        }
+    }
+
+    /** Binds the large card-style checks shared by multiple property panels. */
+    fun bindCheckCard(
+            panelView: View,
+            rowId: Int,
+            checkId: Int,
+            propKey: String,
+            data: ComponentData,
+            onUpdate: (String, String) -> Unit,
+            defaultChecked: Boolean = false
+    ) {
+        val row = panelView.findViewById<View>(rowId) ?: return
+        val check = panelView.findViewById<ImageView>(checkId) ?: return
+        var checked = data.props[propKey]?.toBooleanStrictOrNull() ?: defaultChecked
+        fun render() {
+            check.visibility = if (checked) View.VISIBLE else View.INVISIBLE
+            row.isSelected = checked
+        }
+        render()
+        row.setOnClickListener {
+            checked = !checked
+            render()
+            onUpdate(propKey, checked.toString())
+        }
+    }
+
+    /** Applies one conditional visibility rule during both initial and later binding. */
+    fun setVisibleWhen(value: String?, expectedValue: String, vararg views: View?) {
+        val visibility = if (value == expectedValue) View.VISIBLE else View.GONE
+        views.forEach { it?.visibility = visibility }
     }
     
     fun bindSwitch(

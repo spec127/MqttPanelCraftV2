@@ -15,6 +15,7 @@ import com.example.mqttpanelcraft.ProjectViewActivity
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.ImageCropperView
@@ -58,8 +59,9 @@ object GraphicDefinition : IComponentDefinition {
     override val type: String = "GRAPHIC"
     override val defaultSize: Size = Size(200, 100)
     override val labelPrefix: String = "graphic"
+    override val displayNameResId: Int = R.string.component_label_graphic
     override val iconResId: Int = R.drawable.ic_palette
-    override val group: String = "DISPLAY"
+    override val group = ComponentGroup.DISPLAY
 
     override val propertiesLayoutId: Int = R.layout.layout_prop_graphic
 

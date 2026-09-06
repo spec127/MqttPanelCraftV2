@@ -374,14 +374,16 @@ class PropertiesSheetManager(
 
             // Hide topic row for DISPLAY (Media/Decoration) components
             val containerTopicRow = propertyContainer.findViewById<View>(R.id.containerTopicRow)
-            if (def?.group == "DISPLAY") {
+            if (def?.group == com.example.mqttpanelcraft.ui.components.ComponentGroup.DISPLAY) {
                 containerTopicRow?.visibility = View.GONE
             } else {
                 containerTopicRow?.visibility = View.VISIBLE
             }
 
             // Generic Payload Logic
-            if (def != null && def.group == "CONTROL") {
+            if (def != null &&
+                    def.group == com.example.mqttpanelcraft.ui.components.ComponentGroup.CONTROL
+            ) {
                 tilGenericPayload?.visibility = View.VISIBLE
                 val payloadVal = data.props["payload"] ?: ""
                 if (etPropGenericPayload?.text?.toString() != payloadVal) {

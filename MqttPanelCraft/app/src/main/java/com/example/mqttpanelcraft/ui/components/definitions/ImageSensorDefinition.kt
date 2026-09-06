@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.ImageDisplayView
@@ -24,8 +25,9 @@ object ImageSensorDefinition : IComponentDefinition {
     override val type: String = "IMAGE_SENSOR"
     override val defaultSize: Size = Size(200, 150)
     override val labelPrefix: String = "cam"
+    override val displayNameResId: Int = R.string.component_label_image_sensor
     override val iconResId: Int = android.R.drawable.ic_menu_camera
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.SENSOR
     override val propertiesLayoutId: Int = R.layout.layout_prop_image
 
     override fun getDefaultProps(): Map<String, String> = mapOf(

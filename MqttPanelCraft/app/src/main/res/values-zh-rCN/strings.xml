@@ -211,4 +211,7 @@
     <string name="broadcast_mode_alert_tts">警报+语音</string>
     <string name="broadcast_waiting_text">等待语音广播文字...</string>
     <string name="broadcast_no_linked">无其他可连接的接收元件</string>
+    <string name="val_slider_style_classic">经典</string>
+    <string name="val_slider_style_capsule">胶囊</string>
+    <string name="val_slider_style_toggle">拨杆</string>
 </resources>

@@ -313,6 +313,7 @@
     <string name="val_orient_vertical">Vertical</string>
     <string name="val_slider_style_classic">Classic</string>
     <string name="val_slider_style_capsule">Capsule</string>
+    <string name="val_slider_style_toggle">Toggle</string>
     <string name="val_stepper_style_standard">Standard</string>
     <string name="val_stepper_style_block">Block</string>
     <string name="val_stepper_style_smooth">Smooth</string>

@@ -16,6 +16,7 @@ import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.LedView
@@ -28,8 +29,9 @@ object LedDefinition : IComponentDefinition {
     override val type: String = "LED"
     override val defaultSize: Size = Size(80, 80)
     override val labelPrefix: String = "led"
+    override val displayNameResId: Int = R.string.component_label_led
     override val iconResId: Int = R.drawable.ic_led_orb
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.SENSOR
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
         "style" to "ORB",

@@ -14,7 +14,9 @@ import com.example.mqttpanelcraft.data.ColorHistoryManager
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
+import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.StepperView
 import com.example.mqttpanelcraft.utils.TextWatcherAdapter
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -33,8 +35,9 @@ object StepperDefinition : IComponentDefinition {
     override val type: String = "STEPPER"
     override val defaultSize: Size = Size(150, 70)
     override val labelPrefix: String = "stepper"
+    override val displayNameResId: Int = R.string.component_label_stepper
     override val iconResId: Int = android.R.drawable.ic_input_add
-    override val group: String = "CONTROL"
+    override val group = ComponentGroup.CONTROL
 
     override val propertiesLayoutId: Int = R.layout.layout_prop_stepper
 
@@ -92,16 +95,9 @@ object StepperDefinition : IComponentDefinition {
         val context = panelView.context
 
         // 1. 數值範圍與步進、當前值 (互動功能)
-        val bindNum = { id: Int, key: String, def: String ->
-            panelView.findViewById<EditText>(id)?.apply {
-                setText(data.props[key] ?: def)
-                addTextChangedListener(TextWatcherAdapter { text -> onUpdate(key, text) })
-            }
-        }
-        bindNum(R.id.etPropMin, "min", "0")
-        bindNum(R.id.etPropMax, "max", "100")
-        bindNum(R.id.etPropStep, "step", "1")
-        bindNum(R.id.etPropUnit, "unit", "")
+        CommonPropBinder.bindEditText(panelView, R.id.etPropMin, "min", data, onUpdate, "0")
+        CommonPropBinder.bindEditText(panelView, R.id.etPropMax, "max", data, onUpdate, "100")
+        CommonPropBinder.bindEditText(panelView, R.id.etPropStep, "step", data, onUpdate, "1")
 
         // 2. 長按連續步進 Toggle
         val toggleLongPress = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleLongPress)

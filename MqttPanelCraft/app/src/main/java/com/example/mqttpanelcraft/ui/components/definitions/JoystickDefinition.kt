@@ -12,7 +12,9 @@ import com.example.mqttpanelcraft.data.ColorHistoryManager
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
+import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.JoystickView
 import com.example.mqttpanelcraft.utils.TextWatcherAdapter
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -22,8 +24,9 @@ object JoystickDefinition : IComponentDefinition {
     override val type = "JOYSTICK"
     override val defaultSize = Size(200, 200)
     override val labelPrefix = "joystick"
+    override val displayNameResId: Int = R.string.component_label_joystick
     override val iconResId = R.drawable.ic_joystick
-    override val group = "CONTROL"
+    override val group = ComponentGroup.CONTROL
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
@@ -167,14 +170,8 @@ object JoystickDefinition : IComponentDefinition {
         }
 
         // 3. Range & Precision
-        val etPropMin = panelView.findViewById<EditText>(R.id.etPropMin)
-        val etPropMax = panelView.findViewById<EditText>(R.id.etPropMax)
-
-        etPropMin?.setText(data.props["min"] ?: "-100")
-        etPropMin?.addTextChangedListener(TextWatcherAdapter { onUpdate("min", it) })
-
-        etPropMax?.setText(data.props["max"] ?: "100")
-        etPropMax?.addTextChangedListener(TextWatcherAdapter { onUpdate("max", it) })
+        CommonPropBinder.bindEditText(panelView, R.id.etPropMin, "min", data, onUpdate, "-100")
+        CommonPropBinder.bindEditText(panelView, R.id.etPropMax, "max", data, onUpdate, "100")
 
         val tvPropPrecision =
                 panelView.findViewById<android.widget.AutoCompleteTextView>(R.id.tvPropPrecision)
@@ -199,21 +196,7 @@ object JoystickDefinition : IComponentDefinition {
         // Improved: Pre-fill defaults so user sees what will be sent (Req: "No default values
         // written")
         val bindMsg = { id: Int, key: String, defVal: String ->
-            panelView.findViewById<EditText>(id)?.apply {
-                val currentVal = data.props[key]
-                val displayVal = if (currentVal.isNullOrEmpty()) defVal else currentVal
-                setText(displayVal)
-                addTextChangedListener(TextWatcherAdapter { onUpdate(key, it) })
-
-                // If it was empty/null, ensure we save the default back to props?
-                // No, only save if user modifies or we want to persist defaults.
-                // Assuming we just want to show it. But if we show it, and user doesn't touch it,
-                // and then saves, it might assume what's in the box is the value.
-                // PropertySheetManager usually reads from the inputs on save.
-                // If we setText here, and the user clicks Save (check button), the Manager reads
-                // the EditText.
-                // So this effectively sets the default.
-            }
+            CommonPropBinder.bindEditText(panelView, id, key, data, onUpdate, defVal)
         }
 
         bindMsg(R.id.etMsgRelease, "msg_release", "stop")
@@ -223,10 +206,14 @@ object JoystickDefinition : IComponentDefinition {
         bindMsg(R.id.etMsgRight, "msg_right", "right")
 
         // 5. Interval
-        panelView.findViewById<EditText>(R.id.etPropInterval)?.apply {
-            setText(data.props["interval"] ?: "100")
-            addTextChangedListener(TextWatcherAdapter { onUpdate("interval", it) })
-        }
+        CommonPropBinder.bindEditText(
+                panelView,
+                R.id.etPropInterval,
+                "interval",
+                data,
+                onUpdate,
+                "100"
+        )
 
         // 6. Initial Style Selector setup
         updateStyleAdapter(panelView, curMode, data, onUpdate)

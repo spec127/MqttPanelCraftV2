@@ -11,7 +11,9 @@ import android.widget.LinearLayout
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
+import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.ColorPaletteView
 import com.example.mqttpanelcraft.utils.TextWatcherAdapter
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -22,8 +24,9 @@ object ColorPaletteDefinition : IComponentDefinition {
         override val type = "PALETTE"
         override val defaultSize = Size(200, 200)
         override val labelPrefix = "palette"
+    override val displayNameResId: Int = R.string.component_label_palette
         override val iconResId = R.drawable.ic_palette
-        override val group = "CONTROL"
+        override val group = ComponentGroup.CONTROL
 
         override fun createView(context: Context, isEditMode: Boolean): View {
                 val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
@@ -303,10 +306,14 @@ object ColorPaletteDefinition : IComponentDefinition {
                 }
 
                 // 6. Interval
-                panelView.findViewById<EditText>(R.id.etPaletteInterval)?.apply {
-                        setText(data.props["interval"] ?: "100")
-                        addTextChangedListener(TextWatcherAdapter { onUpdate("interval", it) })
-                }
+                CommonPropBinder.bindEditText(
+                        panelView,
+                        R.id.etPaletteInterval,
+                        "interval",
+                        data,
+                        onUpdate,
+                        "100"
+                )
 
                 // 7. Data Format
                 val tvFormat =
