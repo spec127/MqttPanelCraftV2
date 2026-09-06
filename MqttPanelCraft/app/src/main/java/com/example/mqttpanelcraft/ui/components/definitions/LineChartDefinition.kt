@@ -32,7 +32,7 @@ object LineChartDefinition : IComponentDefinition {
     override val labelPrefix: String = "chart"
     override val displayNameResId: Int = R.string.component_label_chart
     override val iconResId: Int = android.R.drawable.ic_menu_report_image
-    override val group = ComponentGroup.DISPLAY
+    override val group = ComponentGroup.SENSOR
 
     override val propertiesLayoutId: Int = R.layout.layout_prop_line_chart
 

@@ -34,7 +34,7 @@ object BroadcastDefinition : IComponentDefinition {
     override val labelPrefix: String = "broadcast"
     override val displayNameResId: Int = R.string.component_label_broadcast
     override val iconResId: Int = android.R.drawable.ic_lock_silent_mode_off
-    override val group = ComponentGroup.DISPLAY
+    override val group = ComponentGroup.SENSOR
     override val propertiesLayoutId: Int = R.layout.layout_prop_broadcast
 
     private fun getActivity(context: Context): Activity? {
