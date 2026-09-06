@@ -40,11 +40,6 @@ object TextDefinition : IComponentDefinition {
         "text_effect" to "NONE"
     )
 
-    override fun getDefaultProps(context: Context): Map<String, String> =
-        getDefaultProps().toMutableMap().apply {
-            put("default_text", context.getString(R.string.default_text_content))
-        }
-
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
         val tv = TextView(context).apply {
