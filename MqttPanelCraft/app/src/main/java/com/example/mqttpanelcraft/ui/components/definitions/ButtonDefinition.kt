@@ -8,8 +8,10 @@ import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.StateListDrawable
 import android.text.Editable
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Size
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -22,20 +24,26 @@ import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.doOnLayout
+import androidx.core.widget.TextViewCompat
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.data.ColorHistoryManager
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
+import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 
 object ButtonDefinition : IComponentDefinition {
 
     override val type = "BUTTON"
     override val defaultSize = Size(120, 70)
     override val labelPrefix = "button"
+    override val displayNameResId: Int = R.string.component_label_button
     override val iconResId = R.drawable.ic_btn_power
-    override val group = "CONTROL"
+    override val group = ComponentGroup.CONTROL
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
         "color" to "#2196F3",
@@ -44,6 +52,8 @@ object ButtonDefinition : IComponentDefinition {
     )
 
     override fun createView(context: Context, isEditMode: Boolean): View {
+        val density = context.resources.displayMetrics.density
+        fun dp(value: Int) = (value * density).toInt()
         // Set default blue color if not set
         // Note: data is not available here, will be set in onUpdateView
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
@@ -54,6 +64,11 @@ object ButtonDefinition : IComponentDefinition {
                     elevation = 0f
                     textSize = 16f
                     isAllCaps = false
+                    isSingleLine = true
+                    ellipsize = TextUtils.TruncateAt.END
+                    gravity = Gravity.CENTER
+                    includeFontPadding = false
+                    setPadding(dp(4), dp(2), dp(4), dp(2))
                     tag = "target"
                     layoutParams =
                             FrameLayout.LayoutParams(
@@ -62,12 +77,11 @@ object ButtonDefinition : IComponentDefinition {
                                     )
                                     .apply {
                                         gravity = Gravity.CENTER
-                                        setMargins(12, 12, 12, 12)
+                                        setMargins(dp(4), dp(4), dp(4), dp(4))
                                     }
                 }
         container.addView(button, 0)
 
-        val density = context.resources.displayMetrics.density
         val iconView =
                 ImageView(context).apply {
                     tag = "ICON_OVERLAY"
@@ -103,8 +117,8 @@ object ButtonDefinition : IComponentDefinition {
                 }
         val isOval = (shapeMode == "circle")
 
-        // Dynamic depth based on height (approx 8%)
-        val depth = (data.height.toFloat() * 0.08f) * view.resources.displayMetrics.density
+        // Component dimensions are already pixels; never multiply them by density again.
+        val depth = data.height.toFloat() * 0.08f
         button.background = createTactileDrawable(color, isOval, cornerRadius, depth)
 
         // Dynamic elevation
@@ -120,61 +134,75 @@ object ButtonDefinition : IComponentDefinition {
         val contentColor = if (isLight) Color.BLACK else Color.WHITE
         button.setTextColor(contentColor)
 
-        // Dynamic Scaling: Content occupies ~60% of button height
         val density = view.resources.displayMetrics.density
-        // Use data.height (source of truth) to prevent startup layout glitches where view.height
-        // might be unstable
-        val dim = data.height
-        val targetH = dim * 0.6f
-
-        // Helper for text size
-        fun safeTextSize(px: Float): Float = (px / density).coerceIn(4f, 60f)
-
-        button.text = ""
-        button.setCompoundDrawables(null, null, null, null)
-        iconView.visibility = View.GONE
-
         val apprMode = data.props["appearance_mode"] ?: "text"
         val iconKey = data.props["icon"] ?: "power"
         val iconRes = getIconRes(iconKey)
 
-        when (apprMode) {
-            "icon" -> {
-                iconView.visibility = View.VISIBLE
-                iconView.setImageResource(iconRes)
-                iconView.imageTintList = ColorStateList.valueOf(contentColor)
+        fun applyContent() {
+            button.text = ""
+            button.setCompoundDrawables(null, null, null, null)
+            iconView.visibility = View.GONE
+            val fallbackHeight =
+                    (data.height - 8 * density).toInt().coerceAtLeast((12 * density).toInt())
+            val availableHeight =
+                    ((if (button.height > 0) button.height else fallbackHeight) -
+                                    button.paddingTop - button.paddingBottom)
+                            .coerceAtLeast((8 * density).toInt())
 
-                // Icon Only: scaled to targetH
-                val size = targetH.toInt().coerceAtLeast((8 * density).toInt())
-                iconView.layoutParams =
-                        (iconView.layoutParams as FrameLayout.LayoutParams).apply {
-                            width = size
-                            height = size
-                            gravity = Gravity.CENTER
-                        }
-            }
-            "text_icon" -> {
-                button.text = data.props["text"] ?: "button1"
-                // Stacked: Icon top (60%), Text bottom (40%) of targetH
-                val iconSize = (targetH * 0.6f).toInt().coerceAtLeast((8 * density).toInt())
-                val textSizePx = targetH * 0.25f
-                val padding = (targetH * 0.02f).toInt().coerceAtLeast((1 * density).toInt())
-
-                val d = ContextCompat.getDrawable(view.context, iconRes)?.mutate()
-                d?.setBounds(0, 0, iconSize, iconSize)
-                d?.setTint(contentColor)
-
-                button.setCompoundDrawables(null, d, null, null)
-                button.compoundDrawablePadding = padding
-                button.includeFontPadding = false
-                button.textSize = safeTextSize(textSizePx)
-            }
-            else -> { // "text"
-                button.text = data.props["text"] ?: "button1"
-                val textSizePx = targetH * 0.5f
-                button.textSize = safeTextSize(textSizePx)
+            when (apprMode) {
+                "icon" -> {
+                    iconView.visibility = View.VISIBLE
+                    iconView.setImageResource(iconRes)
+                    iconView.imageTintList = ColorStateList.valueOf(contentColor)
+                    val size = (availableHeight * 0.7f).toInt().coerceAtLeast((8 * density).toInt())
+                    iconView.layoutParams =
+                            (iconView.layoutParams as FrameLayout.LayoutParams).apply {
+                                width = size
+                                height = size
+                                gravity = Gravity.CENTER
+                            }
+                }
+                "text_icon" -> {
+                    button.text = data.props["text"] ?: "button1"
+                    val maxTextPx = (availableHeight * 0.27f).coerceAtLeast(6 * density)
+                    val maxTextSp = (maxTextPx / density).toInt().coerceAtLeast(6)
+                    TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                            button,
+                            6,
+                            maxTextSp,
+                            1,
+                            TypedValue.COMPLEX_UNIT_SP
+                    )
+                    button.setTextSize(TypedValue.COMPLEX_UNIT_PX, maxTextPx)
+                    val fontHeight = button.paint.fontMetrics.run { bottom - top }
+                    val gap = (2 * density).toInt()
+                    val iconSize =
+                            (availableHeight - fontHeight - gap)
+                                    .toInt()
+                                    .coerceAtLeast((6 * density).toInt())
+                    val drawable = ContextCompat.getDrawable(view.context, iconRes)?.mutate()
+                    drawable?.setBounds(0, 0, iconSize, iconSize)
+                    drawable?.setTint(contentColor)
+                    button.setCompoundDrawables(null, drawable, null, null)
+                    button.compoundDrawablePadding = gap
+                }
+                else -> {
+                    button.text = data.props["text"] ?: "button1"
+                    val maxTextSp =
+                            ((availableHeight * 0.5f) / density).toInt().coerceIn(6, 60)
+                    TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
+                            button,
+                            6,
+                            maxTextSp,
+                            1,
+                            TypedValue.COMPLEX_UNIT_SP
+                    )
+                }
             }
         }
+        applyContent()
+        button.doOnLayout { applyContent() }
     }
 
     private fun createTactileDrawable(
@@ -279,43 +307,30 @@ object ButtonDefinition : IComponentDefinition {
         // 0. Topic Config (Shared) - Handled by PropertiesSheetManager
         // No manual binding needed here
 
-        val etText = panelView.findViewById<EditText>(R.id.etPropText)
-        etText?.setText(data.props["text"] ?: "button1")
-        etText?.addTextChangedListener(
-                object : TextWatcher {
-                    override fun afterTextChanged(s: Editable?) {
-                        onUpdate("text", s.toString())
-                    }
-                    override fun beforeTextChanged(
-                            s: CharSequence?,
-                            start: Int,
-                            count: Int,
-                            after: Int
-                    ) {}
-                    override fun onTextChanged(
-                            s: CharSequence?,
-                            start: Int,
-                            before: Int,
-                            count: Int
-                    ) {}
-                }
+        CommonPropBinder.bindEditText(
+                panelView,
+                R.id.etPropText,
+                "text",
+                data,
+                onUpdate,
+                "button1"
         )
 
-        val spShape = panelView.findViewById<AutoCompleteTextView>(R.id.spPropShape)
-        val shapeKeys = listOf("pill", "rect", "circle")
-        val shapeLabels =
+        val shapeOptions =
                 listOf(
-                        context.getString(R.string.val_shape_rounded_rect),
-                        context.getString(R.string.val_shape_square),
-                        context.getString(R.string.val_shape_circle_style)
+                        PropertyOption("pill", R.string.val_shape_rounded_rect),
+                        PropertyOption("rect", R.string.val_shape_square),
+                        PropertyOption("circle", R.string.val_shape_circle_style)
                 )
-        spShape?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, shapeLabels))
-        val curShape = data.props["shape"] ?: "pill"
-        val displayShape = shapeLabels.getOrNull(shapeKeys.indexOf(curShape)) ?: shapeLabels[0]
-        spShape?.setText(displayShape, false)
-        spShape?.setOnItemClickListener { _, _, position, _ ->
-            onUpdate("shape", shapeKeys[position])
-        }
+        CommonPropBinder.bindLocalizedDropdown(
+                panelView,
+                R.id.spPropShape,
+                "shape",
+                data,
+                onUpdate,
+                shapeOptions,
+                "pill"
+        )
 
         // --- Press Payload with 2-step UX ---
         val etPress = panelView.findViewById<AutoCompleteTextView>(R.id.etPropPayloadPress)
@@ -456,37 +471,23 @@ object ButtonDefinition : IComponentDefinition {
         }
 
         // Timer Duration
-        val etTimer = panelView.findViewById<EditText>(R.id.etPropTimer)
-        etTimer?.setText(data.props["timer_ms"] ?: "1000")
-        etTimer?.addTextChangedListener(
-                object : TextWatcher {
-                    override fun afterTextChanged(s: Editable?) {
-                        onUpdate("timer_ms", s.toString())
-                    }
-                    override fun beforeTextChanged(i: CharSequence?, s: Int, c: Int, a: Int) {}
-                    override fun onTextChanged(i: CharSequence?, s: Int, b: Int, c: Int) {}
-                }
+        CommonPropBinder.bindEditText(
+                panelView,
+                R.id.etPropTimer,
+                "timer_ms",
+                data,
+                onUpdate,
+                "1000"
         )
 
         // Appearance Mode (Text/Icon/Both)
-        val spApprMode = panelView.findViewById<AutoCompleteTextView>(R.id.spPropApprMode)
         val modeOptions =
                 listOf(
-                        context.getString(R.string.properties_mode_text),
-                        context.getString(R.string.properties_mode_icon),
-                        context.getString(R.string.properties_mode_text_icon)
+                        PropertyOption("text", R.string.properties_mode_text),
+                        PropertyOption("icon", R.string.properties_mode_icon),
+                        PropertyOption("text_icon", R.string.properties_mode_text_icon)
                 )
-        spApprMode?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, modeOptions))
-
-        // Map mode string to index
         val curApprMode = data.props["appearance_mode"] ?: "text"
-        val initialIndex =
-                when (curApprMode) {
-                    "icon" -> 1
-                    "text_icon" -> 2
-                    else -> 0
-                }
-        spApprMode?.setText(modeOptions[initialIndex], false)
 
         val containerText = panelView.findViewById<View>(R.id.containerPropText)
         val containerIcon = panelView.findViewById<View>(R.id.containerPropIcon)
@@ -509,16 +510,18 @@ object ButtonDefinition : IComponentDefinition {
         }
         updateApprVisibility(curApprMode)
 
-        spApprMode?.setOnItemClickListener { _, _, position, _ ->
-            val newMode =
-                    when (position) {
-                        1 -> "icon"
-                        2 -> "text_icon"
-                        else -> "text"
-                    }
-            onUpdate("appearance_mode", newMode)
-            updateApprVisibility(newMode)
-        }
+        CommonPropBinder.bindLocalizedDropdown(
+                panelView,
+                R.id.spPropApprMode,
+                "appearance_mode",
+                data,
+                { key, value ->
+                    onUpdate(key, value)
+                    updateApprVisibility(value)
+                },
+                modeOptions,
+                "text"
+        )
 
         // Icon Grid Logic
         val iconMap =

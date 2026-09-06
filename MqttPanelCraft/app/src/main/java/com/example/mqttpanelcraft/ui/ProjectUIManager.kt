@@ -225,6 +225,7 @@ class ProjectUIManager(
     }
 
     fun updateModeUI(isEditMode: Boolean, selectedId: Int?) {
+        interactionManager.cancelInteraction()
         val toolbarColor = ContextCompat.getColor(activity, R.color.toolbar_text)
 
         // Lock Sheet?

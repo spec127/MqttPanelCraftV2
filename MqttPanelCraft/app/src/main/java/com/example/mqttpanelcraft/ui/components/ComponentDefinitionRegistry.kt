@@ -25,11 +25,11 @@ object ComponentDefinitionRegistry {
         register(SignalIndicatorDefinition)
         register(TextDisplayDefinition)
         register(ImageSensorDefinition) // 影像(圖片與串流)
+        register(LineChartDefinition)
+        register(BroadcastDefinition) // 廣播(TTS語音轉文字)
 
         // --- DISPLAY 多媒體顯示 ---
         register(GraphicDefinition) // 圖形組件
-        register(LineChartDefinition)
-        register(BroadcastDefinition) // 廣播(TTS語音轉文字)
         register(TextDefinition)
         register(CalendarClockDefinition)
         register(ClockDefinition)

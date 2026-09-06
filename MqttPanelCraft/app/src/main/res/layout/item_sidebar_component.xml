@@ -37,7 +37,7 @@
             android:id="@+id/tvLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Component"
+            android:text="@string/preview_component"
             android:textSize="11sp"
             android:textStyle="bold"
             android:textColor="@color/sidebar_text_primary"

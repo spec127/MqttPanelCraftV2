@@ -88,6 +88,20 @@ class CanvasInteractionManager(
     // State Tracking
     private var currentDeleteState = DeleteState.NONE
 
+    /** Clears every transient gesture state so a missing UP/CANCEL cannot poison the next touch. */
+    fun cancelInteraction() {
+        activeView?.alpha = 1.0f
+        guideOverlay.clear()
+        currentDeleteState = DeleteState.NONE
+        callbacks.onDeleteZoneState(DeleteState.NONE)
+        currentMode = Mode.IDLE
+        activeView = null
+        isDragDetected = false
+        hasTriggeredDragSelection = false
+        isDeleteHovered = false
+        canvasCanvas.requestDisallowInterceptTouchEvent(false)
+    }
+
     fun handleTouch(event: MotionEvent): Boolean {
         val x = event.x
         val y = event.y
@@ -96,11 +110,11 @@ class CanvasInteractionManager(
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
+                cancelInteraction()
                 downX = rawX
                 downY = rawY
                 isDragDetected = false
                 hasTriggeredDragSelection = false
-                currentDeleteState = DeleteState.NONE
 
                 // Only allow Drag/Resize in Edit Mode
                 if (isEditMode()) {
@@ -188,13 +202,18 @@ class CanvasInteractionManager(
                     val canvasW = canvasCanvas.width
                     val compH = activeView!!.height
                     val compW = activeView!!.width
-                    val safeLimitY = (canvasH - bottomInset - compH).toFloat()
+                    val safeLimitY = (canvasH - bottomInset - compH).coerceAtLeast(0).toFloat()
 
                     var newY = nominalY
                     var nextState = DeleteState.NONE
 
-                    val screenH = canvasCanvas.context.resources.displayMetrics.heightPixels
-                    val fingerInDeleteZone = rawY > (screenH - bottomInset)
+                    val fingerInDeleteZone =
+                            isFingerInDeleteZone(
+                                    rawY,
+                                    currentCanvasScreenY,
+                                    canvasH,
+                                    bottomInset
+                            )
 
                     if (nominalY > safeLimitY) {
                         // OVERSHOOT Logic
@@ -294,7 +313,11 @@ class CanvasInteractionManager(
                     return true
                 }
             }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+            MotionEvent.ACTION_CANCEL -> {
+                cancelInteraction()
+                return true
+            }
+            MotionEvent.ACTION_UP -> {
                 guideOverlay.clear()
                 val wasDeleteActive = (currentDeleteState == DeleteState.ACTIVE)
                 if (currentDeleteState != DeleteState.NONE) {
@@ -305,7 +328,7 @@ class CanvasInteractionManager(
                 if (currentMode == Mode.DRAGGING && activeView != null) {
                     val canvasH = canvasCanvas.height
                     val compH = activeView!!.height
-                    val safeLimitY = (canvasH - bottomInset - compH).toFloat()
+                    val safeLimitY = (canvasH - bottomInset - compH).coerceAtLeast(0).toFloat()
 
                     if (wasDeleteActive) {
                         callbacks.onComponentDeleted(activeView!!.id)
@@ -350,9 +373,7 @@ class CanvasInteractionManager(
                     callbacks.onComponentClicked(activeView!!.id)
                 }
 
-                currentMode = Mode.IDLE
-                activeView = null
-                isDeleteHovered = false
+                cancelInteraction()
                 return true
             }
         }
@@ -620,3 +641,10 @@ class CanvasInteractionManager(
     private fun findLabelFor(view: View): View? =
             canvasCanvas.findViewWithTag("LABEL_FOR_${view.id}")
 }
+
+internal fun isFingerInDeleteZone(
+        rawY: Float,
+        canvasScreenY: Float,
+        canvasHeight: Int,
+        bottomInset: Int
+): Boolean = rawY > canvasScreenY + canvasHeight - bottomInset

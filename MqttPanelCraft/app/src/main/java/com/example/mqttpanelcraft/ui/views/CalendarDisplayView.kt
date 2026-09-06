@@ -15,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import java.text.SimpleDateFormat
+import java.text.DateFormatSymbols
 import java.util.Calendar
 import java.util.Locale
 
@@ -77,10 +78,10 @@ class CalendarDisplayView(context: Context) : FrameLayout(context) {
     private fun renderBigDate(scale: Float) {
         val now = Calendar.getInstance()
         val day = SimpleDateFormat("dd", Locale.getDefault()).format(now.time)
-        val monthAndWeekday = SimpleDateFormat("M 月 · EEEE", Locale.getDefault()).format(now.time)
+        val month = SimpleDateFormat("MMMM", Locale.getDefault()).format(now.time)
         addView(verticalContainer(scale).apply {
             addView(text(day, (54f * scale).coerceAtLeast(13f), primaryColor, Typeface.NORMAL))
-            addView(text(monthAndWeekday, (13f * scale).coerceAtLeast(7f), secondaryColor(), Typeface.NORMAL))
+            addView(text(month, (13f * scale).coerceAtLeast(7f), secondaryColor(), Typeface.NORMAL))
         })
     }
 
@@ -97,7 +98,9 @@ class CalendarDisplayView(context: Context) : FrameLayout(context) {
     private fun renderMonth(scale: Float) {
         val calendar = Calendar.getInstance()
         val today = calendar.get(Calendar.DAY_OF_MONTH)
-        val monthTitle = SimpleDateFormat("yyyy 年 M 月", Locale.getDefault()).format(calendar.time)
+        val locale = Locale.getDefault()
+        val monthPattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "yMMMM")
+        val monthTitle = SimpleDateFormat(monthPattern, locale).format(calendar.time)
         val padH = (dp(10) * scale).toInt().coerceAtLeast(dp(2))
         val padV = (dp(8) * scale).toInt().coerceAtLeast(dp(2))
         val content = LinearLayout(context).apply {
@@ -115,7 +118,8 @@ class CalendarDisplayView(context: Context) : FrameLayout(context) {
             rowCount = 7
             layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 1f)
         }
-        listOf("日", "一", "二", "三", "四", "五", "六").forEach { label ->
+        val weekdays = DateFormatSymbols(locale).shortWeekdays
+        (Calendar.SUNDAY..Calendar.SATURDAY).map { weekdays[it] }.forEach { label ->
             grid.addView(dayCell(label, (10f * scale).coerceAtLeast(5.5f), secondaryColor(), false, scale))
         }
 

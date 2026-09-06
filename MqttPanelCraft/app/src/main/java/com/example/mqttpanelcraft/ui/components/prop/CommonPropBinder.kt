@@ -8,13 +8,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.annotation.StringRes
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.data.ColorHistoryManager
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.google.android.material.button.MaterialButtonToggleGroup
+
+/** A localized label paired with the stable value stored in project JSON. */
+data class PropertyOption(val value: String, @StringRes val labelResId: Int)
 
 /**
  * A utility class to reduce boilerplate code in
@@ -192,13 +200,124 @@ object CommonPropBinder {
                 }
 
         autoComplete.setText(currentLabel, false)
-        val adapter = ArrayAdapter(context, android.R.layout.simple_dropdown_item_1line, options)
+        val adapter = ArrayAdapter(context, R.layout.list_item_dropdown, options)
         autoComplete.setAdapter(adapter)
 
         autoComplete.setOnItemClickListener { _, _, position, _ ->
             val selectedLabel = options[position]
             val selectedValue = valueMap?.get(selectedLabel) ?: selectedLabel
             onUpdate(propKey, selectedValue)
+        }
+    }
+
+    /** Binds a fixed-value dropdown without deriving JSON values from translated labels. */
+    fun bindLocalizedDropdown(
+            panelView: View,
+            autoCompleteId: Int,
+            propKey: String,
+            data: ComponentData,
+            onUpdate: (String, String) -> Unit,
+            options: List<PropertyOption>,
+            defaultValue: String = options.firstOrNull()?.value.orEmpty()
+    ) {
+        if (options.isEmpty()) return
+        val autoComplete = panelView.findViewById<AutoCompleteTextView>(autoCompleteId) ?: return
+        val labels = options.map { panelView.context.getString(it.labelResId) }
+        val currentValue = data.props[propKey] ?: defaultValue
+        val currentIndex = options.indexOfFirst { it.value == currentValue }.coerceAtLeast(0)
+
+        autoComplete.setAdapter(
+                ArrayAdapter(panelView.context, R.layout.list_item_dropdown, labels)
+        )
+        autoComplete.setText(labels[currentIndex], false)
+        autoComplete.setOnItemClickListener { _, _, position, _ ->
+            options.getOrNull(position)?.let { onUpdate(propKey, it.value) }
+        }
+    }
+
+    /** Binds the large card-style checks shared by multiple property panels. */
+    fun bindCheckCard(
+            panelView: View,
+            rowId: Int,
+            checkId: Int,
+            propKey: String,
+            data: ComponentData,
+            onUpdate: (String, String) -> Unit,
+            defaultChecked: Boolean = false
+    ) {
+        val row = panelView.findViewById<View>(rowId) ?: return
+        val check = panelView.findViewById<ImageView>(checkId) ?: return
+        var checked = data.props[propKey]?.toBooleanStrictOrNull() ?: defaultChecked
+        fun render() {
+            check.visibility = if (checked) View.VISIBLE else View.INVISIBLE
+            row.isSelected = checked
+        }
+        render()
+        row.setOnClickListener {
+            checked = !checked
+            render()
+            onUpdate(propKey, checked.toString())
+        }
+    }
+
+    /** Applies one conditional visibility rule during both initial and later binding. */
+    fun setVisibleWhen(value: String?, expectedValue: String, vararg views: View?) {
+        val visibility = if (value == expectedValue) View.VISIBLE else View.GONE
+        views.forEach { it?.visibility = visibility }
+    }
+
+    /**
+     * Binds the linked-component checklist used by receiver and local-trigger components.
+     * Component ids remain the only values persisted in JSON; labels and topics are presentation.
+     */
+    fun bindLinkedComponents(
+        panelView: View,
+        containerId: Int,
+        data: ComponentData,
+        candidates: List<ComponentData>,
+        onUpdate: (String, String) -> Unit,
+        includeOwner: Boolean = true,
+        @StringRes emptyTextResId: Int = 0,
+        itemLabel: (ComponentData) -> String = { "${it.label} (${it.topicConfig})" },
+        ownerLabel: (ComponentData) -> String = itemLabel
+    ) {
+        val container = panelView.findViewById<LinearLayout>(containerId) ?: return
+        val context = panelView.context
+        val linked = data.props["linked_components"]
+            .orEmpty()
+            .split(",")
+            .map(String::trim)
+            .filter(String::isNotEmpty)
+            .toMutableSet()
+        val targets = candidates.filter { it.id != data.id }
+
+        container.removeAllViews()
+        if (includeOwner) {
+            container.addView((LayoutInflater.from(context)
+                .inflate(R.layout.item_prop_linked_component, container, false) as CheckBox).apply {
+                text = ownerLabel(data)
+                isChecked = true
+                isEnabled = false
+                alpha = 0.5f
+            })
+        }
+        targets.forEach { component ->
+            container.addView((LayoutInflater.from(context)
+                .inflate(R.layout.item_prop_linked_component, container, false) as CheckBox).apply {
+                text = itemLabel(component)
+                isChecked = component.id.toString() in linked
+                setOnCheckedChangeListener { _, checked ->
+                    if (checked) linked.add(component.id.toString())
+                    else linked.remove(component.id.toString())
+                    onUpdate("linked_components", linked.joinToString(","))
+                }
+            })
+        }
+        if (targets.isEmpty() && emptyTextResId != 0) {
+            container.addView((LayoutInflater.from(context)
+                .inflate(R.layout.item_prop_linked_empty, container, false) as TextView).apply {
+                setText(emptyTextResId)
+            })
         }
     }
     

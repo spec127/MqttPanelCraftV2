@@ -104,7 +104,7 @@ class LogConsoleManager(
                  // Activity should pass a callback or we just assume logic.
                  // Wait, LogConsoleManager shouldn't update UI directly for local actions if we have VM.
              } else {
-                 Toast.makeText(rootView.context, "Enter Topic to Publish", Toast.LENGTH_SHORT).show()
+                 Toast.makeText(rootView.context, R.string.console_enter_topic, Toast.LENGTH_SHORT).show()
              }
         }
     }

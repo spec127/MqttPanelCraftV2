@@ -346,17 +346,13 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:hint="@string/properties_label_color_mode"
-            app:boxCornerRadiusTopStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusBottomEnd="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+            style="@style/Widget.App.TextInputLayout.Properties.Dropdown">
             <AutoCompleteTextView
                 android:id="@+id/spinnerColorMode"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="none"
-                android:textSize="12sp"/>
+                android:textSize="@dimen/prop_dropdown_text_size"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Color Pickers Area (Weight 0.6, Vertical) -->

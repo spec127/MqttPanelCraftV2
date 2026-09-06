@@ -10,7 +10,9 @@ import android.widget.FrameLayout
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.views.ScaleMeterView
 
@@ -18,8 +20,9 @@ object ScaleMeterDefinition : IComponentDefinition {
     override val type: String = "SCALE_METER"
     override val defaultSize: Size = Size(200, 70)
     override val labelPrefix: String = "meter"
+    override val displayNameResId: Int = R.string.component_label_scale_meter
     override val iconResId: Int = android.R.drawable.ic_menu_sort_by_size
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.SENSOR
     override val propertiesLayoutId: Int = R.layout.layout_prop_scale_meter
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
@@ -113,7 +116,15 @@ object ScaleMeterDefinition : IComponentDefinition {
             CommonPropBinder.bindEditText(panelView, R.id.etMin, "min", data, onUpdate, "0")
             CommonPropBinder.bindEditText(panelView, R.id.etMax, "max", data, onUpdate, "100")
             CommonPropBinder.bindEditText(panelView, R.id.etScaleUnit, "unit", data, onUpdate, "")
-            CommonPropBinder.bindColorPalette(panelView, R.id.containerThemeColor, "theme_color", data, onUpdate, "主體顏色", "#FF9800")
+            CommonPropBinder.bindColorPalette(
+                    panelView,
+                    R.id.containerThemeColor,
+                    "theme_color",
+                    data,
+                    onUpdate,
+                    panelView.context.getString(R.string.properties_label_theme_color),
+                    "#FF9800"
+            )
 
             // Feedback Checkboxes
             fun bindCheckbox(itemId: Int, checkId: Int, key: String) {
@@ -316,7 +327,7 @@ object ScaleMeterDefinition : IComponentDefinition {
                             background = null
                             setTextColor(Color.parseColor("#2196F3")) // 改為藍色
                             gravity = android.view.Gravity.CENTER
-                            hint = "上限"
+                            hint = context.getString(R.string.meter_limit_max)
                             setHintTextColor(Color.parseColor("#94A3B8"))
                             inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
                             addTextChangedListener(object : android.text.TextWatcher {
@@ -451,9 +462,19 @@ object ScaleMeterDefinition : IComponentDefinition {
             }
 
             // SECTION 2: APPEARANCE
-            val styleOptions = listOf("經典實心 (Solid)", "分段陣列 (Segmented)", "溫度計 (Thermometer)")
-            val styleMap = mapOf("經典實心 (Solid)" to "SOLID", "分段陣列 (Segmented)" to "SEGMENTED", "溫度計 (Thermometer)" to "THERMOMETER")
-            CommonPropBinder.bindDropdown(panelView, R.id.spScaleStyle, "style", data, onUpdate, styleOptions, styleMap, "SOLID")
+            CommonPropBinder.bindLocalizedDropdown(
+                    panelView,
+                    R.id.spScaleStyle,
+                    "style",
+                    data,
+                    onUpdate,
+                    listOf(
+                            PropertyOption("SOLID", R.string.scale_style_solid),
+                            PropertyOption("SEGMENTED", R.string.scale_style_segmented),
+                            PropertyOption("THERMOMETER", R.string.scale_style_thermometer)
+                    ),
+                    "SOLID"
+            )
 
             // 方向選擇器切換按鈕 (VERTICAL / HORIZONTAL)
             val toggleOrientation = panelView.findViewById<com.google.android.material.button.MaterialButtonToggleGroup>(R.id.toggleOrientation)

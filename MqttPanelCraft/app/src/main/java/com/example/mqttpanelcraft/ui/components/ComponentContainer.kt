@@ -16,7 +16,7 @@ object ComponentContainer {
             context: Context,
             tag: String,
             isEditMode: Boolean,
-            group: String = "CONTROL"
+            group: ComponentGroup = ComponentGroup.CONTROL
     ): FrameLayout {
         val container = InterceptableFrameLayout(context)
 
@@ -76,12 +76,11 @@ object ComponentContainer {
         return container
     }
 
-    private fun getGroupColor(group: String, isDark: Boolean): Int {
+    private fun getGroupColor(group: ComponentGroup, isDark: Boolean): Int {
         return when (group) {
-            "CONTROL" -> if (isDark) Color.parseColor("#1976D2") else Color.parseColor("#2196F3")
-            "SENSOR" -> if (isDark) Color.parseColor("#FBC02D") else Color.parseColor("#FFEB3B")
-            "DISPLAY" -> if (isDark) Color.parseColor("#D32F2F") else Color.parseColor("#F44336")
-            else -> if (isDark) Color.parseColor("#757575") else Color.parseColor("#9E9E9E")
+            ComponentGroup.CONTROL -> if (isDark) Color.parseColor("#1976D2") else Color.parseColor("#2196F3")
+            ComponentGroup.SENSOR -> if (isDark) Color.parseColor("#FBC02D") else Color.parseColor("#FFEB3B")
+            ComponentGroup.DISPLAY -> if (isDark) Color.parseColor("#D32F2F") else Color.parseColor("#F44336")
         }
     }
 }

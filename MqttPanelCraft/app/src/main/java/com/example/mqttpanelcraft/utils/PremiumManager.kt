@@ -1,6 +1,7 @@
 package com.example.mqttpanelcraft.utils
 
 import android.content.Context
+import com.example.mqttpanelcraft.R
 
 object PremiumManager {
     private const val PREFS_NAME = "AppSettings"
@@ -34,23 +35,23 @@ object PremiumManager {
      */
     fun showPremiumDialog(context: Context, callback: (Boolean) -> Unit) {
         androidx.appcompat.app.AlertDialog.Builder(context)
-            .setTitle("Upgrade to Premium")
-            .setMessage("Unlock advanced features like File Import and remove all ads!\n\n(Simulation: Click 'Buy' to enable)")
-            .setPositiveButton("Buy ($1.99)") { _, _ ->
+            .setTitle(R.string.premium_upgrade_title)
+            .setMessage(R.string.premium_upgrade_message)
+            .setPositiveButton(R.string.premium_buy) { _, _ ->
                 setPremium(context, true)
-                android.widget.Toast.makeText(context, "Premium Unlocked!", android.widget.Toast.LENGTH_SHORT).show()
+                android.widget.Toast.makeText(context, R.string.premium_unlocked, android.widget.Toast.LENGTH_SHORT).show()
                 callback(true)
             }
-            .setNegativeButton("Cancel") { _, _ ->
+            .setNegativeButton(R.string.common_btn_cancel) { _, _ ->
                 callback(false)
             }
-            .setNeutralButton("Restore") { _, _ ->
+            .setNeutralButton(R.string.premium_restore) { _, _ ->
                  // Simulation: Check if already true? Or just re-enable
                  if (isPremium(context)) {
-                     android.widget.Toast.makeText(context, "Already Premium", android.widget.Toast.LENGTH_SHORT).show()
+                     android.widget.Toast.makeText(context, R.string.premium_already, android.widget.Toast.LENGTH_SHORT).show()
                      callback(true)
                  } else {
-                     android.widget.Toast.makeText(context, "No purchase found", android.widget.Toast.LENGTH_SHORT).show()
+                     android.widget.Toast.makeText(context, R.string.premium_no_purchase, android.widget.Toast.LENGTH_SHORT).show()
                  }
             }
             .show()

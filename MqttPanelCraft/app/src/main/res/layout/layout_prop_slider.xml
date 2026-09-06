@@ -225,14 +225,11 @@
                 <AutoCompleteTextView
                     android:id="@+id/spPropStyle"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="none"
                     android:maxLines="1"
-                    app:autoSizeTextType="uniform"
-                    app:autoSizeMinTextSize="10sp"
-                    app:autoSizeMaxTextSize="14sp"
                     android:ellipsize="end"
-                    android:textSize="12sp"/>
+                    android:textSize="@dimen/prop_dropdown_text_size"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <include
@@ -268,7 +265,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="顯示尺規刻度標記與數值分界"
+                    android:text="@string/slider_ticks_desc"
                     android:textColor="@color/prop_text_secondary"
                     android:textSize="11sp"/>
             </LinearLayout>
@@ -304,7 +301,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="拖曳操作時即時提示目前數值氣泡"
+                    android:text="@string/slider_bubble_desc"
                     android:textColor="@color/prop_text_secondary"
                     android:textSize="11sp"/>
             </LinearLayout>

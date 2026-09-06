@@ -43,7 +43,7 @@
                 android:layout_gravity="center_horizontal"
                 android:background="#E0E0E0"
                 android:padding="16dp"
-                android:text="Logo"
+                android:text="@string/auth_logo"
                 android:textSize="16sp" />
 
             <TextView
@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp"
-                android:text="Welcome Back"
+                android:text="@string/auth_welcome_back"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -63,7 +63,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:hint="Email">
+                android:hint="@string/auth_email">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -77,7 +77,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Password">
+                android:hint="@string/auth_password">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPassword"
@@ -94,7 +94,7 @@
                 android:layout_marginTop="24dp"
                 android:backgroundTint="@color/primary"
                 android:paddingVertical="12dp"
-                android:text="LOGIN"
+                android:text="@string/auth_login"
                 android:textSize="16sp" />
 
             <!-- Google Button -->
@@ -104,7 +104,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Sign in with Google"
+                android:text="@string/auth_google_sign_in"
                 android:textSize="16sp"
                 app:icon="@drawable/ic_google"
                 app:iconGravity="textStart" />
@@ -116,7 +116,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Try as Guest"
+                android:text="@string/auth_guest"
                 android:textSize="16sp"
                 android:textColor="#757575" />
 
@@ -131,14 +131,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Don't have an account? "
+                    android:text="@string/auth_no_account"
                     android:textColor="#757575" />
 
                 <TextView
                     android:id="@+id/tvRegister"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Register"
+                    android:text="@string/auth_register"
                     android:textColor="@color/primary"
                     android:textStyle="bold" />
             </LinearLayout>

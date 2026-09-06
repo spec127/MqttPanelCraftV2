@@ -1,0 +1,26 @@
+PRIVACY POLICY
+
+Effective Date: 2026-01-26
+
+1. Introduction
+This Privacy Policy explains how MqttPanelCraft ("we", "our", or "the App") handles your information. We are committed to protecting your privacy.
+
+2. Data Collection and Use
+We do not knowingly collect, store, or share personal information from our users. The App operates primarily as a local tool for creating MQTT dashboards.
+
+3. App Permissions
+- INTERNET: Connect to MQTT brokers and load ads.
+- ACCESS_NETWORK_STATE: Check network connectivity.
+- READ_EXTERNAL_STORAGE / READ_MEDIA_IMAGES: Load optional panel background images.
+
+4. Third-Party Services
+Google Mobile Ads SDK (AdMob) may collect data, such as the Advertising ID, to serve ads. Its use is governed by Google’s applicable privacy policy and terms.
+
+5. MQTT Data
+Your MQTT configuration and payload data are processed locally on your device or sent directly to the MQTT broker you specify. We do not have access to your MQTT data.
+
+6. Changes to This Privacy Policy
+We may update this policy from time to time. Please review it periodically for changes.
+
+7. Contact Us
+Questions or suggestions: niceboat919@gmail.com

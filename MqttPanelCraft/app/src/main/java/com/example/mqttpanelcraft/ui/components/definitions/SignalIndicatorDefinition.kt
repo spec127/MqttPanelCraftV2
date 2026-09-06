@@ -13,9 +13,11 @@ import android.widget.TextView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.findComponentTarget
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.SignalIndicatorView
 import com.google.android.material.button.MaterialButtonToggleGroup
 import androidx.core.text.HtmlCompat
@@ -24,8 +26,9 @@ object SignalIndicatorDefinition : IComponentDefinition {
     override val type: String = "SIGNAL_INDICATOR"
     override val defaultSize: Size = Size(125, 100)
     override val labelPrefix: String = "signal"
+    override val displayNameResId: Int = R.string.component_label_signal_indicator
     override val iconResId: Int = android.R.drawable.ic_menu_sort_by_size
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.SENSOR
     override val propertiesLayoutId: Int = R.layout.layout_prop_signal_indicator
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
@@ -266,18 +269,7 @@ object SignalIndicatorDefinition : IComponentDefinition {
         CommonPropBinder.bindEditText(panelView, R.id.etAlarmThreshold, "alarm_threshold", data, onUpdate, "4")
 
         // Color Mode
-        val spinnerColorMode = panelView.findViewById<AutoCompleteTextView>(R.id.spinnerColorMode)
-        val colorModes = arrayOf(
-            ctx.getString(R.string.prop_val_color_solid),
-            ctx.getString(R.string.prop_val_color_step),
-            ctx.getString(R.string.prop_val_color_gradient)
-        )
-        val adapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, colorModes)
-        spinnerColorMode.setAdapter(adapter)
-        
         val cmStr = data.props["color_mode"] ?: "SOLID"
-        val cmIndex = when(cmStr) { "STEP" -> 1; "GRADIENT" -> 2; else -> 0 }
-        spinnerColorMode.setText(colorModes[cmIndex], false)
         
         val containerColorEnd = panelView.findViewById<View>(R.id.containerColorEnd)
         val containerStepThreshold = panelView.findViewById<View>(R.id.containerStepThreshold)
@@ -302,11 +294,19 @@ object SignalIndicatorDefinition : IComponentDefinition {
         }
         updateColorPickersVisibility(cmStr)
         
-        spinnerColorMode.setOnItemClickListener { _, _, position, _ ->
-            val newMode = when(position) { 1 -> "STEP"; 2 -> "GRADIENT"; else -> "SOLID" }
-            onUpdate("color_mode", newMode)
-            updateColorPickersVisibility(newMode)
-        }
+        CommonPropBinder.bindLocalizedDropdown(
+            panelView,
+            R.id.spinnerColorMode,
+            "color_mode",
+            data,
+            { key, value -> onUpdate(key, value); updateColorPickersVisibility(value) },
+            listOf(
+                PropertyOption("SOLID", R.string.prop_val_color_solid),
+                PropertyOption("STEP", R.string.prop_val_color_step),
+                PropertyOption("GRADIENT", R.string.prop_val_color_gradient)
+            ),
+            "SOLID"
+        )
         
     }
 

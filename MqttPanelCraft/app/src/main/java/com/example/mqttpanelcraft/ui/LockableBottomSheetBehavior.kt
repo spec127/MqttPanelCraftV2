@@ -20,11 +20,26 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
     // var headerViewId: Int = 0 (Removed)
     // private var headerView: View? = null (Removed)
     var isLocked: Boolean = true // Now always TRUE effectively based on user request
+    private var dragStartedInHeader = false
 
     constructor() : super()
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
     
-    // Helper removed (isTouchInHeader)
+    private fun isTouchInHeader(child: V, event: MotionEvent): Boolean {
+        val header = child.findViewById<View>(R.id.bottomSheetHeader) ?: return false
+        val location = IntArray(2)
+        header.getLocationOnScreen(location)
+        return event.rawX >= location[0] &&
+                event.rawX <= location[0] + header.width &&
+                event.rawY >= location[1] &&
+                event.rawY <= location[1] + header.height
+    }
+
+    private fun beginGestureIfNeeded(child: V, event: MotionEvent) {
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+            dragStartedInHeader = !isLocked || isTouchInHeader(child, event)
+        }
+    }
 
     override fun onInterceptTouchEvent(
         parent: CoordinatorLayout,
@@ -37,28 +52,15 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
              return false
         }
     
-        // 1. If Locked matches user request: Only DRAG from Header Area (e.g. top 80dp)
-        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-            if (isLocked) {
-                // Check if touch is within the top draggable area of the sheet
-                // instead of a specific view ID, which might be hard to sync layout-wise.
-                val location = IntArray(2)
-                child.getLocationOnScreen(location)
-                val sheetTop = location[1]
-                val touchY = event.rawY
-                
-                // Allow dragging if touch is within top 85dp (matching peek height or handle area)
-                val density = child.resources.displayMetrics.density
-                val dragLimit = sheetTop + (85 * density) 
-                
-                if (touchY > dragLimit) {
-                    return false // Touch is below the header area, consume or ignore based on behavior
-                }
-                // If in Header area, allow!
-            }
+        beginGestureIfNeeded(child, event)
+        val allowed = !isLocked || dragStartedInHeader
+        val handled = allowed && super.onInterceptTouchEvent(parent, child, event)
+        if (event.actionMasked == MotionEvent.ACTION_UP ||
+                event.actionMasked == MotionEvent.ACTION_CANCEL
+        ) {
+            dragStartedInHeader = false
         }
-
-        return super.onInterceptTouchEvent(parent, child, event)
+        return handled
     }
 
     override fun onTouchEvent(
@@ -66,21 +68,15 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
         child: V,
         event: MotionEvent
     ): Boolean {
-        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-            if (isLocked) {
-                 // Check if touch is within the top draggable area of the sheet
-                val location = IntArray(2)
-                child.getLocationOnScreen(location)
-                val sheetTop = location[1]
-                val touchY = event.rawY
-                
-                val density = child.resources.displayMetrics.density
-                val dragLimit = sheetTop + (85 * density) 
-                
-                if (touchY > dragLimit) return false
-            }
+        beginGestureIfNeeded(child, event)
+        val allowed = !isLocked || dragStartedInHeader
+        val handled = allowed && super.onTouchEvent(parent, child, event)
+        if (event.actionMasked == MotionEvent.ACTION_UP ||
+                event.actionMasked == MotionEvent.ACTION_CANCEL
+        ) {
+            dragStartedInHeader = false
         }
-        return super.onTouchEvent(parent, child, event)
+        return handled
     }
 
     override fun onStartNestedScroll(
@@ -91,6 +87,7 @@ class LockableBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
         axes: Int,
         type: Int
     ): Boolean {
+        if (isLocked) return false
         return super.onStartNestedScroll(coordinatorLayout, child, directTargetChild, target, axes, type)
     }
 

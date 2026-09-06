@@ -24,7 +24,10 @@ import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
+import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.google.android.material.button.MaterialButtonToggleGroup
 import org.json.JSONArray
 import org.json.JSONObject
@@ -44,11 +47,12 @@ object SelectorDefinition : IComponentDefinition {
     override val type = "SELECTOR"
     override val defaultSize = android.util.Size(200, 60)
     override val labelPrefix = "selector"
+    override val displayNameResId: Int = R.string.component_label_selector
     override val iconResId = R.drawable.ic_selector_thumb
-    override val group = "CONTROL"
+    override val group = ComponentGroup.CONTROL
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
-        "segments" to "[{\"label\":\"S1\",\"val\":\"1\"},{\"label\":\"S2\",\"val\":\"2\"},{\"label\":\"S3\",\"val\":\"3\"}]",
+        "segments" to DEFAULT_SELECTOR_SEGMENTS,
         "style" to "rounded",
         "color" to "#FF2196F3"
     )
@@ -504,33 +508,21 @@ object SelectorDefinition : IComponentDefinition {
         // 0. Topic Config (Shared) - Handled by PropertiesSheetManager
 
         // Style
-        val spStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spPropStyle)
-        val styles =
+        val styleOptions =
                 listOf(
-                        context.getString(R.string.val_style_rounded), // 0: Rects
-                        context.getString(R.string.val_shape_circle_style), // 1: Circles
-                        context.getString(R.string.val_style_segmented) // 2: Capsule
+                        PropertyOption(Style.ROUNDED, R.string.val_style_rounded),
+                        PropertyOption(Style.CIRCLE, R.string.val_shape_circle_style),
+                        PropertyOption(Style.SEGMENTED, R.string.val_style_segmented)
                 )
-        spStyle?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, styles))
-        val curStyle = data.props["style"] ?: Style.ROUNDED
-        val displayStyle =
-                when (curStyle) {
-                    Style.CIRCLE -> context.getString(R.string.val_shape_circle_style)
-                    Style.SEGMENTED -> context.getString(R.string.val_style_segmented)
-                    else -> context.getString(R.string.val_style_rounded)
-                }
-        spStyle?.setText(displayStyle, false)
-
-        spStyle?.setOnItemClickListener { _, _, position, _ ->
-            val key =
-                    when (position) {
-                        0 -> Style.ROUNDED
-                        1 -> Style.CIRCLE
-                        2 -> Style.SEGMENTED
-                        else -> Style.ROUNDED
-                    }
-            onUpdate("style", key)
-        }
+        CommonPropBinder.bindLocalizedDropdown(
+                panelView,
+                R.id.spPropStyle,
+                "style",
+                data,
+                onUpdate,
+                styleOptions,
+                Style.ROUNDED
+        )
 
         // Orientation
         val toggleOrient = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleOrientation)
@@ -669,7 +661,7 @@ object SelectorDefinition : IComponentDefinition {
                         btnToggle.setImageResource(R.drawable.ic_emoji_emotions)
                         etLabel.visibility = View.VISIBLE
                         llIconSelector.visibility = View.GONE
-                        etLabel.hint = "Label"
+                        etLabel.hint = context.getString(R.string.prop_label_label_caps)
                     }
                 }
                 updateRefIcon()
@@ -831,13 +823,16 @@ object SelectorDefinition : IComponentDefinition {
                 list.add(
                         Segment(
                                 obj.optString("label", "?"),
-                                obj.optString("value", "0"),
+                                resolveSelectorSegmentValue(
+                                        obj.optString("value").takeIf { obj.has("value") },
+                                        obj.optString("val").takeIf { obj.has("val") }
+                                ),
                                 obj.optString("type", "text")
                         )
                 )
             }
         } catch (e: Exception) {
-            return mutableListOf(Segment("Error", "0"))
+            return mutableListOf(Segment("?", "0"))
         }
         return list
     }
@@ -853,3 +848,9 @@ object SelectorDefinition : IComponentDefinition {
                 else -> R.drawable.ic_btn_power
             }
 }
+
+internal fun resolveSelectorSegmentValue(value: String?, legacyValue: String?): String =
+        value ?: legacyValue ?: "0"
+
+internal const val DEFAULT_SELECTOR_SEGMENTS =
+        "[{\"label\":\"S1\",\"value\":\"1\",\"type\":\"text\"},{\"label\":\"S2\",\"value\":\"2\",\"type\":\"text\"},{\"label\":\"S3\",\"value\":\"3\",\"type\":\"text\"}]"

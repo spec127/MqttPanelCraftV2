@@ -1,0 +1,25 @@
+MqttPanelCraft
+Version {VERSION_NAME}
+Copyright © 2026
+
+Privacy & Legal
+
+Privacy Policy: {PRIVACY_POLICY_LINK}
+Contact: {SUPPORT_EMAIL}
+
+Trademarks:
+All trademarks, logos, and brand names are the property of their respective owners. This app is not affiliated with, sponsored, or endorsed by Google or the Eclipse Foundation.
+
+Third-Party Services
+
+This app integrates Google Mobile Ads SDK (AdMob) for advertising and monetization. Its use is governed by Google’s applicable terms and policies.
+
+Open Source Notices
+
+1) AndroidX Libraries — Apache License 2.0
+2) Material Components for Android — Apache License 2.0
+3) Kotlin Coroutines — Apache License 2.0
+4) Eclipse Paho MQTT Client — EPL-2.0 and EDL-1.0
+5) PubSubClient (Arduino) — MIT License
+
+Third-party product names, license names, and attribution above are intentionally kept in their original form. Contact {SUPPORT_EMAIL} if an attribution is missing or incorrect.

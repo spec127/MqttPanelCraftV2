@@ -265,7 +265,7 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         val newSystemId = maxId + 1
 
         // 5. Default Props (From Component Definition single source of truth)
-        val initialProps = definition?.getDefaultProps()?.toMutableMap() ?: mutableMapOf()
+        val initialProps = definition?.getDefaultProps(getApplication())?.toMutableMap() ?: mutableMapOf()
 
         if (type == "BUTTON") {
             initialProps["text"] = newLabel // Default text is the label name

@@ -6,8 +6,6 @@ import android.content.ContextWrapper
 import android.graphics.Color
 import android.util.Size
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -18,8 +16,10 @@ import com.example.mqttpanelcraft.ProjectViewModel
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.BroadcastView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -32,8 +32,9 @@ object BroadcastDefinition : IComponentDefinition {
     override val type: String = "BROADCAST"
     override val defaultSize: Size = Size(150, 50)
     override val labelPrefix: String = "broadcast"
+    override val displayNameResId: Int = R.string.component_label_broadcast
     override val iconResId: Int = android.R.drawable.ic_lock_silent_mode_off
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.SENSOR
     override val propertiesLayoutId: Int = R.layout.layout_prop_broadcast
 
     private fun getActivity(context: Context): Activity? {
@@ -46,7 +47,7 @@ object BroadcastDefinition : IComponentDefinition {
     }
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
-        "title" to "語音警報廣播",
+        "title" to "Voice Alert Broadcast",
         "topic" to "home/tts/say",
         "broadcast_mode" to "TTS_ONLY",
         "alert_type" to "Chime",
@@ -57,6 +58,11 @@ object BroadcastDefinition : IComponentDefinition {
         "color" to "#FF9800",
         "show_text" to "true"
     )
+
+    override fun getDefaultProps(context: Context): Map<String, String> =
+            getDefaultProps().toMutableMap().apply {
+                put("title", context.getString(R.string.broadcast_title))
+            }
 
     override fun createView(
         context: Context,
@@ -127,20 +133,19 @@ object BroadcastDefinition : IComponentDefinition {
         }
 
         // 2. Alert Type Dropdown
-        val spAlert = panelView.findViewById<AutoCompleteTextView>(R.id.spAlertType)
-        val alertList = listOf("Chime", "Siren", "Buzzer")
-        val alertNames = listOf(
-            context.getString(R.string.val_alert_alarm_classic),
-            context.getString(R.string.val_alert_siren),
-            context.getString(R.string.val_alert_synthesizer)
+        CommonPropBinder.bindLocalizedDropdown(
+            panelView,
+            R.id.spAlertType,
+            "alert_type",
+            data,
+            onUpdate,
+            listOf(
+                PropertyOption("Chime", R.string.val_alert_alarm_classic),
+                PropertyOption("Siren", R.string.val_alert_siren),
+                PropertyOption("Buzzer", R.string.val_alert_synthesizer)
+            ),
+            "Chime"
         )
-        spAlert?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, alertNames))
-        val curAlert = data.props["alert_type"] ?: "Chime"
-        val aIdx = alertList.indexOf(curAlert).coerceAtLeast(0)
-        spAlert?.setText(alertNames[aIdx], false)
-        spAlert?.setOnItemClickListener { _, _, pos, _ ->
-            onUpdate("alert_type", alertList[pos])
-        }
 
         val togglePitch = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleVoicePitch)
         val curPreset = data.props["speech_voice_preset"] ?: "NATURAL"
@@ -166,22 +171,17 @@ object BroadcastDefinition : IComponentDefinition {
             }
         }
 
-        val styleLabels = listOf(
-            context.getString(R.string.val_style_text_capsule),
-            context.getString(R.string.val_style_text_glass)
-        )
-        val styleMap = mapOf(
-            context.getString(R.string.val_style_text_capsule) to "Capsule",
-            context.getString(R.string.val_style_text_glass) to "Glass"
-        )
-        CommonPropBinder.bindDropdown(
+        CommonPropBinder.bindLocalizedDropdown(
             panelView,
             R.id.spStyle,
             "chart_style",
             data,
             onUpdate,
-            styleLabels,
-            styleMap
+            listOf(
+                PropertyOption("Capsule", R.string.val_style_text_capsule),
+                PropertyOption("Glass", R.string.val_style_text_glass)
+            ),
+            "Capsule"
         )
 
         CommonPropBinder.bindColorPalette(
@@ -190,7 +190,7 @@ object BroadcastDefinition : IComponentDefinition {
             "color",
             data,
             onUpdate,
-            label = "色表",
+            label = context.getString(R.string.properties_label_theme_color),
             defaultColor = "#FF9800"
         )
         
@@ -215,48 +215,17 @@ object BroadcastDefinition : IComponentDefinition {
         )
 
         // 5. Linked Components (掛勾接收對象)
-        val containerLinked = panelView.findViewById<LinearLayout>(R.id.containerLinkedComponents)
-        if (containerLinked != null) {
-            containerLinked.removeAllViews()
-            val linkedString = data.props["linked_components"] ?: ""
-            val linkedSet = linkedString.split(",").filter { it.isNotEmpty() }.toMutableSet()
-
-            val activity = getActivity(context) as? ViewModelStoreOwner
-            val viewModel = activity?.let { ViewModelProvider(it)[ProjectViewModel::class.java] }
-            val components = viewModel?.components?.value ?: emptyList()
-
-            // Add self as first item (checked, alpha = 0.5f)
-            val ownCb = CheckBox(context).apply {
-                text = "${data.label} (${data.topicConfig})"
-                isChecked = true
-                alpha = 0.5f
-                setOnCheckedChangeListener { buttonView, isChecked ->
-                    if (!isChecked) {
-                        buttonView.isChecked = true
-                    }
-                }
-            }
-            containerLinked.addView(ownCb)
-
-            components.filter { it.id != data.id }.forEach { comp ->
-                val cb = CheckBox(context).apply {
-                    text = "${comp.label} (${comp.topicConfig})"
-                    isChecked = linkedSet.contains(comp.id.toString())
-                    setOnCheckedChangeListener { _, isChecked ->
-                        if (isChecked) linkedSet.add(comp.id.toString()) else linkedSet.remove(comp.id.toString())
-                        onUpdate("linked_components", linkedSet.joinToString(","))
-                    }
-                }
-                containerLinked.addView(cb)
-            }
-            if (containerLinked.childCount == 1 && components.size <= 1) {
-                containerLinked.addView(TextView(context).apply {
-                    text = context.getString(R.string.broadcast_no_linked)
-                    textSize = 12f
-                    setTextColor(Color.parseColor("#B0B8C4"))
-                })
-            }
-        }
+        val activity = getActivity(context) as? ViewModelStoreOwner
+        val components = activity?.let { ViewModelProvider(it)[ProjectViewModel::class.java] }
+            ?.components?.value.orEmpty()
+        CommonPropBinder.bindLinkedComponents(
+            panelView,
+            R.id.containerLinkedComponents,
+            data,
+            components,
+            onUpdate,
+            emptyTextResId = R.string.broadcast_no_linked
+        )
     }
 
     override fun attachBehavior(

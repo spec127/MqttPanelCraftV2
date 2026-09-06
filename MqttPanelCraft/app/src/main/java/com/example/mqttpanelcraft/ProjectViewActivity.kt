@@ -131,6 +131,7 @@ class ProjectViewActivity : BaseActivity() {
 
             // Wire UI Manager Callbacks
             projectUIManager.onModeToggleCallback = {
+                interactionManager.cancelInteraction()
                 isEditMode = !isEditMode
                 idleAdController.onUserInteraction() // Keep Ad Alive
 
@@ -198,7 +199,7 @@ class ProjectViewActivity : BaseActivity() {
 
                         // Also update local selectedComponentId if strictly needed, but VM reload
                         // handles most.
-                        Toast.makeText(this, "Project ID Updated", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, R.string.project_id_updated, Toast.LENGTH_SHORT).show()
                     } else {
                         // Just content update, verify if we need to reload?
                         // onResume usually acts, but explicit reload is safer if onResume is
@@ -475,6 +476,7 @@ class ProjectViewActivity : BaseActivity() {
         drawerLayout.addDrawerListener(
                 object : androidx.drawerlayout.widget.DrawerLayout.SimpleDrawerListener() {
                     override fun onDrawerOpened(drawerView: View) {
+                        interactionManager.cancelInteraction()
                         val sheet = findViewById<View>(R.id.bottomSheet)
                         val behavior =
                                 com.google.android.material.bottomsheet.BottomSheetBehavior.from(
@@ -672,7 +674,12 @@ class ProjectViewActivity : BaseActivity() {
                             .show()
                     viewModel.retryMqtt()
                 } else {
-                    Toast.makeText(this, "Status: $status", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                                    this,
+                                    getString(R.string.status_format, status),
+                                    Toast.LENGTH_SHORT
+                            )
+                            .show()
                 }
             }
         }
@@ -871,7 +878,7 @@ class ProjectViewActivity : BaseActivity() {
     private fun subscribeToMqtt() {
         MqttRepository.connectionStatus.observe(this) { status ->
             if (status == 1) {
-                subscribeToCurrentProject("Auto-Subscribing to")
+                subscribeToCurrentProject(R.string.project_log_auto_subscribing)
             } else {
                 hasSubscribed = false
             }
@@ -935,7 +942,7 @@ class ProjectViewActivity : BaseActivity() {
         }
     }
 
-    private fun subscribeToCurrentProject(logPrefix: String) {
+    private fun subscribeToCurrentProject(@androidx.annotation.StringRes logResId: Int) {
         if (hasSubscribed) return
         val proj = viewModel.project.value ?: return
         com.example.mqttpanelcraft.utils.TopicHelper.collectSubscriptionTopics(proj).forEach {
@@ -945,7 +952,7 @@ class ProjectViewActivity : BaseActivity() {
                 putExtra("TOPIC", topic)
             }
             startService(intent)
-            viewModel.addLog("$logPrefix: $topic")
+            viewModel.addLog(getString(logResId, topic))
         }
         hasSubscribed = true
     }
@@ -959,6 +966,7 @@ class ProjectViewActivity : BaseActivity() {
     }
 
     override fun onStop() {
+        interactionManager.cancelInteraction()
         if (mqttListenerRegistered) {
             MqttRepository.unregisterListener(mqttMessageListener)
             mqttListenerRegistered = false
@@ -1008,7 +1016,7 @@ class ProjectViewActivity : BaseActivity() {
         val proj = viewModel.project.value ?: return
         val status = com.example.mqttpanelcraft.MqttRepository.connectionStatus.value
         if (status == 1) {
-            subscribeToCurrentProject("Re-subscribing to")
+            subscribeToCurrentProject(R.string.project_log_resubscribing)
         } else if (status != 0) {
             viewModel.retryMqtt()
         }

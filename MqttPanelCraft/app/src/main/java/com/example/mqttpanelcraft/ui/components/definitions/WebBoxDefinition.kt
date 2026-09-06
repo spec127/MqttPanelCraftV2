@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
 import com.example.mqttpanelcraft.ui.views.WebBoxView
@@ -18,8 +19,9 @@ object WebBoxDefinition : IComponentDefinition {
     override val type: String = "WEB_BOX"
     override val defaultSize: Size = Size(250, 330)
     override val labelPrefix: String = "web"
+    override val displayNameResId: Int = R.string.component_label_web_box
     override val iconResId: Int = R.drawable.ic_globe
-    override val group: String = "DISPLAY"
+    override val group = ComponentGroup.DISPLAY
     override val propertiesLayoutId: Int = R.layout.layout_prop_web
 
     override fun getDefaultProps(): Map<String, String> = mapOf(

@@ -14,9 +14,11 @@ import android.widget.TextView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
 import com.example.mqttpanelcraft.ui.components.findComponentTarget
 import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.GaugeMeterView
 import com.google.android.material.button.MaterialButtonToggleGroup
 
@@ -24,8 +26,9 @@ object GaugeMeterDefinition : IComponentDefinition {
     override val type: String = "GAUGE_METER"
     override val defaultSize: Size = Size(200, 200)
     override val labelPrefix: String = "gauge"
+    override val displayNameResId: Int = R.string.component_label_gauge_meter
     override val iconResId: Int = android.R.drawable.ic_menu_compass
-    override val group: String = "SENSOR"
+    override val group = ComponentGroup.SENSOR
     override val propertiesLayoutId: Int = R.layout.layout_prop_gauge_meter
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
@@ -98,7 +101,15 @@ object GaugeMeterDefinition : IComponentDefinition {
         CommonPropBinder.bindEditText(panelView, R.id.etMax, "max", data, onUpdate, "100")
         CommonPropBinder.bindEditText(panelView, R.id.etUnit, "unit", data, onUpdate, "")
         
-        CommonPropBinder.bindColorPalette(panelView, R.id.containerThemeColor, "theme_color", data, onUpdate, "主體顏色", "#FF9800")
+        CommonPropBinder.bindColorPalette(
+                panelView,
+                R.id.containerThemeColor,
+                "theme_color",
+                data,
+                onUpdate,
+                panelView.context.getString(R.string.properties_label_theme_color),
+                "#FF9800"
+        )
 
         // Threshold Mode Toggle
         val thresholdModeKey = "threshold_mode"
@@ -272,7 +283,7 @@ object GaugeMeterDefinition : IComponentDefinition {
                         background = null
                         setTextColor(Color.parseColor("#2196F3"))
                         gravity = android.view.Gravity.CENTER
-                        hint = "上限"
+                        hint = ctx.getString(R.string.meter_limit_max)
                         setHintTextColor(Color.parseColor("#94A3B8"))
                         inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
                         addTextChangedListener(object : android.text.TextWatcher {
@@ -399,15 +410,18 @@ object GaugeMeterDefinition : IComponentDefinition {
         }
 
         // Style Selector
-        val acStyle = panelView.findViewById<AutoCompleteTextView>(R.id.acMeterStyle)
-        val styleAdapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, listOf("指針", "陣列"))
-        acStyle.setAdapter(styleAdapter)
-        val currentStyle = data.props["style"] ?: "NEEDLE"
-        acStyle.setText(if (currentStyle == "NEEDLE") "指針" else "陣列", false)
-        acStyle.setOnItemClickListener { _, _, pos, _ ->
-            val newValue = if (pos == 0) "NEEDLE" else "SEGMENTED"
-            onUpdate("style", newValue)
-        }
+        CommonPropBinder.bindLocalizedDropdown(
+                panelView,
+                R.id.acMeterStyle,
+                "style",
+                data,
+                onUpdate,
+                listOf(
+                        PropertyOption("NEEDLE", R.string.meter_style_needle),
+                        PropertyOption("SEGMENTED", R.string.meter_style_segmented)
+                ),
+                "NEEDLE"
+        )
 
         // Angle Selector
         val acAngle = panelView.findViewById<AutoCompleteTextView>(R.id.acTrackAngle)
@@ -430,29 +444,20 @@ object GaugeMeterDefinition : IComponentDefinition {
         }
 
         // Ticks Selector
-        val acGaugeTicks = panelView.findViewById<AutoCompleteTextView>(R.id.acGaugeTicks)
-        val ticksAdapter = ArrayAdapter(ctx, android.R.layout.simple_dropdown_item_1line, listOf("無", "刻度", "顯示極限", "刻度+極限"))
-        if (acGaugeTicks != null) {
-            acGaugeTicks.setAdapter(ticksAdapter)
-            val currentMode = data.props["tick_mode"] ?: "LIMITS"
-            val tickStr = when (currentMode) {
-                "NONE" -> "無"
-                "TICKS" -> "刻度"
-                "LIMITS" -> "顯示極限"
-                "ALL" -> "刻度+極限"
-                else -> "無"
-            }
-            acGaugeTicks.setText(tickStr, false)
-            acGaugeTicks.setOnItemClickListener { _, _, pos, _ ->
-                val newValue = when(pos) {
-                    0 -> "NONE"
-                    1 -> "TICKS"
-                    2 -> "LIMITS"
-                    else -> "ALL"
-                }
-                onUpdate("tick_mode", newValue)
-            }
-        }
+        CommonPropBinder.bindLocalizedDropdown(
+                panelView,
+                R.id.acGaugeTicks,
+                "tick_mode",
+                data,
+                onUpdate,
+                listOf(
+                        PropertyOption("NONE", R.string.meter_ticks_none),
+                        PropertyOption("TICKS", R.string.meter_ticks_marks),
+                        PropertyOption("LIMITS", R.string.meter_ticks_limits),
+                        PropertyOption("ALL", R.string.meter_ticks_all)
+                ),
+                "LIMITS"
+        )
     }
 
     override fun attachBehavior(

@@ -13,7 +13,10 @@ import com.example.mqttpanelcraft.data.ColorHistoryManager
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
+import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.JoystickView
 import com.example.mqttpanelcraft.utils.TextWatcherAdapter
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -31,8 +34,9 @@ object DpadDefinition : IComponentDefinition {
     override val type: String = "DPAD"
     override val defaultSize: Size = Size(180, 180)
     override val labelPrefix: String = "dpad"
+    override val displayNameResId: Int = R.string.component_label_dpad
     override val iconResId: Int = R.drawable.ic_joystick
-    override val group: String = "CONTROL"
+    override val group = ComponentGroup.CONTROL
 
     override val propertiesLayoutId: Int = R.layout.layout_prop_joystick
 
@@ -139,37 +143,22 @@ object DpadDefinition : IComponentDefinition {
         }
 
         // 3. 風格設定面板 ("圓形" to "Beveled", "銳利" to "Neon")
-        val styleAuto = panelView.findViewById<AutoCompleteTextView>(R.id.tvJoystickStyle)
-        if (styleAuto != null) {
-            val styleItems = listOf(
-                "圓形" to "Beveled",
-                "銳利" to "Neon"
-            )
-            val styleAdapter = android.widget.ArrayAdapter(
-                context,
-                android.R.layout.simple_dropdown_item_1line,
-                styleItems.map { it.first }
-            )
-            styleAuto.setAdapter(styleAdapter)
-
-            val curStyle = data.props["style"] ?: "Beveled"
-            val displayLabel = styleItems.find { it.second.equals(curStyle, true) }?.first
-                ?: styleItems[0].first
-            styleAuto.setText(displayLabel, false)
-
-            styleAuto.setOnItemClickListener { _, _, position, _ ->
-                onUpdate("style", styleItems[position].second)
-            }
-        }
+        CommonPropBinder.bindLocalizedDropdown(
+                panelView,
+                R.id.tvJoystickStyle,
+                "style",
+                data,
+                onUpdate,
+                listOf(
+                        PropertyOption("Beveled", R.string.val_joystick_style_smooth),
+                        PropertyOption("Neon", R.string.val_joystick_style_sharp)
+                ),
+                "Beveled"
+        )
 
         // 4. 方向指令輸入框設定
         val bindMsg = { id: Int, key: String, defVal: String ->
-            panelView.findViewById<EditText>(id)?.apply {
-                val currentVal = data.props[key]
-                val displayVal = if (currentVal.isNullOrEmpty()) defVal else currentVal
-                setText(displayVal)
-                addTextChangedListener(TextWatcherAdapter { text -> onUpdate(key, text) })
-            }
+            CommonPropBinder.bindEditText(panelView, id, key, data, onUpdate, defVal)
         }
         bindMsg(R.id.etMsgUp, "msg_up", "up")
         bindMsg(R.id.etMsgDown, "msg_down", "down")

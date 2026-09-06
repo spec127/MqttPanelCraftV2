@@ -101,7 +101,7 @@ class DashboardActivity : BaseActivity() {
                 binding.drawerLayout.openDrawer(GravityCompat.START)
             }
         } catch (e: Exception) {
-            CrashLogger.logError(this, "Dashboard Init Failed", e)
+            CrashLogger.logError(this, getString(R.string.crash_dashboard_init_failed), e)
         }
     }
 
@@ -182,9 +182,9 @@ class DashboardActivity : BaseActivity() {
         val tvVersion = headerView.findViewById<android.widget.TextView>(R.id.tvVersion)
         try {
             val pInfo = packageManager.getPackageInfo(packageName, 0)
-            tvVersion?.text = "v${pInfo.versionName} (Beta)"
+            tvVersion?.text = getString(R.string.dashboard_version_beta, pInfo.versionName)
         } catch (e: Exception) {
-            tvVersion?.text = "v0.5.1 (Beta)"
+            tvVersion?.text = getString(R.string.version_unknown)
         }
 
         // 1. Dark Mode Switch
@@ -314,7 +314,13 @@ class DashboardActivity : BaseActivity() {
     // --- Language Handling ---
     private fun showLanguageDialog() {
         // Options: System Default, English, Traditional Chinese
-        val languages = arrayOf(getString(R.string.lang_system_default), "English", "繁體中文", "简体中文")
+        val languages =
+                arrayOf(
+                        getString(R.string.lang_system_default),
+                        getString(R.string.lang_english),
+                        getString(R.string.lang_traditional_chinese),
+                        getString(R.string.lang_simplified_chinese)
+                )
         val codes =
                 arrayOf(
                         com.example.mqttpanelcraft.utils.LocaleManager.CODE_AUTO,
@@ -333,11 +339,6 @@ class DashboardActivity : BaseActivity() {
                     val selectedCode = codes[which]
                     if (selectedCode != currentCode) {
                         com.example.mqttpanelcraft.utils.LocaleManager.setLocale(this, selectedCode)
-                        // Full App Restart
-                        val intent = Intent(this, DashboardActivity::class.java)
-                        intent.flags =
-                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
                     }
                     dialog.dismiss()
                 }
@@ -411,7 +412,7 @@ class DashboardActivity : BaseActivity() {
                                                         )
                                                         .show()
                                             } catch (e: Exception) {
-                                                CrashLogger.logError(this, "Delete Failed", e)
+                                                CrashLogger.logError(this, getString(R.string.crash_delete_failed), e)
                                             }
                                         }
                                         .setNegativeButton(

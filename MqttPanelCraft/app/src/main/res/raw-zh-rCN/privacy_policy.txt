@@ -1,0 +1,26 @@
+隐私政策
+
+生效日期：2026-01-26
+
+1. 前言
+本政策说明 MqttPanelCraft（以下简称“本应用”）如何处理您的信息。我们重视并致力于保护您的隐私。
+
+2. 数据收集与使用
+我们不会刻意收集、存储或分享用户的个人信息。本应用主要是在设备本地创建 MQTT 仪表板的工具。
+
+3. 应用权限
+- INTERNET：连接至 MQTT Broker 及加载广告。
+- ACCESS_NETWORK_STATE：检查网络连接状态。
+- READ_EXTERNAL_STORAGE / READ_MEDIA_IMAGES：加载可选的面板背景图片。
+
+4. 第三方服务
+Google Mobile Ads SDK (AdMob) 可能收集广告标识符等数据以提供广告，其使用受 Google 适用的隐私政策与条款约束。
+
+5. MQTT 数据
+您的 MQTT 设置与 Payload 只会在设备本地处理，或直接发送至您指定的 MQTT Broker。我们无法访问您的 MQTT 数据。
+
+6. 政策变更
+本政策可能不定期更新，请定期查看是否有变动。
+
+7. 联系我们
+如有问题或建议，请发送邮件至：niceboat919@gmail.com

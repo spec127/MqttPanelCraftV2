@@ -41,7 +41,7 @@
                     android:maxWidth="140dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Web Project"
+                    android:text="@string/component_label_web"
                     android:textColor="@color/toolbar_text"
                     android:textSize="20sp"
                     android:textStyle="bold" />

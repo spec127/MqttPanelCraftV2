@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <!-- 最小值 (Min) 與 最大值 (Max) -->
+        <!-- 最小值、最大值與步進大小：三欄等寬 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="6dp"
+                android:layout_marginEnd="4dp"
                 android:hint="@string/stepper_hint_min">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -60,7 +60,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:hint="@string/stepper_hint_max">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -70,22 +71,13 @@
                     android:inputType="numberDecimal|numberSigned"
                     android:textSize="13sp" />
             </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
-
-        <!-- 步進長度 (Step Size) 與 單位 (Unit) -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false"
-            android:layout_marginBottom="12dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.App.TextInputLayout.Properties"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="6dp"
+                android:layout_marginStart="4dp"
                 android:hint="@string/stepper_hint_step">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -93,22 +85,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    android:textSize="13sp" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.App.TextInputLayout.Properties"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                android:hint="@string/stepper_hint_unit">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etPropUnit"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
                     android:textSize="13sp" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
@@ -251,7 +227,7 @@
                     android:inputType="none"
                     android:maxLines="1"
                     android:ellipsize="end"
-                    android:textSize="12sp" />
+                    android:textSize="@dimen/prop_dropdown_text_size" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- 右邊：調色盤 6/10 -->

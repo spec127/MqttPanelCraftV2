@@ -27,7 +27,10 @@ import com.example.mqttpanelcraft.data.ColorHistoryManager
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
+import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.google.android.material.button.MaterialButtonToggleGroup
 
 object SwitchDefinition : IComponentDefinition {
@@ -46,8 +49,9 @@ object SwitchDefinition : IComponentDefinition {
     override val type = "SWITCH"
     override val defaultSize = android.util.Size(120, 70)
     override val labelPrefix = "switch"
+    override val displayNameResId: Int = R.string.component_label_switch
     override val iconResId = R.drawable.ic_toggle_on
-    override val group = "CONTROL"
+    override val group = ComponentGroup.CONTROL
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
         "state" to "2",
@@ -303,13 +307,7 @@ object SwitchDefinition : IComponentDefinition {
         // 0. Topic Config (Shared)
         // 0. Topic Config (Shared) - Handled by PropertiesSheetManager
 
-        val toggleMode = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleMode)
         val mode = resolveMode(data)
-
-        when (mode) {
-            Mode.TWO_WAY -> toggleMode.check(R.id.btnMode2Way)
-            Mode.THREE_WAY -> toggleMode.check(R.id.btnMode3Way)
-        }
 
         fun updateSubPanels(m: String) {
             val containerTri = panelView.findViewById<View>(R.id.containerTriStateConfig)
@@ -327,31 +325,29 @@ object SwitchDefinition : IComponentDefinition {
         }
         updateSubPanels(mode)
 
-        val spStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spPropStyle)
-        val styles =
+        CommonPropBinder.bindToggleGroup(
+                panelView,
+                R.id.toggleMode,
+                "mode",
+                data,
+                { _, m ->
+                    updateSubPanels(m)
+                    onUpdate("mode", m)
+                },
+                mapOf(R.id.btnMode2Way to Mode.TWO_WAY, R.id.btnMode3Way to Mode.THREE_WAY)
+        )
+        CommonPropBinder.bindLocalizedDropdown(
+                panelView,
+                R.id.spPropStyle,
+                "style",
+                data,
+                onUpdate,
                 listOf(
-                        context.getString(R.string.val_style_classic),
-                        context.getString(R.string.val_style_lever)
-                )
-        val adapterS = ArrayAdapter(context, R.layout.list_item_dropdown, styles)
-        spStyle.setAdapter(adapterS)
-        val curStyle = data.props["style"] ?: Style.CLASSIC
-        val display =
-                if (curStyle == Style.LEVER) context.getString(R.string.val_style_lever)
-                else context.getString(R.string.val_style_classic)
-        spStyle.setText(display, false)
-
-        toggleMode.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked) {
-                val m = if (checkedId == R.id.btnMode2Way) Mode.TWO_WAY else Mode.THREE_WAY
-                updateSubPanels(m)
-                onUpdate("mode", m)
-            }
-        }
-        spStyle.setOnItemClickListener { _, _, position, _ ->
-            val key = if (position == 1) Style.LEVER else Style.CLASSIC
-            onUpdate("style", key)
-        }
+                        PropertyOption(Style.CLASSIC, R.string.val_style_classic),
+                        PropertyOption(Style.LEVER, R.string.val_style_lever)
+                ),
+                Style.CLASSIC
+        )
 
         listOf(
                         R.id.etPayloadLeft to "payloadLeft",
@@ -359,15 +355,15 @@ object SwitchDefinition : IComponentDefinition {
                         R.id.etPayloadRight to "payloadRight"
                 )
                 .forEach { (id, prop) ->
-                    val et = panelView.findViewById<EditText>(id) ?: return@forEach
-                    et.setText(
-                            data.props[prop]
-                                    ?: if (prop == "payloadCenter") "1"
-                                    else if (prop.endsWith("Left")) "OFF" else "ON"
+                    CommonPropBinder.bindEditText(
+                            panelView,
+                            id,
+                            prop,
+                            data,
+                            onUpdate,
+                            if (prop == "payloadCenter") "1"
+                            else if (prop.endsWith("Left")) "OFF" else "ON"
                     )
-                    et.setOnFocusChangeListener { _, hasFocus ->
-                        if (!hasFocus) onUpdate(prop, et.text.toString())
-                    }
                 }
 
         val colorViews =

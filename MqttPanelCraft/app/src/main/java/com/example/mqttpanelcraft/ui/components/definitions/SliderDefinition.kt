@@ -3,8 +3,6 @@ package com.example.mqttpanelcraft.ui.components.definitions
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Size
 import android.view.View
 import android.widget.ArrayAdapter
@@ -15,7 +13,10 @@ import com.example.mqttpanelcraft.data.ColorHistoryManager
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.ui.ColorPickerDialog
 import com.example.mqttpanelcraft.ui.components.ComponentContainer
+import com.example.mqttpanelcraft.ui.components.ComponentGroup
 import com.example.mqttpanelcraft.ui.components.IComponentDefinition
+import com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder
+import com.example.mqttpanelcraft.ui.components.prop.PropertyOption
 import com.example.mqttpanelcraft.ui.views.PanelSliderView
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.textfield.TextInputLayout
@@ -25,8 +26,9 @@ object SliderDefinition : IComponentDefinition {
     override val type = "SLIDER"
     override val defaultSize = Size(200, 70)
     override val labelPrefix = "slider"
+    override val displayNameResId: Int = R.string.component_label_slider
     override val iconResId = android.R.drawable.ic_menu_preferences
-    override val group = "CONTROL"
+    override val group = ComponentGroup.CONTROL
 
     override fun getDefaultProps(): Map<String, String> = mapOf(
         "value" to "35",
@@ -97,37 +99,10 @@ object SliderDefinition : IComponentDefinition {
             data: ComponentData,
             onUpdate: (String, String) -> Unit
     ) {
-        val watcher = { key: String ->
-            object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                    onUpdate(key, s?.toString() ?: "")
-                }
-                override fun beforeTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        count: Int,
-                        after: Int
-                ) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            }
-        }
-
         // Range
-        panelView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etMin)
-                ?.apply {
-                    setText(data.props["min"] ?: "0")
-                    addTextChangedListener(watcher("min"))
-                }
-        panelView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etMax)
-                ?.apply {
-                    setText(data.props["max"] ?: "100")
-                    addTextChangedListener(watcher("max"))
-                }
-        panelView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etStep)
-                ?.apply {
-                    setText(data.props["step"] ?: "1")
-                    addTextChangedListener(watcher("step"))
-                }
+        CommonPropBinder.bindEditText(panelView, R.id.etMin, "min", data, onUpdate, "0")
+        CommonPropBinder.bindEditText(panelView, R.id.etMax, "max", data, onUpdate, "100")
+        CommonPropBinder.bindEditText(panelView, R.id.etStep, "step", data, onUpdate, "1")
 
         // Interaction
         val toggleSendMode = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleSendMode)
@@ -151,10 +126,14 @@ object SliderDefinition : IComponentDefinition {
             }
         }
 
-        etInterval?.apply {
-            setText(data.props["interval"] ?: "100")
-            addTextChangedListener(watcher("interval"))
-        }
+        CommonPropBinder.bindEditText(
+                panelView,
+                R.id.etInterval,
+                "interval",
+                data,
+                onUpdate,
+                "100"
+        )
 
         // Appearance - Orientation Toggle Button
         val toggleOrientation = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleOrientation)
@@ -181,9 +160,14 @@ object SliderDefinition : IComponentDefinition {
         // Appearance - Combined Style & Shape Selection
         val spStyle = panelView.findViewById<AutoCompleteTextView>(R.id.spPropStyle)
         val context = panelView.context
-        val styleOptions = listOf("經典 (Classic)", "膠囊 (Capsule)", "撥桿 (Toggle)")
-        val styleKeys = listOf("Classic", "Capsule", "Toggle")
-        spStyle?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, styleOptions))
+        val styleOptions =
+            listOf(
+                PropertyOption("Classic", R.string.val_slider_style_classic),
+                PropertyOption("Capsule", R.string.val_slider_style_capsule),
+                PropertyOption("Toggle", R.string.val_slider_style_toggle)
+            )
+        val styleLabels = styleOptions.map { context.getString(it.labelResId) }
+        spStyle?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, styleLabels))
 
         val currentStyle = data.props["sliderStyle"] ?: "Classic"
         val currentShape = data.props["shape"] ?: "Circle"
@@ -192,11 +176,11 @@ object SliderDefinition : IComponentDefinition {
             currentStyle == "Capsule" -> "Capsule"
             else -> "Classic"
         }
-        val styleIndex = styleKeys.indexOf(initialKey).coerceAtLeast(0)
-        spStyle?.setText(styleOptions[styleIndex], false)
+        val styleIndex = styleOptions.indexOfFirst { it.value == initialKey }.coerceAtLeast(0)
+        spStyle?.setText(styleLabels[styleIndex], false)
 
         spStyle?.setOnItemClickListener { _, _, position, _ ->
-            when (styleKeys[position]) {
+            when (styleOptions[position].value) {
                 "Classic" -> {
                     onUpdate("sliderStyle", "Classic")
                     onUpdate("shape", "Circle")
