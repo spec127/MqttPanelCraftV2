@@ -553,4 +553,12 @@
     <string name="prop_graphic_opacity">Opacity</string>
     <string name="component_label_text">Text Display</string>
     <string name="component_label_graphic">Graphic</string>
+    <string name="setup_keep_mqtt_background">Keep MQTT connected in background</string>
+    <string name="setup_keep_mqtt_background_desc">Keeps the last opened project connected and shows a persistent notification. This may use more battery.</string>
+    <string name="mqtt_notification_channel">MQTT connection</string>
+    <string name="mqtt_notification_connecting">Connecting…</string>
+    <string name="mqtt_notification_connected">Connected</string>
+    <string name="mqtt_notification_reconnecting">Reconnecting…</string>
+    <string name="mqtt_notification_stop">Stop MQTT</string>
+    <string name="mqtt_notification_permission_denied">Notifications are disabled. Android may show the MQTT service only in Active apps.</string>
 </resources>

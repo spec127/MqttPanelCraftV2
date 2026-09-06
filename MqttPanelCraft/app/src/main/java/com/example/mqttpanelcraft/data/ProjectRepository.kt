@@ -81,8 +81,9 @@ object ProjectRepository {
                 val orientation = obj.optString("orientation", "SENSOR")
                 val createdAt = obj.optLong("createdAt", System.currentTimeMillis())
                 val lastOpenedAt = obj.optLong("lastOpenedAt", System.currentTimeMillis())
+                val keepMqttInBackground = obj.optBoolean("keepMqttInBackground", false)
 
-                val project = Project(id, name, broker, port, user, pass, client, type, false, mutableListOf(), customCode, orientation, createdAt, lastOpenedAt)
+                val project = Project(id, name, broker, port, user, pass, client, type, false, mutableListOf(), customCode, orientation, createdAt, lastOpenedAt, keepMqttInBackground)
 
                 val compsArray = obj.optJSONArray("components")
                 if (compsArray != null) {
@@ -170,6 +171,7 @@ object ProjectRepository {
             obj.put("orientation", p.orientation)
             obj.put("createdAt", p.createdAt)
             obj.put("lastOpenedAt", p.lastOpenedAt)
+            obj.put("keepMqttInBackground", p.keepMqttInBackground)
 
             val compsArray = JSONArray()
             for (c in p.components) {
@@ -297,6 +299,7 @@ object ProjectRepository {
             pObj.put("orientation", project.orientation)
             pObj.put("createdAt", project.createdAt)
             pObj.put("lastOpenedAt", project.lastOpenedAt)
+            pObj.put("keepMqttInBackground", project.keepMqttInBackground)
 
             val compsArray = JSONArray()
             for (c in project.components) {
@@ -358,7 +361,8 @@ object ProjectRepository {
                 customCode = customCode,
                 orientation = orientation,
                 createdAt = pObj.optLong("createdAt", System.currentTimeMillis()),
-                lastOpenedAt = pObj.optLong("lastOpenedAt", System.currentTimeMillis())
+                lastOpenedAt = pObj.optLong("lastOpenedAt", System.currentTimeMillis()),
+                keepMqttInBackground = pObj.optBoolean("keepMqttInBackground", false)
             )
 
             val compsArray = pObj.optJSONArray("components")

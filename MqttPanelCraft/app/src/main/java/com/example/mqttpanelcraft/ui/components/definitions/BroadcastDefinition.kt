@@ -279,6 +279,16 @@ object BroadcastDefinition : IComponentDefinition {
         onUpdateProp("value", payload)
     }
 
+    override fun onMqttSnapshot(
+        view: View,
+        data: ComponentData,
+        payload: String,
+        onUpdateProp: (key: String, value: String) -> Unit
+    ) {
+        view.findViewWithTag<BroadcastView>("target_broadcast")?.setMessageQuietly(payload)
+        onUpdateProp("value", payload)
+    }
+
     fun onLinkedMqttMessage(view: View, data: ComponentData, payload: String, sourceComp: ComponentData) {
         val broadcastView = view.findViewWithTag<BroadcastView>("target_broadcast") ?: return
         broadcastView.speak(payload)

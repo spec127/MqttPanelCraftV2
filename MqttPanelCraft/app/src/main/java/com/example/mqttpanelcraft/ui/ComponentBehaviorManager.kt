@@ -38,6 +38,13 @@ class ComponentBehaviorManager(
         }
     }
 
+    fun applyMqttSnapshot(view: View, data: ComponentData, payload: String) {
+        val def = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(data.type)
+        def?.onMqttSnapshot(view, data, payload) { key, value ->
+            onUpdateProp(data.id, key, value)
+        }
+    }
+
     fun triggerLinkedComponent(view: View, data: ComponentData, value: String) {
         val def =
                 com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(data.type)

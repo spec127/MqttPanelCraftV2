@@ -211,4 +211,12 @@
     <string name="broadcast_mode_alert_tts">警报+语音</string>
     <string name="broadcast_waiting_text">等待语音广播文字...</string>
     <string name="broadcast_no_linked">无其他可连接的接收元件</string>
+    <string name="setup_keep_mqtt_background">在后台保持 MQTT 连接</string>
+    <string name="setup_keep_mqtt_background_desc">持续连接最后打开的项目并显示常驻通知，可能增加耗电。</string>
+    <string name="mqtt_notification_channel">MQTT 连接</string>
+    <string name="mqtt_notification_connecting">连接中…</string>
+    <string name="mqtt_notification_connected">已连接</string>
+    <string name="mqtt_notification_reconnecting">重新连接中…</string>
+    <string name="mqtt_notification_stop">停止 MQTT</string>
+    <string name="mqtt_notification_permission_denied">通知已关闭，Android 可能只会在“运行中的应用”显示 MQTT 服务。</string>
 </resources>

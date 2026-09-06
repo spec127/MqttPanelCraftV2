@@ -46,6 +46,7 @@ class SetupActivity : BaseActivity() {
     private lateinit var btnSave: MaterialButton
     private lateinit var btnImport: MaterialButton
     private lateinit var btnExport: MaterialButton
+    private lateinit var cbKeepMqttInBackground: com.google.android.material.checkbox.MaterialCheckBox
 
     // Data State
     private var originalProject: Project? = null // For Edit Mode
@@ -212,6 +213,7 @@ class SetupActivity : BaseActivity() {
         etPort.setText(project.port.toString())
         etUser.setText(project.username)
         etPassword.setText(project.password)
+        cbKeepMqttInBackground.isChecked = project.keepMqttInBackground
 
         // Set ID (Listeners already set in onCreate)
         val etProjectId = findViewById<TextInputEditText>(R.id.etProjectId)
@@ -314,6 +316,7 @@ class SetupActivity : BaseActivity() {
         btnSave = findViewById(R.id.btnSaveProject)
         btnImport = findViewById(R.id.btnImportJson)
         btnExport = findViewById(R.id.btnExportJson)
+        cbKeepMqttInBackground = findViewById(R.id.cbKeepMqttInBackground)
 
         // Orientation Init (Default Sensor)
         setOrientationUI("SENSOR")
@@ -701,7 +704,8 @@ class SetupActivity : BaseActivity() {
                         isConnected = false,
                         components = finalComponents,
                         customCode = finalCustomCode,
-                        orientation = finalOrientation
+                        orientation = finalOrientation,
+                        keepMqttInBackground = cbKeepMqttInBackground.isChecked
                 )
 
         // Unified Flow: Always Show Rewarded (unless disabled)
@@ -808,8 +812,12 @@ class SetupActivity : BaseActivity() {
 
     private fun saveAndFinish(newProject: Project, targetProjectId: String) {
         val returnToHome = intent.getBooleanExtra("RETURN_TO_HOME", false)
+        val activeProjectId = com.example.mqttpanelcraft.MqttRepository.activeProjectId
         if (projectId != null) {
             if (newProject.id != projectId) {
+                if (activeProjectId == projectId) {
+                    com.example.mqttpanelcraft.mqtt.MqttSessionClient.stop(this)
+                }
                 // ID Changed: Delete old, Add new
                 ProjectRepository.deleteProject(projectId!!)
                 ProjectRepository.addProject(newProject)
@@ -820,6 +828,9 @@ class SetupActivity : BaseActivity() {
                 setResult(RESULT_OK, resultIntent)
             } else {
                 ProjectRepository.updateProject(newProject)
+                if (activeProjectId == newProject.id) {
+                    com.example.mqttpanelcraft.mqtt.MqttSessionClient.refresh(this, newProject.id)
+                }
                 setResult(RESULT_OK)
             }
         } else {

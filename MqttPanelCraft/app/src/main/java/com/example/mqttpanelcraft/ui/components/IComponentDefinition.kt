@@ -53,6 +53,14 @@ interface IComponentDefinition {
                 onUpdateProp: (key: String, value: String) -> Unit
         )
 
+        /** Applies a cached background value when UI returns. Override for side-effecting views. */
+        fun onMqttSnapshot(
+                view: View,
+                data: ComponentData,
+                payload: String,
+                onUpdateProp: (key: String, value: String) -> Unit
+        ) = onMqttMessage(view, data, payload, onUpdateProp)
+
         /**
          * Handles an in-app trigger from another component. The source component never publishes
          * MQTT itself; the linked target owns the topic and payload used here.

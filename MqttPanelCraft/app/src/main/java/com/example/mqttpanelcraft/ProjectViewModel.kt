@@ -81,17 +81,7 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun loadProject(projectId: String) {
-        // Force MQTT Reconnect on Project Load (Handle ID change)
-        connectionJob?.cancel()
-        connectionJob = null
         mqttStatus.postValue(MqttStatus.IDLE)
-
-        // v44.3: Reset Global MqttRepository state to prevent stall status leakage
-        com.example.mqttpanelcraft.MqttRepository.setStatus(
-                com.example.mqttpanelcraft.MqttStatus.CONNECTING
-        )
-        com.example.mqttpanelcraft.MqttRepository.activeProjectId = projectId
-
         _currentProjectId.value = projectId
     }
 
@@ -367,83 +357,25 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         CONNECTED,
         FAILED
     }
-    val mqttStatus = MutableLiveData(MqttStatus.IDLE)
-
-    private var connectionJob: kotlinx.coroutines.Job? = null
-
-    fun initMqtt() {
-        if (connectionJob?.isActive == true) return
-        connectionJob =
-                uiScope.launch {
-                    val proj = project.value ?: return@launch
-
-                    // 1. Initial Attempt
-                    mqttStatus.postValue(MqttStatus.CONNECTING)
-                    fireConnect(proj)
-                    if (waitForConn(2000)) {
-                        startHeartbeat()
-                        return@launch
-                    }
-
-                    // 2. Retry Loop (6 times, 1s interval)
-                    repeat(6) {
-                        kotlinx.coroutines.delay(1000)
-                        fireConnect(proj)
-                        if (waitForConn(2000)) {
-                            startHeartbeat()
-                            return@launch
-                        }
-                    }
-
-                    // 3. Final Fail
-                    mqttStatus.postValue(MqttStatus.FAILED)
-                }
-    }
-
-    fun retryMqtt() {
-        connectionJob?.cancel()
-        connectionJob = null
-        initMqtt()
-    }
-
-    private suspend fun startHeartbeat() {
-        mqttStatus.postValue(MqttStatus.CONNECTED)
-        // delay() checks for cancellation automatically, so we can use while(true)
-        while (true) {
-            kotlinx.coroutines.delay(10000) // 10s Heartbeat
-            if (com.example.mqttpanelcraft.MqttRepository.connectionStatus.value != 1) {
-                mqttStatus.postValue(MqttStatus.FAILED)
-                break
+    val mqttStatus = androidx.lifecycle.MediatorLiveData<MqttStatus>().apply {
+        value = MqttStatus.IDLE
+        addSource(com.example.mqttpanelcraft.MqttRepository.connectionState) { state ->
+            value = when (state) {
+                com.example.mqttpanelcraft.mqtt.MqttConnectionState.CONNECTED -> MqttStatus.CONNECTED
+                com.example.mqttpanelcraft.mqtt.MqttConnectionState.FAILED -> MqttStatus.FAILED
+                com.example.mqttpanelcraft.mqtt.MqttConnectionState.CONNECTING,
+                com.example.mqttpanelcraft.mqtt.MqttConnectionState.RECONNECTING -> MqttStatus.CONNECTING
+                else -> MqttStatus.IDLE
             }
         }
     }
 
-    private fun fireConnect(proj: Project) {
-        val context = getApplication<Application>()
-        val intent =
-                android.content.Intent(
-                                context,
-                                com.example.mqttpanelcraft.service.MqttService::class.java
-                        )
-                        .apply {
-                            action = "CONNECT"
-                            putExtra("BROKER", proj.broker)
-                            putExtra("PORT", proj.port)
-                            putExtra("USER", proj.username)
-                            putExtra("PASSWORD", proj.password)
-                            putExtra("CLIENT_ID", proj.clientId)
-                        }
-        context.startService(intent)
+    fun initMqtt() {
+        project.value?.let { com.example.mqttpanelcraft.mqtt.MqttSessionClient.activate(getApplication(), it.id) }
     }
 
-    private suspend fun waitForConn(timeoutMs: Long): Boolean {
-        // Poll MqttRepository.connectionStatus
-        val start = System.currentTimeMillis()
-        while (System.currentTimeMillis() - start < timeoutMs) {
-            if (com.example.mqttpanelcraft.MqttRepository.connectionStatus.value == 1) return true
-            kotlinx.coroutines.delay(200)
-        }
-        return false
+    fun retryMqtt() {
+        initMqtt()
     }
 
     companion object {
