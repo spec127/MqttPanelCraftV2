@@ -38,8 +38,10 @@ class ProjectAdapter(
         holder.tvProjectName.text = project.name
         holder.tvBrokerUrl.text = project.broker
         holder.chipType.text =
-                when (project.type.name) {
-                    "HOME" -> "PANEL"
+                when {
+                    com.example.mqttpanelcraft.utils.DemoBroker.isLocal(project.broker) ->
+                            holder.itemView.context.getString(R.string.project_badge_tutorial)
+                    project.type.name == "HOME" -> "PANEL"
                     else -> project.type.name
                 }
 

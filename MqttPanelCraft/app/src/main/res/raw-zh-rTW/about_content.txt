@@ -1,25 +1,33 @@
 MqttPanelCraft
-版本 {VERSION_NAME}
-Copyright © 2026
+版本 {VERSION_NAME}（組建 {BUILD_NUMBER}）
+Copyright © 2026 {COPYRIGHT_HOLDER}
 
 隱私與法律資訊
+生效日期：{EFFECTIVE_DATE}
 
-隱私權政策：{PRIVACY_POLICY_LINK}
+隱私權政策：請點本畫面的「隱私權政策」按鈕。
 聯絡方式：{SUPPORT_EMAIL}
 
 商標聲明：
-所有商標、標誌與品牌名稱均屬其各自所有者。本 App 與 Google 或 Eclipse Foundation 無從屬、贊助或背書關係。
+MQTT 為 OASIS Open 之商標。Google、AdMob、Google Play 為 Google LLC 之商標。Eclipse、Eclipse Paho 為 Eclipse Foundation 之商標。Arduino 為 Arduino S.r.l. 之商標。ESP32、ESP8266 為 Espressif Systems 之商標。其他商標、標誌與品牌名稱均屬其各自所有者。本 App 與上述任一單位無從屬、贊助或背書關係。
 
-第三方服務
+無專利主張：
+本 App 不主張任何專利、申請中專利、獨家演算法，或對 MQTT、Arduino 等相關技術的專屬權利。
 
-本 App 使用 Google Mobile Ads SDK (AdMob) 提供廣告與營利功能，其使用受 Google 適用條款與政策約束。
+重要免責：
+本軟體依「現況」提供，不附任何明示或默示保證。僅供嗜好與非安全關鍵儀表板使用。請勿用於醫療、生命維持、工業安全、門鎖、電熱器、水泵，或任何故障可能造成傷亡或財產損失的設備。您須自行確保 Broker、帳密與連線裝置的安全。Google Play 購買之退款依 Google Play 退款政策辦理。
 
-開放原始碼聲明
+進階版：
+進階版為透過 Google Play 銷售的一次性非訂閱解鎖，同一 Google Play 帳號可還原。結帳金額以 Google Play 顯示為準，可能因地區與稅額而異。
 
-1) AndroidX Libraries — Apache License 2.0
-2) Material Components for Android — Apache License 2.0
-3) Kotlin Coroutines — Apache License 2.0
-4) Eclipse Paho MQTT Client — EPL-2.0 and EDL-1.0
-5) PubSubClient (Arduino) — MIT License
+第三方服務：
+本 App 可能使用 Google Mobile Ads（AdMob）顯示廣告，以及 Google Play Billing 處理進階版購買，並受 Google 適用條款與政策約束。購買進階版後會移除廣告顯示；Ads SDK 仍可能存在於 App 內。
 
-以上第三方產品名稱、授權名稱與出處刻意保留原文。如有遺漏或錯誤，請聯絡 {SUPPORT_EMAIL}。
+開放原始碼聲明：
+完整授權全文請點「開源許可證」按鈕。摘要如下：
+1) AndroidX / AppCompat / Material Components / Kotlin / Coroutines — Apache License 2.0
+2) Eclipse Paho MQTT Client — EPL-2.0 / EDL-1.0
+3) Google Play services Ads / Play Billing / OSS Licenses — Google 條款
+4) 匯出之 Arduino 範本可能需在微控制器端另行安裝 PubSubClient（MIT）、ArduinoJson、WiFiManager 等函式庫；這些並未打包進本 Android App。
+
+如有遺漏或錯誤，請聯絡 {SUPPORT_EMAIL}。

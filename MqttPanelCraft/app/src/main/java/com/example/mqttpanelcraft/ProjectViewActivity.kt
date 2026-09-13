@@ -46,6 +46,7 @@ class ProjectViewActivity : BaseActivity() {
     private var mqttListenerRegistered = false
     private var hasSubscribed = false
     private var activatedSessionProjectId: String? = null
+    private var tutorialOverlayStarted = false
 
     private val mqttMessageListener =
             object : MqttRepository.MessageListener {
@@ -611,6 +612,7 @@ class ProjectViewActivity : BaseActivity() {
                 } else if (MqttRepository.activeProjectId == project.id) {
                     MqttSessionClient.refresh(this, project.id)
                 }
+                maybeShowTutorialOverlay()
             }
         }
 
@@ -1011,6 +1013,14 @@ class ProjectViewActivity : BaseActivity() {
         }
     }
 
+    private fun maybeShowTutorialOverlay() {
+        if (tutorialOverlayStarted) return
+        if (!intent.getBooleanExtra(EXTRA_SHOW_TUTORIAL, false)) return
+        tutorialOverlayStarted = true
+        val host = findViewById<FrameLayout>(R.id.tutorialOverlayHost)
+        TutorialOverlayController(host)
+    }
+
     override fun onPause() {
         if (::idleAdController.isInitialized) {
             idleAdController.stop()
@@ -1022,5 +1032,9 @@ class ProjectViewActivity : BaseActivity() {
             putBoolean("GUIDES_VISIBLE", viewModel.isGuidesVisible.value ?: true)
             apply()
         }
+    }
+
+    companion object {
+        const val EXTRA_SHOW_TUTORIAL = "SHOW_TUTORIAL"
     }
 }

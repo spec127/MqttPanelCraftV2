@@ -26,6 +26,12 @@ class MyApplication : Application() {
             else androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
         )
 
+        val projectsFile = File(filesDir, "projects.json")
+        com.example.mqttpanelcraft.utils.OnboardingCoordinator.migrateExistingInstall(
+            this,
+            projectsFile.exists()
+        )
+
         // Init Data Layer
         com.example.mqttpanelcraft.data.ProjectRepository.initialize(this)
         com.example.mqttpanelcraft.utils.PlayBillingManager.initialize(this)

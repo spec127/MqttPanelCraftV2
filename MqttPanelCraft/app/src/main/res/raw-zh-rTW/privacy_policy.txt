@@ -1,26 +1,54 @@
 隱私權政策
 
-生效日期：2026-01-26
+生效日期：2026-09-13
+App：MqttPanelCraft
+開發者／聯絡：Spec127 / niceboat919@gmail.com
 
 1. 前言
-本政策說明 MqttPanelCraft（以下稱「本 App」）如何處理您的資訊。我們重視並致力於保護您的隱私。
+本政策說明 MqttPanelCraft（以下稱「本 App」）如何處理資訊。我們不為本 App 營運自有後端伺服器。多數專案資料會留在您的裝置，或只傳送到您自行設定的 MQTT Broker。
 
-2. 資料蒐集與使用
-我們不會刻意蒐集、儲存或分享使用者的個人資訊。本 App 主要是在裝置本機建立 MQTT 儀表板的工具。
+2. 我們自己不會蒐集什麼
+本 App 沒有自建帳號系統。我們的伺服器不會收到您的 MQTT Broker 密碼或 Payload，因為我們並未營運此類伺服器。
 
-3. App 權限
-- INTERNET：連線至 MQTT Broker 及載入廣告。
-- ACCESS_NETWORK_STATE：檢查網路連線狀態。
-- READ_EXTERNAL_STORAGE / READ_MEDIA_IMAGES：載入選用的面板背景圖片。
+3. 在您裝置上處理的資訊
+- 您輸入的專案設定（Broker 主機、埠號、帳號、密碼、Topic、面板配置、選用背景圖）會儲存在裝置本機，通常為 App 私有檔案。
+- 選擇性的崩潰日誌可能寫入本 App 專屬外部檔案區。只有您在「關於」主動開啟時才會顯示或複製；我們不會自動上傳。
+- 經 Google Play 確認購買後，進階版權益快取可能儲存在本機。
 
-4. 第三方服務
-Google Mobile Ads SDK (AdMob) 可能蒐集廣告識別碼等資料以提供廣告，其使用受 Google 適用的隱私權政策與條款約束。
+4. 可能蒐集資料的第三方服務
+- Google Mobile Ads（AdMob）：可能蒐集廣告識別碼、裝置與 App 資訊、廣告互動資料以顯示廣告。詳見 Google 廣告相關隱私政策。
+- Google Play Billing：處理一次性進階版購買。付款細節由 Google 處理。我們透過 Play Billing API 取得購買／權益狀態，不會取得您的信用卡號。
+購買進階版後會移除廣告顯示。Ads SDK 仍可能存在於 App 內；若不顯示廣告，廣告放送相關蒐集應會減少，但裝置上的 Google Play 服務仍可能依 Google 政策運作。
 
-5. MQTT 資料
-您的 MQTT 設定與 Payload 只會在裝置本機處理，或直接傳送至您指定的 MQTT Broker。我們無法存取您的 MQTT 資料。
+5. 權限（與目前 Manifest 對齊）
+- INTERNET：MQTT 連線與廣告／付款網路請求
+- ACCESS_NETWORK_STATE：檢查網路狀態
+- READ_EXTERNAL_STORAGE / READ_MEDIA_IMAGES：選用面板背景圖
+- WRITE_EXTERNAL_STORAGE（較舊 Android）：舊版儲存存取需求
+- FOREGROUND_SERVICE / FOREGROUND_SERVICE_CONNECTED_DEVICE：以前景通知維持 MQTT 工作階段
+- CHANGE_NETWORK_STATE：App 相關網路操作
+- POST_NOTIFICATIONS：在系統要求時顯示連線／工作階段通知
 
-6. 政策變更
-本政策可能不定期更新，請定期查看是否有異動。
+6. MQTT 資料與明文傳輸
+MQTT 設定與 Payload 會在裝置本機處理，或直接傳送到您指定的 Broker。我們無法在自有伺服器讀取該流量。本 App 可能允許非 TLS（明文）MQTT，以支援本機／嗜好用 Broker。若連到網際網路上的 Broker，請盡可能使用 TLS 與強密碼。
 
-7. 聯絡我們
-如有問題或建議，請寄信至：niceboat919@gmail.com
+7. Android 備份
+Android 自動備份／換機轉移可能備份部分 App 資料。進階版購買旗標已排除於備份之外。含 Broker 憑證的專案檔仍可能被系統備份，除非您清除 App 資料或解除安裝。請將裝置備份視為敏感資料。
+
+8. 兒童
+本 App 非針對未滿 13 歲（或在要求較高年齡門檻的地區未滿 16 歲）之兒童設計。請勿用來蒐集兒童資訊。
+
+9. 您的選擇
+- 清除 App 儲存空間或解除安裝即可刪除本機資料。
+- 可在系統設定重設廣告識別碼。
+- 可在 Google Play 管理或還原購買。
+- 隱私問題請寄至 niceboat919@gmail.com。由於我們不託管您的 MQTT 專案資料，通常無法遠端刪除只存在於您裝置上的內容。
+
+10. 國際使用者
+廣告與 Play 付款由 Google 提供，可能依 Google 條款在您所在國家以外處理資料。
+
+11. 變更
+我們可能更新本政策，並同步更新上方生效日期。請定期查看本畫面。正式上架 Google Play 前，相同政策也應公開託管於網址，並填入 Play Console。
+
+12. 聯絡我們
+niceboat919@gmail.com

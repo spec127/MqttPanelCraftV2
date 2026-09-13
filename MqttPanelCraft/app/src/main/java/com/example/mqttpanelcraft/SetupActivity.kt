@@ -39,8 +39,11 @@ class SetupActivity : BaseActivity() {
     private lateinit var etName: TextInputEditText
     private lateinit var tilBroker: com.google.android.material.textfield.TextInputLayout
     private lateinit var etBroker: TextInputEditText
+    private lateinit var tilPort: com.google.android.material.textfield.TextInputLayout
     private lateinit var etPort: TextInputEditText
+    private lateinit var tilUser: com.google.android.material.textfield.TextInputLayout
     private lateinit var etUser: TextInputEditText
+    private lateinit var tilPassword: com.google.android.material.textfield.TextInputLayout
     private lateinit var etPassword: TextInputEditText
     private lateinit var btnTest: MaterialButton
     private lateinit var btnSave: MaterialButton
@@ -238,6 +241,7 @@ class SetupActivity : BaseActivity() {
         findViewById<MaterialButton>(R.id.btnSaveProject).text =
                 getString(R.string.setup_btn_update_only)
         findViewById<TextView>(R.id.tvPageTitle).text = getString(R.string.setup_title_edit)
+        applyDemoBrokerLock()
     }
 
     private fun setupToolbar() {
@@ -313,8 +317,11 @@ class SetupActivity : BaseActivity() {
         tilBroker = findViewById(R.id.tilBroker)
         etBroker = findViewById(R.id.etBroker)
 
+        tilPort = findViewById(R.id.tilPort)
         etPort = findViewById(R.id.etPort)
+        tilUser = findViewById(R.id.tilUser)
         etUser = findViewById(R.id.etUser)
+        tilPassword = findViewById(R.id.tilPassword)
         etPassword = findViewById(R.id.etPassword)
 
         btnTest = findViewById(R.id.btnTestConnection)
@@ -493,6 +500,7 @@ class SetupActivity : BaseActivity() {
             pendingImportedProject = normalized.project
             cbKeepMqttInBackground.isChecked = imported.keepMqttInBackground
             setOrientationUI(imported.orientation)
+            applyDemoBrokerLock()
 
             if (normalized.repairedIds > 0 || normalized.removedLinkedReferences > 0) {
                 AlertDialog.Builder(this)
@@ -548,6 +556,14 @@ class SetupActivity : BaseActivity() {
         }
 
         val port = portStr.toIntOrNull() ?: 1883
+        if (com.example.mqttpanelcraft.utils.DemoBroker.isLocal(broker)) {
+            btnTest.setText(R.string.setup_connected)
+            btnTest.isEnabled = true
+            btnTest.setTextColor(Color.GREEN)
+            btnTest.strokeColor = ColorStateList.valueOf(Color.GREEN)
+            android.widget.Toast.makeText(this, R.string.setup_demo_connection_ok, android.widget.Toast.LENGTH_SHORT).show()
+            return
+        }
         val uri = "tcp://$broker:$port"
 
         btnTest.isEnabled = false
@@ -638,6 +654,14 @@ class SetupActivity : BaseActivity() {
         tilBroker.isErrorEnabled = false
 
         val port = portStr.toIntOrNull() ?: 1883
+        val lockedDemo = com.example.mqttpanelcraft.utils.DemoBroker.isLocal(originalProject?.broker) ||
+                com.example.mqttpanelcraft.utils.DemoBroker.isLocal(broker)
+        val finalBroker =
+                if (lockedDemo) com.example.mqttpanelcraft.utils.DemoBroker.HOST else broker
+        val finalPort =
+                if (lockedDemo) com.example.mqttpanelcraft.utils.DemoBroker.PORT else port
+        val finalUser = if (lockedDemo) "" else user
+        val finalPass = if (lockedDemo) "" else pass
 
         // Persist the ID shown by the generator in both create and edit mode.
         val etProjectId = findViewById<TextInputEditText>(R.id.etProjectId)
@@ -695,10 +719,10 @@ class SetupActivity : BaseActivity() {
                 Project(
                         id = finalId,
                         name = name,
-                        broker = broker,
-                        port = port,
-                        username = user,
-                        password = pass,
+                        broker = finalBroker,
+                        port = finalPort,
+                        username = finalUser,
+                        password = finalPass,
                         clientId = (originalProject ?: pendingImportedProject)?.clientId ?: "",
                         type = selectedType,
                         components = finalComponents,
@@ -706,7 +730,7 @@ class SetupActivity : BaseActivity() {
                         orientation = finalOrientation,
                         createdAt = (originalProject ?: pendingImportedProject)?.createdAt ?: System.currentTimeMillis(),
                         lastOpenedAt = (originalProject ?: pendingImportedProject)?.lastOpenedAt ?: System.currentTimeMillis(),
-                        keepMqttInBackground = cbKeepMqttInBackground.isChecked
+                        keepMqttInBackground = if (lockedDemo) false else cbKeepMqttInBackground.isChecked
                 )
 
         // Unified Flow: Always Show Rewarded (unless disabled)
@@ -721,7 +745,7 @@ class SetupActivity : BaseActivity() {
 
         // New Feature: First Project is Free (No Ad)
         // If creating new project (projectId == null) AND repository is empty
-        if (projectId == null && ProjectRepository.getAllProjects().isEmpty()) {
+        if (projectId == null && ProjectRepository.countBillableProjects() == 0) {
             // First Project Bonus: Ad Skipped silently
             saveAndFinish(newProject, targetProjectId)
             return
@@ -839,6 +863,29 @@ class SetupActivity : BaseActivity() {
                                 ?: System.currentTimeMillis(),
                 keepMqttInBackground = cbKeepMqttInBackground.isChecked
         )
+    }
+
+    private fun applyDemoBrokerLock() {
+        val locked = com.example.mqttpanelcraft.utils.DemoBroker.isLocal(etBroker.text?.toString()) ||
+                com.example.mqttpanelcraft.utils.DemoBroker.isLocal(originalProject?.broker)
+        val hint = findViewById<TextView>(R.id.tvDemoBrokerHint)
+        if (!locked) {
+            hint.visibility = View.GONE
+            return
+        }
+        etBroker.setText(com.example.mqttpanelcraft.utils.DemoBroker.HOST)
+        etPort.setText(com.example.mqttpanelcraft.utils.DemoBroker.PORT.toString())
+        etUser.setText("")
+        etPassword.setText("")
+        etBroker.isEnabled = false
+        etPort.isEnabled = false
+        etUser.isEnabled = false
+        etPassword.isEnabled = false
+        cbKeepMqttInBackground.isEnabled = false
+        cbKeepMqttInBackground.isChecked = false
+        tilBroker.helperText = getString(R.string.setup_demo_broker_helper)
+        tilBroker.isHelperTextEnabled = true
+        hint.visibility = View.VISIBLE
     }
 
     private fun isExportFormUnsaved(exportProject: Project): Boolean {

@@ -1,5 +1,6 @@
 package com.example.mqttpanelcraft
 
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -11,6 +12,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.example.mqttpanelcraft.utils.PremiumManager
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import java.io.File
 
 class AboutActivity : BaseActivity() {
@@ -24,7 +26,6 @@ class AboutActivity : BaseActivity() {
 
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        // Fix: Force tint programmatically using setHomeAsUpIndicator
         val typedValue = android.util.TypedValue()
         theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
         val colorOnSurface = if (typedValue.resourceId != 0) {
@@ -32,23 +33,24 @@ class AboutActivity : BaseActivity() {
         } else {
             typedValue.data
         }
-        
+
         val arrow = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_arrow_back)?.mutate()
         arrow?.setTint(colorOnSurface)
         supportActionBar?.setHomeAsUpIndicator(arrow)
-        
-        toolbar.setNavigationOnClickListener { onBackPressed() }
+
+        toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         val tvVersion = findViewById<TextView>(R.id.tvVersion)
         var version = getString(R.string.version_unknown_value)
         var build: Long = 0
-        
+
         try {
             val pInfo = packageManager.getPackageInfo(packageName, 0)
             version = pInfo.versionName ?: getString(R.string.version_unknown_value)
             build = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
                 pInfo.longVersionCode
             } else {
+                @Suppress("DEPRECATION")
                 pInfo.versionCode.toLong()
             }
             tvVersion.text = getString(R.string.version_format, version, build.toString())
@@ -65,39 +67,41 @@ class AboutActivity : BaseActivity() {
         }
 
         findViewById<Button>(R.id.btnPrivacy).setOnClickListener {
-            // Show Privacy Policy in-app instead of opening browser
             showPrivacyDialog()
         }
 
         findViewById<Button>(R.id.btnContact).setOnClickListener {
-            // ... (keep existing email logic if needed, but for brevity I'll keep it as is if I don't touch it)
-             val intent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:") 
-                putExtra(Intent.EXTRA_EMAIL, arrayOf("niceboat919@gmail.com"))
-                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_email_subject))
-            }
-            if (intent.resolveActivity(packageManager) != null) {
-                startActivity(intent)
-            } else {
-                 // Fallback for emulator often
-                 android.widget.Toast.makeText(this, R.string.error_no_email_client, android.widget.Toast.LENGTH_SHORT).show()
-            }
+            openSupportEmail()
         }
-        
+
         findViewById<Button>(R.id.btnOssLicenses).setOnClickListener {
-            // Feature disabled as dependencies were reverted
-            android.widget.Toast.makeText(this, getString(R.string.msg_feature_disabled), android.widget.Toast.LENGTH_SHORT).show()
-            // startActivity(Intent(this, com.google.android.gms.oss.licenses.OssLicensesMenuActivity::class.java))
+            startActivity(Intent(this, OssLicensesMenuActivity::class.java))
         }
 
         val tvContent = findViewById<TextView>(R.id.tvContent)
         tvContent.text = loadAboutContent(version, build.toString())
     }
-    
-    // License Dialog replaced by Google OSS Activity
+
+    private fun openSupportEmail() {
+        val email = getString(R.string.support_email_address)
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:$email")
+            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_email_subject))
+        }
+        try {
+            startActivity(Intent.createChooser(intent, getString(R.string.contact_support)))
+        } catch (_: ActivityNotFoundException) {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("support email", email))
+            Toast.makeText(this, getString(R.string.error_no_email_client_copied, email), Toast.LENGTH_LONG).show()
+        }
+    }
 
     private fun onVersionTapped() {
-        if (!PremiumManager.isDebuggable(this)) return
+        if (!PremiumManager.isDebuggable(this)) {
+            Toast.makeText(this, R.string.developer_mode_release_hint, Toast.LENGTH_SHORT).show()
+            return
+        }
         val now = SystemClock.uptimeMillis()
         if (now - lastVersionTapAt > 1500L) versionTapCount = 0
         lastVersionTapAt = now
@@ -130,7 +134,7 @@ class AboutActivity : BaseActivity() {
         } catch (e: Exception) {
             getString(R.string.error_privacy_load)
         }
-        
+
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.title_privacy_policy))
             .setMessage(privacyText)
@@ -144,11 +148,9 @@ class AboutActivity : BaseActivity() {
             rawContent
                 .replace("{VERSION_NAME}", version)
                 .replace("{BUILD_NUMBER}", build)
-                .replace("{Developer/Company}", "Spec127")
-                .replace("{YYYY-MM-DD}", "2026-01-26") // Effective Date
-                .replace("{SUPPORT_EMAIL}", "niceboat919@gmail.com")
-                .replace("{WEBSITE_LINK}", "https://example.com")
-                .replace("{PRIVACY_POLICY_LINK}", "https://www.google.com/policies/privacy")
+                .replace("{COPYRIGHT_HOLDER}", "Spec127")
+                .replace("{EFFECTIVE_DATE}", "2026-09-13")
+                .replace("{SUPPORT_EMAIL}", getString(R.string.support_email_address))
         } catch (e: Exception) {
             e.printStackTrace()
             getString(R.string.error_about_load)
@@ -162,7 +164,6 @@ class AboutActivity : BaseActivity() {
                 Toast.makeText(this, R.string.crash_no_logs, Toast.LENGTH_SHORT).show()
                 return
             }
-            // Crash logs append across launches; never allocate an unbounded file on the UI thread.
             val content = java.io.RandomAccessFile(file, "r").use { log ->
                 val count = minOf(log.length(), 64L * 1024).toInt()
                 log.seek(log.length() - count)

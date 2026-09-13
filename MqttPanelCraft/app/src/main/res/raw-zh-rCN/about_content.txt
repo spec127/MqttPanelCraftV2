@@ -1,25 +1,33 @@
 MqttPanelCraft
-版本 {VERSION_NAME}
-Copyright © 2026
+版本 {VERSION_NAME}（组建 {BUILD_NUMBER}）
+Copyright © 2026 {COPYRIGHT_HOLDER}
 
 隐私与法律信息
+生效日期：{EFFECTIVE_DATE}
 
-隐私政策：{PRIVACY_POLICY_LINK}
+隐私政策：请点本屏幕的“隐私权政策”按钮。
 联系方式：{SUPPORT_EMAIL}
 
 商标声明：
-所有商标、标志和品牌名称均属于其各自所有者。本应用与 Google 或 Eclipse Foundation 没有从属、赞助或背书关系。
+MQTT 为 OASIS Open 的商标。Google、AdMob、Google Play 为 Google LLC 的商标。Eclipse、Eclipse Paho 为 Eclipse Foundation 的商标。Arduino 为 Arduino S.r.l. 的商标。ESP32、ESP8266 为 Espressif Systems 的商标。其他商标、标志和品牌名称均属于其各自所有者。本应用与上述任一单位没有从属、赞助或背书关系。
 
-第三方服务
+无专利主张：
+本应用不主张任何专利、申请中专利、独家算法，或对 MQTT、Arduino 等相关技术的专属权利。
 
-本应用使用 Google Mobile Ads SDK (AdMob) 提供广告与营利功能，其使用受 Google 适用条款和政策约束。
+重要免责：
+本软件按“现状”提供，不附带任何明示或默示保证。仅供爱好与非安全关键仪表板使用。请勿用于医疗、生命维持、工业安全、门锁、电热器、水泵，或任何故障可能导致伤亡或财产损失的设备。您须自行确保 Broker、账号密码与连接设备的安全。Google Play 购买的退款依 Google Play 退款政策办理。
 
-开源声明
+高级版：
+高级版是通过 Google Play 销售的一次性非订阅解锁，同一 Google Play 账号可还原。结账金额以 Google Play 显示为准，可能因地区与税额而异。
 
-1) AndroidX Libraries — Apache License 2.0
-2) Material Components for Android — Apache License 2.0
-3) Kotlin Coroutines — Apache License 2.0
-4) Eclipse Paho MQTT Client — EPL-2.0 and EDL-1.0
-5) PubSubClient (Arduino) — MIT License
+第三方服务：
+本应用可能使用 Google Mobile Ads（AdMob）显示广告，以及 Google Play Billing 处理高级版购买，并受 Google 适用条款与政策约束。购买高级版后会移除广告显示；Ads SDK 仍可能存在于应用内。
 
-以上第三方产品名称、许可证名称和出处刻意保留原文。如有遗漏或错误，请联系 {SUPPORT_EMAIL}。
+开源声明：
+完整许可全文请点“开源许可证”按钮。摘要如下：
+1) AndroidX / AppCompat / Material Components / Kotlin / Coroutines — Apache License 2.0
+2) Eclipse Paho MQTT Client — EPL-2.0 / EDL-1.0
+3) Google Play services Ads / Play Billing / OSS Licenses — Google 条款
+4) 导出的 Arduino 模板可能需在微控制器端另行安装 PubSubClient（MIT）、ArduinoJson、WiFiManager 等库；这些并未打包进本 Android 应用。
+
+如有遗漏或错误，请联系 {SUPPORT_EMAIL}。

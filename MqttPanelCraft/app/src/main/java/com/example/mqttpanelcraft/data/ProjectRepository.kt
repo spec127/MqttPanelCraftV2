@@ -218,6 +218,10 @@ object ProjectRepository {
     fun getAllProjects(): List<Project> {
         return projects.toList()
     }
+
+    @Synchronized
+    fun countBillableProjects(): Int =
+        projects.count { !com.example.mqttpanelcraft.utils.DemoBroker.isLocal(it.broker) }
     
     @Synchronized
     fun getProjectById(id: String): Project? {

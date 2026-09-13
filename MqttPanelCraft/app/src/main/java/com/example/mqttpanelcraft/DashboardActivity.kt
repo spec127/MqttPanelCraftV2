@@ -18,6 +18,7 @@ class DashboardActivity : BaseActivity() {
 
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var projectAdapter: ProjectAdapter
+    private var tutorialLaunchAttempted = false
 
     // v85: Sorting State
     // 0: Custom, 1: Name, 2: Date, 3: Last Opened
@@ -33,6 +34,12 @@ class DashboardActivity : BaseActivity() {
 
             binding = ActivityDashboardBinding.inflate(layoutInflater)
             setContentView(binding.root)
+
+            if (!com.example.mqttpanelcraft.utils.OnboardingCoordinator.isLanguageGateDone(this) &&
+                            savedInstanceState == null
+            ) {
+                startActivity(Intent(this, LanguageOnboardingActivity::class.java))
+            }
 
             setupToolbar()
             setupDrawer()
@@ -138,6 +145,7 @@ class DashboardActivity : BaseActivity() {
             }
         }
         updateUserBadge()
+        maybeLaunchFirstTutorial()
     }
 
     private fun updateUserBadge() {
@@ -216,6 +224,7 @@ class DashboardActivity : BaseActivity() {
                     startActivity(Intent(this, AboutActivity::class.java))
                 }
                 R.id.nav_language -> showLanguageDialog()
+                R.id.nav_tutorial -> openOrReplayTutorial()
                 R.id.nav_premium -> {
                     com.example.mqttpanelcraft.utils.PremiumManager.showPremiumDialog(this) { success ->
                         updateUserBadge()
@@ -487,7 +496,7 @@ class DashboardActivity : BaseActivity() {
     private fun setupFab() {
         binding.fabAddProject.setOnClickListener {
             if (!com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this) &&
-                            ProjectRepository.getAllProjects().size >= 1
+                            ProjectRepository.countBillableProjects() >= 1
             ) {
 
                 AlertDialog.Builder(this)
@@ -510,6 +519,29 @@ class DashboardActivity : BaseActivity() {
             val intent = Intent(this, SetupActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun maybeLaunchFirstTutorial() {
+        if (tutorialLaunchAttempted) return
+        if (!com.example.mqttpanelcraft.utils.OnboardingCoordinator.isLanguageGateDone(this)) return
+        if (com.example.mqttpanelcraft.utils.OnboardingCoordinator.isTutorialSeeded(this)) return
+        tutorialLaunchAttempted = true
+        val project = com.example.mqttpanelcraft.data.TutorialProjectFactory.ensureTutorialProject(this)
+        com.example.mqttpanelcraft.utils.OnboardingCoordinator.markTutorialSeeded(this)
+        openTutorialCanvas(project.id, showTutorial = true)
+    }
+
+    private fun openOrReplayTutorial() {
+        val project = com.example.mqttpanelcraft.data.TutorialProjectFactory.ensureTutorialProject(this)
+        com.example.mqttpanelcraft.utils.OnboardingCoordinator.markTutorialSeeded(this)
+        openTutorialCanvas(project.id, showTutorial = true)
+    }
+
+    private fun openTutorialCanvas(projectId: String, showTutorial: Boolean) {
+        val intent = Intent(this, ProjectViewActivity::class.java)
+        intent.putExtra("PROJECT_ID", projectId)
+        intent.putExtra(ProjectViewActivity.EXTRA_SHOW_TUTORIAL, showTutorial)
+        startActivity(intent)
     }
 
 }

@@ -15,7 +15,11 @@
         android:icon="@drawable/ic_globe" 
         android:title="@string/drawer_item_language" />
     <item
+        android:id="@+id/nav_tutorial"
+        android:icon="@drawable/ic_light"
+        android:title="@string/drawer_item_tutorial" />
+    <item
         android:id="@+id/nav_about"
-        android:icon="@drawable/ic_google"
+        android:icon="@drawable/ic_info_custom"
         android:title="@string/drawer_item_about" />
 </menu>

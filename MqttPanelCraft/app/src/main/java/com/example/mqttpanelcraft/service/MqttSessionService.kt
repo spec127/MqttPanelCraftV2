@@ -21,8 +21,10 @@ import com.example.mqttpanelcraft.model.Project
 import com.example.mqttpanelcraft.model.ProjectType
 import com.example.mqttpanelcraft.mqtt.ClockAutomationEngine
 import com.example.mqttpanelcraft.mqtt.ClockRuntimeRecord
+import com.example.mqttpanelcraft.mqtt.DemoMqttEngine
 import com.example.mqttpanelcraft.mqtt.MqttConnectionState
 import com.example.mqttpanelcraft.mqtt.MqttSessionClient
+import com.example.mqttpanelcraft.utils.DemoBroker
 import com.example.mqttpanelcraft.utils.TopicHelper
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -59,9 +61,12 @@ class MqttSessionService : Service() {
     private val projectTopics = linkedSetOf<String>()
     private val dynamicTopics = linkedSetOf<String>()
     private var currentConfig: ConnectionConfig? = null
+    private var demoLoopback = false
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
-            if (project != null && client?.isConnected != true) startConnectLoop(generation)
+            if (project != null && !demoLoopback && client?.isConnected != true) {
+                startConnectLoop(generation)
+            }
         }
     }
 
@@ -120,6 +125,7 @@ class MqttSessionService : Service() {
             generation++
             connectJob?.cancel()
             disconnectClient()
+            demoLoopback = false
             if (project?.id != next.id) {
                 dynamicTopics.clear()
                 MqttRepository.clearSessionState()
@@ -137,7 +143,7 @@ class MqttSessionService : Service() {
         MqttRepository.updateClockDeadlines(clockEngine.deadlines())
         persistClockState()
         startClockLoop()
-        if (!sameConnection || client?.isConnected != true) {
+        if (!sameConnection || !(demoLoopback || client?.isConnected == true)) {
             startConnectLoop(generation)
         } else {
             updateState(next, MqttConnectionState.CONNECTED)
@@ -172,6 +178,10 @@ class MqttSessionService : Service() {
             var attempt = 0
             while (isActive && expectedGeneration == generation) {
                 val active = project ?: return@launch
+                if (DemoBroker.isLocal(active.broker)) {
+                    connectDemo(active)
+                    return@launch
+                }
                 updateState(active, if (attempt == 0) MqttConnectionState.CONNECTING else MqttConnectionState.RECONNECTING)
                 try {
                     connectOnce(active, currentConfig ?: connectionConfig(active))
@@ -190,8 +200,16 @@ class MqttSessionService : Service() {
         }
     }
 
+    private fun connectDemo(active: Project) {
+        disconnectClient()
+        demoLoopback = true
+        updateState(active, MqttConnectionState.CONNECTED)
+        log("Connected to ${DemoBroker.HOST} (local tutorial)")
+    }
+
     private fun connectOnce(active: Project, config: ConnectionConfig) {
         disconnectClient()
+        demoLoopback = false
         val nextClient = MqttClient(config.uri, config.clientId, MemoryPersistence())
         client = nextClient
         nextClient.setCallback(object : MqttCallbackExtended {
@@ -223,6 +241,7 @@ class MqttSessionService : Service() {
     }
 
     private fun subscribeAll() {
+        if (demoLoopback) return
         val activeClient = client ?: return
         if (!activeClient.isConnected) return
         (projectTopics + dynamicTopics).filter(String::isNotBlank).distinct().forEach { topic ->
@@ -238,6 +257,10 @@ class MqttSessionService : Service() {
     private fun subscribeDynamic(topic: String?) {
         val clean = topic?.trim().orEmpty()
         if (clean.isEmpty() || project == null) return
+        if (demoLoopback) {
+            if (clean.isNotEmpty()) dynamicTopics.add(clean)
+            return
+        }
         if (dynamicTopics.add(clean) && client?.isConnected == true) {
             try { client?.subscribe(clean) } catch (error: Exception) { log("Subscribe failed: ${error.message}") }
         }
@@ -250,7 +273,15 @@ class MqttSessionService : Service() {
     }
 
     private fun publish(topic: String?, payload: String?) {
-        if (topic.isNullOrBlank() || payload == null || client?.isConnected != true || project == null) {
+        if (topic.isNullOrBlank() || payload == null || project == null) {
+            log("Publish ignored: no active MQTT session")
+            return
+        }
+        if (demoLoopback) {
+            DemoMqttEngine.publish(topic, payload, time())
+            return
+        }
+        if (client?.isConnected != true) {
             log("Publish ignored: no active MQTT session")
             return
         }
@@ -269,7 +300,7 @@ class MqttSessionService : Service() {
         clockJob = scope.launch {
             while (isActive) {
                 val active = project ?: return@launch
-                val result = clockEngine.tick(active, client?.isConnected == true)
+                val result = clockEngine.tick(active, client?.isConnected == true || demoLoopback)
                 MqttRepository.updateClockDeadlines(clockEngine.deadlines())
                 result.events.forEach { publish(it.topic, it.payload) }
                 if (result.changed) persistClockState()
@@ -284,6 +315,7 @@ class MqttSessionService : Service() {
         clockJob?.cancel()
         persistClockState()
         disconnectClient()
+        demoLoopback = false
         project = null
         currentConfig = null
         projectTopics.clear()

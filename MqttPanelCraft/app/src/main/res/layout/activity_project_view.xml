@@ -875,4 +875,13 @@
             app:tint="#FFFFFF"/>
     </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/tutorialOverlayHost"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:clickable="false"
+        android:elevation="30dp"
+        android:visibility="gone" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

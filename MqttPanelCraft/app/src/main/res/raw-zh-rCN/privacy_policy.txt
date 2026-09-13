@@ -1,26 +1,54 @@
 隐私政策
 
-生效日期：2026-01-26
+生效日期：2026-09-13
+应用：MqttPanelCraft
+开发者／联系：Spec127 / niceboat919@gmail.com
 
 1. 前言
-本政策说明 MqttPanelCraft（以下简称“本应用”）如何处理您的信息。我们重视并致力于保护您的隐私。
+本政策说明 MqttPanelCraft（以下简称“本应用”）如何处理信息。我们不为该应用运营自有后端服务器。多数项目数据会留在您的设备，或只发送到您自行配置的 MQTT Broker。
 
-2. 数据收集与使用
-我们不会刻意收集、存储或分享用户的个人信息。本应用主要是在设备本地创建 MQTT 仪表板的工具。
+2. 我们自己不会收集什么
+本应用没有自建账号系统。我们的服务器不会收到您的 MQTT Broker 密码或 Payload，因为我们并未运营此类服务器。
 
-3. 应用权限
-- INTERNET：连接至 MQTT Broker 及加载广告。
-- ACCESS_NETWORK_STATE：检查网络连接状态。
-- READ_EXTERNAL_STORAGE / READ_MEDIA_IMAGES：加载可选的面板背景图片。
+3. 在您设备上处理的信息
+- 您输入的项目设置（Broker 主机、端口、账号、密码、Topic、面板配置、可选背景图）会保存在设备本地，通常为应用私有文件。
+- 可选的崩溃日志可能写入本应用专用外部文件区。只有您在“关于”主动打开时才会显示或复制；我们不会自动上传。
+- 经 Google Play 确认购买后，高级版权益缓存可能保存在本地。
 
-4. 第三方服务
-Google Mobile Ads SDK (AdMob) 可能收集广告标识符等数据以提供广告，其使用受 Google 适用的隐私政策与条款约束。
+4. 可能收集数据的第三方服务
+- Google Mobile Ads（AdMob）：可能收集广告标识符、设备与应用信息、广告互动数据以展示广告。详见 Google 广告相关隐私政策。
+- Google Play Billing：处理一次性高级版购买。付款细节由 Google 处理。我们通过 Play Billing API 获取购买／权益状态，不会获取您的信用卡号。
+购买高级版后会移除广告显示。Ads SDK 仍可能存在于应用内；若不显示广告，广告投放相关收集应会减少，但设备上的 Google Play 服务仍可能依 Google 政策运行。
 
-5. MQTT 数据
-您的 MQTT 设置与 Payload 只会在设备本地处理，或直接发送至您指定的 MQTT Broker。我们无法访问您的 MQTT 数据。
+5. 权限（与当前 Manifest 对齐）
+- INTERNET：MQTT 连接与广告／付款网络请求
+- ACCESS_NETWORK_STATE：检查网络状态
+- READ_EXTERNAL_STORAGE / READ_MEDIA_IMAGES：可选面板背景图
+- WRITE_EXTERNAL_STORAGE（较旧 Android）：旧版存储访问需求
+- FOREGROUND_SERVICE / FOREGROUND_SERVICE_CONNECTED_DEVICE：以前台通知维持 MQTT 会话
+- CHANGE_NETWORK_STATE：应用相关网络操作
+- POST_NOTIFICATIONS：在系统要求时显示连接／会话通知
 
-6. 政策变更
-本政策可能不定期更新，请定期查看是否有变动。
+6. MQTT 数据与明文传输
+MQTT 设置与 Payload 会在设备本地处理，或直接发送到您指定的 Broker。我们无法在自有服务器读取该流量。本应用可能允许非 TLS（明文）MQTT，以支持本地／爱好用 Broker。若连接到互联网上的 Broker，请尽可能使用 TLS 与强密码。
 
-7. 联系我们
-如有问题或建议，请发送邮件至：niceboat919@gmail.com
+7. Android 备份
+Android 自动备份／换机迁移可能备份部分应用数据。高级版购买标志已排除在备份之外。含 Broker 凭据的项目文件仍可能被系统备份，除非您清除应用数据或卸载。请将设备备份视为敏感数据。
+
+8. 儿童
+本应用非针对未满 13 岁（或在要求更高年龄门槛的地区未满 16 岁）的儿童设计。请勿用来收集儿童信息。
+
+9. 您的选择
+- 清除应用存储空间或卸载即可删除本地数据。
+- 可在系统设置重置广告标识符。
+- 可在 Google Play 管理或还原购买。
+- 隐私问题请发送至 niceboat919@gmail.com。由于我们不托管您的 MQTT 项目数据，通常无法远程删除只存在于您设备上的内容。
+
+10. 国际用户
+广告与 Play 付款由 Google 提供，可能依 Google 条款在您所在国家以外处理数据。
+
+11. 变更
+我们可能更新本政策，并同步更新上方生效日期。请定期查看本屏幕。正式上架 Google Play 前，相同政策也应公开托管于网址，并填入 Play Console。
+
+12. 联系我们
+niceboat919@gmail.com

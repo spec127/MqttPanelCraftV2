@@ -1,25 +1,33 @@
 MqttPanelCraft
-Version {VERSION_NAME}
-Copyright © 2026
+Version {VERSION_NAME} (Build {BUILD_NUMBER})
+Copyright © 2026 {COPYRIGHT_HOLDER}
 
 Privacy & Legal
+Effective date: {EFFECTIVE_DATE}
 
-Privacy Policy: {PRIVACY_POLICY_LINK}
+Privacy Policy: tap the Privacy Policy button on this screen.
 Contact: {SUPPORT_EMAIL}
 
 Trademarks:
-All trademarks, logos, and brand names are the property of their respective owners. This app is not affiliated with, sponsored, or endorsed by Google or the Eclipse Foundation.
+MQTT is a trademark of OASIS Open. Google, AdMob, and Google Play are trademarks of Google LLC. Eclipse and Eclipse Paho are trademarks of the Eclipse Foundation. Arduino is a trademark of Arduino S.r.l. ESP32 and ESP8266 are trademarks of Espressif Systems. All other trademarks, logos, and brand names are the property of their respective owners. This app is not affiliated with, sponsored by, or endorsed by any of them.
 
-Third-Party Services
+No patent claims:
+This app does not claim any patents, patent-pending status, exclusive algorithms, or exclusive rights over MQTT, Arduino, or related technologies.
 
-This app integrates Google Mobile Ads SDK (AdMob) for advertising and monetization. Its use is governed by Google’s applicable terms and policies.
+Important disclaimer:
+The software is provided “as is”, without warranty of any kind. It is intended for hobby and non-safety-critical dashboards. Do not use it to control medical devices, life-support systems, industrial safety systems, locks, heaters, pumps, or any equipment where failure could cause injury, death, or property damage. You are responsible for securing your broker, credentials, and connected devices. Refunds for Play purchases follow Google Play’s refund policy.
 
-Open Source Notices
+Premium:
+Premium is a one-time non-subscription unlock sold through Google Play. It is restored with the same Google Play account. Price is shown by Google Play at checkout and may vary by region and tax.
 
-1) AndroidX Libraries — Apache License 2.0
-2) Material Components for Android — Apache License 2.0
-3) Kotlin Coroutines — Apache License 2.0
-4) Eclipse Paho MQTT Client — EPL-2.0 and EDL-1.0
-5) PubSubClient (Arduino) — MIT License
+Third-party services:
+This app may use Google Mobile Ads (AdMob) to show ads, and Google Play Billing for Premium purchases. Those services are governed by Google’s terms and policies. Buying Premium removes ad display; the Ads SDK may still be present in the app binary.
 
-Third-party product names, license names, and attribution above are intentionally kept in their original form. Contact {SUPPORT_EMAIL} if an attribution is missing or incorrect.
+Open source notices:
+Full license texts are available from the Open Source Licenses button. Summary:
+1) AndroidX / AppCompat / Material Components / Kotlin / Coroutines — Apache License 2.0
+2) Eclipse Paho MQTT Client — EPL-2.0 / EDL-1.0
+3) Google Play services Ads / Play Billing / OSS Licenses — Google terms
+4) Generated Arduino export templates may require third-party libraries such as PubSubClient (MIT), ArduinoJson, and WiFiManager on the microcontroller side; those are not bundled inside this Android app.
+
+Contact {SUPPORT_EMAIL} if an attribution is missing or incorrect.

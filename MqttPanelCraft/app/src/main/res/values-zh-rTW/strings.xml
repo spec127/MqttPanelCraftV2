@@ -10,12 +10,14 @@
     <string name="version_unknown">版本未知</string>
     <string name="version_unknown_value">未知</string>
     <string name="support_email_subject">MqttPanelCraft 支援</string>
+    <string name="support_email_address">niceboat919@gmail.com</string>
     <string name="title_privacy_policy">隱私權政策</string>
     <string name="privacy_policy">隱私權政策</string>
     <string name="error_privacy_load">載入隱私權政策出錯。</string>
     <string name="error_about_load">無法載入關於資訊，請聯絡支援人員。</string>
     <string name="open_source_licenses">開源許可證</string>
     <string name="contact_support">聯繫我們</string>
+    <string name="error_no_email_client_copied">找不到電子郵件 App。已複製支援信箱：%1$s</string>
     <string name="msg_feature_disabled">功能暫時停用</string>
 
     <!-- Drawer Menu -->
@@ -693,6 +695,7 @@
     <string name="developer_mode_disable_skip">顯示廣告</string>
     <string name="developer_mode_enabled">此 debug 安裝已略過廣告</string>
     <string name="developer_mode_disabled">此 debug 安裝已恢復廣告</string>
+    <string name="developer_mode_release_hint">開發者模式僅在 debug 安裝可用。</string>
     <string name="console_enter_topic">請輸入要發送的 Topic</string>
     <string name="topic_copied">Topic 已複製</string>
     <string name="setup_connecting">連線中…</string>
@@ -747,4 +750,39 @@
     <string name="mqtt_notification_permission_denied">通知已關閉，Android 可能只會在「運作中的應用程式」顯示 MQTT 服務。</string>
     <string name="setup_error_id_exists">此專案 ID 已被使用，請重新產生。</string>
     <string name="setup_msg_arduino_export_unsaved">匯出使用目前表單內容。請先儲存專案，這些設定才會寫入檔案。</string>
+    <string name="common_btn_next">下一步</string>
+    <string name="common_btn_previous">上一步</string>
+    <string name="common_btn_skip">略過</string>
+    <string name="onboarding_language_title">選擇語言</string>
+    <string name="onboarding_language_subtitle">之後可在側欄再改。</string>
+    <string name="drawer_item_tutorial">新手教學</string>
+    <string name="project_badge_tutorial">示範</string>
+    <string name="setup_demo_broker_helper">教學用假地址，只在本機模擬，無法連到真實設備。</string>
+    <string name="setup_demo_broker_create_new">要連真實 Broker，請返回並新增專案。</string>
+    <string name="setup_demo_connection_ok">本地教學連線已就緒。</string>
+    <string name="arduino_demo_export_title">教學用地址</string>
+    <string name="arduino_demo_export_message">此專案使用 demo.local。燒到開發板後無法遠端連線。仍要匯出嗎？</string>
+    <string name="arduino_demo_export_continue">仍要匯出</string>
+    <string name="tutorial_btn_done">完成</string>
+    <string name="tutorial_step_counter">第 %1$d 步，共 %2$d 步</string>
+    <string name="tutorial_step1_title">歡迎</string>
+    <string name="tutorial_step1_body">這是練習專案，不會連到家裡的設備或網路上的 Broker。</string>
+    <string name="tutorial_step2_title">假地址</string>
+    <string name="tutorial_step2_body">Broker 是 demo.local，欄位已鎖住。之後請新建專案來連真實設備。</string>
+    <string name="tutorial_step3_title">連線狀態</string>
+    <string name="tutorial_step3_body">連線圖示應顯示已連線。訊息只在這支手機裡轉一圈。</string>
+    <string name="tutorial_step4_title">送出與接收</string>
+    <string name="tutorial_step4_body">按鈕送出指令，LED 顯示狀態。真實專案也是這個概念。</string>
+    <string name="tutorial_step5_title">同一個 Topic</string>
+    <string name="tutorial_step5_body">這些元件已經共用同一個 Topic。MQTT 靠 Topic 文字對上，不是因為它們放在同一頁。</string>
+    <string name="tutorial_step6_title">開燈</string>
+    <string name="tutorial_step6_body">請按 ON 按鈕，LED 應會亮起。</string>
+    <string name="tutorial_step7_title">關燈</string>
+    <string name="tutorial_step7_body">請按 OFF 按鈕，LED 應會熄滅。</string>
+    <string name="tutorial_step8_title">選用：再加一顆 LED</string>
+    <string name="tutorial_step8_body">從側欄新拖的 LED 會是不同 Topic，按按鈕不會亮。打開屬性，把 Topic 改成跟按鈕一樣再試。此步可略過。</string>
+    <string name="tutorial_step9_title">接下來用真設備</string>
+    <string name="tutorial_step9_body">回到專案列表並點新增。免費版除了這個練習專案，還能再建 1 個正式專案。</string>
+    <string name="tutorial_step10_title">匯出</string>
+    <string name="tutorial_step10_body">JSON 備份可以。Arduino 匯出仍會帶假地址，請改用正式專案再燒錄。</string>
 </resources>

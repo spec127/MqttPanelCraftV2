@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.oss.licenses.plugin)
 }
 
 android {
@@ -57,4 +58,5 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation(libs.play.services.ads)
     implementation(libs.billing)
+    implementation(libs.play.services.oss.licenses)
 }
