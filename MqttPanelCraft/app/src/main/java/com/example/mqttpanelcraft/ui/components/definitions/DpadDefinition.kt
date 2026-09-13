@@ -49,7 +49,7 @@ object DpadDefinition : IComponentDefinition {
         "msg_right" to "right",
         "msg_release" to "stop",
         "send_on_release" to "true",
-        "style" to "Beveled",
+        "style" to "Neon",
         "axisMode" to "4-Way"
     )
 
@@ -61,7 +61,7 @@ object DpadDefinition : IComponentDefinition {
             tag = "target"
             joystickMode = "Buttons" // 強制設定為按鍵式方向鍵
             axisMode = "4-Way"
-            visualStyle = "Beveled"
+            visualStyle = "Neon"
             layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
@@ -75,7 +75,7 @@ object DpadDefinition : IComponentDefinition {
         val dpad = view.findViewWithTag<JoystickView>("target") ?: return
         dpad.joystickMode = "Buttons" // 始終維持按鍵式方向鍵
         dpad.axisMode = data.props["axisMode"] ?: "4-Way"
-        dpad.visualStyle = data.props["style"] ?: "Beveled"
+        dpad.visualStyle = data.props["style"] ?: "Neon"
 
         dpad.msgUp = data.props["msg_up"] ?: "up"
         dpad.msgDown = data.props["msg_down"] ?: "down"
@@ -142,7 +142,7 @@ object DpadDefinition : IComponentDefinition {
             }
         }
 
-        // 3. 風格設定面板 ("圓形" to "Beveled", "銳利" to "Neon")
+        // Canvas mapping is swapped vs the stored keys so 立體/霓虹 match what users see.
         CommonPropBinder.bindLocalizedDropdown(
                 panelView,
                 R.id.tvJoystickStyle,
@@ -150,10 +150,10 @@ object DpadDefinition : IComponentDefinition {
                 data,
                 onUpdate,
                 listOf(
-                        PropertyOption("Beveled", R.string.val_dpad_style_beveled),
-                        PropertyOption("Neon", R.string.val_dpad_style_neon)
+                        PropertyOption("Neon", R.string.val_dpad_style_beveled),
+                        PropertyOption("Beveled", R.string.val_dpad_style_neon)
                 ),
-                "Beveled"
+                "Neon"
         )
 
         // 4. 方向指令輸入框設定

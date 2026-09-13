@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="language_row_selected">#F3E5F5</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -86,6 +87,8 @@
 
     <!-- User Design Colors -->
     <color name="props_primary">#a573bc</color>
+    <color name="prop_segment_checked_bg">#7B1FA2</color>
+    <color name="prop_segment_checked_text">#FFFFFF</color>
 
     <!-- Dynamic Semantic Colors -->
     <color name="popup_bg_color">#FFFFFF</color>

@@ -52,9 +52,21 @@ class LogAdapter : RecyclerView.Adapter<LogAdapter.LogViewHolder>() {
 
     private val topItems = mutableListOf<TopLevelItem>()
 
+    fun setLogs(newLogs: List<String>) {
+        topItems.clear()
+        for (log in newLogs) {
+            ingest(log, notify = false)
+        }
+        notifyDataSetChanged()
+    }
+
     fun addLog(message: String) {
+        ingest(message, notify = true)
+    }
+
+    private fun ingest(message: String, notify: Boolean) {
         val timestamp = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
-        val raw = "[$timestamp] $message"
+        val raw = if (message.startsWith("[")) message else "[$timestamp] $message"
 
         val chunkIdx = raw.indexOf("CHUNK:")
         if (chunkIdx != -1) {
@@ -80,7 +92,7 @@ class LogAdapter : RecyclerView.Adapter<LogAdapter.LogViewHolder>() {
                         topItems.add(TopLevelItem.Group(newGroup))
                     }
                     trimTopItems()
-                    notifyDataSetChanged()
+                    if (notify) notifyDataSetChanged()
                     return
                 }
             } catch (_: Exception) {}
@@ -96,21 +108,12 @@ class LogAdapter : RecyclerView.Adapter<LogAdapter.LogViewHolder>() {
             topItems.add(TopLevelItem.Standard(std))
         }
         trimTopItems()
-        notifyDataSetChanged()
+        if (notify) notifyDataSetChanged()
     }
 
     private fun trimTopItems() {
         if (topItems.size > 150) {
             topItems.removeAt(0)
-        }
-    }
-
-    fun setLogs(newLogs: List<String>) {
-        topItems.clear()
-        for (log in newLogs) {
-            // Re-feed through addLog logic without timestamping if already formatted
-            val cleanMsg = if (log.startsWith("[")) log.substringAfter("] ").trim() else log
-            addLog(cleanMsg)
         }
     }
 

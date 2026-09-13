@@ -6,7 +6,6 @@ import com.example.mqttpanelcraft.model.Project
 import com.example.mqttpanelcraft.model.ProjectType
 import com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry
 import com.example.mqttpanelcraft.utils.DemoBroker
-import com.example.mqttpanelcraft.utils.TutorialTopics
 
 object TutorialProjectFactory {
     private const val BASE_NAME = "Tutorial_Local"
@@ -15,7 +14,10 @@ object TutorialProjectFactory {
         ProjectRepository.getAllProjects().firstOrNull { DemoBroker.isLocal(it.broker) }
 
     fun ensureTutorialProject(context: Context): Project {
-        findTutorialProject()?.let { return it }
+        findTutorialProject()?.let { existing ->
+            resetGuidedLayout(context, existing)
+            return ProjectRepository.getProjectById(existing.id) ?: existing
+        }
         val project = create(context)
         ProjectRepository.addProject(project)
         return ProjectRepository.getProjectById(project.id) ?: project
@@ -24,41 +26,69 @@ object TutorialProjectFactory {
     fun create(context: Context): Project {
         val id = ProjectRepository.generateId()
         val name = uniqueName()
-        val density = context.resources.displayMetrics.density
-        fun dp(value: Int) = (value * density).toInt()
-        val topic = TutorialTopics.sharedCommandTopic(name, id)
-        val buttonOn = component(context, 101, "BUTTON", "light_on", 24f * density, 72f * density, topic) {
-            it["text"] = "ON"
-            it["payload"] = "ON"
-            it["trigger_mode"] = "tap"
-        }
-        val buttonOff = component(context, 102, "BUTTON", "light_off", 160f * density, 72f * density, topic) {
-            it["text"] = "OFF"
-            it["payload"] = "OFF"
-            it["trigger_mode"] = "tap"
-        }
-        val led = component(context, 103, "LED", "led", 88f * density, 176f * density, topic)
-        val display = component(
-            context,
-            104,
-            "TEXT_DISPLAY",
-            "receivebox",
-            24f * density,
-            280f * density,
-            topic
-        ) {
-            it["default_text"] = "loading"
-        }
-        display.width = dp(220)
-        display.height = dp(52)
         return Project(
             id = id,
             name = name,
             broker = DemoBroker.HOST,
             port = DemoBroker.PORT,
             type = ProjectType.HOME,
-            components = mutableListOf(buttonOn, buttonOff, led, display),
+            components = guidedComponents(context).toMutableList(),
             keepMqttInBackground = false
+        )
+    }
+
+    private fun resetGuidedLayout(context: Context, project: Project) {
+        project.components.clear()
+        project.components.addAll(guidedComponents(context))
+        ProjectRepository.updateProject(project)
+    }
+
+    private fun guidedComponents(context: Context): List<ComponentData> {
+        val density = context.resources.displayMetrics.density
+        fun dp(value: Int) = (value * density).toInt()
+        val frameW = dp(300)
+        val frameH = dp(250)
+        val gap = dp(20)
+        val originX = 16f * density
+        val originY = 12f * density
+        val top = graphicFrame(
+            context, 101, "group_light", originX, originY, frameW, frameH, "A"
+        )
+        val bottom = graphicFrame(
+            context, 102, "group_slider", originX, originY + frameH + gap, frameW, frameH, "B"
+        )
+        return listOf(top, bottom)
+    }
+
+    private fun graphicFrame(
+        context: Context,
+        id: Int,
+        label: String,
+        x: Float,
+        y: Float,
+        width: Int,
+        height: Int,
+        group: String
+    ): ComponentData {
+        val definition = ComponentDefinitionRegistry.get("GRAPHIC")
+        val props = (definition?.getDefaultProps(context) ?: emptyMap()).toMutableMap()
+        props["showLabel"] = "false"
+        props["opacity"] = "18"
+        props["stroke_width"] = "3"
+        props["enable_corner"] = "true"
+        props["fill_color"] = "#7B1FA2"
+        props["stroke_color"] = "#7B1FA2"
+        props["tutorial_group"] = group
+        return ComponentData(
+            id = id,
+            type = "GRAPHIC",
+            x = x,
+            y = y,
+            width = width,
+            height = height,
+            label = label,
+            topicConfig = "",
+            props = props
         )
     }
 
@@ -69,34 +99,5 @@ object TutorialProjectFactory {
             index++
         }
         return "$BASE_NAME$index"
-    }
-
-    private fun component(
-        context: Context,
-        id: Int,
-        type: String,
-        label: String,
-        x: Float,
-        y: Float,
-        topic: String,
-        extras: (MutableMap<String, String>) -> Unit = {}
-    ): ComponentData {
-        val definition = ComponentDefinitionRegistry.get(type)
-        val density = context.resources.displayMetrics.density
-        val width = ((definition?.defaultSize?.width ?: 120) * density).toInt()
-        val height = ((definition?.defaultSize?.height ?: 70) * density).toInt()
-        val props = (definition?.getDefaultProps(context) ?: emptyMap()).toMutableMap()
-        extras(props)
-        return ComponentData(
-            id = id,
-            type = type,
-            x = x,
-            y = y,
-            width = width,
-            height = height,
-            label = label,
-            topicConfig = topic,
-            props = props
-        )
     }
 }

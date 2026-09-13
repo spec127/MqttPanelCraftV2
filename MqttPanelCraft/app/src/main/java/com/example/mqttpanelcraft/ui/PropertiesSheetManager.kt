@@ -70,6 +70,8 @@ class PropertiesSheetManager(
 
     init {
         setupListeners()
+        com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder.disableAutofill(propertyContainer)
+        com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder.disableHintAnimation(propertyContainer)
     }
 
     private fun setupListeners() {
@@ -343,6 +345,8 @@ class PropertiesSheetManager(
                     
                     // Inflate with attachToRoot = false for more control
                     val specificView = inflater.inflate(def.propertiesLayoutId, containerSpecificProps, false)
+                    com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder.disableHintAnimation(specificView)
+                    com.example.mqttpanelcraft.ui.components.prop.CommonPropBinder.disableAutofill(specificView)
                     containerSpecificProps?.addView(specificView)
                     
                     android.util.Log.d("PropsManager", "Binding properties for $typeClean")

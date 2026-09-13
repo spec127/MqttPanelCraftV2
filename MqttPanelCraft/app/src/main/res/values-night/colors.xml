@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="language_row_selected">#33243A</color>
     <color name="purple_200">#E2D9F3</color> <color name="purple_500">#D1C4E9</color>
     <color name="purple_700">#9575CD</color>
     <color name="teal_200">#03DAC5</color>
@@ -80,6 +81,8 @@
     
     <!-- User Design Colors -->
     <color name="props_primary">#a573bc</color>
+    <color name="prop_segment_checked_bg">#E1BEE7</color>
+    <color name="prop_segment_checked_text">#1A1025</color>
     <!-- Maps to dark bg in night mode -->
 
     <!-- Dynamic Semantic Colors -->

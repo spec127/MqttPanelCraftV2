@@ -31,6 +31,7 @@ object ClockDefinition : IComponentDefinition {
     override val displayNameResId: Int = R.string.component_label_clock
     override val iconResId: Int = android.R.drawable.ic_lock_idle_alarm
     override val group = ComponentGroup.DISPLAY
+    override val showInLibrary: Boolean = false
     override val propertiesLayoutId: Int = R.layout.layout_prop_clock
 
     override fun getDefaultProps(): Map<String, String> = mapOf(

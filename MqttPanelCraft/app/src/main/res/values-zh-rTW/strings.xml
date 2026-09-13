@@ -93,7 +93,8 @@
     <string name="properties_label_payload_press">按下時發送</string>
     <string name="properties_label_trigger_mode">觸發模式</string>
     <string name="properties_label_payload_release">放開時發送</string>
-    <string name="properties_mode_text">文字模式</string>
+    <string name="properties_mode_text">文字</string>
+    <string name="properties_label_icon">圖示</string>
     <string name="properties_label_default">預設值</string>
     <string name="copy_code">複製程式碼</string>
 
@@ -113,7 +114,7 @@
     <string name="component_label_value_display">數值顯示</string>
 
     <string name="component_label_signal_indicator">信號面板</string>
-    <string name="component_label_stepper">加減鍵</string>
+    <string name="component_label_stepper">步進鈕</string>
     <string name="component_label_dpad">方向鍵</string>
     <string name="component_label_image_sensor">即時影像</string>
     <string name="component_label_audio_sensor">聲音警示</string>
@@ -197,11 +198,11 @@
     <string name="component_label_inputbox">發送框</string>
     <string name="component_label_text_display">接收框</string>
     <string name="properties_label_joystick_style">視覺風格</string>
-    <string name="val_joystick_style_neon">霓虹 (Neon)</string>
+    <string name="val_joystick_style_neon">霓虹</string>
     <string name="val_style_orb">光球</string>
-    <string name="val_joystick_style_sharp">俐落 (Sharp)</string>
-    <string name="val_joystick_style_smooth">圓滑 (Smooth)</string>
-    <string name="val_joystick_style_arrow">箭頭 (Arrow)</string>
+    <string name="val_joystick_style_sharp">俐落</string>
+    <string name="val_joystick_style_smooth">圓滑</string>
+    <string name="val_joystick_style_arrow">箭頭</string>
     <string name="val_dpad_style_beveled">立體</string>
     <string name="val_dpad_style_neon">霓虹</string>
     <string name="prop_label_axis_mode">軸向模式</string>
@@ -212,7 +213,7 @@
     <string name="prop_label_min_val">下限</string>
     <string name="prop_label_max_val">上限</string>
     <string name="prop_label_precision">精度</string>
-    <string name="prop_label_msg_release">鬆手發送</string>
+    <string name="prop_label_msg_release">放開時發送停止</string>
     <string name="prop_label_msg_up">上</string>
     <string name="prop_label_msg_down">下</string>
     <string name="prop_label_msg_left">左</string>
@@ -385,12 +386,14 @@
     <string name="prop_desc_clear_on_send">發送訊息後自動清空輸入框。</string>
     <string name="prop_desc_enter_as_send">按下鍵盤 Enter 鍵時直接發送。</string>
 
-    <string name="val_mode_tap">點擊切換</string>
-    <string name="val_mode_hold">長按觸發</string>
+    <string name="val_mode_tap">點擊發送</string>
+    <string name="val_mode_hold">按住發送</string>
     <string name="val_mode_timer">定時模式</string>
     <string name="properties_unit_ms">毫秒</string>
     
-    <string name="desc_mode_tap">點擊時發送指令。</string>
+    <string name="desc_mode_tap">點一下就發送指令。</string>
+    <string name="desc_mode_hold">按下時發送指令，放開時發送另一則。</string>
+    <string name="desc_mode_timer">按下立刻發送，時間到再發送放開指令。</string>
 
     <string name="properties_switch_mode_standard">標準</string>
     <string name="properties_switch_mode_tri_state">三段</string>
@@ -428,7 +431,8 @@
     <string name="val_match_exact_alt">相符</string>
     <string name="val_match_contains_alt">包含</string>
     <string name="error_duplicate">重複</string>
-    <string name="prop_label_led_color_active">顏色</string>
+    <string name="prop_label_led_color_active">亮起顏色</string>
+    <string name="prop_label_led_color_idle">熄滅顏色</string>
     <string name="prop_label_led_keyword">關鍵字</string>
     <string name="prop_label_led_effect">觸發效果</string>
     <string name="val_effect_steady_short">常亮</string>
@@ -522,10 +526,10 @@
     <string name="prop_graphic_fill_color">填滿顏色</string>
     <string name="prop_graphic_stroke_color">邊框顏色</string>
     <string name="prop_graphic_stroke_width">邊框粗細</string>
-    <string name="prop_graphic_corner_radius">圓角半徑</string>
+    <string name="prop_graphic_corner_radius">圓角</string>
     <string name="prop_graphic_line_direction">線條方向</string>
-    <string name="val_line_horizontal">水平線</string>
-    <string name="val_line_vertical">垂直線</string>
+    <string name="val_line_horizontal">水平</string>
+    <string name="val_line_vertical">垂直</string>
     <string name="prop_graphic_line_style">線條樣式</string>
     <string name="val_line_solid">實線</string>
     <string name="val_line_dashed">虛線</string>
@@ -589,6 +593,9 @@
     <string name="clock_style_combo">類比＋數字</string>
     <string name="clock_self_linked">%1$s（時鐘本身不發送）</string>
     <string name="clock_no_linked">目前沒有可連動的控制元件</string>
+    <string name="calendar_family_label">類型</string>
+    <string name="calendar_family_calendar">月曆</string>
+    <string name="calendar_family_clock">時鐘</string>
     <string name="calendar_date_format">日期格式</string>
     <string name="calendar_time_format">時間格式</string>
     <string name="calendar_style_hint">視覺外觀</string>
@@ -753,6 +760,7 @@
     <string name="common_btn_next">下一步</string>
     <string name="common_btn_previous">上一步</string>
     <string name="common_btn_skip">略過</string>
+    <string name="onboarding_language_continue">繼續</string>
     <string name="onboarding_language_title">選擇語言</string>
     <string name="onboarding_language_subtitle">之後可在側欄再改。</string>
     <string name="drawer_item_tutorial">新手教學</string>
@@ -766,19 +774,19 @@
     <string name="tutorial_btn_done">完成</string>
     <string name="tutorial_step_counter">第 %1$d 步，共 %2$d 步</string>
     <string name="tutorial_step1_title">歡迎</string>
-    <string name="tutorial_step1_body">這是練習專案，不會連到家裡的設備或網路上的 Broker。</string>
-    <string name="tutorial_step2_title">假地址</string>
-    <string name="tutorial_step2_body">Broker 是 demo.local，欄位已鎖住。之後請新建專案來連真實設備。</string>
-    <string name="tutorial_step3_title">連線狀態</string>
-    <string name="tutorial_step3_body">連線圖示應顯示已連線。訊息只在這支手機裡轉一圈。</string>
-    <string name="tutorial_step4_title">送出與接收</string>
-    <string name="tutorial_step4_body">按鈕送出指令，LED 顯示狀態。真實專案也是這個概念。</string>
-    <string name="tutorial_step5_title">同一個 Topic</string>
-    <string name="tutorial_step5_body">這些元件已經共用同一個 Topic。MQTT 靠 Topic 文字對上，不是因為它們放在同一頁。</string>
-    <string name="tutorial_step6_title">開燈</string>
-    <string name="tutorial_step6_body">請按 ON 按鈕，LED 應會亮起。</string>
-    <string name="tutorial_step7_title">關燈</string>
-    <string name="tutorial_step7_body">請按 OFF 按鈕，LED 應會熄滅。</string>
+    <string name="tutorial_step1_body">這是練習專案。畫布上兩個框只是分組，不會連到家裡的設備或網路上的 Broker。</string>
+    <string name="tutorial_step2_title">拖出第一組</string>
+    <string name="tutorial_step2_body">打開側欄，把按鈕、LED、接收框拖進上方的框。現在 Topic 可以不一樣。</string>
+    <string name="tutorial_step3_title">看 MQTT 日誌</string>
+    <string name="tutorial_step3_body">點播放，再點你的按鈕。日誌會出現訊息。LED 還不會亮，因為 Topic 還沒對上。</string>
+    <string name="tutorial_step4_title">改成同一個 Topic</string>
+    <string name="tutorial_step4_body">回到編輯，打開屬性，把按鈕、LED、接收框的 Topic 改成相同。再播放一次就會連動。</string>
+    <string name="tutorial_step5_title">滑桿這一組</string>
+    <string name="tutorial_step5_body">在下方的框拖入滑桿、刻度計、另一個接收框。這三個也要同一個 Topic，刻度計和接收框才會跟著滑桿。</string>
+    <string name="tutorial_step6_title">刪除元件</string>
+    <string name="tutorial_step6_body">選取一個元件，拖到紅色刪除列，或用刪除把手。之後隨時可以再拖回來。</string>
+    <string name="tutorial_step7_title">可以開始了</string>
+    <string name="tutorial_step7_body">請新增專案來連真實 Broker。這裡可以做 JSON 備份；Arduino 匯出仍會帶假地址。</string>
     <string name="tutorial_step8_title">選用：再加一顆 LED</string>
     <string name="tutorial_step8_body">從側欄新拖的 LED 會是不同 Topic，按按鈕不會亮。打開屬性，把 Topic 改成跟按鈕一樣再試。此步可略過。</string>
     <string name="tutorial_step9_title">接下來用真設備</string>

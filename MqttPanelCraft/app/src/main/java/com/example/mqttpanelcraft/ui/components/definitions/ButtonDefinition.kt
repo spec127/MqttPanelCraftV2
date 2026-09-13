@@ -334,7 +334,7 @@ object ButtonDefinition : IComponentDefinition {
 
         // --- Press Payload with 2-step UX ---
         val etPress = panelView.findViewById<AutoCompleteTextView>(R.id.etPropPayloadPress)
-        val payloadOptions = listOf("ON", "OFF", "1", "0", "TOGGLE")
+        val payloadOptions = listOf("ON", "OFF", "1", "0")
         etPress?.setAdapter(ArrayAdapter(context, R.layout.list_item_dropdown, payloadOptions))
         etPress?.setText(data.props["payload"] ?: "ON", false)
 
@@ -406,6 +406,7 @@ object ButtonDefinition : IComponentDefinition {
                 )
         val containerRelease = panelView.findViewById<View>(R.id.containerReleaseOnly)
         val containerTimer = panelView.findViewById<View>(R.id.containerTimerMode)
+        val tvModeDesc = panelView.findViewById<android.widget.TextView>(R.id.tvTriggerModeDesc)
 
         val curMode = data.props["trigger_mode"] ?: "tap"
         when (curMode) {
@@ -418,7 +419,17 @@ object ButtonDefinition : IComponentDefinition {
             containerRelease?.visibility = if (mode == "hold") View.VISIBLE else View.GONE
             containerTimer?.visibility = if (mode == "timer") View.VISIBLE else View.GONE
         }
+        fun updateTriggerDesc(mode: String) {
+            tvModeDesc?.setText(
+                    when (mode) {
+                        "hold" -> R.string.desc_mode_hold
+                        "timer" -> R.string.desc_mode_timer
+                        else -> R.string.desc_mode_tap
+                    }
+            )
+        }
         updateModeVisibility(curMode)
+        updateTriggerDesc(curMode)
 
         toggleTrigger?.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
@@ -430,6 +441,7 @@ object ButtonDefinition : IComponentDefinition {
                         }
                 onUpdate("trigger_mode", newMode)
                 updateModeVisibility(newMode)
+                updateTriggerDesc(newMode)
             }
         }
 
@@ -490,7 +502,8 @@ object ButtonDefinition : IComponentDefinition {
         val curApprMode = data.props["appearance_mode"] ?: "text"
 
         val containerText = panelView.findViewById<View>(R.id.containerPropText)
-        val containerIcon = panelView.findViewById<View>(R.id.containerPropIcon)
+        val containerIcon = panelView.findViewById<View>(R.id.tilPropIcon)
+                ?: panelView.findViewById<View>(R.id.containerPropIcon)
 
         fun updateApprVisibility(mode: String) {
             when (mode) {

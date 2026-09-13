@@ -76,7 +76,7 @@
         android:gravity="center"
         app:selectionRequired="true"
         app:singleSelection="true"
-        app:checkedButton="@+id/btnTriggerStandard">
+        app:checkedButton="@+id/btnTriggerTap">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTriggerTap"
@@ -195,6 +195,7 @@
 
     <!-- Trigger Mode Description -->
     <TextView
+        android:id="@+id/tvTriggerModeDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="12sp"
@@ -301,6 +302,13 @@
             </com.google.android.material.textfield.TextInputLayout>
             
             <!-- Icon Container (Framed) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPropIcon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/properties_label_icon"
+                android:visibility="gone"
+                style="@style/Widget.App.TextInputLayout.Properties">
             <LinearLayout
                 android:id="@+id/containerPropIcon"
                 android:layout_width="match_parent"
@@ -308,8 +316,7 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:background="@drawable/bg_palette_border"
-                android:padding="4dp"
-                android:visibility="gone">
+                android:padding="4dp">
                 
                 <ImageView android:id="@+id/iconPreview1" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_power" app:tint="@color/prop_text_primary"/>
                 <ImageView android:id="@+id/iconPreview2" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_lighting" app:tint="@color/prop_text_secondary"/>
@@ -318,6 +325,7 @@
                 <ImageView android:id="@+id/iconPreview5" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_tune" app:tint="@color/prop_text_secondary"/>
                 <ImageView android:id="@+id/iconPreview6" android:layout_width="0dp" android:layout_weight="1" android:layout_height="24dp" android:src="@drawable/ic_btn_energy" app:tint="@color/prop_text_secondary"/>
             </LinearLayout>
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </LinearLayout>
 

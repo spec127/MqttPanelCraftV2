@@ -30,6 +30,8 @@
         <item name="boxStrokeWidth">1dp</item>
         <item name="hintTextColor">@color/props_primary</item>
         <item name="android:textColorHint">@color/prop_text_secondary</item>
+        <item name="hintAnimationEnabled">false</item>
+        <item name="android:importantForAutofill">noExcludeDescendants</item>
     </style>
 
     <!-- 屬性視窗 - 通用下拉選單樣式 (全局預設，圓角 16dp)
@@ -44,6 +46,8 @@
         <item name="hintTextColor">@color/props_primary</item>
         <item name="android:textColorHint">@color/prop_text_secondary</item>
         <item name="android:popupBackground">@drawable/bg_popup_rounded</item>
+        <item name="hintAnimationEnabled">false</item>
+        <item name="android:importantForAutofill">noExcludeDescendants</item>
     </style>
 
     <!-- 舊版 Compact 名稱保留供現有 Layout 相容，外觀統一繼承同一套下拉選單令牌。 -->
@@ -76,11 +80,15 @@
     <style name="Widget.App.Button.Segmented.Properties" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="cornerRadius">@dimen/prop_toggle_corner_radius</item>
         <item name="strokeColor">@color/props_primary</item>
-        <item name="android:textColor">@color/props_primary</item>
+        <item name="backgroundTint">@color/prop_segmented_bg</item>
+        <item name="android:textColor">@color/prop_segmented_text</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
         <item name="android:minWidth">0dp</item>
         <item name="android:minHeight">@dimen/prop_toggle_height</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textSize">11sp</item>
     </style>
 
     <style name="PropertyLabel" parent="Widget.MaterialComponents.TextView">

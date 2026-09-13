@@ -79,7 +79,7 @@ class SidebarManager(
                 }
 
                 val registry = com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry
-                val allDefs = registry.getAllTypes().mapNotNull { registry.get(it) }
+                val allDefs = registry.getAllTypes().mapNotNull { registry.get(it) }.filter { it.showInLibrary }
 
                 // Define Group Order
                 val groupOrder = ComponentGroup.entries

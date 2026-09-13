@@ -342,9 +342,9 @@ class DashboardActivity : BaseActivity() {
         val languages =
                 arrayOf(
                         getString(R.string.lang_system_default),
-                        getString(R.string.lang_english),
-                        getString(R.string.lang_traditional_chinese),
-                        getString(R.string.lang_simplified_chinese)
+                        *com.example.mqttpanelcraft.utils.LanguageCatalog.options
+                                .map { it.nativeName }
+                                .toTypedArray()
                 )
         val codes =
                 arrayOf(

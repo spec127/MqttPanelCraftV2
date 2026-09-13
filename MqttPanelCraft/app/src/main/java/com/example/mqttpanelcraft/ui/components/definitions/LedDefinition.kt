@@ -491,7 +491,7 @@ object LedDefinition : IComponentDefinition {
         updateRgbStateRows()
 
         CommonPropBinder.bindColorPalette(panelView, R.id.containerActiveColor, "active_color", data, onUpdate, context.getString(R.string.prop_label_led_color_active), "#FF9800")
-        CommonPropBinder.bindColorPalette(panelView, R.id.containerIdleColor, "idle_color", data, onUpdate, context.getString(R.string.properties_label_default), "#808080")
+        CommonPropBinder.bindColorPalette(panelView, R.id.containerIdleColor, "idle_color", data, onUpdate, context.getString(R.string.prop_label_led_color_idle), "#808080")
 
         val tgEffect = panelView.findViewById<MaterialButtonToggleGroup>(R.id.toggleLedEffect)
         tgEffect?.check(if ((data.props["effect"] ?: "NONE") == "NONE") R.id.btnEffectNone else R.id.btnEffectBlink)

@@ -23,7 +23,7 @@
     <dimen name="prop_input_height_compact_inner">52dp</dimen>
 
     <!-- 所有元件屬性下拉選單共用字級與水平內距。 -->
-    <dimen name="prop_dropdown_text_size">13sp</dimen>
+    <dimen name="prop_dropdown_text_size">11sp</dimen>
     <dimen name="prop_dropdown_padding_horizontal">16dp</dimen>
 
     <!-- MaterialButtonToggleGroup 切換列高度 (全局預設 = 36dp) -->

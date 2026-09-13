@@ -48,6 +48,24 @@ class ClockAutomationEngineTest {
         assertTrue(engine.tick(project, connected = true).events.isEmpty())
     }
 
+    @Test
+    fun calendarFamilyClockCountdownTriggers() {
+        var now = 0L
+        val engine = ClockAutomationEngine({ now }, { utc })
+        val clock = component(1, "CALENDAR", "", mutableMapOf(
+            "family_kind" to "CLOCK",
+            "clock_mode" to "COUNTDOWN",
+            "countdown_seconds" to "10",
+            "trigger_value" to "TRIGGER",
+            "linked_components" to "2"
+        ))
+        val target = component(2, "BUTTON", "test/clock", mutableMapOf("payload" to "ON"))
+        val project = Project("project", "test", "broker", type = ProjectType.HOME, components = mutableListOf(clock, target))
+        engine.configure(project, true)
+        now = 20_000L
+        assertEquals("ON", engine.tick(project, connected = true).events.single().payload)
+    }
+
     private fun project(clockMode: String, countdown: String = "10", schedule: String = "07:30"): Project {
         val clock = component(1, "CLOCK", "", mutableMapOf(
             "clock_mode" to clockMode,

@@ -458,6 +458,7 @@
                                                     android:layout_width="match_parent"
                                                     android:layout_height="wrap_content"
                                                     android:inputType="text"
+                                                    android:importantForAutofill="no"
                                                     android:textSize="14sp"
                                                     android:paddingEnd="48dp" 
                                                     android:textColor="@color/prop_text_primary"/>
@@ -594,7 +595,7 @@
                                             android:layout_height="wrap_content"
                                             android:background="@null"
                                             android:hint=""
-                                            android:inputType="textNoSuggestions|textVisiblePassword"
+                                            android:inputType="textNoSuggestions"
                                             android:paddingStart="2dp"
                                             android:paddingEnd="4dp"
                                             android:textColor="@color/props_primary"

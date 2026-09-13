@@ -130,6 +130,120 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     var onActionUp: (() -> Unit)? = null
     var onActionDown: (() -> Unit)? = null // V17.3
 
+    private data class LinearGeom(
+            val startX: Float,
+            val startY: Float,
+            val endX: Float,
+            val endY: Float,
+            val trackThickness: Float,
+            val thumbSize: Float,
+            val vScale: Float,
+            val isSmall: Boolean
+    )
+
+    private fun computeLinearGeom(w: Float, h: Float, density: Float): LinearGeom {
+        val isVertical = orientation == "Vertical"
+        val isCapsule = sliderStyle == "Capsule"
+        val isSquare = shape == "Square"
+        val isClassic = sliderStyle == "Classic"
+        val hasBubble = feedback == "Bubble" || feedback == "Both"
+        val hasTicks = feedback == "Ticks" || feedback == "Both"
+        val isSmall = Math.min(w, h) < 50f * density
+        val baseFaderSize = 60f * density
+        val shortSide = if (isVertical) w else h
+        var vScale = ((shortSide / baseFaderSize).coerceAtLeast(0.15f)) * 0.85f
+        val gap = 4f * density
+
+        fun thickness(scale: Float) =
+                if (isCapsule) (if (isVertical) w * 0.125f else h * 0.125f)
+                else 4f * density * scale
+
+        fun thumb(scale: Float, thick: Float): Float {
+            val thumbScale = if (isSquare) 1.0f else 1.2f
+            val baseThumb =
+                    if (isSquare) {
+                        if (isClassic) 24f * density * scale else 40f * density * scale
+                    } else {
+                        22f * density * scale
+                    }
+            return if (isCapsule) thick * thumbScale else baseThumb
+        }
+
+        var trackThickness = thickness(vScale)
+        var thumbSize = thumb(vScale, trackThickness)
+        var bubbleRadius = 12f * density * vScale
+        var majorTickLen = 10f * density * vScale
+        var labelSize = 10f * density * vScale
+        fun textWidth() =
+                Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = labelSize }.measureText("100.0")
+
+        var leftNeed = 8f * density
+        var rightNeed = 8f * density
+        var topNeed = 8f * density
+        var bottomNeed = 8f * density
+        if (!isSmall) {
+            if (isVertical) {
+                leftNeed =
+                        if (hasBubble) bubbleRadius * 2.5f + gap + 4f * density
+                        else thumbSize / 2f + 4f * density
+                rightNeed =
+                        if (hasTicks) majorTickLen + gap + textWidth() + 4f * density
+                        else thumbSize / 2f + 4f * density
+            } else {
+                topNeed =
+                        if (hasBubble) bubbleRadius * 2.5f + gap + 4f * density
+                        else thumbSize / 2f + 4f * density
+                bottomNeed =
+                        if (hasTicks) majorTickLen + gap + labelSize + 14f * density
+                        else thumbSize / 2f + 4f * density
+            }
+        }
+
+        if (isVertical) {
+            val totalNeedW = leftNeed + trackThickness + rightNeed
+            if (totalNeedW > w && totalNeedW > 0f) {
+                vScale *= (w / totalNeedW)
+                trackThickness = thickness(vScale)
+                thumbSize = thumb(vScale, trackThickness)
+                bubbleRadius = 12f * density * vScale
+                majorTickLen = 10f * density * vScale
+                labelSize = 10f * density * vScale
+                leftNeed = if (hasBubble && !isSmall) bubbleRadius * 2.5f + gap + 4f * density else 8f * density
+                rightNeed =
+                        if (hasTicks && !isSmall) majorTickLen + gap + textWidth() + 4f * density
+                        else 8f * density
+            }
+        } else {
+            val totalNeedH = topNeed + trackThickness + bottomNeed
+            if (totalNeedH > h && totalNeedH > 0f) {
+                vScale *= (h / totalNeedH)
+                trackThickness = thickness(vScale)
+                thumbSize = thumb(vScale, trackThickness)
+                bubbleRadius = 12f * density * vScale
+                majorTickLen = 10f * density * vScale
+                labelSize = 10f * density * vScale
+                topNeed = if (hasBubble && !isSmall) bubbleRadius * 2.5f + gap + 4f * density else 8f * density
+                bottomNeed =
+                        if (hasTicks && !isSmall) majorTickLen + gap + labelSize + 14f * density
+                        else 8f * density
+            }
+        }
+
+        val bubbleHalf = if (hasBubble && !isSmall) bubbleRadius * 1.3f + 2f * density else 0f
+        val endPad =
+                Math.max(thumbSize / 2f + 4f * density * vScale, bubbleHalf).coerceAtLeast(2f * density)
+
+        return if (isVertical) {
+            val extra = ((w - (leftNeed + trackThickness + rightNeed)) / 2f).coerceAtLeast(0f)
+            val x = extra + leftNeed + trackThickness / 2f
+            LinearGeom(x, h - endPad, x, endPad, trackThickness, thumbSize, vScale, isSmall)
+        } else {
+            val extra = ((h - (topNeed + trackThickness + bottomNeed)) / 2f).coerceAtLeast(0f)
+            val y = extra + topNeed + trackThickness / 2f
+            LinearGeom(endPad, y, w - endPad, y, trackThickness, thumbSize, vScale, isSmall)
+        }
+    }
+
     init {
         // Enable software rendering for BlurMaskFilter if needed
         setLayerType(LAYER_TYPE_SOFTWARE, null)
@@ -179,124 +293,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         val isSquare = shape == "Square"
         val isClassic = sliderStyle == "Classic"
         val hasBubble = (feedback == "Bubble" || feedback == "Both")
-
-        // Debug Log for Bubble
-        if (isDragging) {
-            // android.util.Log.d("SliderDraw", "Draw: Bubble=$hasBubble (feed=$feedback), w=$w,
-            // h=$h")
-        }
-
-        // V12: Dynamic scaling factor based on shortest dimension
-        // We use 60dp as the baseline fader size. If w (horizontal) or h (vertical) is smaller, we
-        // scale down.
-        val baseFaderSize = 60f * density
-        // V18.2: Removed cap on shortSide to allow full proportional scaling as requested
-        val shortSide = if (isVertical) w else h
-
-        // Scale factor: if shortSide != 60dp, all elements scale proportionally
-        // V15.3: Removed 1.0f cap to allow growth; kept 0.15f floor for extreme thinness
-        // V18.5: Reduced scale by 15% as requested (0.85f factor)
-        val vScale = ((shortSide / baseFaderSize).coerceAtLeast(0.15f)) * 0.85f
-
-        val trackThickness =
-                if (isCapsule) (if (isVertical) w * 0.125f else h * 0.125f)
-                else 4f * density * vScale
-
-        val thumbScale = if (isSquare) 1.0f else 1.2f
-        val baseThumbSize =
-                if (isSquare) {
-                    if (isClassic) 24f * density * vScale else 40f * density * vScale
-                } else {
-                    22f * density * vScale
-                }
-
-        val thumbSize = if (isCapsule) trackThickness * thumbScale else baseThumbSize
-
-        // V18.3: Detect thumbnail/small mode
-        val isSmall = Math.min(w, h) < 50f * density
-
-        // V18.5: Calculate Bubble Space Requirements to prevent clipping
-        // Bubble Geometry:
-        // offsetFromThumb = thumbSize / 2 + 8f * density * vScale
-        // tipDistance = 20f * density * vScale
-        // radius = 10f * density * vScale
-        // totalExtension = offset + tipDistance + radius + padding
-        val bubbleRadius = 10f * density * vScale
-        val bubbleExtension =
-                (thumbSize / 2f) +
-                        (8f * density * vScale) +
-                        (2f * bubbleRadius) +
-                        (bubbleRadius * 1.3f) // 1.3 is hRadius factor
-
-        // V17.0: Remove bubbleSpace - use overflow strategy instead
-        // V18.3: Reduce padding for thumbnails to maximize visible track
-        // V18.5: If Bubble is enabled, ensure pad covers the bubble's width (horizontal) or height
-        // (vertical) at the ends
-        // BUT bubble moves with thumb. The critical clipping happens perpendicular to track (shift)
-        // AND parallel to track (at 0% and 100%).
-        // Parallel clipping: Bubble width is ~ 2 * 1.3 * 10 * vScale = 26 * vScale.
-        // Thumb width is ~ 22 * vScale.
-        // So Bubble is slightly wider. We need slightly more pad if bubble is on.
-        var pad = if (isSmall) 2f * density else (thumbSize / 2f + 4f * density * vScale)
-        if (hasBubble && !isSmall) {
-            val bubbleHalfWidth = bubbleRadius * 1.3f
-            pad = Math.max(pad, bubbleHalfWidth + 2f * density)
-        }
-
-        // V18.1: Alignment Shift
-        // User wants:
-        // - Bubble side (Left/Top): 200% space
-        // - Opposite side (Right/Bottom): 80% space
-        // - Capsule opposite side: Minimal space
-        // This means shifting the track AWAY from the bubble side.
-
-        // V18.5: Dynamic Shift to contain bubble
-        // We need 'bubbleExtension' space on the Top (Horizontal) or Left (Vertical).
-        // Center is at w/2 (Vert) or h/2 (Horz).
-        // Space available at center = w/2. We need bubbleExtension.
-        // If we shift by S, space becomes availableHalf + S (if shifting away from bubble).
-        // So: availableHalf + S >= bubbleExtension
-        // S >= bubbleExtension - availableHalf
-
-        val defaultShift =
-                if (isSmall) {
-                    0f
-                } else if (isCapsule) {
-                    thumbSize * 0.4f
-                } else {
-                    thumbSize * 0.25f
-                }
-
-        var shiftAmount = defaultShift
-
-        if (feedback == "None") {
-            shiftAmount = 0.0f
-        } else if (hasBubble && !isSmall) {
-            val availableHalf = if (isVertical) w / 2f else h / 2f
-            val requiredShift = bubbleExtension - availableHalf + (4f * density) // +4dp margin
-            if (requiredShift > shiftAmount) {
-                shiftAmount = requiredShift
-            }
-        }
-
-        val startX: Float
-        val startY: Float
-        val endX: Float
-        val endY: Float
-
-        if (isVertical) {
-            // Centered vertically -> Shift X to Right (Bubble is on Left)
-            startX = (w / 2f) + shiftAmount
-            startY = h - pad
-            endX = startX
-            endY = pad
-        } else {
-            // Centered horizontally -> Shift Y to Bottom (Bubble is on Top)
-            startX = pad
-            startY = (h / 2f) + shiftAmount
-            endX = w - pad
-            endY = startY
-        }
+        val geom = computeLinearGeom(w, h, density)
+        val vScale = geom.vScale
+        val trackThickness = geom.trackThickness
+        val thumbSize = geom.thumbSize
+        val isSmall = geom.isSmall
+        val startX = geom.startX
+        val startY = geom.startY
+        val endX = geom.endX
+        val endY = geom.endY
 
         // V18.5: Draw Track Border
         if (!isSmall) {
@@ -589,37 +594,14 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         val w = width.toFloat()
         val h = height.toFloat()
         val isVertical = orientation == "Vertical"
-        val isCapsule = sliderStyle == "Capsule"
-        val isSquare = shape == "Square"
-        val isClassic = sliderStyle == "Classic"
-
-        // V16.0: Scaling must EXACTLY match drawLinear
-        val baseFaderSize = 60f * density
-        val shortSide = if (isVertical) w else h
-        // V18.6: FIX: Apply the same 0.85f scaling factor as in onDraw
-        val vScale = ((shortSide / baseFaderSize).coerceAtLeast(0.15f)) * 0.85f
-
-        val trackThickness =
-                if (isCapsule) (if (isVertical) w * 0.125f else h * 0.125f)
-                else 4f * density * vScale
-
-        val thumbScale = if (isSquare) 1.0f else 1.2f
-        val baseThumbSize =
-                if (isSquare) {
-                    if (isClassic) 24f * density * vScale else 40f * density * vScale
-                } else {
-                    22f * density * vScale
-                }
-
-        val thumbSize = if (isCapsule) trackThickness * thumbScale else baseThumbSize
-        val pad = thumbSize / 2f + 4f * density * vScale
-
-        // V16.0: Touch coordinates must match the offset track exactly
+        val geom = computeLinearGeom(w, h, density)
         val progress =
                 if (isVertical) {
-                    ((h - pad - ty) / (h - 2 * pad)).coerceIn(0f, 1f)
+                    val span = geom.startY - geom.endY
+                    if (span == 0f) 0f else ((geom.startY - ty) / span).coerceIn(0f, 1f)
                 } else {
-                    ((tx - pad) / (w - 2 * pad)).coerceIn(0f, 1f)
+                    val span = geom.endX - geom.startX
+                    if (span == 0f) 0f else ((tx - geom.startX) / span).coerceIn(0f, 1f)
                 }
         applyValue(progress)
     }

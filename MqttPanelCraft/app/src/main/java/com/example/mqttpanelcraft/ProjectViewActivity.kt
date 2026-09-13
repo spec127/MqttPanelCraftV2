@@ -47,6 +47,7 @@ class ProjectViewActivity : BaseActivity() {
     private var hasSubscribed = false
     private var activatedSessionProjectId: String? = null
     private var tutorialOverlayStarted = false
+    private var tutorialOverlay: TutorialOverlayController? = null
 
     private val mqttMessageListener =
             object : MqttRepository.MessageListener {
@@ -100,6 +101,13 @@ class ProjectViewActivity : BaseActivity() {
             com.example.mqttpanelcraft.data.ProjectRepository.initialize(applicationContext)
 
             setContentView(R.layout.activity_project_view)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                window.decorView.importantForAutofill =
+                    android.view.View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
+            }
+            if (intent.getBooleanExtra(EXTRA_SHOW_TUTORIAL, false)) {
+                isEditMode = true
+            }
             viewModel = ViewModelProvider(this)[ProjectViewModel::class.java]
 
             // Bind UI
@@ -148,6 +156,7 @@ class ProjectViewActivity : BaseActivity() {
                     ensureMqttConnectedAndSubscribed()
                 }
                 viewModel.project.value?.let { MqttSessionClient.setRuntime(this, it.id, !isEditMode) }
+                tutorialOverlay?.onCanvasState(viewModel.components.value.orEmpty(), isEditMode)
             }
 
             // Subscribers
@@ -588,6 +597,7 @@ class ProjectViewActivity : BaseActivity() {
                 editorCanvas.tag = 0f
                 editorCanvas.post { projectUIManager.updateCanvasOcclusion(0f) }
             }
+            tutorialOverlay?.onCanvasState(components, isEditMode)
         }
 
         viewModel.project.observe(this) { project ->
@@ -1018,7 +1028,8 @@ class ProjectViewActivity : BaseActivity() {
         if (!intent.getBooleanExtra(EXTRA_SHOW_TUTORIAL, false)) return
         tutorialOverlayStarted = true
         val host = findViewById<FrameLayout>(R.id.tutorialOverlayHost)
-        TutorialOverlayController(host)
+        tutorialOverlay = TutorialOverlayController(host)
+        tutorialOverlay?.onCanvasState(viewModel.components.value.orEmpty(), isEditMode)
     }
 
     override fun onPause() {

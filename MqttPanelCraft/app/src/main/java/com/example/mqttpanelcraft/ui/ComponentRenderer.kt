@@ -95,6 +95,7 @@ class ComponentRenderer(
                             visibility = if (isHidden) View.GONE else View.VISIBLE
                         }
                 canvasCanvas.addView(label)
+                viewCache[data.id] = newView
 
                 // Apply Initial State
                 updateViewState(newView, data, isEditMode, isSelected)
@@ -139,6 +140,28 @@ class ComponentRenderer(
                     label.visibility = if (isHidden) View.GONE else View.VISIBLE
                 }
             }
+        }
+        applyZOrder(components, selectedId)
+    }
+
+    private fun applyZOrder(components: List<ComponentData>, selectedId: Int?) {
+        fun rank(type: String): Int =
+                when (
+                    com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(type)
+                            ?.group
+                ) {
+                    com.example.mqttpanelcraft.ui.components.ComponentGroup.DISPLAY -> 0
+                    com.example.mqttpanelcraft.ui.components.ComponentGroup.SENSOR -> 1
+                    com.example.mqttpanelcraft.ui.components.ComponentGroup.CONTROL -> 2
+                    else -> 1
+                }
+        components.sortedBy { rank(it.type) }.forEach { data ->
+            viewCache[data.id]?.bringToFront()
+            canvasCanvas.findViewWithTag<TextView>("LABEL_FOR_${data.id}")?.bringToFront()
+        }
+        selectedId?.let { id ->
+            viewCache[id]?.bringToFront()
+            canvasCanvas.findViewWithTag<TextView>("LABEL_FOR_$id")?.bringToFront()
         }
     }
 

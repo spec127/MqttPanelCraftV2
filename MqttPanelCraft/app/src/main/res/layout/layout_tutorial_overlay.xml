@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/tvTutorialTitle"
@@ -50,21 +50,18 @@
                 android:id="@+id/btnTutorialSkip"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/common_btn_skip" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnTutorialBack"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/common_btn_previous" />
+                android:layout_height="48dp"
+                android:minWidth="72dp"
+                android:text="@string/common_btn_skip"
+                android:textSize="14sp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnTutorialNext"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/common_btn_next" />
+                android:layout_height="48dp"
+                android:minWidth="88dp"
+                android:text="@string/common_btn_next"
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

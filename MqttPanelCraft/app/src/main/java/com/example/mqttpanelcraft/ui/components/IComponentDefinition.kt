@@ -29,6 +29,10 @@ interface IComponentDefinition {
         val iconResId: Int // e.g. R.drawable.ic_button
         val group: ComponentGroup
 
+        /** When false, the widget stays registered for existing projects but is hidden in the sidebar. */
+        val showInLibrary: Boolean
+            get() = true
+
         /**
          * Opt-in shared payload row. Default is false on purpose: control widgets already
          * edit command payloads in their specific property layouts. Override only when a

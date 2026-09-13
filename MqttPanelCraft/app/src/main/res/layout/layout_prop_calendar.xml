@@ -10,124 +10,178 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- 互動 Interaction -->
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="start|center_vertical"
-            android:layout_marginBottom="12dp">
-            <ImageView
-                android:layout_width="@dimen/prop_section_icon_size"
-                android:layout_height="@dimen/prop_section_icon_size"
-                android:src="@drawable/ic_touch_app"
-                app:tint="@color/props_primary"
-                android:layout_marginEnd="6dp"/>
-            <TextView
-                android:text="@string/properties_section_interaction"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/prop_text_secondary"
-                android:letterSpacing="0.05"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+            android:layout_marginBottom="6dp"
+            android:text="@string/calendar_family_label"
+            android:textColor="@color/prop_text_secondary"
+            android:textSize="12sp"/>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/containerDateFormat"
-            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/tgCalendarFamily"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/prop_toggle_height"
             android:layout_marginBottom="12dp"
-            android:hint="@string/calendar_date_format">
-            <AutoCompleteTextView
-                android:id="@+id/spDateFormat"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/prop_input_height_inner"
-                android:inputType="none"
-                android:background="@null"
-                android:paddingStart="16dp"
-                android:paddingEnd="12dp"/>
-        </com.google.android.material.textfield.TextInputLayout>
+            app:selectionRequired="true"
+            app:singleSelection="true">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFamilyCalendar"
+                style="@style/Widget.App.Button.Segmented.Properties"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:text="@string/calendar_family_calendar"
+                android:textSize="12sp"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFamilyClock"
+                style="@style/Widget.App.Button.Segmented.Properties"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:text="@string/calendar_family_clock"
+                android:textSize="12sp"/>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/containerTimeFormat"
-            style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:hint="@string/calendar_time_format">
-            <AutoCompleteTextView
-                android:id="@+id/spTimeFormat"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/prop_input_height_inner"
-                android:inputType="none"
-                android:background="@null"
-                android:paddingStart="16dp"
-                android:paddingEnd="12dp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/divider_line"
-            android:layout_marginBottom="12dp"/>
-
-        <!-- 視覺外觀 Visual Appearance -->
         <LinearLayout
+            android:id="@+id/containerCalendarFamily"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="start|center_vertical"
-            android:layout_marginBottom="12dp">
-            <ImageView
-                android:layout_width="@dimen/prop_section_icon_size"
-                android:layout_height="@dimen/prop_section_icon_size"
-                android:src="@drawable/ic_palette"
-                app:tint="@color/props_primary"
-                android:layout_marginEnd="6dp"/>
-            <TextView
-                android:text="@string/properties_section_appearance"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@color/prop_text_secondary"
-                android:letterSpacing="0.05"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+            android:orientation="vertical">
 
-        <!-- Row: Visual style (Left 0.4) + Color (Right 0.6) -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp"
-            android:baselineAligned="false">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="start|center_vertical"
+                android:layout_marginBottom="12dp">
+                <ImageView
+                    android:layout_width="@dimen/prop_section_icon_size"
+                    android:layout_height="@dimen/prop_section_icon_size"
+                    android:src="@drawable/ic_touch_app"
+                    app:tint="@color/props_primary"
+                    android:layout_marginEnd="6dp"/>
+                <TextView
+                    android:text="@string/properties_section_interaction"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/prop_text_secondary"
+                    android:letterSpacing="0.05"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.App.TextInputLayout.Properties.DenseDropdown"
-                android:layout_width="0dp"
+                android:id="@+id/containerDateFormat"
+                style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.4"
-                android:hint="@string/calendar_style_hint">
+                android:layout_marginBottom="12dp"
+                android:hint="@string/calendar_date_format">
                 <AutoCompleteTextView
-                    android:id="@+id/spVisualStyle"
+                    android:id="@+id/spDateFormat"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/prop_input_height_compact_inner"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="none"
                     android:background="@null"
                     android:paddingStart="16dp"
                     android:paddingEnd="12dp"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/containerTimeFormat"
+                style="@style/Widget.App.TextInputLayout.Properties.Dropdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="@string/calendar_time_format">
+                <AutoCompleteTextView
+                    android:id="@+id/spTimeFormat"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/prop_input_height_inner"
+                    android:inputType="none"
+                    android:background="@null"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="12dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider_line"
+                android:layout_marginBottom="12dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="start|center_vertical"
+                android:layout_marginBottom="12dp">
+                <ImageView
+                    android:layout_width="@dimen/prop_section_icon_size"
+                    android:layout_height="@dimen/prop_section_icon_size"
+                    android:src="@drawable/ic_palette"
+                    app:tint="@color/props_primary"
+                    android:layout_marginEnd="6dp"/>
+                <TextView
+                    android:text="@string/properties_section_appearance"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/prop_text_secondary"
+                    android:letterSpacing="0.05"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                android:baselineAligned="false">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.App.TextInputLayout.Properties.DenseDropdown"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.4"
+                    android:hint="@string/calendar_style_hint">
+                    <AutoCompleteTextView
+                        android:id="@+id/spVisualStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/prop_input_height_compact_inner"
+                        android:inputType="none"
+                        android:background="@null"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="12dp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/propColor"
+                    layout="@layout/layout_prop_generic_color"
+                    android:layout_width="0dp"
+                    android:layout_weight="0.6"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/containerClockFamily"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
             <include
-                android:id="@+id/propColor"
-                layout="@layout/layout_prop_generic_color"
-                android:layout_width="0dp"
-                android:layout_weight="0.6"
+                layout="@layout/layout_prop_clock_inner"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
 

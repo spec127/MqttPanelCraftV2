@@ -1,52 +1,57 @@
-# Gradle files
+# Gradle / Kotlin
 .gradle/
+**/.gradle/
+**/.kotlin/
 build/
+**/build/
 
-# Local configuration file (sdk path, etc)
+# Local SDK / IDE
 local.properties
+.idea/
+.vscode/
+*.iml
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
 
-# Log/OS Files
-*.log
-
-# Android Studio generated files and folders
+# Android generated
 captures/
 .externalNativeBuild/
 .cxx/
 *.aab
 *.apk
 output-metadata.json
-
-# IntelliJ
-*.iml
-.idea/
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
-
-# Keystore files
-*.jks
-*.keystore
-
-# Google Services (e.g. APIs or Firebase)
-google-services.json
-
-# Android Profiling
 *.hprof
 
-.vscode/
-# === Local build/debug logs (do not commit) ===
+# Secrets
+*.jks
+*.keystore
+google-services.json
+
+# Logs
+*.log
 MqttPanelCraft/build_*.txt
 MqttPanelCraft/build_log*.txt
 MqttPanelCraft/errors*.txt
 MqttPanelCraft/*verification*.txt
-MqttPanelCraft/*.log
 
-# === Gradle / build outputs ===
-**/.gradle/
-**/.kotlin/
-**/build/
+# Node / helper deps (never ship these)
+node_modules/
+package-lock.json
+package.json
 
-# === Android Studio / IntelliJ ===
-.idea/
-*.iml
-local.properties
+# Agent skills, planning, extra docs
+.agent/
+PLAY_STORE_LAUNCH.md
+PROJECT_MAP.md
+ARDUINO_AUDIT_*.md
+REVIEW_*.md
+README_EN.md
+
+# Small test / prototype programs
+test_*.js
+test_*.py
+test_*.ts
+web_prototype/
+arduino/**/mqtt_tester_gui.py
+arduino/**/explained/

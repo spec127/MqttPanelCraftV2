@@ -2,6 +2,7 @@ package com.example.mqttpanelcraft.ui.components.prop
 
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -61,6 +62,7 @@ object CommonPropBinder {
 
         // Apply Native Label
         val inputLayout = container.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.containerColorInputLayout)
+        inputLayout?.isHintAnimationEnabled = false
         if (label != null) {
             inputLayout?.hint = label
             inputLayout?.isHintEnabled = true
@@ -155,6 +157,7 @@ object CommonPropBinder {
             defaultValue: String = ""
     ) {
         val editText = panelView.findViewById<EditText>(editTextId) ?: return
+        disableAutofill(editText)
         editText.setText(data.props[propKey] ?: defaultValue)
         editText.addTextChangedListener(
                 object : TextWatcher {
@@ -189,6 +192,7 @@ object CommonPropBinder {
             defaultValue: String = ""
     ) {
         val autoComplete = panelView.findViewById<AutoCompleteTextView>(autoCompleteId) ?: return
+        disableAutofill(autoComplete)
         val context = panelView.context
 
         val currentValue = data.props[propKey] ?: defaultValue
@@ -222,6 +226,7 @@ object CommonPropBinder {
     ) {
         if (options.isEmpty()) return
         val autoComplete = panelView.findViewById<AutoCompleteTextView>(autoCompleteId) ?: return
+        disableAutofill(autoComplete)
         val labels = options.map { panelView.context.getString(it.labelResId) }
         val currentValue = data.props[propKey] ?: defaultValue
         val currentIndex = options.indexOfFirst { it.value == currentValue }.coerceAtLeast(0)
@@ -336,6 +341,31 @@ object CommonPropBinder {
         switchView.isChecked = isChecked
         switchView.setOnCheckedChangeListener { _, isCheckedNow ->
             onUpdate(propKey, isCheckedNow.toString())
+        }
+    }
+
+    fun disableAutofill(view: View) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            view.importantForAutofill =
+                    if (view is android.view.ViewGroup) {
+                        View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
+                    } else {
+                        View.IMPORTANT_FOR_AUTOFILL_NO
+                    }
+            if (view is EditText) {
+                view.setAutofillHints()
+            }
+        }
+    }
+
+    fun disableHintAnimation(view: View) {
+        if (view is com.google.android.material.textfield.TextInputLayout) {
+            view.isHintAnimationEnabled = false
+        }
+        if (view is android.view.ViewGroup) {
+            for (i in 0 until view.childCount) {
+                disableHintAnimation(view.getChildAt(i))
+            }
         }
     }
 }

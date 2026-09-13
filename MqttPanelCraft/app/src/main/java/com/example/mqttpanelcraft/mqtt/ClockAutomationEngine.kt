@@ -46,7 +46,7 @@ class ClockAutomationEngine(
         }
         runtime = true
         val current = now()
-        val clocks = project.components.filter { it.type == "CLOCK" }
+        val clocks = project.components.filter { isClockComponent(it) }
         records.keys.retainAll(clocks.map { it.id }.toSet())
         clocks.forEach { clock ->
             val signature = signature(clock)
@@ -82,7 +82,7 @@ class ClockAutomationEngine(
         val current = now()
         val events = mutableListOf<ClockTriggerEvent>()
         var changed = false
-        project.components.filter { it.type == "CLOCK" }.forEach { clock ->
+        project.components.filter { isClockComponent(it) }.forEach { clock ->
             val record = records[clock.id] ?: return@forEach
             when (clock.props["clock_mode"] ?: "TIME") {
                 "COUNTDOWN" -> if (!record.countdownFired && current >= record.deadlineAt && connected) {
@@ -149,5 +149,9 @@ class ClockAutomationEngine(
 
     companion object {
         const val SCHEDULE_GRACE_MS = 5 * 60 * 1000L
+
+        fun isClockComponent(component: ComponentData): Boolean =
+            component.type == "CLOCK" ||
+                (component.type == "CALENDAR" && component.props["family_kind"] == "CLOCK")
     }
 }

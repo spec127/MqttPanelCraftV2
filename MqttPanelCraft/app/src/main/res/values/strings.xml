@@ -101,6 +101,7 @@
     <string name="properties_mode_text">Text</string>
     <string name="properties_mode_icon">Icon</string>
     <string name="properties_mode_text_icon">Text + Icon</string>
+    <string name="properties_label_icon">Icon</string>
     <string name="properties_label_default">Default Value</string>
     <string name="copy_code">Copy Code</string>
 
@@ -217,7 +218,7 @@
     <string name="prop_label_min_val">Min</string>
     <string name="prop_label_max_val">Max</string>
     <string name="prop_label_precision">Scale Unit</string>
-    <string name="prop_label_msg_release">Release Msg</string>
+    <string name="prop_label_msg_release">Send stop on release</string>
     <string name="prop_label_msg_up">Up</string>
     <string name="prop_label_msg_down">Down</string>
     <string name="prop_label_msg_left">Left</string>
@@ -396,11 +397,13 @@
     <string name="prop_desc_enter_as_send">Send message when Enter key is pressed.</string>
 
     <string name="val_mode_tap">Tap</string>
-    <string name="val_mode_hold">Hold</string>
+    <string name="val_mode_hold">Press &amp; hold</string>
     <string name="val_mode_timer">Timer</string>
     <string name="properties_unit_ms">ms</string>
     
-    <string name="desc_mode_tap">Sends command on click.</string>
+    <string name="desc_mode_tap">Sends the command once when you tap.</string>
+    <string name="desc_mode_hold">Sends the press command on touch down, and the release command when you let go.</string>
+    <string name="desc_mode_timer">Sends the press command immediately, then the release command after the timer.</string>
 
     <string name="properties_switch_mode_standard">Standard</string>
     <string name="properties_switch_mode_tri_state">Tri-State</string>
@@ -438,7 +441,8 @@
     <string name="val_match_exact_alt">Exact</string>
     <string name="val_match_contains_alt">Contains</string>
     <string name="error_duplicate">Duplicate</string>
-    <string name="prop_label_led_color_active">Color</string>
+    <string name="prop_label_led_color_active">On color</string>
+    <string name="prop_label_led_color_idle">Off color</string>
     <string name="prop_label_led_keyword">Keyword</string>
     <string name="prop_label_led_effect">Active Effect</string>
     <string name="val_effect_steady_short">Steady</string>
@@ -557,7 +561,7 @@
     <string name="prop_graphic_fill_color">Fill Color</string>
     <string name="prop_graphic_stroke_color">Stroke Color</string>
     <string name="prop_graphic_stroke_width">Stroke Width</string>
-    <string name="prop_graphic_corner_radius">Corner Radius</string>
+    <string name="prop_graphic_corner_radius">Corner</string>
     <string name="prop_graphic_line_direction">Direction</string>
     <string name="val_line_horizontal">Horizontal</string>
     <string name="val_line_vertical">Vertical</string>
@@ -595,6 +599,9 @@
     <string name="clock_no_linked">No control components are available</string>
     <string name="calendar_date_format">Date Format</string>
     <string name="calendar_time_format">Time Format</string>
+    <string name="calendar_family_label">Kind</string>
+    <string name="calendar_family_calendar">Calendar</string>
+    <string name="calendar_family_clock">Clock</string>
     <string name="calendar_style_hint">Visual Style</string>
     <string name="calendar_style_month">Full Month</string>
     <string name="calendar_style_big_date">Today Large</string>
@@ -757,6 +764,7 @@
     <string name="common_btn_next">Next</string>
     <string name="common_btn_previous">Back</string>
     <string name="common_btn_skip">Skip</string>
+    <string name="onboarding_language_continue">Continue</string>
     <string name="onboarding_language_title">Choose your language</string>
     <string name="onboarding_language_subtitle">You can change this later in the side menu.</string>
     <string name="drawer_item_tutorial">Tutorial</string>
@@ -770,19 +778,19 @@
     <string name="tutorial_btn_done">Done</string>
     <string name="tutorial_step_counter">Step %1$d of %2$d</string>
     <string name="tutorial_step1_title">Welcome</string>
-    <string name="tutorial_step1_body">This is a practice project. Nothing is sent to a home device or an internet broker.</string>
-    <string name="tutorial_step2_title">Fake address</string>
-    <string name="tutorial_step2_body">The broker is demo.local. That field is locked. Use a new project later for a real broker.</string>
-    <string name="tutorial_step3_title">Connection</string>
-    <string name="tutorial_step3_body">The link icon should show connected. Messages stay on this phone.</string>
-    <string name="tutorial_step4_title">Send and receive</string>
-    <string name="tutorial_step4_body">Buttons send a command. The LED shows status. Real projects work the same way.</string>
-    <string name="tutorial_step5_title">Same topic</string>
-    <string name="tutorial_step5_body">These widgets already share one topic. MQTT matches topic text, not the fact that they sit on the same page.</string>
-    <string name="tutorial_step6_title">Turn the light on</string>
-    <string name="tutorial_step6_body">Press the ON button. The LED should light up.</string>
-    <string name="tutorial_step7_title">Turn the light off</string>
-    <string name="tutorial_step7_body">Press the OFF button. The LED should turn off.</string>
+    <string name="tutorial_step1_body">This is a practice project. The two frames on the canvas are just groups. Nothing is sent to a real device.</string>
+    <string name="tutorial_step2_title">Drag the first group</string>
+    <string name="tutorial_step2_body">Open the side panel and drag a Button, an LED, and a receive box (text display) into the upper frame. Their topics can stay different for now.</string>
+    <string name="tutorial_step3_title">Read the MQTT log</string>
+    <string name="tutorial_step3_body">Tap the play button, then tap your Button. The log shows the message. The LED will not change yet because the topics are not the same.</string>
+    <string name="tutorial_step4_title">Match the topic</string>
+    <string name="tutorial_step4_body">Switch back to edit, open each widget’s properties, and set the Button, LED, and receive box to the same topic. Then play again to see them link.</string>
+    <string name="tutorial_step5_title">Slider group</string>
+    <string name="tutorial_step5_body">In the lower frame, drag a Slider, a scale meter, and another receive box. Give those three the same topic so the meter and box follow the slider.</string>
+    <string name="tutorial_step6_title">Delete a widget</string>
+    <string name="tutorial_step6_body">Select a widget and drag it to the red delete bar, or use the delete handle. You can add it again any time.</string>
+    <string name="tutorial_step7_title">You’re ready</string>
+    <string name="tutorial_step7_body">Create a new project for a real broker. JSON backup is fine here; Arduino export still contains the fake tutorial address.</string>
     <string name="tutorial_step8_title">Optional: add another LED</string>
     <string name="tutorial_step8_body">A new LED from the sidebar gets a different topic, so it will not react. Open properties and paste the same topic as the buttons, then try again. You can skip this step.</string>
     <string name="tutorial_step9_title">Use a real device next</string>
