@@ -1,6 +1,7 @@
 package com.example.mqttpanelcraft.ui.views
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
@@ -63,7 +64,7 @@ class CalendarDisplayView(context: Context) : FrameLayout(context) {
         removeAllViews()
         val scale = currentScale()
         background = GradientDrawable().apply {
-            setColor(if (ColorUtils.calculateLuminance(primaryColor) < 0.45) Color.WHITE else Color.rgb(28, 24, 30))
+            setColor(cardBackground())
             setStroke(dp(1), ColorUtils.setAlphaComponent(primaryColor, 135))
             cornerRadius = (dp(10) * scale).coerceAtLeast(dp(3).toFloat())
         }
@@ -77,8 +78,8 @@ class CalendarDisplayView(context: Context) : FrameLayout(context) {
 
     private fun renderBigDate(scale: Float) {
         val now = Calendar.getInstance()
-        val day = SimpleDateFormat("dd", Locale.getDefault()).format(now.time)
-        val month = SimpleDateFormat("MMMM", Locale.getDefault()).format(now.time)
+        val day = SimpleDateFormat("dd", Locale.ENGLISH).format(now.time)
+        val month = SimpleDateFormat("MMMM", Locale.ENGLISH).format(now.time)
         addView(verticalContainer(scale).apply {
             addView(text(day, (54f * scale).coerceAtLeast(13f), primaryColor, Typeface.NORMAL))
             addView(text(month, (13f * scale).coerceAtLeast(7f), secondaryColor(), Typeface.NORMAL))
@@ -98,7 +99,7 @@ class CalendarDisplayView(context: Context) : FrameLayout(context) {
     private fun renderMonth(scale: Float) {
         val calendar = Calendar.getInstance()
         val today = calendar.get(Calendar.DAY_OF_MONTH)
-        val locale = Locale.getDefault()
+        val locale = Locale.ENGLISH
         val monthPattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "yMMMM")
         val monthTitle = SimpleDateFormat(monthPattern, locale).format(calendar.time)
         val padH = (dp(10) * scale).toInt().coerceAtLeast(dp(2))
@@ -175,14 +176,26 @@ class CalendarDisplayView(context: Context) : FrameLayout(context) {
 
     private fun safeFormat(pattern: String, date: java.util.Date): String =
         try {
-            SimpleDateFormat(pattern, Locale.getDefault()).format(date).replace(" ", "\u00A0")
+            SimpleDateFormat(pattern, Locale.ENGLISH).format(date).replace(" ", "\u00A0")
         } catch (_: Exception) { "" }
 
-    private fun normalizeDatePattern(pattern: String): String =
-        pattern.replace("YYYY", "yyyy").replace("DD", "dd")
+    private fun normalizeDatePattern(pattern: String): String {
+        if (pattern.contains("年") || pattern.contains("月")) return "MMM d, yyyy"
+        return pattern.replace("YYYY", "yyyy").replace("DD", "dd")
+    }
+
+    private fun isNightMode(): Boolean =
+        (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+    private fun cardBackground(): Int {
+        if (isNightMode()) return Color.rgb(18, 18, 20)
+        return if (ColorUtils.calculateLuminance(primaryColor) < 0.45) Color.WHITE else Color.rgb(28, 24, 30)
+    }
 
     private fun secondaryColor(): Int =
-        if (ColorUtils.calculateLuminance(primaryColor) < 0.45) Color.DKGRAY else Color.LTGRAY
+        if (isNightMode()) Color.rgb(176, 176, 180)
+        else if (ColorUtils.calculateLuminance(primaryColor) < 0.45) Color.DKGRAY
+        else Color.LTGRAY
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 

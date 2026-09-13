@@ -9,7 +9,6 @@ data class Project(
     val password: String = "",
     val clientId: String = "",
     val type: ProjectType,
-    val isConnected: Boolean = false,
     val components: MutableList<ComponentData> = mutableListOf(),
     val customCode: String = "",
     val orientation: String = "SENSOR",

@@ -64,10 +64,10 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="6dp"/>
         
-    <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggleMapping"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/prop_toggle_height"
         app:singleSelection="true"
         app:selectionRequired="true"
         android:layout_marginBottom="8dp">
@@ -75,17 +75,17 @@
             android:id="@+id/btnMapAbsolute"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            app:cornerRadius="16dp"
+            android:layout_height="match_parent"
+            style="@style/Widget.App.Button.Segmented.Properties"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"
             android:text="@string/prop_val_mapping_absolute"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnMapRatio"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            app:cornerRadius="16dp"
+            android:layout_height="match_parent"
+            style="@style/Widget.App.Button.Segmented.Properties"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"
             android:text="@string/prop_val_mapping_ratio"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
@@ -130,7 +130,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etMin"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="numberDecimal|numberSigned"
                 android:text="0"
                 android:textSize="13sp"/>
@@ -145,7 +145,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etMax"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="numberDecimal|numberSigned"
                 android:text="100"
                 android:textSize="13sp"/>
@@ -235,10 +235,10 @@
         android:visibility="gone">
 
         <!-- High/Low Toggle -->
-        <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleAlarmMode"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/prop_toggle_height"
             android:layout_marginBottom="8dp"
             app:singleSelection="true"
             app:selectionRequired="true">
@@ -247,21 +247,21 @@
                 android:id="@+id/btnAlarmLow"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="@string/prop_val_alarm_low"
                 android:textSize="12sp"
-                app:cornerRadius="16dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"
+                style="@style/Widget.App.Button.Segmented.Properties"/>
                 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAlarmHigh"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="@string/prop_val_alarm_high"
                 android:textSize="12sp"
-                app:cornerRadius="16dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                app:cornerRadius="@dimen/prop_toggle_corner_radius"
+                style="@style/Widget.App.Button.Segmented.Properties"/>
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <!-- Inputs Row -->
@@ -280,7 +280,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etAlarmDuration"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="number"
                     android:textSize="14sp"/>
             </com.google.android.material.textfield.TextInputLayout>

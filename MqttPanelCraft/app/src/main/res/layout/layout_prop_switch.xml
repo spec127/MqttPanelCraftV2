@@ -31,10 +31,10 @@
     </LinearLayout>
 
     <!-- Mode Toggle (2-Way / 3-Way) -->
-    <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggleMode"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="@dimen/prop_toggle_height"
         android:layout_marginBottom="16dp"
         app:singleSelection="true"
         app:selectionRequired="true"
@@ -42,7 +42,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnMode2Way"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -55,7 +55,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnMode3Way"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -97,7 +97,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPayloadLeft"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:hint="L"
                     android:inputType="text"
                     android:textSize="14sp"/>
@@ -114,7 +114,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPayloadCenter"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:hint="C"
                     android:inputType="text"
                     android:textSize="14sp"/>
@@ -130,7 +130,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPayloadRight"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:hint="R"
                     android:inputType="text"
                     android:textSize="14sp"/>

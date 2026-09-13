@@ -43,6 +43,21 @@ class TopicHelperTest {
         )
     }
 
+    @Test
+    fun rewriteGeneratedProjectTopic_changesOnlyTheExactOldBase() {
+        val oldProject = project("Old Project", emptyList())
+        assertEquals(
+                "new_project/id2/button/1",
+                TopicHelper.rewriteGeneratedProjectTopic(
+                        "old_project/id/button/1", oldProject, "New Project", "id2")
+        )
+        assertEquals(
+                "external/id/button/1",
+                TopicHelper.rewriteGeneratedProjectTopic(
+                        "external/id/button/1", oldProject, "New Project", "id2")
+        )
+    }
+
     private fun project(name: String, components: List<ComponentData>) =
             Project(
                     id = "id",

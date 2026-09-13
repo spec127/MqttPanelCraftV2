@@ -167,7 +167,7 @@ class ImageDisplayView @JvmOverloads constructor(
             layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f)
             textSize = 10f
             setTextColor(if (isDarkMode) Color.parseColor("#E2E8F0") else Color.parseColor("#334155"))
-            text = context.getString(R.string.image_no_image_resolution)
+            text = "No image | 800x600px"
             visibility = View.VISIBLE
         }
         bottomBar.addView(infoTextView)
@@ -219,9 +219,9 @@ class ImageDisplayView @JvmOverloads constructor(
     private fun updatePlaceholderText() {
         val label = placeholderView.findViewById<TextView>(R.id.tvPayloadLabel)
         label?.text = if (streamMode == "SINGLE") {
-            context.getString(R.string.image_waiting_snapshot)
+            "Snapshot • Waiting for image"
         } else {
-            context.getString(R.string.image_waiting_stream, fps)
+            "Live stream ($fps FPS) • Waiting for image"
         }
     }
 
@@ -231,7 +231,7 @@ class ImageDisplayView @JvmOverloads constructor(
         chunkBuffer.clear()
         imageView.setImageDrawable(null)
         placeholderView.visibility = View.VISIBLE
-        infoTextView.text = context.getString(R.string.image_no_image_waiting)
+        infoTextView.text = "No image | Waiting"
         if (hadData) {
             onImageCleared?.invoke()
         }

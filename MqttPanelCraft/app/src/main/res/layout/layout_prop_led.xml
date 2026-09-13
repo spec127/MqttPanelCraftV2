@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"/>
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleLedLogicMode"
             android:layout_width="match_parent"
             android:layout_height="@dimen/prop_toggle_height"
@@ -59,7 +59,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:text="@string/val_led_logic_standard"
                 android:padding="0dp"
                 android:textSize="12sp"
@@ -71,7 +71,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:text="@string/val_led_logic_rgb"
                 android:padding="0dp"
                 android:textSize="12sp"
@@ -201,11 +201,11 @@
                 android:baselineAligned="false">
 
                 <!-- 70% 比對方式切換按鈕 (32dp, 對齊 Selector 風格) -->
-                <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
                     android:id="@+id/containerMatchMode"
                     android:layout_width="0dp"
                     android:layout_weight="7"
-                    android:layout_height="32dp"
+                    android:layout_height="@dimen/prop_toggle_height"
                     android:layout_marginEnd="8dp"
                     app:singleSelection="true"
                     app:selectionRequired="true"
@@ -213,7 +213,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRgbMatchEqual"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.App.Button.Segmented.Properties"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="match_parent"
@@ -226,7 +226,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnRgbMatchContain"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        style="@style/Widget.App.Button.Segmented.Properties"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="match_parent"
@@ -243,7 +243,7 @@
                     android:id="@+id/containerRgbStepper"
                     android:layout_width="0dp"
                     android:layout_weight="3"
-                    android:layout_height="32dp"
+                    android:layout_height="@dimen/prop_toggle_height"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:background="@drawable/bg_input_outline"
@@ -302,7 +302,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"/>
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleLedActionMode"
             android:layout_width="match_parent"
             android:layout_height="@dimen/prop_toggle_height"
@@ -317,7 +317,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:text="@string/val_led_action_latch"
                 android:padding="0dp"
                 android:textSize="12sp"
@@ -329,7 +329,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:text="@string/val_led_action_timer"
                 android:padding="0dp"
                 android:textSize="12sp"
@@ -469,7 +469,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"/>
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleLedEffect"
             android:layout_width="match_parent"
             android:layout_height="@dimen/prop_toggle_height"
@@ -483,7 +483,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:text="@string/val_effect_steady_short"
                 android:padding="0dp"
                 android:textSize="12sp"
@@ -495,7 +495,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:text="@string/val_effect_blink_short"
                 android:padding="0dp"
                 android:textSize="12sp"
@@ -654,7 +654,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etNeonLabel"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/prop_input_height_inner"
             android:inputType="textMultiLine"
             android:minLines="1"
             android:gravity="top|start"

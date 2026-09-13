@@ -27,7 +27,7 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
     
     private var tts: TextToSpeech? = null
     private var isTtsReady = false
-    private var lastMessage: String = context.getString(R.string.broadcast_waiting_text)
+    private var lastMessage: String = "loading"
 
     var isEditMode: Boolean = false
 
@@ -35,9 +35,9 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
         set(value) {
             field = value
             modeChip.text = when (value) {
-                "ALERT_ONLY" -> context.getString(R.string.broadcast_mode_pure_alert)
-                "ALERT_AND_TTS" -> context.getString(R.string.broadcast_mode_alert_tts)
-                else -> context.getString(R.string.broadcast_mode_pure_tts)
+                "ALERT_ONLY" -> "Alert Only"
+                "ALERT_AND_TTS" -> "Alert + Speech"
+                else -> "Speech Only"
             }
             modeChip.setBackgroundColor(when (value) {
                 "ALERT_ONLY" -> Color.parseColor("#33EF5350")
@@ -200,7 +200,7 @@ class BroadcastView(context: Context) : FrameLayout(context), TextToSpeech.OnIni
         headerRow.addView(space)
 
         modeChip = TextView(context).apply {
-            text = context.getString(R.string.broadcast_mode_pure_tts)
+            text = "Speech Only"
             textSize = 10f
             typeface = android.graphics.Typeface.DEFAULT_BOLD
             

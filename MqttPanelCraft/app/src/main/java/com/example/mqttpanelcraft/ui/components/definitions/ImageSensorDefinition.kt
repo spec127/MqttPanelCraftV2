@@ -45,11 +45,6 @@ object ImageSensorDefinition : IComponentDefinition {
         "color" to "#FF9800"
     )
 
-    override fun getDefaultProps(context: Context): Map<String, String> =
-            getDefaultProps().toMutableMap().apply {
-                put("title", context.getString(R.string.component_label_image_sensor))
-            }
-
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
         val imageDisplayView = ImageDisplayView(context).apply {

@@ -105,7 +105,6 @@
     <string name="component_label_palette">調色盤控制</string>
     <string name="component_label_input">輸入框</string>
     <string name="component_label_scale_meter">刻度計</string>
-    <string name="component_label_gauge">儀錶板</string>
     <string name="component_label_gauge_meter">儀表板</string>
     <string name="component_label_value_display">數值顯示</string>
 
@@ -199,6 +198,8 @@
     <string name="val_joystick_style_sharp">俐落 (Sharp)</string>
     <string name="val_joystick_style_smooth">圓滑 (Smooth)</string>
     <string name="val_joystick_style_arrow">箭頭 (Arrow)</string>
+    <string name="val_dpad_style_beveled">立體</string>
+    <string name="val_dpad_style_neon">霓虹</string>
     <string name="prop_label_axis_mode">軸向模式</string>
     <string name="val_axis_4way">4維</string>
     <string name="val_axis_2way_h">2維橫向</string>
@@ -291,7 +292,7 @@
     <string name="prop_text_show_bg_desc">為文字元件加上底色方塊</string>
     <string name="prop_text_effect">文字特效</string>
     <string name="default_text_content">文字</string>
-    <string name="default_received_text">等待資料…</string>
+    <string name="default_received_text">loading</string>
     <string name="val_text_effect_none">無</string>
     <string name="val_text_effect_neon">霓虹</string>
     <string name="val_text_effect_shadow">陰影</string>
@@ -394,6 +395,7 @@
     <string name="project_msg_add_component">組件已新增</string>
     <string name="project_msg_component_deleted">組件已刪除</string>
     <string name="project_msg_components_loaded">已載入 %1$d 個元件</string>
+    <string name="project_msg_import_repaired">已修正 %1$d 個元件 ID，移除 %2$d 個無效連動</string>
     <string name="project_msg_file_read_failed">讀取失敗：%1$s</string>
     <string name="project_msg_file_save_failed">儲存失敗：%1$s</string>
     <string name="project_msg_file_saved">儲存成功</string>
@@ -502,10 +504,10 @@
 
     <!-- Broadcast View & Linked strings -->
     <string name="broadcast_title">語音警報廣播</string>
-    <string name="broadcast_mode_pure_tts">純語音</string>
-    <string name="broadcast_mode_pure_alert">純警報</string>
-    <string name="broadcast_mode_alert_tts">警報+語音</string>
-    <string name="broadcast_waiting_text">等待語音廣播文字...</string>
+    <string name="broadcast_mode_pure_tts">Speech Only</string>
+    <string name="broadcast_mode_pure_alert">Alert Only</string>
+    <string name="broadcast_mode_alert_tts">Alert + Speech</string>
+    <string name="broadcast_waiting_text">loading</string>
     <string name="broadcast_no_linked">無其他可連結的接收元件</string>    <!-- Graphic (Shape) Component Properties -->
     <string name="component_graphic">圖式</string>
     <string name="prop_graphic_type">圖形種類</string>
@@ -595,23 +597,6 @@
     <string name="status_connected">已連線</string>
     <string name="content_desc_add_keyword">新增關鍵字</string>
     <string name="content_desc_clear_logs">清除紀錄</string>
-    <string name="auth_logo">標誌</string>
-    <string name="auth_welcome_back">歡迎回來</string>
-    <string name="auth_email">電子郵件</string>
-    <string name="auth_password">密碼</string>
-    <string name="auth_login">登入</string>
-    <string name="auth_google_sign_in">使用 Google 登入</string>
-    <string name="auth_guest">以訪客身分試用</string>
-    <string name="auth_no_account">還沒有帳號？</string>
-    <string name="auth_register">註冊</string>
-    <string name="auth_create_account">建立帳號</string>
-    <string name="auth_account_name">帳號名稱</string>
-    <string name="auth_confirm_password">確認密碼</string>
-    <string name="auth_verification_code">驗證碼</string>
-    <string name="auth_send">傳送</string>
-    <string name="auth_code_sent">驗證碼已傳送（展示功能）</string>
-    <string name="auth_registration_success">註冊成功（展示功能）</string>
-    <string name="auth_google_demo">Google 登入（展示功能）</string>
     <string name="setup_mode_panel">面板</string>
     <string name="setup_mode_webview">網頁</string>
     <string name="graphic_select_local_image">選擇本機圖片</string>
@@ -660,10 +645,10 @@
     <string name="log_chunk_expand">  [+]［分片 %1$d/%2$d（%3$dB）－點擊展開］</string>
     <string name="log_long_compact">%1$s\n［點擊收合］</string>
     <string name="log_long_expand">%1$s［長篇資料（%2$dB）－點擊展開］</string>
-    <string name="image_no_image_resolution">無圖片｜800x600px</string>
-    <string name="image_waiting_snapshot">單次快照・等待圖片</string>
-    <string name="image_waiting_stream">連續串流（%1$s FPS）・等待圖片</string>
-    <string name="image_no_image_waiting">無圖片｜等待傳送</string>
+    <string name="image_no_image_resolution">No image | 800x600px</string>
+    <string name="image_waiting_snapshot">Snapshot • Waiting for image</string>
+    <string name="image_waiting_stream">Live stream (%1$s FPS) • Waiting for image</string>
+    <string name="image_no_image_waiting">No image | Waiting</string>
     <string name="image_gallery_location">相簿（Pictures/MqttPanelCraft）</string>
     <string name="image_saved">已儲存快照至 %1$s（%2$dx%3$d）</string>
     <string name="image_save_create_failed">無法建立快照檔案，請檢查儲存權限</string>
@@ -679,7 +664,6 @@
     <string name="crash_logs_cleared">紀錄已清除</string>
     <string name="crash_logs_error">讀取紀錄失敗：%1$s</string>
     <string name="common_btn_clear">清除</string>
-    <string name="auth_resend_countdown">%1$d 秒</string>
     <string name="common_btn_ok">確定</string>
     <string name="project_id_updated">專案 ID 已更新</string>
     <string name="status_format">狀態：%1$s</string>
@@ -708,7 +692,7 @@
     <string name="setup_continue_countdown">繼續（%1$d）</string>
     <string name="setup_continue">繼續</string>
     <string name="unknown_component">未知元件：%1$s</string>
-    <string name="input_text_hint">輸入文字…</string>
+    <string name="input_text_hint">Enter text…</string>
     <string name="linked_no_other_components">找不到其他元件</string>
     <string name="crash_saved">App 已停止，報告已儲存至 %1$s。</string>
     <string name="project_default_untitled">未命名</string>
@@ -723,10 +707,6 @@
     <string name="crash_log_write_failed">無法寫入記錄檔。\n原始錯誤：%1$s</string>
     <string name="crash_dashboard_init_failed">主畫面初始化失敗</string>
     <string name="crash_delete_failed">刪除失敗</string>
-    <string name="crash_login_failed">登入失敗</string>
-    <string name="crash_guest_login_failed">訪客登入失敗</string>
-    <string name="crash_google_sign_in_failed">Google 登入失敗</string>
-    <string name="crash_register_navigation_failed">無法開啟註冊頁面</string>
     <string name="mqtt_notification_active">MQTT 連線執行中</string>
     <string name="mqtt_notification_channel">MQTT 服務</string>
     <string name="mqtt_log_already_connected">已連線至 %1$s:%2$d，略過重複重設。</string>
@@ -754,4 +734,6 @@
     <string name="mqtt_notification_reconnecting">重新連線中…</string>
     <string name="mqtt_notification_stop">停止 MQTT</string>
     <string name="mqtt_notification_permission_denied">通知已關閉，Android 可能只會在「運作中的應用程式」顯示 MQTT 服務。</string>
+    <string name="setup_error_id_exists">此專案 ID 已被使用，請重新產生。</string>
+    <string name="setup_msg_arduino_export_unsaved">匯出使用目前表單內容。請先儲存專案，這些設定才會寫入檔案。</string>
 </resources>

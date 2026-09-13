@@ -347,7 +347,7 @@ object LedDefinition : IComponentDefinition {
                 // (Flash logic handled by onUpdateView)
             }
             while (currentStates.size > count) {
-                currentStates.removeLast()
+                currentStates.removeAt(currentStates.lastIndex)
                 saveRgbStates(currentStates)
             }
 
@@ -396,7 +396,7 @@ object LedDefinition : IComponentDefinition {
                 val picker = android.widget.ImageView(context).apply {
                     val pSize = (22 * density).toInt()
                     layoutParams = FrameLayout.LayoutParams(pSize, pSize, android.view.Gravity.CENTER)
-                        setImageResource(R.drawable.ic_palette_open)
+                    setImageResource(R.drawable.ic_palette_open)
                     imageTintList = ColorStateList.valueOf(Color.parseColor(statePair.second))
                     setOnClickListener { anchor ->
                         var latest = statePair.second

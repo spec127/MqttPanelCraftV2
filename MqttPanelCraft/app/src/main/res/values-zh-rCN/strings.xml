@@ -95,7 +95,6 @@
     <string name="component_label_palette">调色盘控制</string>
     <string name="component_label_input">输入框</string>
     <string name="component_label_scale_meter">刻度计</string>
-    <string name="component_label_gauge">仪表板</string>
     <string name="component_label_gauge_meter">仪表板</string>
     <string name="component_label_value_display">数值显示</string>
     <string name="component_label_signal_indicator">信号面板</string>
@@ -180,6 +179,8 @@
     <string name="val_joystick_style_sharp">俐落 (Sharp)</string>
     <string name="val_joystick_style_smooth">圆滑 (Smooth)</string>
     <string name="val_joystick_style_arrow">箭头 (Arrow)</string>
+    <string name="val_dpad_style_beveled">立体</string>
+    <string name="val_dpad_style_neon">霓虹</string>
     <string name="prop_label_axis_mode">轴向模式</string>
     <string name="val_axis_4way">4维</string>
     <string name="val_axis_2way_h">2维横向</string>
@@ -266,7 +267,7 @@
     <string name="prop_text_show_bg_desc">为文字元件加上底色方块</string>
     <string name="prop_text_effect">文字特效</string>
     <string name="default_text_content">文字</string>
-    <string name="default_received_text">等待数据…</string>
+    <string name="default_received_text">loading</string>
     <string name="val_text_effect_none">无</string>
     <string name="val_text_effect_neon">霓虹</string>
     <string name="val_text_effect_shadow">阴影</string>
@@ -356,6 +357,7 @@
     <string name="project_msg_add_component">组件已新增</string>
     <string name="project_msg_component_deleted">组件已删除</string>
     <string name="project_msg_components_loaded">已加载 %1$d 个组件</string>
+    <string name="project_msg_import_repaired">已修正 %1$d 个组件 ID，移除 %2$d 个无效联动</string>
     <string name="project_msg_file_read_failed">读取失败：%1$s</string>
     <string name="project_msg_file_save_failed">保存失败：%1$s</string>
     <string name="project_msg_file_saved">储存成功</string>
@@ -471,10 +473,10 @@
     <string name="chart_err_parse">%1$s (ERROR): JSON 解析失败 - %2$s</string>
     <string name="chart_err_number">%1$s (ERROR): 无法将纯文字转为数值 [%2$s]</string>
     <string name="broadcast_title">语音警报广播</string>
-    <string name="broadcast_mode_pure_tts">纯语音</string>
-    <string name="broadcast_mode_pure_alert">纯警报</string>
-    <string name="broadcast_mode_alert_tts">警报+语音</string>
-    <string name="broadcast_waiting_text">等待语音广播文字...</string>
+    <string name="broadcast_mode_pure_tts">Speech Only</string>
+    <string name="broadcast_mode_pure_alert">Alert Only</string>
+    <string name="broadcast_mode_alert_tts">Alert + Speech</string>
+    <string name="broadcast_waiting_text">loading</string>
     <string name="broadcast_no_linked">无其他可连结的接收元件</string>
     <string name="component_graphic">图式</string>
     <string name="prop_graphic_type">图形种类</string>
@@ -532,23 +534,6 @@
     <string name="status_connected">已连接</string>
     <string name="content_desc_add_keyword">新增关键词</string>
     <string name="content_desc_clear_logs">清除记录</string>
-    <string name="auth_logo">标志</string>
-    <string name="auth_welcome_back">欢迎回来</string>
-    <string name="auth_email">电子邮件</string>
-    <string name="auth_password">密码</string>
-    <string name="auth_login">登录</string>
-    <string name="auth_google_sign_in">使用 Google 登录</string>
-    <string name="auth_guest">以访客身份试用</string>
-    <string name="auth_no_account">还没有账号？</string>
-    <string name="auth_register">注册</string>
-    <string name="auth_create_account">创建账号</string>
-    <string name="auth_account_name">账号名称</string>
-    <string name="auth_confirm_password">确认密码</string>
-    <string name="auth_verification_code">验证码</string>
-    <string name="auth_send">发送</string>
-    <string name="auth_code_sent">验证码已发送（演示功能）</string>
-    <string name="auth_registration_success">注册成功（演示功能）</string>
-    <string name="auth_google_demo">Google 登录（演示功能）</string>
     <string name="setup_mode_panel">面板</string>
     <string name="setup_mode_webview">网页</string>
     <string name="graphic_select_local_image">选择本机图片</string>
@@ -597,10 +582,10 @@
     <string name="log_chunk_expand">  [+]［分片 %1$d/%2$d（%3$dB）－点击展开］</string>
     <string name="log_long_compact">%1$s\n［点击收起］</string>
     <string name="log_long_expand">%1$s［长篇数据（%2$dB）－点击展开］</string>
-    <string name="image_no_image_resolution">无图片｜800x600px</string>
-    <string name="image_waiting_snapshot">单次快照・等待图片</string>
-    <string name="image_waiting_stream">连续串流（%1$s FPS）・等待图片</string>
-    <string name="image_no_image_waiting">无图片｜等待发送</string>
+    <string name="image_no_image_resolution">No image | 800x600px</string>
+    <string name="image_waiting_snapshot">Snapshot • Waiting for image</string>
+    <string name="image_waiting_stream">Live stream (%1$s FPS) • Waiting for image</string>
+    <string name="image_no_image_waiting">No image | Waiting</string>
     <string name="image_gallery_location">相册（Pictures/MqttPanelCraft）</string>
     <string name="image_saved">已保存快照至 %1$s（%2$dx%3$d）</string>
     <string name="image_save_create_failed">无法创建快照文件，请检查存储权限</string>
@@ -616,7 +601,6 @@
     <string name="crash_logs_cleared">记录已清除</string>
     <string name="crash_logs_error">读取记录失败：%1$s</string>
     <string name="common_btn_clear">清除</string>
-    <string name="auth_resend_countdown">%1$d 秒</string>
     <string name="common_btn_ok">确定</string>
     <string name="project_id_updated">项目 ID 已更新</string>
     <string name="status_format">状态：%1$s</string>
@@ -645,7 +629,7 @@
     <string name="setup_continue_countdown">继续（%1$d）</string>
     <string name="setup_continue">继续</string>
     <string name="unknown_component">未知组件：%1$s</string>
-    <string name="input_text_hint">输入文字…</string>
+    <string name="input_text_hint">Enter text…</string>
     <string name="linked_no_other_components">找不到其他组件</string>
     <string name="crash_saved">App 已停止，报告已保存至 %1$s。</string>
     <string name="project_default_untitled">未命名</string>
@@ -660,10 +644,6 @@
     <string name="crash_log_write_failed">无法写入日志文件。\n原始错误：%1$s</string>
     <string name="crash_dashboard_init_failed">主界面初始化失败</string>
     <string name="crash_delete_failed">删除失败</string>
-    <string name="crash_login_failed">登录失败</string>
-    <string name="crash_guest_login_failed">访客登录失败</string>
-    <string name="crash_google_sign_in_failed">Google 登录失败</string>
-    <string name="crash_register_navigation_failed">无法打开注册页面</string>
     <string name="mqtt_notification_active">MQTT 连接运行中</string>
     <string name="mqtt_notification_channel">MQTT 服务</string>
     <string name="mqtt_log_already_connected">已连接至 %1$s:%2$d，跳过重复重置。</string>
@@ -691,4 +671,6 @@
     <string name="mqtt_notification_reconnecting">重新连接中…</string>
     <string name="mqtt_notification_stop">停止 MQTT</string>
     <string name="mqtt_notification_permission_denied">通知已关闭，Android 可能只会在“运行中的应用”显示 MQTT 服务。</string>
+    <string name="setup_error_id_exists">此项目 ID 已被使用，请重新生成。</string>
+    <string name="setup_msg_arduino_export_unsaved">导出使用当前表单内容。请先保存项目，这些设置才会写入文件。</string>
 </resources>

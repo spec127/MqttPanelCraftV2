@@ -68,7 +68,7 @@
         android:layout_marginBottom="6dp"/>
 
     <!-- Trigger Mode (Toggle Group) -->
-    <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/togglePropTrigger"
         android:layout_width="match_parent"
         android:layout_height="@dimen/prop_toggle_height"
@@ -83,7 +83,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:text="@string/val_mode_tap"
             android:padding="0dp"
             android:textSize="12sp"
@@ -95,7 +95,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:text="@string/val_mode_hold"
             android:padding="0dp"
             android:textSize="12sp"
@@ -107,7 +107,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:text="@string/val_mode_timer"
             android:padding="0dp"
             android:textSize="12sp"

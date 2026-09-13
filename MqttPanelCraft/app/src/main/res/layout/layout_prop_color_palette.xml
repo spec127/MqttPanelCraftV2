@@ -37,27 +37,27 @@
         android:textColor="@color/prop_text_secondary"
         android:layout_marginBottom="8dp"/>
 
-    <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/togglePaletteStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/prop_toggle_height"
         android:layout_marginBottom="16dp"
         app:checkedButton="@id/btnStyleArc"
         app:singleSelection="true"
         app:selectionRequired="true">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStyleArc"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/val_palette_style_arc"
             android:textSize="12sp" />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStyleSquare"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/val_palette_style_square"
             android:textSize="12sp" />
@@ -73,27 +73,27 @@
         android:textColor="@color/prop_text_secondary"
         android:layout_marginBottom="8dp"/>
 
-    <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/togglePaletteMode"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/prop_toggle_height"
         android:layout_marginBottom="16dp"
         app:checkedButton="@id/btnModeFull"
         app:singleSelection="true"
         app:selectionRequired="true">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnModeFull"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/val_palette_mode_full"
             android:textSize="12sp" />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnModeMono"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/val_palette_mode_mono"
             android:textSize="12sp" />
@@ -252,7 +252,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPaletteInterval"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/prop_input_height_inner"
             android:inputType="number"
             android:textSize="14sp"
             android:textColor="@color/prop_text_primary"/>

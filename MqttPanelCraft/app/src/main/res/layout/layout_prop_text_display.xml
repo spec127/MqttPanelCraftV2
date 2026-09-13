@@ -39,10 +39,10 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"/>
     
-    <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggleDisplayMode"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/prop_toggle_height"
         android:layout_marginBottom="12dp"
         app:singleSelection="true"
         app:selectionRequired="true">
@@ -50,17 +50,17 @@
             android:id="@+id/btnModeSingle"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            app:cornerRadius="16dp"
+            android:layout_height="match_parent"
+            style="@style/Widget.App.Button.Segmented.Properties"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"
             android:text="@string/prop_val_display_single"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnModeLog"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            app:cornerRadius="16dp"
+            android:layout_height="match_parent"
+            style="@style/Widget.App.Button.Segmented.Properties"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"
             android:text="@string/prop_val_display_log"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
@@ -121,7 +121,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etDisplayLines"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="number"
                 android:textSize="14sp"/>
         </com.google.android.material.textfield.TextInputLayout>
@@ -136,7 +136,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etMaxLines"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="number"
                 android:textSize="14sp"/>
         </com.google.android.material.textfield.TextInputLayout>
@@ -217,7 +217,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPrefixPreview"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="text"
                 android:paddingTop="15dp"
                 android:paddingBottom="15dp"
@@ -277,10 +277,10 @@
     </LinearLayout>
 
     <!-- Row: 字體切換按鈕 (標準字體 / 手寫字體) -->
-    <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggleFont"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/prop_toggle_height"
         android:layout_marginBottom="12dp"
         app:singleSelection="true"
         app:selectionRequired="true">
@@ -288,17 +288,17 @@
             android:id="@+id/btnFontNormal"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            app:cornerRadius="16dp"
+            android:layout_height="match_parent"
+            style="@style/Widget.App.Button.Segmented.Properties"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"
             android:text="@string/prop_val_font_normal"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnFontHandwriting"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            app:cornerRadius="16dp"
+            android:layout_height="match_parent"
+            style="@style/Widget.App.Button.Segmented.Properties"
+            app:cornerRadius="@dimen/prop_toggle_corner_radius"
             android:text="@string/prop_val_font_handwriting"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
 

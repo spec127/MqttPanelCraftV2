@@ -81,7 +81,7 @@ class CodeExportDialogFragment : DialogFragment() {
         when (currentMode) {
             Mode.EXPORT_ARDUINO -> {
                 tvTitle.text = getString(R.string.arduino_code_export)
-                tvCodeFilename.text = "arduino_sketch.ino"
+                tvCodeFilename.text = "arduino_sketch.txt"
                 btnSave.text = getString(R.string.common_btn_save)
                 btnCopy.text = getString(R.string.copy_code)
                 etCode.isFocusable = false
@@ -155,7 +155,7 @@ class CodeExportDialogFragment : DialogFragment() {
                 onImportCallback?.invoke("action:OPEN_FILE")
                 dismiss()
             } else {
-                val ext = if (currentMode == Mode.EXPORT_ARDUINO) ".ino" else ".json"
+                val ext = if (currentMode == Mode.EXPORT_ARDUINO) ".txt" else ".json"
                 val name =
                         if (currentMode == Mode.EXPORT_ARDUINO) "arduino_mqtt_panel$ext"
                         else "config$ext"
@@ -184,8 +184,8 @@ class CodeExportDialogFragment : DialogFragment() {
             etCode.setHintTextColor(0xFF64748B.toInt())
 
             val darkBorderColor = 0xFF475569.toInt() // Slate-600
-            btnSave.supportBackgroundTintList =
-                    android.content.res.ColorStateList.valueOf(darkBorderColor)
+            androidx.core.view.ViewCompat.setBackgroundTintList(btnSave,
+                    android.content.res.ColorStateList.valueOf(darkBorderColor))
             btnSave.setTextColor(0xFF94A3B8.toInt())
         } else {
             cardRoot?.setCardBackgroundColor(android.graphics.Color.WHITE)
@@ -197,7 +197,7 @@ class CodeExportDialogFragment : DialogFragment() {
             etCode.setTextColor(0xFF1E293B.toInt()) // Slate-800
             etCode.setHintTextColor(0xFF94A3B8.toInt())
 
-            btnSave.supportBackgroundTintList = null
+            androidx.core.view.ViewCompat.setBackgroundTintList(btnSave, null)
             btnSave.setTextColor(0xFF7C3AED.toInt())
         }
     }

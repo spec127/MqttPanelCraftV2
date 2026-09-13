@@ -61,7 +61,6 @@ object ClockDefinition : IComponentDefinition {
             data.props["time_format"] ?: "HH:mm",
             data.props["countdown_seconds"]?.toLongOrNull() ?: 60L,
             data.props["schedule_time"] ?: "07:30",
-            data.props["trigger_value"] ?: "TRIGGER",
             data.props["visual_style"] ?: "DIGITAL",
             data.props["color"] ?: "#7B1FA2"
         )

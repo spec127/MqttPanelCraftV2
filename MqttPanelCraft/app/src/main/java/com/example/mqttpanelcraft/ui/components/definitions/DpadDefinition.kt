@@ -150,8 +150,8 @@ object DpadDefinition : IComponentDefinition {
                 data,
                 onUpdate,
                 listOf(
-                        PropertyOption("Beveled", R.string.val_joystick_style_smooth),
-                        PropertyOption("Neon", R.string.val_joystick_style_sharp)
+                        PropertyOption("Beveled", R.string.val_dpad_style_beveled),
+                        PropertyOption("Neon", R.string.val_dpad_style_neon)
                 ),
                 "Beveled"
         )

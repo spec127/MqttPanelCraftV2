@@ -1,7 +1,6 @@
 package com.example.mqttpanelcraft.ui.components
 
 import android.content.Context
-import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
@@ -20,11 +19,7 @@ object ComponentContainer {
     ): FrameLayout {
         val container = InterceptableFrameLayout(context)
 
-        // Dynamic border color based on component group
-        val isDark =
-                (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
-                        Configuration.UI_MODE_NIGHT_YES
-        val borderColor = getGroupColor(group, isDark)
+        val borderColor = getGroupColor(context, group)
 
         val borderDrawable =
                 GradientDrawable().apply {
@@ -76,11 +71,11 @@ object ComponentContainer {
         return container
     }
 
-    private fun getGroupColor(group: ComponentGroup, isDark: Boolean): Int {
+    private fun getGroupColor(context: Context, group: ComponentGroup): Int {
         return when (group) {
-            ComponentGroup.CONTROL -> if (isDark) Color.parseColor("#1976D2") else Color.parseColor("#2196F3")
-            ComponentGroup.SENSOR -> if (isDark) Color.parseColor("#FBC02D") else Color.parseColor("#FFEB3B")
-            ComponentGroup.DISPLAY -> if (isDark) Color.parseColor("#D32F2F") else Color.parseColor("#F44336")
+            ComponentGroup.CONTROL -> context.getColor(R.color.component_control_accent)
+            ComponentGroup.SENSOR -> context.getColor(R.color.component_sensor_accent)
+            ComponentGroup.DISPLAY -> context.getColor(R.color.component_display_accent)
         }
     }
 }

@@ -20,7 +20,7 @@
         
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="@dimen/prop_input_height_inner"
             android:focusable="false"
             android:clickable="false"
             android:cursorVisible="false" />

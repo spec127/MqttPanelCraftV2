@@ -8,7 +8,14 @@
     
     <color name="background_color">#0F0F10</color> <color name="surface_color">#1E1E20</color>
 
-    <color name="grid_dot_color">#334155</color>
+    <color name="grid_dot_color">#40808080</color>
+    <color name="canvas_grid_dot">#80C4B5FD</color>
+    <color name="canvas_alignment_guide">#F5D0FE</color>
+    <color name="resize_handle_fill">#1E293B</color>
+    <color name="resize_handle_stroke">#64748B</color>
+    <color name="component_control_accent">#60A5FA</color>
+    <color name="component_sensor_accent">#FBBF24</color>
+    <color name="component_display_accent">#C084FC</color>
 
 
     <color name="vivid_blue">#40C4FF</color>

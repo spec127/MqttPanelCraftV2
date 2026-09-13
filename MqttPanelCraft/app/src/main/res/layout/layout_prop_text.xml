@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"/>
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/tgTextAlign"
             android:layout_width="match_parent"
             android:layout_height="@dimen/prop_toggle_height"
@@ -52,7 +52,7 @@
             app:selectionRequired="true">
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAlignLeft"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -63,7 +63,7 @@
                 android:insetBottom="0dp"/>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAlignCenter"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -74,7 +74,7 @@
                 android:insetBottom="0dp"/>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAlignRight"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -152,7 +152,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"/>
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/tgTextStyle"
             android:layout_width="match_parent"
             android:layout_height="@dimen/prop_toggle_height"
@@ -161,7 +161,7 @@
             app:singleSelection="false">
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnStyleBold"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -172,7 +172,7 @@
                 android:insetBottom="0dp"/>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnStyleItalic"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"

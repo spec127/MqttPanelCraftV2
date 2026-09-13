@@ -37,11 +37,6 @@
             android:value="ca-app-pub-4344043793626988~1899848529"/>
 
         <activity
-            android:name=".LoginActivity"
-            android:exported="false"
-            android:windowSoftInputMode="stateHidden|adjustPan" />
-
-        <activity
             android:name=".DashboardActivity"
             android:exported="true"
             android:windowSoftInputMode="stateHidden|adjustResize">
@@ -70,12 +65,6 @@
             android:name=".SetupActivity"
             android:exported="false"
             android:windowSoftInputMode="stateHidden|adjustPan" />
-
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false"
-            android:windowSoftInputMode="stateHidden|adjustPan" />
-
 
 
     </application>

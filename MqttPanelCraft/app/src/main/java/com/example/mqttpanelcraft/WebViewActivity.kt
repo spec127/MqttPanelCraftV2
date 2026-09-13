@@ -3,6 +3,10 @@ package com.example.mqttpanelcraft
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -13,6 +17,7 @@ import com.example.mqttpanelcraft.model.Project
 import com.example.mqttpanelcraft.mqtt.MqttSessionClient
 import com.example.mqttpanelcraft.utils.HtmlTemplates
 import com.example.mqttpanelcraft.utils.TopicHelper
+import org.json.JSONObject
 
 class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
 
@@ -21,6 +26,10 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
     private var projectId: String? = null
     private var project: Project? = null
     private var mqttListenerRegistered = false
+    private val codeSaveHandler = Handler(Looper.getMainLooper())
+    private var codeEditorReady = false
+    private var codeDraftDirty = false
+    private val saveCodeDraft = Runnable { flushCodeDraft() }
 
     @SuppressLint("SetJavaScriptEnabled", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,10 +99,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
 
         // MQTT Service Integration
         // Ensure Service is Connected using Project Defaults
-        project?.let {
-            ensureMqttNotificationPermission()
-            MqttSessionClient.activate(this, it.id)
-        }
+        project?.let { ensureMqttNotificationPermission() }
 
         // Subscribe logic moved to connection observer to prevent race conditions
         // if (project != null) { ... }
@@ -127,6 +133,17 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
 
         codeEditor.setText(initialCode)
         codeEditor.hint = getString(R.string.web_editor_hint)
+        codeEditorReady = true
+        codeEditor.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            override fun afterTextChanged(s: Editable?) {
+                if (!codeEditorReady) return
+                codeDraftDirty = true
+                codeSaveHandler.removeCallbacks(saveCodeDraft)
+                codeSaveHandler.postDelayed(saveCodeDraft, CODE_SAVE_DEBOUNCE_MS)
+            }
+        })
 
         // Initial Load
         webView.loadDataWithBaseURL(null, initialCode, "text/html", "utf-8", null)
@@ -145,14 +162,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
                 imm.hideSoftInputFromWindow(codeEditor.windowToken, 0)
 
                 val code = codeEditor.text.toString()
-
-                // Save to ProjectRepository (Persistence in JSON)
-                if (project != null) {
-                    val updatedProject = project!!.copy(customCode = code)
-                    ProjectRepository.updateProject(updatedProject)
-                    project = updatedProject // Update local Ref
-                    Toast.makeText(this, R.string.web_code_saved, Toast.LENGTH_SHORT).show()
-                }
+                flushCodeDraft(showConfirmation = true)
 
                 webView.loadDataWithBaseURL(null, code, "text/html", "utf-8", null)
             } else {
@@ -254,7 +264,8 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         val colorRed = android.graphics.Color.RED
         val colorGray = android.graphics.Color.GRAY
 
-        when (status) {
+        val projectStatus = if (MqttRepository.activeProjectId == projectId) status else 0
+        when (projectStatus) {
             1 -> { // Connected
                 viewStatusDot.setImageResource(R.drawable.ic_link)
                 viewStatusDot.setColorFilter(colorGreen)
@@ -282,10 +293,10 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
     override fun onMessageReceived(topic: String, payload: String) {
         runOnUiThread {
             // Inject into JS
-            val safePayload = payload.replace("'", "\\'")
-            val safeTopic = topic.replace("'", "\\'")
+            val safePayload = JSONObject.quote(payload)
+            val safeTopic = JSONObject.quote(topic)
             webView.evaluateJavascript(
-                    "if(window.mqttOnMessage) mqttOnMessage('$safeTopic', '$safePayload')",
+                    "if(typeof window.mqttOnMessage === 'function') window.mqttOnMessage($safeTopic, $safePayload)",
                     null
             )
         }
@@ -293,11 +304,13 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
 
     override fun onStart() {
         super.onStart()
+        if (projectId != null) loadProjectConfig()
         if (!mqttListenerRegistered) {
             MqttRepository.registerListener(this)
             mqttListenerRegistered = true
         }
         project?.let { current ->
+            MqttSessionClient.activate(this, current.id)
             MqttSessionClient.setVisible(this, current.id, true)
             MqttRepository.consumeBackgroundSnapshots(current.id).forEach { snapshot ->
                 onMessageReceived(snapshot.topic, snapshot.payload)
@@ -306,6 +319,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
     }
 
     override fun onStop() {
+        flushCodeDraft()
         project?.let { current ->
             MqttRepository.markUiDetached(current.id)
             MqttSessionClient.setVisible(this, current.id, false)
@@ -365,6 +379,21 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         }
     }
 
+    private fun flushCodeDraft(showConfirmation: Boolean = false) {
+        codeSaveHandler.removeCallbacks(saveCodeDraft)
+        if (!codeDraftDirty || !::codeEditor.isInitialized) return
+        val current = projectId?.let(ProjectRepository::getProjectById) ?: return
+        val code = codeEditor.text?.toString() ?: return
+        codeDraftDirty = false
+        if (current.customCode == code) return
+        val updatedProject = current.copy(customCode = code)
+        ProjectRepository.updateProject(updatedProject)
+        project = updatedProject
+        if (showConfirmation) {
+            Toast.makeText(this, R.string.web_code_saved, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun dispatchTouchEvent(ev: android.view.MotionEvent?): Boolean {
         if (::idleAdController.isInitialized) {
             idleAdController.onUserInteraction()
@@ -393,10 +422,7 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
                             )
 
                             // Save immediately
-                            if (project != null) {
-                                project = project!!.copy(customCode = htmlContent)
-                                ProjectRepository.updateProject(project!!)
-                            }
+                            flushCodeDraft()
 
                             Toast.makeText(this, R.string.web_import_success, Toast.LENGTH_SHORT)
                                     .show()
@@ -426,5 +452,9 @@ class WebViewActivity : BaseActivity(), MqttRepository.MessageListener {
         fun subscribe(topic: String) {
             MqttSessionClient.subscribe(this@WebViewActivity, topic)
         }
+    }
+
+    private companion object {
+        const val CODE_SAVE_DEBOUNCE_MS = 500L
     }
 }

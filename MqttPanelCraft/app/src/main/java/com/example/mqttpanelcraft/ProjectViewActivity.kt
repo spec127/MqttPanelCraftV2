@@ -45,6 +45,7 @@ class ProjectViewActivity : BaseActivity() {
     private var lastResizeUpdate = 0L
     private var mqttListenerRegistered = false
     private var hasSubscribed = false
+    private var activatedSessionProjectId: String? = null
 
     private val mqttMessageListener =
             object : MqttRepository.MessageListener {
@@ -243,22 +244,11 @@ class ProjectViewActivity : BaseActivity() {
                             MqttSessionClient.publish(this, topic, payload)
                         },
                         { id, key, value ->
-                            // Sync property to ViewModel (and then to disk)
-                            viewModel.components.value?.find { it.id == id }?.let { comp ->
-                                if (comp.props[key] != value) {
-                                    val updated =
-                                            comp.copy(
-                                                    props =
-                                                            comp.props.toMutableMap().apply {
-                                                                put(key, value)
-                                                            }
-                                            )
-                                    viewModel.updateComponent(updated)
-                                }
+                            // MQTT/gesture runtime data updates only its own View; it must not
+                            // recreate WebViews or rebind every component on the canvas.
+                            viewModel.updateRuntimeProperty(id, key, value)?.let { updated ->
+                                renderer.updateRuntimeComponent(updated, isEditMode)
                             }
-                        },
-                        { source, value ->
-                            dispatchLocalComponentTrigger(source, value)
                         }
                 )
 
@@ -615,7 +605,12 @@ class ProjectViewActivity : BaseActivity() {
                             requestedOrientation =
                                     android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
                 }
-                viewModel.initMqtt()
+                if (activatedSessionProjectId != project.id) {
+                    viewModel.initMqtt()
+                    activatedSessionProjectId = project.id
+                } else if (MqttRepository.activeProjectId == project.id) {
+                    MqttSessionClient.refresh(this, project.id)
+                }
             }
         }
 
@@ -919,25 +914,6 @@ class ProjectViewActivity : BaseActivity() {
         }
     }
 
-    private fun dispatchLocalComponentTrigger(source: com.example.mqttpanelcraft.model.ComponentData, value: String) {
-        val linkedIds =
-                source.props["linked_components"]
-                        .orEmpty()
-                        .split(",")
-                        .mapNotNull { it.trim().toIntOrNull() }
-                        .toSet()
-        if (linkedIds.isEmpty()) return
-
-        viewModel.components.value.orEmpty().forEach { target ->
-            if (target.id in linkedIds) {
-                renderer.getView(target.id)?.let { targetView ->
-                    behaviorManager.triggerLinkedComponent(targetView, target, value)
-                    viewModel.addLog("${source.label} → ${target.label}: $value")
-                }
-            }
-        }
-    }
-
     private fun subscribeToCurrentProject(@androidx.annotation.StringRes logResId: Int) {
         if (hasSubscribed) return
         val proj = viewModel.project.value ?: return
@@ -953,6 +929,8 @@ class ProjectViewActivity : BaseActivity() {
             mqttListenerRegistered = true
         }
         viewModel.project.value?.let { proj ->
+            MqttSessionClient.activate(this, proj.id)
+            activatedSessionProjectId = proj.id
             MqttSessionClient.setVisible(this, proj.id, true)
             editorCanvas.post { replayBackgroundSnapshots(proj) }
         }

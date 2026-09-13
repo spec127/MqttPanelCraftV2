@@ -17,7 +17,7 @@ class GridPatternView @JvmOverloads constructor(
     private var spacing = 0
     private var dotRadiusPx = 0f
     private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#EAEAEA")
+        color = ContextCompat.getColor(context, R.color.grid_dot_color)
         style = Paint.Style.FILL
     }
     private val clipRect = Rect()

@@ -330,6 +330,12 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    /** Keep existing last-value persistence, without notifying the full canvas for each value. */
+    fun updateRuntimeProperty(componentId: Int, key: String, value: String): ComponentData? {
+        val projectId = project.value?.id ?: return null
+        return ProjectRepository.updateRuntimeProperty(projectId, componentId, key, value)
+    }
+
     fun selectComponent(id: Int?) {
         _selectedComponentId.value = id
     }
@@ -360,7 +366,7 @@ class ProjectViewModel(application: Application) : AndroidViewModel(application)
     val mqttStatus = androidx.lifecycle.MediatorLiveData<MqttStatus>().apply {
         value = MqttStatus.IDLE
         addSource(com.example.mqttpanelcraft.MqttRepository.connectionState) { state ->
-            value = when (state) {
+            value = if (MqttRepository.activeProjectId != _currentProjectId.value) MqttStatus.IDLE else when (state) {
                 com.example.mqttpanelcraft.mqtt.MqttConnectionState.CONNECTED -> MqttStatus.CONNECTED
                 com.example.mqttpanelcraft.mqtt.MqttConnectionState.FAILED -> MqttStatus.FAILED
                 com.example.mqttpanelcraft.mqtt.MqttConnectionState.CONNECTING,

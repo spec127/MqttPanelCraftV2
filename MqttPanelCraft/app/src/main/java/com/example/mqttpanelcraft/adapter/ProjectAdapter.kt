@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.model.Project
+import com.example.mqttpanelcraft.mqtt.MqttConnectionState
+import com.example.mqttpanelcraft.MqttRepository
 import com.google.android.material.chip.Chip
 
 class ProjectAdapter(
@@ -42,21 +44,24 @@ class ProjectAdapter(
                 }
 
         // Status Dot Color & Text
-        val statusDrawable =
-                if (project.isConnected) {
-                    holder.tvStatusText.text =
-                            holder.itemView.context.getString(R.string.msg_mqtt_connected)
-                    holder.tvStatusText.setTextColor(
-                            android.graphics.Color.parseColor("#4CAF50")
-                    ) // Green
-                    R.drawable.shape_circle_green
-                } else {
-                    holder.tvStatusText.text =
-                            holder.itemView.context.getString(R.string.msg_mqtt_disconnected)
-                    holder.tvStatusText.setTextColor(android.graphics.Color.RED)
-                    R.drawable.shape_circle_red
-                }
-        holder.viewStatus.setBackgroundResource(statusDrawable)
+        val state = if (MqttRepository.activeProjectId == project.id)
+                MqttRepository.connectionState.value else MqttConnectionState.IDLE
+        val label = when (state) {
+            MqttConnectionState.CONNECTED -> R.string.msg_mqtt_connected
+            MqttConnectionState.CONNECTING -> R.string.mqtt_notification_connecting
+            MqttConnectionState.RECONNECTING -> R.string.mqtt_notification_reconnecting
+            MqttConnectionState.FAILED -> R.string.project_msg_mqtt_failed
+            else -> R.string.msg_mqtt_disconnected
+        }
+        val color = when (state) {
+            MqttConnectionState.CONNECTED -> android.graphics.Color.rgb(46, 125, 50)
+            MqttConnectionState.FAILED -> android.graphics.Color.rgb(198, 40, 40)
+            else -> androidx.core.content.ContextCompat.getColor(holder.itemView.context, R.color.prop_text_secondary)
+        }
+        holder.tvStatusText.setText(label)
+        holder.tvStatusText.setTextColor(color)
+        holder.viewStatus.setBackgroundResource(R.drawable.shape_circle_green)
+        holder.viewStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(color)
 
         holder.itemView.setOnClickListener { onProjectClick(project) }
 

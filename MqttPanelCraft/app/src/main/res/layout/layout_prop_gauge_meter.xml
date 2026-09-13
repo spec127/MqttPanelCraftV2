@@ -48,7 +48,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etMin"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:importantForAutofill="no"
                 android:inputType="numberDecimal|numberSigned"
                 android:text="0"
@@ -65,7 +65,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etMax"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:importantForAutofill="no"
                 android:inputType="numberDecimal|numberSigned"
                 android:text="100"
@@ -82,7 +82,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etUnit"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:importantForAutofill="no"
                 android:inputType="text"
                 android:maxLines="1"
@@ -142,18 +142,18 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="12dp">
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
                 android:id="@+id/toggleThresholdEffect"
                 android:layout_width="0dp"
                 android:layout_weight="1.4"
-                android:layout_height="40dp"
+                android:layout_height="@dimen/prop_toggle_height"
                 app:singleSelection="true"
                 app:selectionRequired="true"
                 app:checkedButton="@+id/btnEffectSolid">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEffectSolid"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.App.Button.Segmented.Properties"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
@@ -167,7 +167,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEffectGradient"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.App.Button.Segmented.Properties"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
@@ -184,7 +184,7 @@
                 android:id="@+id/containerRgbStepper"
                 android:layout_width="0dp"
                 android:layout_weight="0.6"
-                android:layout_height="40dp"
+                android:layout_height="@dimen/prop_toggle_height"
                 android:layout_marginStart="12dp"
                 android:gravity="center"
                 android:orientation="horizontal"

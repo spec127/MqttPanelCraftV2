@@ -50,7 +50,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etYMax"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="numberDecimal|numberSigned"
                     android:maxLines="1"
                     android:textSize="13sp"/>
@@ -66,7 +66,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etYMin"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:inputType="numberDecimal|numberSigned"
                     android:maxLines="1"
                     android:textSize="13sp"/>
@@ -81,7 +81,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etChartUnit"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:maxLines="1"
                     android:textSize="13sp"/>
             </com.google.android.material.textfield.TextInputLayout>
@@ -107,17 +107,17 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etMaxPoints"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="@dimen/prop_input_height_inner"
             android:inputType="number"
             android:maxLines="1"
             android:textSize="13sp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- 3. 單線多線資料切換按鈕 -->
-    <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggleSeriesMode"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="@dimen/prop_toggle_height"
         android:layout_marginBottom="10dp"
         app:singleSelection="true"
         app:selectionRequired="true"
@@ -125,7 +125,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnModeSingle"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
@@ -138,7 +138,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnModeMulti"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
@@ -160,11 +160,11 @@
         android:weightSum="10"
         android:layout_marginBottom="10dp">
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleSeriesListMode"
             android:layout_width="0dp"
             android:layout_weight="7"
-            android:layout_height="32dp"
+            android:layout_height="@dimen/prop_toggle_height"
             android:layout_marginEnd="12dp"
             app:singleSelection="true"
             app:selectionRequired="true"
@@ -172,7 +172,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnListModeKey"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -186,7 +186,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnListModeColorOnly"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -202,7 +202,7 @@
         <!-- 加減數量操作鈕 (減少高度) -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="32dp"
+            android:layout_height="@dimen/prop_toggle_height"
             android:layout_weight="3"
             android:orientation="horizontal"
             android:gravity="center"

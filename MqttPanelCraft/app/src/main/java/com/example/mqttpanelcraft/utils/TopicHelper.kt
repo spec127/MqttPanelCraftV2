@@ -39,6 +39,20 @@ object TopicHelper {
         return "${formatBaseTopic(project.name, project.id)}/#"
     }
 
+    /** Rewrites only a generated topic under the exact old project base. */
+    fun rewriteGeneratedProjectTopic(
+        topic: String,
+        oldProject: Project,
+        newProjectName: String,
+        newProjectId: String
+    ): String {
+        val oldBase = formatBaseTopic(oldProject.name, oldProject.id)
+        val trimmedTopic = topic.trim()
+        if (!trimmedTopic.startsWith("$oldBase/")) return topic
+        val suffix = trimmedTopic.removePrefix(oldBase)
+        return "${formatBaseTopic(newProjectName, newProjectId)}$suffix"
+    }
+
     fun collectSubscriptionTopics(project: Project): Set<String> {
         val wildcard = formatProjectWildcard(project)
         val coveredPrefix = wildcard.dropLast(1)

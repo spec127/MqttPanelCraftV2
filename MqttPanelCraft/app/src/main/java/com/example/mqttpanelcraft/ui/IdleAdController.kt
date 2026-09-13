@@ -10,7 +10,6 @@ class IdleAdController(
     private val onAdClosed: () -> Unit
 ) {
     private val handler = Handler(Looper.getMainLooper())
-    private val intervals = listOf(30L, 60L, 180L, 300L, 600L) // Seconds
     private var currentIntervalIndex = 0
     private var isRunning = false
 
@@ -22,7 +21,7 @@ class IdleAdController(
         if (isRunning) return
         isRunning = true
         currentIntervalIndex = 0 
-        scheduleNext(intervals[0])
+        scheduleNext(IDLE_INTERVALS_SECONDS.first())
     }
 
     fun stop() {
@@ -35,8 +34,7 @@ class IdleAdController(
         if (isRunning) {
             // Reset timer for CURRENT interval
             handler.removeCallbacks(idleRunnable)
-            val delay = if (currentIntervalIndex < intervals.size) intervals[currentIntervalIndex] else 600L
-            scheduleNext(delay)
+            scheduleNext(currentIntervalSeconds())
         }
     }
 
@@ -51,13 +49,20 @@ class IdleAdController(
 
         com.example.mqttpanelcraft.utils.AdManager.showInterstitial(activity) {
             // On Ad Closed
-            if (currentIntervalIndex < intervals.size - 1) {
+            if (currentIntervalIndex < IDLE_INTERVALS_SECONDS.lastIndex) {
                 currentIntervalIndex++
             }
-            val delay = if (currentIntervalIndex < intervals.size) intervals[currentIntervalIndex] else 600L
-            scheduleNext(delay)
+            scheduleNext(currentIntervalSeconds())
 
             onAdClosed()
         }
+    }
+
+    private fun currentIntervalSeconds(): Long =
+        IDLE_INTERVALS_SECONDS.getOrElse(currentIntervalIndex) { IDLE_INTERVALS_SECONDS.last() }
+
+    companion object {
+        // Isolated idle-ad policy: first wait 3 min, then 5 min, then stay at 10 min.
+        private val IDLE_INTERVALS_SECONDS = listOf(180L, 300L, 600L)
     }
 }

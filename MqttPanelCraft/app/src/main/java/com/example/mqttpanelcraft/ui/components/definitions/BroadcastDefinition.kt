@@ -59,11 +59,6 @@ object BroadcastDefinition : IComponentDefinition {
         "show_text" to "true"
     )
 
-    override fun getDefaultProps(context: Context): Map<String, String> =
-            getDefaultProps().toMutableMap().apply {
-                put("title", context.getString(R.string.broadcast_title))
-            }
-
     override fun createView(
         context: Context,
         isEditMode: Boolean

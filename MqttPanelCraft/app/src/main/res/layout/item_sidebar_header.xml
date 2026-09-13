@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -17,7 +18,7 @@
         android:layout_height="20dp"
         android:src="@android:drawable/ic_menu_preferences"
         android:layout_marginEnd="8dp"
-        android:tint="@color/sidebar_header_text"/>
+        app:tint="@color/sidebar_header_text"/>
 
     <TextView
         android:id="@+id/tvHeaderTitle"
@@ -39,7 +40,7 @@
         android:layout_height="20dp"
         android:src="@drawable/ic_expand_less_circle" 
         android:rotation="180" 
-        android:tint="@color/sidebar_header_text"
+        app:tint="@color/sidebar_header_text"
         android:alpha="0.5"/>
 
 </LinearLayout>

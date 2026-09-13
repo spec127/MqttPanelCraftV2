@@ -271,7 +271,8 @@ object JoystickDefinition : IComponentDefinition {
 
     override fun isFixedAspectRatio(data: ComponentData): Boolean {
         // Only 4-Way joystick needs to be square
-        return (data.props["axes"] ?: "4-Way") == "4-Way"
+        val mode = data.props["axisMode"] ?: data.props["axes"] ?: "4-Way"
+        return mode == "4-Way"
     }
 
     override fun onMqttMessage(

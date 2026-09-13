@@ -1,6 +1,7 @@
 package com.example.mqttpanelcraft.ui.views
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -22,8 +23,6 @@ import java.util.Locale
 class ClockTriggerView(context: Context) : FrameLayout(context) {
     var componentId: Int = android.view.View.NO_ID
     var isEditMode: Boolean = false
-    var onLocalTrigger: ((String) -> Unit)? = null
-
     private val content = LinearLayout(context)
     private val mainText = TextView(context)
     private val subText = TextView(context)
@@ -32,7 +31,6 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
     private var timeFormat = "HH:mm"
     private var countdownSeconds = 60L
     private var scheduleTime = "07:30"
-    private var triggerValue = "TRIGGER"
     private var visualStyle = "DIGITAL"
     private var primaryColor = Color.parseColor("#7B1FA2")
     private val clockPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -72,7 +70,6 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
         newTimeFormat: String,
         newCountdownSeconds: Long,
         newScheduleTime: String,
-        newTriggerValue: String,
         newVisualStyle: String,
         colorHex: String
     ) {
@@ -83,7 +80,6 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
         timeFormat = newTimeFormat.ifBlank { "HH:mm" }
         countdownSeconds = safeSeconds
         scheduleTime = newScheduleTime.ifBlank { "07:30" }
-        triggerValue = newTriggerValue.ifBlank { "TRIGGER" }
         visualStyle = when (newVisualStyle) {
             "ANALOG" -> "ANALOG"
             "COMBO" -> "COMBO"
@@ -153,7 +149,6 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
         mainText.text = String.format(Locale.ROOT, "%02d:%02d:%02d", hours, minutes, seconds)
         if (runtime && remaining == 0L && !countdownTriggered) {
             countdownTriggered = true
-            onLocalTrigger?.invoke(triggerValue)
         }
     }
 
@@ -164,18 +159,24 @@ class ClockTriggerView(context: Context) : FrameLayout(context) {
         val currentDate = safeTimeFormat("yyyy-MM-dd", now)
         if (runtime && currentTime == scheduleTime && currentDate != lastScheduleDate) {
             lastScheduleDate = currentDate
-            onLocalTrigger?.invoke(triggerValue)
         }
     }
 
     private fun safeTimeFormat(pattern: String, date: Date): String =
-        try { SimpleDateFormat(pattern, Locale.getDefault()).format(date) } catch (_: Exception) { "--:--" }
+        try { SimpleDateFormat(pattern, Locale.ENGLISH).format(date) } catch (_: Exception) { "--:--" }
+
+    private fun isNightMode(): Boolean =
+        (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+    private fun cardBackground(): Int {
+        if (isNightMode()) return Color.rgb(18, 18, 20)
+        return if (ColorUtils.calculateLuminance(primaryColor) < 0.45) Color.WHITE else Color.rgb(28, 24, 30)
+    }
 
     private fun updateColors() {
         val scale = currentScale()
-        val darkAccent = ColorUtils.calculateLuminance(primaryColor) < 0.45
         background = GradientDrawable().apply {
-            setColor(if (darkAccent) Color.WHITE else Color.rgb(28, 24, 30))
+            setColor(cardBackground())
             setStroke(dp(1), ColorUtils.setAlphaComponent(primaryColor, 135))
             cornerRadius = (dp(10) * scale).coerceAtLeast(dp(3).toFloat())
         }

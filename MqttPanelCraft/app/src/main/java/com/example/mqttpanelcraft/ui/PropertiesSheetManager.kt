@@ -389,9 +389,7 @@ class PropertiesSheetManager(
             }
 
             // Generic Payload Logic
-            if (def != null &&
-                    def.group == com.example.mqttpanelcraft.ui.components.ComponentGroup.CONTROL
-            ) {
+            if (def?.supportsGenericPayload == true) {
                 tilGenericPayload?.visibility = View.VISIBLE
                 val payloadVal = data.props["payload"] ?: ""
                 if (etPropGenericPayload?.text?.toString() != payloadVal) {

@@ -35,10 +35,10 @@
         </LinearLayout>
 
         <!-- Send Mode Toggle -->
-        <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleSendMode"
             android:layout_width="match_parent"
-            android:layout_height="46dp"
+            android:layout_height="@dimen/prop_toggle_height"
             android:layout_marginBottom="12dp"
             app:singleSelection="true"
             app:selectionRequired="true"
@@ -46,7 +46,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnModeRelease"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -56,7 +56,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnModeContinuous"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -78,7 +78,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etInterval"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:importantForAutofill="no"
                 android:inputType="number"
                 android:text="100"
@@ -103,7 +103,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etMin"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:importantForAutofill="no"
                     android:inputType="numberDecimal"
                     android:text="0"
@@ -120,7 +120,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etMax"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:importantForAutofill="no"
                     android:inputType="numberDecimal"
                     android:text="100"
@@ -136,7 +136,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etStep"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/prop_input_height_inner"
                     android:importantForAutofill="no"
                     android:inputType="numberDecimal"
                     android:text="1"
@@ -176,10 +176,10 @@
         </LinearLayout>
 
         <!-- TOP: Orientation Toggle (Horizontal / Vertical) -->
-        <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleOrientation"
             android:layout_width="match_parent"
-            android:layout_height="46dp"
+            android:layout_height="@dimen/prop_toggle_height"
             android:layout_marginBottom="12dp"
             app:singleSelection="true"
             app:selectionRequired="true"
@@ -187,7 +187,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnOrientationHoriz"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -197,7 +197,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnOrientationVert"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"

@@ -57,7 +57,7 @@ object CalendarClockDefinition : IComponentDefinition {
     ) {
         CommonPropBinder.bindDropdown(
             panelView, R.id.spDateFormat, "date_format", data, onUpdate,
-            listOf("YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY", "YYYY年MM月DD日"),
+            listOf("YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY", "MMM d, yyyy"),
             defaultValue = "YYYY-MM-DD"
         )
         

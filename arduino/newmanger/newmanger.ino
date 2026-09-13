@@ -17,9 +17,11 @@
 
 // --- 1. 使用者設定區 (User Config) ---
 // 這裡定義預設值。如果 LittleFS 有存檔，會優先讀取檔案內的數值。
-char mqtt_server[40] = "your mqtt broker address";
-char mqtt_port[6]    = "1883";
-char mqtt_topic[40]  = "test_topic";
+char mqtt_server[128] = "your mqtt broker address";
+char mqtt_port[8]     = "1883";
+char mqtt_topic[128]  = "test_topic";
+char mqtt_user[64]    = "";
+char mqtt_pass[64]    = "";
 
 // 按鈕設定 (秒)
 #define BTN_PORTAL_SEC 3   // 按 3 秒進設定頁面
@@ -47,6 +49,7 @@ void setup() {
 
   // 2. 啟動 MQTT Panel
   // 把我們的變數指標傳進去，讓模組幫我們填值或儲存
+  mqttpanel_set_auth(mqtt_user, mqtt_pass);
   mqttpanel_begin(&client, mq_receiver, 
            mqtt_server, mqtt_port, mqtt_topic,
            BTN_PORTAL_SEC, BTN_RESET_SEC,

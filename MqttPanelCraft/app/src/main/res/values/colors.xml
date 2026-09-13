@@ -24,6 +24,13 @@
     <color name="prop_stroke_color">#E5E7EB</color>
 
     <color name="grid_dot_color">#E0E0E0</color>
+    <color name="canvas_grid_dot">#52738AA3</color>
+    <color name="canvas_alignment_guide">#7B1FA2</color>
+    <color name="resize_handle_fill">#F8FAFC</color>
+    <color name="resize_handle_stroke">#94A3B8</color>
+    <color name="component_control_accent">#3B82F6</color>
+    <color name="component_sensor_accent">#F59E0B</color>
+    <color name="component_display_accent">#A855F7</color>
 
     <!-- Toolbar Colors -->
     <color name="toolbar_bg">#FFFFFF</color>

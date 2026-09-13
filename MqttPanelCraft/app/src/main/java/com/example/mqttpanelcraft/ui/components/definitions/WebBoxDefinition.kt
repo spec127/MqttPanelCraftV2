@@ -49,9 +49,11 @@ object WebBoxDefinition : IComponentDefinition {
         webView.isEditMode =
             (container as? com.example.mqttpanelcraft.ui.components.InterceptableFrameLayout)
                 ?.isEditMode ?: false
-        webView.sourceType = data.props["source_type"] ?: "URL"
-        webView.urlContent = data.props["url"] ?: ""
-        webView.htmlContent = data.props["html"] ?: ""
+        webView.applyContent(
+                data.props["source_type"] ?: "URL",
+                data.props["url"] ?: "",
+                data.props["html"] ?: ""
+        )
         webView.enableInteraction = (data.props["enable_interaction"] ?: "true").toBoolean()
         webView.refreshIntervalSec = (data.props["refresh_interval"] ?: "0").toIntOrNull() ?: 0
         webView.showBorder = (data.props["show_border"] ?: "false").toBoolean()

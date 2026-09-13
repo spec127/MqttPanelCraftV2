@@ -57,11 +57,6 @@ object LineChartDefinition : IComponentDefinition {
         "series_color_6" to "#FFEB3B"
     )
 
-    override fun getDefaultProps(context: Context): Map<String, String> =
-            getDefaultProps().toMutableMap().apply {
-                put("title", context.getString(R.string.component_label_chart))
-            }
-
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
         val compositeView = LineChartCompositeView(context).apply {

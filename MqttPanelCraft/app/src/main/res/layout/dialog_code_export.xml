@@ -70,7 +70,7 @@
                     android:id="@+id/tvCodeFilename"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="arduino_sketch.ino"
+                    android:text="arduino_sketch.txt"
                     android:textSize="11sp"
                     android:fontFamily="monospace"
                     android:textColor="#64748B"

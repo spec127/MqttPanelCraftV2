@@ -39,7 +39,7 @@
             android:textColor="@color/prop_text_secondary"
             android:textSize="12sp"/>
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/tgSourceType"
             android:layout_width="match_parent"
             android:layout_height="@dimen/prop_toggle_height"
@@ -48,7 +48,7 @@
             app:singleSelection="true">
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSourceTypeUrl"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -59,7 +59,7 @@
                 android:textSize="11sp"/>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSourceTypeHtml"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -81,7 +81,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etUrl"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="textUri"
                 android:textSize="14sp"/>
         </com.google.android.material.textfield.TextInputLayout>
@@ -151,7 +151,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etRefreshInterval"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="number"
                 android:textSize="14sp"/>
         </com.google.android.material.textfield.TextInputLayout>

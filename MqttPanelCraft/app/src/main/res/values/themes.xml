@@ -72,6 +72,17 @@
         <item name="android:textColor">@color/props_primary</item>
     </style>
 
+    <!-- Set corners before ToggleGroup caches its children's original corner sizes. -->
+    <style name="Widget.App.Button.Segmented.Properties" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="cornerRadius">@dimen/prop_toggle_corner_radius</item>
+        <item name="strokeColor">@color/props_primary</item>
+        <item name="android:textColor">@color/props_primary</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">@dimen/prop_toggle_height</item>
+    </style>
+
     <style name="PropertyLabel" parent="Widget.MaterialComponents.TextView">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/prop_text_secondary</item>

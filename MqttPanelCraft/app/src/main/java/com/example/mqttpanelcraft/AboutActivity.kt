@@ -1,12 +1,15 @@
 package com.example.mqttpanelcraft
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.appbar.MaterialToolbar
+import android.widget.Toast
+import java.io.File
 
 class AboutActivity : BaseActivity() {
 
@@ -47,6 +50,10 @@ class AboutActivity : BaseActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
             tvVersion.text = getString(R.string.version_unknown)
+        }
+        tvVersion.setOnLongClickListener {
+            showCrashLogs()
+            true
         }
 
         findViewById<Button>(R.id.btnPrivacy).setOnClickListener {
@@ -109,6 +116,40 @@ class AboutActivity : BaseActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
             getString(R.string.error_about_load)
+        }
+    }
+
+    private fun showCrashLogs() {
+        try {
+            val file = File(getExternalFilesDir(null), "crash_log.txt")
+            if (!file.exists()) {
+                Toast.makeText(this, R.string.crash_no_logs, Toast.LENGTH_SHORT).show()
+                return
+            }
+            // Crash logs append across launches; never allocate an unbounded file on the UI thread.
+            val content = java.io.RandomAccessFile(file, "r").use { log ->
+                val count = minOf(log.length(), 64L * 1024).toInt()
+                log.seek(log.length() - count)
+                val bytes = ByteArray(count)
+                log.readFully(bytes)
+                bytes.toString(Charsets.UTF_8)
+            }
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(R.string.crash_logs_title)
+                .setMessage(content.takeLast(2000))
+                .setPositiveButton(R.string.common_btn_close, null)
+                .setNeutralButton(R.string.common_btn_copy) { _, _ ->
+                    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    clipboard.setPrimaryClip(ClipData.newPlainText("Crash Log", content))
+                    Toast.makeText(this, R.string.crash_logs_copied, Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton(R.string.common_btn_clear) { _, _ ->
+                    file.delete()
+                    Toast.makeText(this, R.string.crash_logs_cleared, Toast.LENGTH_SHORT).show()
+                }
+                .show()
+        } catch (e: Exception) {
+            Toast.makeText(this, getString(R.string.crash_logs_error, e.message), Toast.LENGTH_SHORT).show()
         }
     }
 }

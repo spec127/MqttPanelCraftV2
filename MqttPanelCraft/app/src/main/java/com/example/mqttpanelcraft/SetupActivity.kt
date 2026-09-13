@@ -53,6 +53,7 @@ class SetupActivity : BaseActivity() {
     private var pendingComponents: MutableList<com.example.mqttpanelcraft.model.ComponentData>? =
             null
     private var pendingCustomCode: String? = null // Store imported code
+    private var pendingImportedProject: Project? = null
     private var pendingExportJson: String? = null // Temporary hold for export
 
     // Theme Cards
@@ -92,12 +93,16 @@ class SetupActivity : BaseActivity() {
                         .setMessage(getString(R.string.dialog_change_id_msg))
                         .setPositiveButton(getString(R.string.common_btn_gen_id)) { _, _ ->
                             etProjectId.setText(ProjectRepository.generateId())
+                            tilProjectId.error = null
+                            tilProjectId.isErrorEnabled = false
                         }
                         .setNegativeButton(getString(R.string.common_btn_cancel), null)
                         .show()
             } else {
                 // Create Mode: Just generate
                 etProjectId.setText(ProjectRepository.generateId())
+                tilProjectId.error = null
+                tilProjectId.isErrorEnabled = false
             }
         }
 
@@ -317,6 +322,9 @@ class SetupActivity : BaseActivity() {
         btnImport = findViewById(R.id.btnImportJson)
         btnExport = findViewById(R.id.btnExportJson)
         cbKeepMqttInBackground = findViewById(R.id.cbKeepMqttInBackground)
+        findViewById<View>(R.id.itemKeepMqttInBackground).setOnClickListener {
+            cbKeepMqttInBackground.performClick()
+        }
 
         // Orientation Init (Default Sensor)
         setOrientationUI("SENSOR")
@@ -334,25 +342,15 @@ class SetupActivity : BaseActivity() {
         }
 
         findViewById<android.view.View>(R.id.btnExportArduino).setOnClickListener {
-            // Generate temporary project object for valid state
-            val tempProject =
-                    originalProject
-                            ?: run {
-                                val name = etName.text.toString().ifBlank { getString(R.string.project_default_untitled) }
-                                val broker = etBroker.text.toString().ifBlank { "broker" }
-
-                                Project(
-                                        id = projectId ?: "temp_id",
-                                        name = name,
-                                        broker = broker,
-                                        port = etPort.text.toString().toIntOrNull() ?: 1883,
-                                        username = etUser.text.toString(),
-                                        password = etPassword.text.toString(),
-                                        type = selectedType,
-                                        components = pendingComponents ?: mutableListOf(),
-                                        customCode = pendingCustomCode ?: ""
-                                )
-                            }
+            val tempProject = buildExportProjectFromForm()
+            if (isExportFormUnsaved(tempProject)) {
+                android.widget.Toast.makeText(
+                                this,
+                                R.string.setup_msg_arduino_export_unsaved,
+                                android.widget.Toast.LENGTH_LONG
+                        )
+                        .show()
+            }
 
             if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
                 com.example.mqttpanelcraft.ui.ArduinoExportManager.showExportDialog(
@@ -488,20 +486,27 @@ class SetupActivity : BaseActivity() {
             // Password usually ignored
             selectType(imported.type)
 
-            // Store Structure
-            pendingComponents = imported.components
+            // Keep an imported project internally coherent before it ever reaches the canvas.
+            val normalized = com.example.mqttpanelcraft.data.ProjectImportNormalizer.normalize(imported)
+            pendingComponents = normalized.project.components
+            pendingCustomCode = normalized.project.customCode
+            pendingImportedProject = normalized.project
+            cbKeepMqttInBackground.isChecked = imported.keepMqttInBackground
+            setOrientationUI(imported.orientation)
 
-            // vFix: Sanitize Imported IDs to prevent collisions and crashes
-            // Resetting to NO_ID causes restoreProjectState to generate fresh unique IDs.
-            pendingComponents?.forEach { it.id = android.view.View.NO_ID }
-
-            pendingCustomCode = imported.customCode
+            if (normalized.repairedIds > 0 || normalized.removedLinkedReferences > 0) {
+                AlertDialog.Builder(this)
+                        .setMessage(getString(R.string.project_msg_import_repaired,
+                                normalized.repairedIds, normalized.removedLinkedReferences))
+                        .setPositiveButton(R.string.common_btn_ok, null)
+                        .show()
+            }
 
             android.widget.Toast.makeText(
                             this,
                             getString(
                                     R.string.project_msg_components_loaded,
-                                    imported.components.size
+                                    normalized.project.components.size
                             ),
                             android.widget.Toast.LENGTH_SHORT
                     )
@@ -634,26 +639,27 @@ class SetupActivity : BaseActivity() {
 
         val port = portStr.toIntOrNull() ?: 1883
 
-        // Determine ID
-        var finalId = projectId ?: ProjectRepository.generateId()
-
-        // Check if ID was changed in UI (Only in Edit Mode)
-        if (projectId != null) {
-            val etProjectId = findViewById<TextInputEditText>(R.id.etProjectId)
-            val currentUiId = etProjectId.text.toString()
-            if (currentUiId.isNotEmpty() && currentUiId != projectId) {
-                finalId = currentUiId
-            }
+        // Persist the ID shown by the generator in both create and edit mode.
+        val etProjectId = findViewById<TextInputEditText>(R.id.etProjectId)
+        val finalId = com.example.mqttpanelcraft.data.resolveProjectId(
+                etProjectId.text.toString(), projectId, ProjectRepository::generateId)
+        etProjectId.setText(finalId)
+        val tilProjectId =
+                findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.tilProjectId)
+        if (finalId != projectId && ProjectRepository.getProjectById(finalId) != null) {
+            tilProjectId.error = getString(R.string.setup_error_id_exists)
+            tilProjectId.isErrorEnabled = true
+            return
         }
+        tilProjectId.error = null
+        tilProjectId.isErrorEnabled = false
 
         // ...
 
         // Determine Components & Custom Code
-        val finalComponents =
-                pendingComponents
-                        ?: originalProject?.components
-                                ?.toMutableList() // Copy to avoid mutation issues
-                         ?: mutableListOf()
+        // Editing or abandoning this form must not mutate the repository's original components.
+        val finalComponents = (pendingComponents ?: originalProject?.components)
+                ?.map { it.deepCopy() }?.toMutableList() ?: mutableListOf()
 
         val finalCustomCode = pendingCustomCode ?: originalProject?.customCode ?: ""
 
@@ -661,24 +667,17 @@ class SetupActivity : BaseActivity() {
 
         // Update Component Topics if ID changed
         // Smart Topic Sync 3.0: Split & Match ID
-        if (originalProject != null) {
-            val oldId = originalProject?.id ?: ""
-            if (oldId.isNotEmpty()) {
-                val newSafeName =
-                        name.lowercase().replace("/", "_").replace(" ", "_").replace("+", "")
-                val newSafeId = finalId
+        val topicSourceProject = originalProject
+        if (topicSourceProject != null && pendingImportedProject == null) {
+            if (topicSourceProject.id.isNotEmpty()) {
                 var updatedCount = 0
 
                 finalComponents.forEach { component ->
-                    val parts = component.topicConfig.split("/")
-                    // Expecting format: Name/ID/Item...
-                    if (parts.size >= 3) {
-                        // Check if middle part is the Old ID (Case Insensitive)
-                        if (parts[1].equals(oldId, ignoreCase = true)) {
-                            val suffix = parts.drop(2).joinToString("/")
-                            component.topicConfig = "$newSafeName/$newSafeId/$suffix"
-                            updatedCount++
-                        }
+                    val rewritten = com.example.mqttpanelcraft.utils.TopicHelper.rewriteGeneratedProjectTopic(
+                            component.topicConfig, topicSourceProject, name, finalId)
+                    if (rewritten != component.topicConfig) {
+                        component.topicConfig = rewritten
+                        updatedCount++
                     }
                 }
                 if (updatedCount > 0) {
@@ -700,11 +699,13 @@ class SetupActivity : BaseActivity() {
                         port = port,
                         username = user,
                         password = pass,
+                        clientId = (originalProject ?: pendingImportedProject)?.clientId ?: "",
                         type = selectedType,
-                        isConnected = false,
                         components = finalComponents,
                         customCode = finalCustomCode,
                         orientation = finalOrientation,
+                        createdAt = (originalProject ?: pendingImportedProject)?.createdAt ?: System.currentTimeMillis(),
+                        lastOpenedAt = (originalProject ?: pendingImportedProject)?.lastOpenedAt ?: System.currentTimeMillis(),
                         keepMqttInBackground = cbKeepMqttInBackground.isChecked
                 )
 
@@ -795,6 +796,64 @@ class SetupActivity : BaseActivity() {
     }
 
     // Helper to get Orientation String
+    private fun buildExportProjectFromForm(): Project {
+        val etProjectIdField = findViewById<TextInputEditText>(R.id.etProjectId)
+        val formId =
+                etProjectIdField.text.toString().trim().ifBlank {
+                    projectId ?: originalProject?.id ?: "temp_id"
+                }
+        val name = etName.text.toString().ifBlank { getString(R.string.project_default_untitled) }
+        val components =
+                (pendingComponents ?: originalProject?.components)
+                        ?.map { it.deepCopy() }
+                        ?.toMutableList() ?: mutableListOf()
+        val source = originalProject
+        if (source != null && pendingImportedProject == null) {
+            components.forEach { component ->
+                component.topicConfig =
+                        com.example.mqttpanelcraft.utils.TopicHelper.rewriteGeneratedProjectTopic(
+                                component.topicConfig,
+                                source,
+                                name,
+                                formId
+                        )
+            }
+        }
+        return Project(
+                id = formId,
+                name = name,
+                broker = etBroker.text.toString().ifBlank { "broker" },
+                port = etPort.text.toString().toIntOrNull() ?: 1883,
+                username = etUser.text.toString(),
+                password = etPassword.text.toString(),
+                clientId = (originalProject ?: pendingImportedProject)?.clientId ?: "",
+                type = selectedType,
+                components = components,
+                customCode = pendingCustomCode ?: originalProject?.customCode ?: "",
+                orientation = getSelectedOrientation(),
+                createdAt =
+                        (originalProject ?: pendingImportedProject)?.createdAt
+                                ?: System.currentTimeMillis(),
+                lastOpenedAt =
+                        (originalProject ?: pendingImportedProject)?.lastOpenedAt
+                                ?: System.currentTimeMillis(),
+                keepMqttInBackground = cbKeepMqttInBackground.isChecked
+        )
+    }
+
+    private fun isExportFormUnsaved(exportProject: Project): Boolean {
+        val saved = originalProject ?: return true
+        return saved.id != exportProject.id ||
+                saved.name != exportProject.name ||
+                saved.broker != exportProject.broker ||
+                saved.port != exportProject.port ||
+                saved.username != exportProject.username ||
+                saved.password != exportProject.password ||
+                saved.keepMqttInBackground != exportProject.keepMqttInBackground ||
+                saved.type != exportProject.type || saved.orientation != exportProject.orientation ||
+                saved.customCode != exportProject.customCode || saved.components != exportProject.components
+    }
+
     private fun getSelectedOrientation(): String {
         val rg = findViewById<android.widget.RadioGroup>(R.id.rgOrientation)
         return when (rg.checkedRadioButtonId) {

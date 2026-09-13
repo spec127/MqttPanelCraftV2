@@ -19,9 +19,12 @@ class WebBoxView(context: Context) : FrameLayout(context) {
 
     private val webView: WebView = WebView(context)
     private val refreshHandler = Handler(Looper.getMainLooper())
+    private var applyingContent = false
+    private var contentLoaded = false
 
     var isEditMode: Boolean = false
         set(value) {
+            if (field == value) return
             field = value
             updateInteraction()
             updateRefreshTimer()
@@ -30,36 +33,57 @@ class WebBoxView(context: Context) : FrameLayout(context) {
     // Properties
     var sourceType: String = "URL" // "URL" or "HTML"
         set(value) {
+            if (field == value) return
             field = value
-            loadContent()
+            if (!applyingContent) loadContent()
         }
         
     var urlContent: String = ""
         set(value) {
+            if (field == value) return
             field = value
-            if (sourceType == "URL") loadContent()
+            if (!applyingContent && sourceType == "URL") loadContent()
         }
         
     var htmlContent: String = ""
         set(value) {
+            if (field == value) return
             field = value
-            if (sourceType == "HTML") loadContent()
+            if (!applyingContent && sourceType == "HTML") loadContent()
         }
+
+    /** Applies a model update atomically, so unrelated canvas renders retain page state. */
+    fun applyContent(source: String, url: String, html: String) {
+        val changed = !contentLoaded || sourceType != source ||
+                (if (source == "URL") urlContent != url else htmlContent != html)
+        applyingContent = true
+        try {
+            sourceType = source
+            urlContent = url
+            htmlContent = html
+        } finally {
+            applyingContent = false
+        }
+        if (changed) loadContent()
+    }
         
     var enableInteraction: Boolean = true
         set(value) {
+            if (field == value) return
             field = value
             updateInteraction()
         }
 
     var showBorder: Boolean = false
         set(value) {
+            if (field == value) return
             field = value
             updateBorder()
         }
         
     var refreshIntervalSec: Int = 0
         set(value) {
+            if (field == value) return
             field = value
             updateRefreshTimer()
         }
@@ -96,6 +120,7 @@ class WebBoxView(context: Context) : FrameLayout(context) {
     }
 
     private fun loadContent() {
+        contentLoaded = true
         if (sourceType == "URL") {
             if (urlContent.isNotBlank()) {
                 val finalUrl = if (!urlContent.startsWith("http://") && !urlContent.startsWith("https://")) {
@@ -171,7 +196,7 @@ class WebBoxView(context: Context) : FrameLayout(context) {
     
     private fun updateRefreshTimer() {
         refreshHandler.removeCallbacks(refreshRunnable)
-        if (!isEditMode && refreshIntervalSec > 0) {
+        if (isAttachedToWindow && !isEditMode && refreshIntervalSec > 0) {
             refreshHandler.postDelayed(refreshRunnable, refreshIntervalSec * 1000L)
         }
     }

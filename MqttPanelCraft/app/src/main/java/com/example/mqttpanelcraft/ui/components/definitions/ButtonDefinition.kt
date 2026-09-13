@@ -597,6 +597,7 @@ object ButtonDefinition : IComponentDefinition {
                     if (event.action == MotionEvent.ACTION_UP) {
                         when (mode) {
                             "tap" -> sendMqtt(data.topicConfig, mainPayload)
+                            "hold" -> sendMqtt(data.topicConfig, releasePayload)
                         }
                     }
                     return@setOnTouchListener true

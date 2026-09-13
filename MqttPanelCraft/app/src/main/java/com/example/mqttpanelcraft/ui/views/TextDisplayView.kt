@@ -382,7 +382,7 @@ class TextDisplayView @JvmOverloads constructor(
 
     fun appendText(text: String, maxLines: Int) {
         val currentText = textView.text.toString()
-        val newText = if (currentText.isEmpty() || currentText == "Waiting for data..." || currentText == "loading..." || currentText == "loading ...") text else "$currentText\n$text"
+        val newText = if (com.example.mqttpanelcraft.ui.components.definitions.isCanvasPlaceholder(currentText)) text else "$currentText\n$text"
         
         // Truncate if exceeds maxLines
         val lines = newText.split("\n")

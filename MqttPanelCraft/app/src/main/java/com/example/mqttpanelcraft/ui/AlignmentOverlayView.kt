@@ -2,7 +2,6 @@ package com.example.mqttpanelcraft.ui
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.util.AttributeSet
@@ -13,7 +12,7 @@ class AlignmentOverlayView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val gridPaint = Paint().apply {
-        color = Color.parseColor("#808080") // Darker Grey for better visibility
+        color = context.getColor(com.example.mqttpanelcraft.R.color.canvas_grid_dot)
         strokeWidth = 2f
         style = Paint.Style.STROKE
     }
@@ -31,7 +30,7 @@ class AlignmentOverlayView @JvmOverloads constructor(
 
     // Alignment Guide State
     private val paint = Paint().apply {
-        color = Color.BLUE 
+        color = context.getColor(com.example.mqttpanelcraft.R.color.canvas_alignment_guide)
         style = Paint.Style.STROKE
         strokeWidth = 3f * density 
         pathEffect = DashPathEffect(floatArrayOf(10f, 10f), 0f)
@@ -67,7 +66,7 @@ class AlignmentOverlayView @JvmOverloads constructor(
              var x = 0f
              // Draw Grid Points instead of Lines (User Request #3)
              gridPaint.style = Paint.Style.FILL
-             gridPaint.strokeWidth = 5f // Larger size for dot visibility
+             gridPaint.strokeWidth = 1.5f * density
              
              while (x < width) {
                  var y = 0f

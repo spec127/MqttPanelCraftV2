@@ -57,13 +57,8 @@ object TextDisplayDefinition : IComponentDefinition {
         "display_mode" to "SINGLE",
         "display_lines" to "1",
         "scrollable" to "false",
-        "default_text" to "loading ..."
+        "default_text" to CANVAS_LOADING_TEXT
     )
-
-    override fun getDefaultProps(context: Context): Map<String, String> =
-        getDefaultProps().toMutableMap().apply {
-            put("default_text", context.getString(R.string.default_received_text))
-        }
 
     override fun createView(context: Context, isEditMode: Boolean): View {
         val container = ComponentContainer.createEndpoint(context, type, isEditMode, group)
@@ -106,8 +101,8 @@ object TextDisplayDefinition : IComponentDefinition {
         tvView.isScrollable = if (isLog) (data.props["scrollable"] != "false") else false
         
         // Display Mode defaults
-        if (tvView.textView.text.isEmpty() || tvView.textView.text == "Waiting for data..." || tvView.textView.text == "loading..." || tvView.textView.text == "loading ...") {
-            val defText = data.props["default_text"] ?: "loading ..."
+        if (isCanvasPlaceholder(tvView.textView.text.toString())) {
+            val defText = canvasDisplayText(data.props["default_text"])
             tvView.textView.text = if (!isLog) defText.replace("\n", " ").replace("\r", "") else defText
         }
     }
@@ -331,4 +326,28 @@ object TextDisplayDefinition : IComponentDefinition {
             tvView.prefixLength = prefixStr.length
         }
     }
+
+    private fun canvasDisplayText(raw: String?): String {
+        val text = raw?.trim().orEmpty()
+        return if (isCanvasPlaceholder(text)) CANVAS_LOADING_TEXT else text
+    }
+}
+
+internal const val CANVAS_LOADING_TEXT = "loading"
+
+internal fun isCanvasPlaceholder(text: String?): Boolean {
+    val normalized = text
+        ?.trim()
+        ?.replace('…', '.')
+        ?.replace("...", ".")
+        ?.replace("..", ".")
+        ?.trimEnd('.')
+        ?.trim()
+        ?.lowercase()
+        .orEmpty()
+    return normalized.isEmpty() ||
+        normalized == "loading" ||
+        normalized == "waiting for data" ||
+        normalized == "等待資料" ||
+        normalized == "等待数据"
 }

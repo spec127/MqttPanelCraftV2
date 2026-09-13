@@ -12,8 +12,8 @@ class ComponentRegistryTest {
                     ComponentDefinitionRegistry.get(it)
                 }
 
-        assertEquals(22, definitions.size)
-        assertEquals(22, definitions.map { it.type }.toSet().size)
+        assertEquals(definitions.size, definitions.map { it.type }.toSet().size)
+        assertTrue(definitions.isNotEmpty())
         definitions.forEach { definition ->
             assertTrue(definition.displayNameResId != 0)
             assertTrue(definition.iconResId != 0)

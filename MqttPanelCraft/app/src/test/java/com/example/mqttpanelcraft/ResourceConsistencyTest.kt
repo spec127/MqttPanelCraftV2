@@ -84,7 +84,7 @@ class ResourceConsistencyTest {
     @Test
     fun `layouts do not add unapproved visible literal text`() {
         val allowed = setOf(
-            "", " ", "ON", "L", "C", "R", "prefix/", "arduino_sketch.ino",
+            "", " ", "ON", "L", "C", "R", "prefix/", "arduino_sketch.txt",
             "0", "1", "3", "100", "1883", "3000", "<html>...</html>"
         )
         val attributePattern = Regex("""android:(?:text|hint|contentDescription|label)=\"([^\"]*)\"""")
@@ -110,7 +110,7 @@ class ResourceConsistencyTest {
             ".setNegativeButton(", ".setNeutralButton("
         )
         val literal = Regex("\"([^\"]*[A-Za-z][^\"]*)\"")
-        val allowed = setOf("arduino_sketch.ino", "project_config.json")
+        val allowed = setOf("arduino_sketch.txt", "project_config.json")
         val violations = mainDir.resolve("java").walkTopDown()
             .filter { it.extension == "kt" }
             .flatMap { file ->

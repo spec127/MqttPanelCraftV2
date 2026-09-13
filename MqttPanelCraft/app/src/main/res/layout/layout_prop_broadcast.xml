@@ -36,10 +36,10 @@
         android:layout_marginBottom="6dp"/>
 
     <!-- 廣播模式切換 (TTS / 警報 / 雙重) -->
-    <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggleBroadcastMode"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="@dimen/prop_toggle_height"
         android:layout_marginBottom="8dp"
         app:singleSelection="true"
         app:selectionRequired="true"
@@ -47,7 +47,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnModeTts"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
@@ -60,7 +60,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnModeAlert"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
@@ -73,7 +73,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnModeBoth"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.App.Button.Segmented.Properties"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
@@ -123,10 +123,10 @@
             android:textColor="@color/prop_text_primary"
             android:layout_marginBottom="6dp"/>
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
+<com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleVoicePitch"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="@dimen/prop_toggle_height"
             android:layout_marginBottom="14dp"
             app:singleSelection="true"
             app:selectionRequired="true"
@@ -134,7 +134,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnVoiceLow"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -147,7 +147,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnVoiceNatural"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -160,7 +160,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnVoiceBrisk"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.App.Button.Segmented.Properties"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
@@ -183,7 +183,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etSpeechRate"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="@dimen/prop_input_height_inner"
                 android:inputType="numberDecimal"
                 android:maxLines="1"
                 android:textSize="13sp"/>

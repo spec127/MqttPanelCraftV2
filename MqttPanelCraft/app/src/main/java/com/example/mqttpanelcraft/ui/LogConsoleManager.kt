@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mqttpanelcraft.R
 import com.example.mqttpanelcraft.adapter.LogAdapter
 import com.example.mqttpanelcraft.mqtt.MqttSessionClient
+import com.example.mqttpanelcraft.utils.TopicHelper
 
 class LogConsoleManager(
     private val rootView: View
@@ -50,8 +51,7 @@ class LogConsoleManager(
         val items = ArrayList<com.example.mqttpanelcraft.model.ComponentData>()
         
         if (project != null) {
-             val safeProjName = project.name.lowercase().replace("/", "_").replace(" ", "_").replace("+", "")
-             val prefix = "$safeProjName/${project.id}/"
+             val prefix = "${TopicHelper.formatBaseTopic(project.name, project.id)}/"
              
              // 1. Add "Custom" Topic (Base Prefix)
              items.add(com.example.mqttpanelcraft.model.ComponentData(

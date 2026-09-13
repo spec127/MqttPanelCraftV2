@@ -29,6 +29,14 @@ interface IComponentDefinition {
         val iconResId: Int // e.g. R.drawable.ic_button
         val group: ComponentGroup
 
+        /**
+         * Opt-in shared payload row. Default is false on purpose: control widgets already
+         * edit command payloads in their specific property layouts. Override only when a
+         * component actually uses the generic payload field.
+         */
+        val supportsGenericPayload: Boolean
+            get() = false
+
         // 2. Appearance (Factory)
         fun createView(context: Context, isEditMode: Boolean): View
 
@@ -100,15 +108,6 @@ interface IComponentDefinition {
          * is false (free resizing).
          */
         fun isFixedAspectRatio(data: ComponentData): Boolean = false
-}
-
-/** Implemented by components that emit local trigger events without publishing MQTT directly. */
-interface LocalComponentTriggerSource {
-        fun attachLocalTrigger(
-                view: View,
-                data: ComponentData,
-                onTriggerLinked: (source: ComponentData, value: String) -> Unit
-        )
 }
 
 /**

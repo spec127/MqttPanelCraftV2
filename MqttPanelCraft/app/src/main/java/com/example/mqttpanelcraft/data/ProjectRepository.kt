@@ -83,7 +83,7 @@ object ProjectRepository {
                 val lastOpenedAt = obj.optLong("lastOpenedAt", System.currentTimeMillis())
                 val keepMqttInBackground = obj.optBoolean("keepMqttInBackground", false)
 
-                val project = Project(id, name, broker, port, user, pass, client, type, false, mutableListOf(), customCode, orientation, createdAt, lastOpenedAt, keepMqttInBackground)
+                val project = Project(id, name, broker, port, user, pass, client, type, mutableListOf(), customCode, orientation, createdAt, lastOpenedAt, keepMqttInBackground)
 
                 val compsArray = obj.optJSONArray("components")
                 if (compsArray != null) {
@@ -255,6 +255,19 @@ object ProjectRepository {
         }
     }
 
+    /** Same debounced writer as design updates, but no full-project UI notification. */
+    @Synchronized
+    fun updateRuntimeProperty(projectId: String, componentId: Int, key: String, value: String): ComponentData? {
+        val component = projects.find { it.id == projectId }?.components
+                ?.find { it.id == componentId } ?: return null
+        if (component.props[key] == value) return null
+        // Streaming images are rendered directly by ImageSensorDefinition, never persisted.
+        if (component.type == "IMAGE_SENSOR" || component.type == "IMAGE") return null
+        component.props[key] = value
+        saveProjects()
+        return component
+    }
+
     fun generateId(): String {
         val secureRandom = java.security.SecureRandom()
         val charPool = "0123456789abcdefghijklmnopqrstuvwxyz"
@@ -292,6 +305,7 @@ object ProjectRepository {
             pObj.put("broker", project.broker)
             pObj.put("port", project.port)
             pObj.put("username", project.username)
+            pObj.put("clientId", project.clientId)
             // SECURITY: Do NOT export password by default
             // pObj.put("password", project.password)
             pObj.put("type", project.type.name)
@@ -344,6 +358,7 @@ object ProjectRepository {
             val broker = pObj.optString("broker", "")
             val port = pObj.optInt("port", 1883)
             val user = pObj.optString("username", "")
+            val clientId = pObj.optString("clientId", "")
             // Password usually valid empty on import
             val typeStr = pObj.optString("type", "HOME")
             val type = try { ProjectType.valueOf(typeStr) } catch (e: Exception) { ProjectType.HOME }
@@ -357,6 +372,7 @@ object ProjectRepository {
                 port = port,
                 username = user,
                 password = "",
+                clientId = clientId,
                 type = type,
                 customCode = customCode,
                 orientation = orientation,
@@ -369,7 +385,7 @@ object ProjectRepository {
             if (compsArray != null) {
                 for (k in 0 until compsArray.length()) {
                      val cObj = compsArray.getJSONObject(k)
-                     val cId = cObj.getInt("id")
+                     val cId = cObj.optInt("id", -1)
                      val cType = cObj.getString("type")
                      val cX = cObj.getDouble("x").toFloat()
                      val cY = cObj.getDouble("y").toFloat()

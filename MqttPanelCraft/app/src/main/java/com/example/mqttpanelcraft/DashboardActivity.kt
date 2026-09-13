@@ -13,14 +13,11 @@ import com.example.mqttpanelcraft.data.ProjectRepository
 import com.example.mqttpanelcraft.databinding.ActivityDashboardBinding
 import com.example.mqttpanelcraft.utils.CrashLogger
 import com.google.android.material.switchmaterial.SwitchMaterial
-import kotlinx.coroutines.*
-import kotlinx.coroutines.launch
 
 class DashboardActivity : BaseActivity() {
 
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var projectAdapter: ProjectAdapter
-    private var isGuest = false
 
     // v85: Sorting State
     // 0: Custom, 1: Name, 2: Date, 3: Last Opened
@@ -36,8 +33,6 @@ class DashboardActivity : BaseActivity() {
 
             binding = ActivityDashboardBinding.inflate(layoutInflater)
             setContentView(binding.root)
-
-            isGuest = intent.getBooleanExtra("IS_GUEST", false)
 
             setupToolbar()
             setupDrawer()
@@ -95,6 +90,9 @@ class DashboardActivity : BaseActivity() {
                     binding.rvProjects.visibility = View.VISIBLE
                 }
             }
+            MqttRepository.connectionState.observe(this) {
+                projectAdapter.notifyDataSetChanged()
+            }
 
             // Restore Drawer State (keeps drawer open across theme recreations)
             if (savedInstanceState?.getBoolean("DRAWER_OPEN") == true) {
@@ -128,7 +126,6 @@ class DashboardActivity : BaseActivity() {
                         100
                 )
 
-        startConnectionCheck()
         updateUserBadge()
     }
 
@@ -496,58 +493,4 @@ class DashboardActivity : BaseActivity() {
         }
     }
 
-    // v38: Dashboard Connectivity Check (Request 4)
-    private var connectionJob: kotlinx.coroutines.Job? = null
-    private val dashboardScope =
-            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO)
-
-    override fun onPause() {
-        super.onPause()
-        stopConnectionCheck()
-    }
-
-    private fun startConnectionCheck() {
-        stopConnectionCheck()
-        connectionJob =
-                dashboardScope.launch {
-                    while (isActive) {
-                        checkAllProjectsConnection()
-                        kotlinx.coroutines.delay(10000) // Check every 10s
-                    }
-                }
-    }
-
-    private fun stopConnectionCheck() {
-        connectionJob?.cancel()
-        connectionJob = null
-    }
-
-    private suspend fun checkAllProjectsConnection() {
-        val currentProjects = ProjectRepository.getAllProjects() // Get fresh list
-        if (currentProjects.isEmpty()) return
-
-        val updatedList =
-                currentProjects.map { project ->
-                    val isOnline = checkBrokerConnectivity(project.broker, project.port)
-                    project.copy(isConnected = isOnline)
-                }
-
-        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-            // Re-verify existence to prevent ghosting (race condition with delete)
-            val validIds = ProjectRepository.getAllProjects().map { it.id }.toSet()
-            val validList = updatedList.filter { it.id in validIds }
-            projectAdapter.updateData(validList)
-        }
-    }
-
-    private fun checkBrokerConnectivity(broker: String, port: Int): Boolean {
-        return try {
-            java.net.Socket().use { socket ->
-                socket.connect(java.net.InetSocketAddress(broker, port), 2000) // 2s timeout
-                true
-            }
-        } catch (e: Exception) {
-            false
-        }
-    }
 }

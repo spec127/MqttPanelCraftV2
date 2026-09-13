@@ -182,4 +182,10 @@ class ComponentRenderer(
 
     // Helper to get view for behavior binding
     fun getView(id: Int): View? = viewCache[id]
+
+    /** Updates one already-rendered component without rebinding the rest of the canvas. */
+    fun updateRuntimeComponent(data: ComponentData, isEditMode: Boolean) {
+        val view = viewCache[data.id] ?: return
+        updateViewState(view, data, isEditMode, data.id == selectedComponentId)
+    }
 }

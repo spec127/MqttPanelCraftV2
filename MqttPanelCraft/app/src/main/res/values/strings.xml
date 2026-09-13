@@ -112,7 +112,6 @@
     <string name="component_label_palette">Color Palette</string>
     <string name="component_label_input">Input</string>
     <string name="component_label_scale_meter">Scale Meter</string>
-    <string name="component_label_gauge">Gauge</string>
     <string name="component_label_gauge_meter">Gauge Meter</string>
     <string name="component_label_value_display">Value Display</string>
 
@@ -204,10 +203,12 @@
     <string name="val_joystick_style_sharp">Sharp</string>
     <string name="val_joystick_style_smooth">Smooth</string>
     <string name="val_joystick_style_arrow">Arrow</string>
+    <string name="val_dpad_style_beveled">Beveled</string>
+    <string name="val_dpad_style_neon">Neon</string>
     <string name="prop_label_axis_mode">Axis Mode</string>
     <string name="val_axis_4way">4-Way</string>
-    <string name="val_axis_2way_h">2-Way Horz</string>
-    <string name="val_axis_2way_v">2-Way Vert</string>
+    <string name="val_axis_2way_h">Horizontal</string>
+    <string name="val_axis_2way_v">Vertical</string>
     <string name="prop_label_range_precision">Range &amp; Precision</string>
     <string name="prop_label_min_val">Min</string>
     <string name="prop_label_max_val">Max</string>
@@ -300,7 +301,7 @@
     <string name="prop_text_show_bg_desc">Add a color block behind text</string>
     <string name="prop_text_effect">Text Effect</string>
     <string name="default_text_content">Text</string>
-    <string name="default_received_text">Waiting for data…</string>
+    <string name="default_received_text">loading</string>
     <string name="val_text_effect_none">None</string>
     <string name="val_text_effect_neon">Neon</string>
     <string name="val_text_effect_shadow">Shadow</string>
@@ -404,6 +405,7 @@
     <string name="project_msg_add_component">Component added</string>
     <string name="project_msg_component_deleted">Component deleted</string>
     <string name="project_msg_components_loaded">Loaded %1$d components</string>
+    <string name="project_msg_import_repaired">Repaired %1$d component IDs; removed %2$d invalid links</string>
     <string name="project_msg_file_read_failed">Read failed: %1$s</string>
     <string name="project_msg_file_save_failed">Save failed: %1$s</string>
     <string name="project_msg_file_saved">Saved</string>
@@ -538,7 +540,7 @@
     <string name="broadcast_mode_pure_tts">Speech Only</string>
     <string name="broadcast_mode_pure_alert">Alert Only</string>
     <string name="broadcast_mode_alert_tts">Alert + Speech</string>
-    <string name="broadcast_waiting_text">Waiting for text...</string>
+    <string name="broadcast_waiting_text">loading</string>
     <string name="broadcast_no_linked">No linked targets</string>
 
     <!-- Graphic (Shape) Component Properties -->
@@ -599,23 +601,6 @@
     <string name="status_connected">Connected</string>
     <string name="content_desc_add_keyword">Add keyword</string>
     <string name="content_desc_clear_logs">Clear logs</string>
-    <string name="auth_logo">Logo</string>
-    <string name="auth_welcome_back">Welcome Back</string>
-    <string name="auth_email">Email</string>
-    <string name="auth_password">Password</string>
-    <string name="auth_login">Login</string>
-    <string name="auth_google_sign_in">Sign in with Google</string>
-    <string name="auth_guest">Try as Guest</string>
-    <string name="auth_no_account">Don\'t have an account?</string>
-    <string name="auth_register">Register</string>
-    <string name="auth_create_account">Create Account</string>
-    <string name="auth_account_name">Account Name</string>
-    <string name="auth_confirm_password">Confirm Password</string>
-    <string name="auth_verification_code">Code</string>
-    <string name="auth_send">Send</string>
-    <string name="auth_code_sent">Verification code sent (demo)</string>
-    <string name="auth_registration_success">Registration successful (demo)</string>
-    <string name="auth_google_demo">Google sign-in (demo)</string>
     <string name="setup_mode_panel">Panel</string>
     <string name="setup_mode_webview">Web View</string>
     <string name="graphic_select_local_image">Choose Local Image</string>
@@ -683,7 +668,6 @@
     <string name="crash_logs_cleared">Logs cleared</string>
     <string name="crash_logs_error">Error reading logs: %1$s</string>
     <string name="common_btn_clear">Clear</string>
-    <string name="auth_resend_countdown">%1$ds</string>
     <string name="common_btn_ok">OK</string>
     <string name="project_id_updated">Project ID updated</string>
     <string name="status_format">Status: %1$s</string>
@@ -727,10 +711,6 @@
     <string name="crash_log_write_failed">Could not write to the log file.\nOriginal error: %1$s</string>
     <string name="crash_dashboard_init_failed">Dashboard initialization failed</string>
     <string name="crash_delete_failed">Delete failed</string>
-    <string name="crash_login_failed">Login failed</string>
-    <string name="crash_guest_login_failed">Guest login failed</string>
-    <string name="crash_google_sign_in_failed">Google sign-in failed</string>
-    <string name="crash_register_navigation_failed">Could not open registration</string>
     <string name="mqtt_notification_active">MQTT connection active</string>
     <string name="mqtt_notification_channel">MQTT service</string>
     <string name="mqtt_log_already_connected">Already connected to %1$s:%2$d; skipped a redundant reset.</string>
@@ -758,4 +738,6 @@
     <string name="mqtt_notification_reconnecting">Reconnecting…</string>
     <string name="mqtt_notification_stop">Stop MQTT</string>
     <string name="mqtt_notification_permission_denied">Notifications are disabled. Android may show the MQTT service only in Active apps.</string>
+    <string name="setup_error_id_exists">This project ID is already in use. Generate a new ID.</string>
+    <string name="setup_msg_arduino_export_unsaved">Export uses the current form. Save the project to keep these settings.</string>
 </resources>
