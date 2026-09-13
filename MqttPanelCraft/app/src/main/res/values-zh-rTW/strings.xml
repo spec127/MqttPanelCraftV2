@@ -22,6 +22,8 @@
     <string name="drawer_item_about">關於</string>
     <string name="drawer_item_dark_mode">深色模式</string>
     <string name="drawer_item_disable_ads">停用廣告</string>
+    <string name="drawer_item_upgrade_premium">升級進階版</string>
+    <string name="drawer_item_premium_active">進階版</string>
     <string name="drawer_item_language">語言</string>
     <string name="lang_english">English</string>
     <string name="lang_traditional_chinese">繁體中文</string>
@@ -680,8 +682,17 @@
     <string name="premium_already">目前已是進階版</string>
     <string name="premium_no_purchase">找不到購買紀錄</string>
     <string name="premium_upgrade_title">升級至進階版</string>
-    <string name="premium_upgrade_message">解鎖檔案匯入並移除廣告。\n\n展示功能：點擊購買即可啟用。</string>
+    <string name="premium_upgrade_message">不限專案數量，並關閉所有廣告。\n一次買斷，同一 Google Play 帳號即可還原。</string>
     <string name="premium_buy">購買（US$1.99）</string>
+    <string name="premium_billing_unavailable">此裝置目前無法使用付款。請稍後再試。</string>
+    <string name="premium_product_unavailable">進階版尚未上架，Play 商品可能仍未發布。</string>
+    <string name="premium_purchase_pending">付款尚未完成，完成後才會解鎖進階版。</string>
+    <string name="developer_mode_title">開發者模式</string>
+    <string name="developer_mode_message">僅 debug 安裝有效。可在本機略過廣告與免費專案上限。這不是 Play 購買。</string>
+    <string name="developer_mode_enable_skip">略過廣告</string>
+    <string name="developer_mode_disable_skip">顯示廣告</string>
+    <string name="developer_mode_enabled">此 debug 安裝已略過廣告</string>
+    <string name="developer_mode_disabled">此 debug 安裝已恢復廣告</string>
     <string name="console_enter_topic">請輸入要發送的 Topic</string>
     <string name="topic_copied">Topic 已複製</string>
     <string name="setup_connecting">連線中…</string>

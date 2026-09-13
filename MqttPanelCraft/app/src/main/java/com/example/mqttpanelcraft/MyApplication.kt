@@ -28,6 +28,7 @@ class MyApplication : Application() {
 
         // Init Data Layer
         com.example.mqttpanelcraft.data.ProjectRepository.initialize(this)
+        com.example.mqttpanelcraft.utils.PlayBillingManager.initialize(this)
 
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             handleUncaughtException(thread, throwable)

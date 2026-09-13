@@ -22,6 +22,8 @@
     <string name="drawer_item_about">About</string>
     <string name="drawer_item_dark_mode">Dark Mode</string>
     <string name="drawer_item_disable_ads">Disable Ads</string>
+    <string name="drawer_item_upgrade_premium">Upgrade to Premium</string>
+    <string name="drawer_item_premium_active">Premium</string>
     <string name="drawer_item_language">Language</string>
     <string name="lang_english">English</string>
     <string name="lang_traditional_chinese">Traditional Chinese</string>
@@ -684,8 +686,17 @@
     <string name="premium_already">Already using Premium</string>
     <string name="premium_no_purchase">No purchase found</string>
     <string name="premium_upgrade_title">Upgrade to Premium</string>
-    <string name="premium_upgrade_message">Unlock file import and remove ads.\n\nDemo: tap Buy to enable.</string>
+    <string name="premium_upgrade_message">Unlimited projects and no ads.\nOne-time purchase, restored with the same Google Play account.</string>
     <string name="premium_buy">Buy ($1.99)</string>
+    <string name="premium_billing_unavailable">Billing is unavailable on this device. Try again later.</string>
+    <string name="premium_product_unavailable">Premium is not available yet. The Play product may still be unpublished.</string>
+    <string name="premium_purchase_pending">Payment is still pending. Premium unlocks after it completes.</string>
+    <string name="developer_mode_title">Developer mode</string>
+    <string name="developer_mode_message">Debug builds only. Skip ads and the free project limit on this device. This is not a Play purchase.</string>
+    <string name="developer_mode_enable_skip">Skip ads</string>
+    <string name="developer_mode_disable_skip">Show ads</string>
+    <string name="developer_mode_enabled">Ads skipped on this debug build</string>
+    <string name="developer_mode_disabled">Ads restored on this debug build</string>
     <string name="console_enter_topic">Enter a topic to publish</string>
     <string name="topic_copied">Topic copied</string>
     <string name="setup_connecting">Connecting…</string>

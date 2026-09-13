@@ -18,11 +18,12 @@ android {
     }
 
     defaultConfig {
+        // Play receipts bind to this id. Change it once, before the first Play Console upload.
         applicationId = "com.example.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
-        versionCode = 213
-        versionName = "0.15.2"
+        versionCode = 214
+        versionName = "0.15.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -55,4 +56,5 @@ dependencies {
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation(libs.play.services.ads)
+    implementation(libs.billing)
 }

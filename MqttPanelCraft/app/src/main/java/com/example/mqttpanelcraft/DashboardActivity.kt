@@ -126,6 +126,17 @@ class DashboardActivity : BaseActivity() {
                         100
                 )
 
+        com.example.mqttpanelcraft.utils.PlayBillingManager.refreshPurchases(this) {
+            if (!isFinishing && !isDestroyed) {
+                updateUserBadge()
+                updatePremiumMenuTitle()
+                com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(
+                        this,
+                        binding.bannerAdContainer,
+                        binding.fabAddProject
+                )
+            }
+        }
         updateUserBadge()
     }
 
@@ -196,23 +207,8 @@ class DashboardActivity : BaseActivity() {
             com.example.mqttpanelcraft.utils.ThemeManager.setTheme(this, isChecked)
         }
 
-        // 2. Ads Switch
-        val adsItem = menu.findItem(R.id.nav_ads)
-        val switchAds = adsItem.actionView?.findViewById<SwitchMaterial>(R.id.drawer_switch)
-
-        switchAds?.isChecked = com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)
-        switchAds?.setOnCheckedChangeListener { _, isChecked ->
-            com.example.mqttpanelcraft.utils.PremiumManager.setPremium(this, isChecked)
-            // Refresh banner immediately if possible
-            com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(
-                    this,
-                    binding.bannerAdContainer,
-                    binding.fabAddProject
-            )
-            updateUserBadge()
-        }
-
-        updateUserBadge() // Initial state
+        updatePremiumMenuTitle()
+        updateUserBadge()
 
         binding.navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -220,6 +216,19 @@ class DashboardActivity : BaseActivity() {
                     startActivity(Intent(this, AboutActivity::class.java))
                 }
                 R.id.nav_language -> showLanguageDialog()
+                R.id.nav_premium -> {
+                    com.example.mqttpanelcraft.utils.PremiumManager.showPremiumDialog(this) { success ->
+                        updateUserBadge()
+                        updatePremiumMenuTitle()
+                        if (success) {
+                            com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(
+                                    this,
+                                    binding.bannerAdContainer,
+                                    binding.fabAddProject
+                            )
+                        }
+                    }
+                }
             }
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             true
@@ -231,6 +240,16 @@ class DashboardActivity : BaseActivity() {
         // LinearLayout wrapper)
         // findViewById looks recursively, so it should find it.
         btnExit?.setOnClickListener { finishAffinity() }
+    }
+
+    private fun updatePremiumMenuTitle() {
+        val premiumItem = binding.navigationView.menu.findItem(R.id.nav_premium) ?: return
+        premiumItem.title =
+                if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
+                    getString(R.string.drawer_item_premium_active)
+                } else {
+                    getString(R.string.drawer_item_upgrade_premium)
+                }
     }
 
     private fun setupSettingsUI() {

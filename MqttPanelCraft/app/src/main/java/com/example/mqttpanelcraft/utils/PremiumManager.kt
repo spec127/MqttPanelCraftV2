@@ -1,58 +1,66 @@
 package com.example.mqttpanelcraft.utils
 
+import android.app.Activity
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import com.example.mqttpanelcraft.R
 
 object PremiumManager {
     private const val PREFS_NAME = "AppSettings"
-    // We map premium status to the legacy "ads_disabled" key to maintain current behavior,
-    // as the user mentioned they are currently using SP to simulate it.
-    private const val KEY_PREMIUM_STATUS = "ads_disabled"
+    private const val BILLING_PREFS = "PlayBilling"
+    private const val KEY_PREMIUM_STATUS = "play_premium_owned"
+    private const val KEY_DEV_SKIP_ADS = "dev_skip_ads"
 
-    /**
-     * Checks if the user has Premium status.
-     * This is the single source of truth for ad display logic.
-     */
-    fun isPremium(context: Context): Boolean {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    fun isPremium(context: Context): Boolean =
+        isEntitled(hasPlayEntitlement(context), isDevSkipAds(context))
+
+    fun hasPlayEntitlement(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(BILLING_PREFS, Context.MODE_PRIVATE)
         return prefs.getBoolean(KEY_PREMIUM_STATUS, false)
     }
 
-    /**
-     * Sets the Premium status.
-     * To be called when a purchase is successful or for debugging/simulation.
-     */
-    fun setPremium(context: Context, isPremium: Boolean) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(KEY_PREMIUM_STATUS, isPremium).apply()
-        
-        // Notify AdManager to update its state if necessary (e.g. hide existing banners)
+    internal fun isEntitled(playOwned: Boolean, debugSkip: Boolean): Boolean =
+        playOwned || debugSkip
+
+    fun applyPlayEntitlement(context: Context, owned: Boolean) {
+        val prefs = context.getSharedPreferences(BILLING_PREFS, Context.MODE_PRIVATE)
+        prefs.edit().putBoolean(KEY_PREMIUM_STATUS, owned).apply()
         AdManager.refreshAdState(context)
     }
 
-    /**
-     * Shows a dialog to simulate Premium purchase.
-     */
+    fun isDebuggable(context: Context): Boolean =
+        context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
+
+    fun isDevSkipAds(context: Context): Boolean {
+        if (!isDebuggable(context)) return false
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getBoolean(KEY_DEV_SKIP_ADS, false)
+    }
+
+    fun setDevSkipAds(context: Context, enabled: Boolean) {
+        if (!isDebuggable(context)) return
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putBoolean(KEY_DEV_SKIP_ADS, enabled).apply()
+        AdManager.refreshAdState(context)
+    }
+
     fun showPremiumDialog(context: Context, callback: (Boolean) -> Unit) {
+        val activity = context as? Activity
         androidx.appcompat.app.AlertDialog.Builder(context)
             .setTitle(R.string.premium_upgrade_title)
             .setMessage(R.string.premium_upgrade_message)
             .setPositiveButton(R.string.premium_buy) { _, _ ->
-                setPremium(context, true)
-                android.widget.Toast.makeText(context, R.string.premium_unlocked, android.widget.Toast.LENGTH_SHORT).show()
-                callback(true)
+                if (activity != null) {
+                    PlayBillingManager.launchPurchase(activity, callback)
+                } else {
+                    callback(false)
+                }
             }
             .setNegativeButton(R.string.common_btn_cancel) { _, _ ->
                 callback(false)
             }
             .setNeutralButton(R.string.premium_restore) { _, _ ->
-                 // Simulation: Check if already true? Or just re-enable
-                 if (isPremium(context)) {
-                     android.widget.Toast.makeText(context, R.string.premium_already, android.widget.Toast.LENGTH_SHORT).show()
-                     callback(true)
-                 } else {
-                     android.widget.Toast.makeText(context, R.string.premium_no_purchase, android.widget.Toast.LENGTH_SHORT).show()
-                 }
+                PlayBillingManager.restorePurchases(context, callback)
             }
             .show()
     }

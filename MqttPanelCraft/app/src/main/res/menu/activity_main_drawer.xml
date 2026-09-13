@@ -7,11 +7,9 @@
         app:actionLayout="@layout/item_drawer_switch"
         xmlns:app="http://schemas.android.com/apk/res-auto"/>
     <item
-        android:id="@+id/nav_ads"
+        android:id="@+id/nav_premium"
         android:icon="@drawable/ic_ads_off"
-        android:title="@string/drawer_item_disable_ads"
-        app:actionLayout="@layout/item_drawer_switch"
-        xmlns:app="http://schemas.android.com/apk/res-auto"/>
+        android:title="@string/drawer_item_upgrade_premium" />
     <item
         android:id="@+id/nav_language"
         android:icon="@drawable/ic_globe" 

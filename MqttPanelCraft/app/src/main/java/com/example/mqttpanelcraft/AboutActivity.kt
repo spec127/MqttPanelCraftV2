@@ -6,12 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.SystemClock
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import com.example.mqttpanelcraft.utils.PremiumManager
 import java.io.File
 
 class AboutActivity : BaseActivity() {
+
+    private var versionTapCount = 0
+    private var lastVersionTapAt = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +56,9 @@ class AboutActivity : BaseActivity() {
             e.printStackTrace()
             tvVersion.text = getString(R.string.version_unknown)
         }
+        tvVersion.setOnClickListener {
+            onVersionTapped()
+        }
         tvVersion.setOnLongClickListener {
             showCrashLogs()
             true
@@ -87,6 +95,34 @@ class AboutActivity : BaseActivity() {
     }
     
     // License Dialog replaced by Google OSS Activity
+
+    private fun onVersionTapped() {
+        if (!PremiumManager.isDebuggable(this)) return
+        val now = SystemClock.uptimeMillis()
+        if (now - lastVersionTapAt > 1500L) versionTapCount = 0
+        lastVersionTapAt = now
+        versionTapCount++
+        if (versionTapCount >= 7) {
+            versionTapCount = 0
+            showDeveloperModeDialog()
+        }
+    }
+
+    private fun showDeveloperModeDialog() {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.developer_mode_title)
+            .setMessage(R.string.developer_mode_message)
+            .setPositiveButton(R.string.developer_mode_enable_skip) { _, _ ->
+                PremiumManager.setDevSkipAds(this, true)
+                Toast.makeText(this, R.string.developer_mode_enabled, Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(R.string.developer_mode_disable_skip) { _, _ ->
+                PremiumManager.setDevSkipAds(this, false)
+                Toast.makeText(this, R.string.developer_mode_disabled, Toast.LENGTH_SHORT).show()
+            }
+            .setNeutralButton(R.string.common_btn_close, null)
+            .show()
+    }
 
     private fun showPrivacyDialog() {
         val privacyText = try {

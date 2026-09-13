@@ -45,9 +45,11 @@ object AdManager {
         }
     }
     
-    // Deprecated: Use PremiumManager directly if possible. keeping for easy refactor.
+    // Deprecated no-op: premium is Play-owned or debug developer skip, not a local ads toggle.
     fun setDisabled(disabled: Boolean, context: android.content.Context) {
-        PremiumManager.setPremium(context, disabled)
+        if (PremiumManager.isDebuggable(context)) {
+            PremiumManager.setDevSkipAds(context, disabled)
+        }
     }
 
     // --- Banner Ads ---
