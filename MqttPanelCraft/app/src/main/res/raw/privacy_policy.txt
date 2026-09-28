@@ -1,54 +1,26 @@
 PRIVACY POLICY
-
-Effective Date: 2026-09-13
+Effective date: 2026-09-20
 App: MqttPanelCraft
-Developer / contact: Spec127 / niceboat919@gmail.com
+Developer and privacy contact: Spec127 / niceboat919@gmail.com
 
-1. Introduction
-This Privacy Policy explains how MqttPanelCraft (“we”, “our”, or “the App”) handles information. We do not operate our own backend server for this App. Most project data stays on your device or is sent only to the MQTT broker you configure.
+Local data and connections
+We do not operate an account or project-storage backend. Projects, broker addresses, credentials, topics, layouts, chosen images, web code and received values are stored on your device. MQTT messages go directly to the broker you configure. A web component may load a third-party site, whose operator can receive network and browser data under its own policy. Local tutorial messages stay in the local simulator.
 
-2. What we do not collect ourselves
-We do not run an account system for this App. We do not receive your MQTT broker password or MQTT payloads on our own servers, because we do not operate such servers.
+This version uses cleartext MQTT connections, not an implemented TLS connection mode. Use trusted networks or an independently secured tunnel; do not send secrets over public test brokers. Brokers and websites have their own security, retention and deletion practices.
 
-3. Information processed on your device
-- Project settings you enter (broker host, port, username, password, topics, panel layout, optional background images) are stored locally on the device, typically as app-private files.
-- Optional crash logs may be written to the App’s private external files area. They are shown or copied only if you open them from About; they are not automatically uploaded by us.
-- Premium entitlement cache may be stored locally after Google Play confirms a purchase.
+Advertising and privacy choices
+The free app uses Google Mobile Ads (AdMob) and the User Messaging Platform. Depending on settings and consent, Google may process IP-derived approximate location, device/app identifiers, diagnostics and advertising interactions. Non-personalized ads do not mean no data processing. See https://policies.google.com/privacy and https://policies.google.com/technologies/ads.
+An age band (not a date of birth) is stored locally to apply advertising restrictions. Unknown age does not permit ad requests. Under-18 settings use conservative restricted, non-personalized requests. Where required, the consent form and About > Advertising privacy options let you manage choices. Ads are not requested when the app cannot establish the required permission. The app is designed primarily for users aged 15 and above; age handling is not parental consent or proof of legal eligibility.
 
-4. Third-party services that may collect data
-- Google Mobile Ads (AdMob): may collect advertising identifiers, device and app information, and ad interaction data to show ads. See Google’s privacy policy for Ads.
-- Google Play Billing: processes one-time Premium purchases. Google handles payment details. We receive purchase/entitlement status through Play Billing APIs, not your card numbers.
-Buying Premium removes ad display. The Ads SDK may still be present in the app; if ads are not shown, AdMob collection for ad serving should be reduced, but Google Play services on the device may still operate under Google’s policies.
+Purchases
+Google Play handles payment details; we do not receive payment-card numbers. The app processes signed purchase information, entitlement status and tokens for verification and acknowledgement. Pending acknowledgement work and verified entitlement are kept locally and excluded from Android backup. Reopening the app while online reconciles purchases. Premium removes ads and save waits; Google Play may still process purchase data. Google services follow their own policies.
 
-5. Permissions (aligned with the current Manifest)
-- INTERNET: MQTT connections and ads/billing network calls
-- ACCESS_NETWORK_STATE: check connectivity
-- READ_EXTERNAL_STORAGE / READ_MEDIA_IMAGES: optional panel background images
-- WRITE_EXTERNAL_STORAGE (older Android only): legacy storage access where required
-- FOREGROUND_SERVICE / FOREGROUND_SERVICE_CONNECTED_DEVICE: keep an MQTT session alive with a foreground notification
-- CHANGE_NETWORK_STATE: network-related operations used by the App
-- POST_NOTIFICATIONS: show connection/session notifications where required by the system
+Retention, backups and deletion
+Local project data remains until you delete it, clear app storage or uninstall. Android backup/device transfer may include projects and credentials, so treat backups and exported JSON as sensitive. Deleting the app does not delete copies you exported, Google purchase records or data held by your broker or websites. Use the relevant provider's controls for that data.
+Local crash reports may contain diagnostic text and are not automatically sent to us. You can inspect, clear or voluntarily share them from About; remove credentials and payloads before sharing.
 
-6. MQTT data and cleartext traffic
-MQTT configuration and payloads are processed on your device or sent directly to the broker you choose. We cannot read that traffic on our servers. The App may allow non-TLS (cleartext) MQTT for local/hobby brokers. For internet-facing brokers, use TLS and strong credentials whenever possible.
+Permissions
+Internet/network access supports MQTT, web content, ads and billing. Selected-image/storage permissions support imported assets. Foreground-service and notification permissions support the optional persistent MQTT session. Advertising consent is separate from Android permissions.
 
-7. Android backup
-Android Auto Backup / device transfer may back up some app data. Premium purchase flags are excluded from backup. Project files that contain broker credentials may still be included in system backup unless you clear app data or uninstall. Treat device backups as sensitive.
-
-8. Children
-This App is not directed to children under 13 (or under 16 in regions that require a higher age). Do not use it to collect information from children.
-
-9. Your choices
-- Delete local data by clearing app storage or uninstalling the App.
-- Reset your advertising ID in system settings.
-- Restore or manage Play purchases in Google Play.
-- Contact niceboat919@gmail.com for privacy questions. Because we do not host your MQTT project data, we generally cannot remotely delete content that exists only on your device.
-
-10. International users
-Ads and Play Billing are provided by Google and may involve processing outside your country under Google’s terms.
-
-11. Changes
-We may update this policy. The effective date above will change when we do. Please review this screen periodically. Before Play Store publication, the same policy should also be hosted at a public URL entered in Play Console.
-
-12. Contact
-niceboat919@gmail.com
+Requests and changes
+Contact niceboat919@gmail.com for access, correction or deletion questions regarding information you send to us. We cannot remotely erase projects held only on your device. Google processing may occur outside your country; applicable rights depend on your location. This notice does not limit statutory privacy or consumer rights. Updates change the effective date. The published store policy must match this notice.

@@ -1,0 +1,11 @@
+<resources>
+    <string name="billing_loading">正在获取 Google Play 价格…</string>
+    <string name="billing_offer_message">Premium 一次性购买：%1$s。移除广告与保存等待，非订阅制。可用相同 Google Play 账号恢复。</string>
+    <string name="ads_age_title">选择年龄区间，以应用广告隐私设置</string>
+    <string name="ads_age_under13">未满 13 岁</string>
+    <string name="ads_age_teen">13–17 岁</string>
+    <string name="ads_age_adult">18 岁以上</string>
+    <string name="ads_privacy_options">广告隐私选项</string>
+    <string name="save_choice">等待 10 秒后继续，或自行选择观看奖励广告。取消广告不会丢弃项目内容。</string>
+    <string name="save_watch_ad">观看广告</string>
+</resources>

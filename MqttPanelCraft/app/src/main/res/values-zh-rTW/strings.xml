@@ -247,7 +247,7 @@
     <string name="project_console_title">MQTT/系統日誌</string>
     <string name="project_hint_payload">訊息 (Payload)</string>
     <string name="project_log_mqtt_status">MQTT 狀態: %1$s</string>
-    <string name="msg_invalid_topic">字元不合法！請使用 (a-z, A-Z, 0-9, _)</string>
+    <string name="msg_invalid_topic">請輸入單行 Topic（最多 65535 UTF-8 位元組），不可包含空字元。</string>
 
     <!-- Common Messages & Dialogs -->
     <string name="msg_limit_reached">免費版限制為 1 個專案。</string>

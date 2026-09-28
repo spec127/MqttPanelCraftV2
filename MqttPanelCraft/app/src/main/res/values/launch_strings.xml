@@ -1,0 +1,11 @@
+<resources>
+    <string name="billing_loading">Loading Google Play price…</string>
+    <string name="billing_offer_message">One-time Premium purchase: %1$s. Removes advertising and save waits. Not a subscription. Restore with the same Google Play account.</string>
+    <string name="ads_age_title">Choose your age range for advertising privacy</string>
+    <string name="ads_age_under13">Under 13</string>
+    <string name="ads_age_teen">13–17</string>
+    <string name="ads_age_adult">18 or older</string>
+    <string name="ads_privacy_options">Advertising privacy options</string>
+    <string name="save_choice">Continue after 10 seconds, or choose to watch a rewarded ad. Canceling an ad does not discard your project.</string>
+    <string name="save_watch_ad">Watch an ad</string>
+</resources>

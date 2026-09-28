@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
     <exclude domain="sharedpref" path="PlayBilling.xml"/>
+    <exclude domain="database" path="androidx.work.workdb"/>
+    <exclude domain="database" path="androidx.work.workdb-wal"/>
+    <exclude domain="database" path="androidx.work.workdb-shm"/>
 </full-backup-content>

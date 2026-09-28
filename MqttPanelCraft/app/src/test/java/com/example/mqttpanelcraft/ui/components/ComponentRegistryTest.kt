@@ -20,5 +20,13 @@ class ComponentRegistryTest {
             assertTrue(definition.propertiesLayoutId != 0)
             assertTrue(definition.getDefaultProps().keys.none(String::isBlank))
         }
+        assertEquals(
+            false,
+            ComponentDefinitionRegistry.get("CLOCK")?.showInLibrary
+        )
+        assertEquals(
+            true,
+            ComponentDefinitionRegistry.get("CALENDAR")?.showInLibrary
+        )
     }
 }

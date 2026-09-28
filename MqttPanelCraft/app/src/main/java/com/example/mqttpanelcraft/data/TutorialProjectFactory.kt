@@ -4,100 +4,68 @@ import android.content.Context
 import com.example.mqttpanelcraft.model.ComponentData
 import com.example.mqttpanelcraft.model.Project
 import com.example.mqttpanelcraft.model.ProjectType
+import com.example.mqttpanelcraft.tutorial.*
 import com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry
 import com.example.mqttpanelcraft.utils.DemoBroker
 
 object TutorialProjectFactory {
-    private const val BASE_NAME = "Tutorial_Local"
-
-    fun findTutorialProject(): Project? =
-        ProjectRepository.getAllProjects().firstOrNull { DemoBroker.isLocal(it.broker) }
-
     fun ensureTutorialProject(context: Context): Project {
-        findTutorialProject()?.let { existing ->
-            resetGuidedLayout(context, existing)
-            return ProjectRepository.getProjectById(existing.id) ?: existing
+        TutorialSessionStore.currentProjectId(context)?.let { id ->
+            ProjectRepository.getProjectById(id)?.takeIf { DemoBroker.isLocal(it.broker) }?.let { return it }
         }
+        return newTutorialProject(context)
+    }
+    fun newTutorialProject(context: Context): Project {
         val project = create(context)
         ProjectRepository.addProject(project)
-        return ProjectRepository.getProjectById(project.id) ?: project
+        return project
     }
-
     fun create(context: Context): Project {
         val id = ProjectRepository.generateId()
-        val name = uniqueName()
-        return Project(
-            id = id,
-            name = name,
-            broker = DemoBroker.HOST,
-            port = DemoBroker.PORT,
-            type = ProjectType.HOME,
-            components = guidedComponents(context).toMutableList(),
-            keepMqttInBackground = false
-        )
+        var name = "Tutorial_Local"
+        var suffix = 2
+        while (ProjectRepository.isProjectNameTaken(name)) { name = "Tutorial_Local${suffix++}" }
+        val project = Project(id = id, name = name, broker = DemoBroker.HOST, port = DemoBroker.PORT,
+            type = ProjectType.HOME, components = mutableListOf(), keepMqttInBackground = false)
+        val session = TutorialSession(id)
+        listOf("text", "graphic", "led", "receiver").forEach { addRole(context, project, session, it) }
+        TutorialSessionStore.save(context, session)
+        return project
     }
-
-    private fun resetGuidedLayout(context: Context, project: Project) {
-        project.components.clear()
-        project.components.addAll(guidedComponents(context))
-        ProjectRepository.updateProject(project)
+    fun topic(session: TutorialSession, numeric: Boolean) = "tutorial/${session.projectId}/" + if (numeric) "value" else "light"
+    fun type(role: String): String = when (role) {
+        "receiver" -> "TEXT_DISPLAY"
+        "meter" -> "SCALE_METER"
+        else -> role.uppercase()
     }
-
-    private fun guidedComponents(context: Context): List<ComponentData> {
+    fun addRole(context: Context, project: Project, session: TutorialSession, role: String): ComponentData {
+        project.components.firstOrNull { it.id == session.roles[role] }?.let { return it }
+        val def = requireNotNull(ComponentDefinitionRegistry.get(type(role)))
         val density = context.resources.displayMetrics.density
-        fun dp(value: Int) = (value * density).toInt()
-        val frameW = dp(300)
-        val frameH = dp(250)
-        val gap = dp(20)
-        val originX = 16f * density
-        val originY = 12f * density
-        val top = graphicFrame(
-            context, 101, "group_light", originX, originY, frameW, frameH, "A"
-        )
-        val bottom = graphicFrame(
-            context, 102, "group_slider", originX, originY + frameH + gap, frameW, frameH, "B"
-        )
-        return listOf(top, bottom)
-    }
-
-    private fun graphicFrame(
-        context: Context,
-        id: Int,
-        label: String,
-        x: Float,
-        y: Float,
-        width: Int,
-        height: Int,
-        group: String
-    ): ComponentData {
-        val definition = ComponentDefinitionRegistry.get("GRAPHIC")
-        val props = (definition?.getDefaultProps(context) ?: emptyMap()).toMutableMap()
-        props["showLabel"] = "false"
-        props["opacity"] = "18"
-        props["stroke_width"] = "3"
-        props["enable_corner"] = "true"
-        props["fill_color"] = "#7B1FA2"
-        props["stroke_color"] = "#7B1FA2"
-        props["tutorial_group"] = group
-        return ComponentData(
-            id = id,
-            type = "GRAPHIC",
-            x = x,
-            y = y,
-            width = width,
-            height = height,
-            label = label,
-            topicConfig = "",
-            props = props
-        )
-    }
-
-    private fun uniqueName(): String {
-        if (!ProjectRepository.isProjectNameTaken(BASE_NAME)) return BASE_NAME
-        var index = 2
-        while (ProjectRepository.isProjectNameTaken("$BASE_NAME$index")) {
-            index++
+        val availableWidth = (context.resources.displayMetrics.widthPixels / density - 32).coerceAtLeast(200f)
+        val row = when (role) {
+            "text" -> 12; "graphic" -> 70; "led", "receiver" -> 100
+            "button", "switch" -> 205; "slider" -> 310; "meter" -> 405; "chart" -> 500
+            else -> 12
         }
-        return "$BASE_NAME$index"
+        val x = if (role in listOf("receiver", "switch")) availableWidth / 2 + 16 else 16f
+        val width = when (role) {
+            "led" -> 80f; "receiver", "button", "switch" -> availableWidth / 2 - 8
+            else -> minOf(def.defaultSize.width.toFloat(), availableWidth)
+        }
+        val props = def.getDefaultProps(context).toMutableMap().apply {
+            put("showLabel", "true")
+            if (role == "graphic") { put("opacity", "35"); put("fill_color", "#A855F7") }
+            if (role == "button") { put("payload", "ON"); put("text", "Button") }
+            if (role == "switch") { put("payloadLeft", "OFF"); put("payloadRight", "ON") }
+        }
+        val component = ComponentData((project.components.maxOfOrNull { it.id } ?: 100) + 1, def.type,
+            x * density, row * density.toFloat(), (width * density).toInt(),
+            ((if (role == "graphic") 20 else def.defaultSize.height) * density).toInt(),
+            role, if (role in listOf("led", "receiver")) topic(session, false)
+                else if (role in listOf("meter", "chart")) topic(session, true) else "", props)
+        project.components.add(component)
+        session.roles[role] = component.id
+        return component
     }
 }

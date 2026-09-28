@@ -1,54 +1,25 @@
 隱私權政策
-
-生效日期：2026-09-13
+生效日期：2026-09-20
 App：MqttPanelCraft
-開發者／聯絡：Spec127 / niceboat919@gmail.com
+開發者／隱私聯絡：Spec127／niceboat919@gmail.com
 
-1. 前言
-本政策說明 MqttPanelCraft（以下稱「本 App」）如何處理資訊。我們不為本 App 營運自有後端伺服器。多數專案資料會留在您的裝置，或只傳送到您自行設定的 MQTT Broker。
+本機資料與連線
+我們沒有營運帳號或專案儲存後端。專案、Broker 地址、帳密、Topic、版面、所選圖片、網頁程式及接收數值保存在裝置。MQTT 訊息直接傳至您指定的 Broker。網頁元件可載入第三方網站，其營運者會依自己的政策處理網路及瀏覽資料。本機教學訊息只在模擬器內處理。
+此版本使用明文 MQTT，未實作 TLS 連線模式。請使用可信任網路或另外建立的安全通道，不要在公開測試 Broker 傳送機密。Broker 和網站各有自己的安全、保存及刪除規則。
 
-2. 我們自己不會蒐集什麼
-本 App 沒有自建帳號系統。我們的伺服器不會收到您的 MQTT Broker 密碼或 Payload，因為我們並未營運此類伺服器。
+廣告與隱私選擇
+免費版使用 Google Mobile Ads（AdMob）及 User Messaging Platform。依設定與同意狀態，Google 可能處理由 IP 推得的大致位置、裝置／App 識別資訊、診斷及廣告互動資料。非個人化廣告不代表完全沒有資料處理。請參閱 https://policies.google.com/privacy 與 https://policies.google.com/technologies/ads。
+App 只在本機保存年齡區間，不收集出生日期；年齡未知時不請求廣告。未滿 18 歲使用保守限制及非個人化廣告設定。在適用情況下，可透過同意表單與「關於 > 廣告隱私選項」管理選擇；無法確認所需許可時不請求廣告。本 App 主要面向 15 歲以上使用者；年齡設定並非家長同意，也不代表已確認所有地區的法律資格。
 
-3. 在您裝置上處理的資訊
-- 您輸入的專案設定（Broker 主機、埠號、帳號、密碼、Topic、面板配置、選用背景圖）會儲存在裝置本機，通常為 App 私有檔案。
-- 選擇性的崩潰日誌可能寫入本 App 專屬外部檔案區。只有您在「關於」主動開啟時才會顯示或複製；我們不會自動上傳。
-- 經 Google Play 確認購買後，進階版權益快取可能儲存在本機。
+購買
+Google Play 處理付款，我們不會取得信用卡號。App 處理簽署的購買資料、權益狀態及交易 token，以驗證及確認交易。待確認工作與已驗證權益保存在本機，排除於 Android 備份。連網重新開啟 App 時會核對購買狀態。Premium 移除廣告與儲存等待，但 Google Play 仍可處理購買資料；Google 服務適用自己的政策。
 
-4. 可能蒐集資料的第三方服務
-- Google Mobile Ads（AdMob）：可能蒐集廣告識別碼、裝置與 App 資訊、廣告互動資料以顯示廣告。詳見 Google 廣告相關隱私政策。
-- Google Play Billing：處理一次性進階版購買。付款細節由 Google 處理。我們透過 Play Billing API 取得購買／權益狀態，不會取得您的信用卡號。
-購買進階版後會移除廣告顯示。Ads SDK 仍可能存在於 App 內；若不顯示廣告，廣告放送相關蒐集應會減少，但裝置上的 Google Play 服務仍可能依 Google 政策運作。
+保存、備份與刪除
+本機資料保留至您刪除專案、清除 App 儲存空間或解除安裝。Android 備份／裝置移轉可能包含專案與 Broker 帳密，匯出 JSON 和備份都應視為敏感資料。解除安裝不會刪除已匯出的副本、Google 購買紀錄，或 Broker／網站持有的資料；請使用各服務的刪除管道。
+本機錯誤報告可能含診斷文字，不會自動傳送給我們。可在「關於」查看、清除或自行分享；分享前請移除帳密與敏感訊息內容。
 
-5. 權限（與目前 Manifest 對齊）
-- INTERNET：MQTT 連線與廣告／付款網路請求
-- ACCESS_NETWORK_STATE：檢查網路狀態
-- READ_EXTERNAL_STORAGE / READ_MEDIA_IMAGES：選用面板背景圖
-- WRITE_EXTERNAL_STORAGE（較舊 Android）：舊版儲存存取需求
-- FOREGROUND_SERVICE / FOREGROUND_SERVICE_CONNECTED_DEVICE：以前景通知維持 MQTT 工作階段
-- CHANGE_NETWORK_STATE：App 相關網路操作
-- POST_NOTIFICATIONS：在系統要求時顯示連線／工作階段通知
+權限
+網路權限用於 MQTT、網頁、廣告及購買；圖片／儲存權限用於匯入素材；前景服務與通知權限用於選用的 MQTT 背景連線。廣告同意與 Android 系統權限是不同事項。
 
-6. MQTT 資料與明文傳輸
-MQTT 設定與 Payload 會在裝置本機處理，或直接傳送到您指定的 Broker。我們無法在自有伺服器讀取該流量。本 App 可能允許非 TLS（明文）MQTT，以支援本機／嗜好用 Broker。若連到網際網路上的 Broker，請盡可能使用 TLS 與強密碼。
-
-7. Android 備份
-Android 自動備份／換機轉移可能備份部分 App 資料。進階版購買旗標已排除於備份之外。含 Broker 憑證的專案檔仍可能被系統備份，除非您清除 App 資料或解除安裝。請將裝置備份視為敏感資料。
-
-8. 兒童
-本 App 非針對未滿 13 歲（或在要求較高年齡門檻的地區未滿 16 歲）之兒童設計。請勿用來蒐集兒童資訊。
-
-9. 您的選擇
-- 清除 App 儲存空間或解除安裝即可刪除本機資料。
-- 可在系統設定重設廣告識別碼。
-- 可在 Google Play 管理或還原購買。
-- 隱私問題請寄至 niceboat919@gmail.com。由於我們不託管您的 MQTT 專案資料，通常無法遠端刪除只存在於您裝置上的內容。
-
-10. 國際使用者
-廣告與 Play 付款由 Google 提供，可能依 Google 條款在您所在國家以外處理資料。
-
-11. 變更
-我們可能更新本政策，並同步更新上方生效日期。請定期查看本畫面。正式上架 Google Play 前，相同政策也應公開託管於網址，並填入 Play Console。
-
-12. 聯絡我們
-niceboat919@gmail.com
+請求與變更
+對您主動提供給我們的資料，如需查詢、更正或刪除，請聯絡 niceboat919@gmail.com。我們無法遠端刪除只保存在您裝置的專案。Google 可能在境外處理資料，適用權利依所在地而異。本政策不限制法律保障的隱私或消費者權利。更新時會修改生效日期；商店公開版本須與本政策一致。

@@ -23,6 +23,7 @@ object PremiumManager {
         playOwned || debugSkip
 
     fun applyPlayEntitlement(context: Context, owned: Boolean) {
+        if (hasPlayEntitlement(context) == owned) return
         val prefs = context.getSharedPreferences(BILLING_PREFS, Context.MODE_PRIVATE)
         prefs.edit().putBoolean(KEY_PREMIUM_STATUS, owned).apply()
         AdManager.refreshAdState(context)
@@ -45,16 +46,14 @@ object PremiumManager {
     }
 
     fun showPremiumDialog(context: Context, callback: (Boolean) -> Unit) {
-        val activity = context as? Activity
-        androidx.appcompat.app.AlertDialog.Builder(context)
+        val activity = context as? Activity ?: return
+        if (AdManager.isSuppressed(activity)) return
+        var offer: PlayBillingManager.Offer? = null
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(context)
             .setTitle(R.string.premium_upgrade_title)
-            .setMessage(R.string.premium_upgrade_message)
+            .setMessage(R.string.billing_loading)
             .setPositiveButton(R.string.premium_buy) { _, _ ->
-                if (activity != null) {
-                    PlayBillingManager.launchPurchase(activity, callback)
-                } else {
-                    callback(false)
-                }
+                offer?.let { PlayBillingManager.launchPurchase(activity, it, callback) }
             }
             .setNegativeButton(R.string.common_btn_cancel) { _, _ ->
                 callback(false)
@@ -62,6 +61,15 @@ object PremiumManager {
             .setNeutralButton(R.string.premium_restore) { _, _ ->
                 PlayBillingManager.restorePurchases(context, callback)
             }
-            .show()
+            .create()
+        dialog.show()
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).isEnabled = false
+        PlayBillingManager.loadOffer(context) { loaded ->
+            if (!dialog.isShowing || activity.isDestroyed || activity.isFinishing) return@loadOffer
+            offer = loaded
+            dialog.setMessage(if (loaded == null) context.getString(R.string.premium_product_unavailable)
+                else context.getString(R.string.billing_offer_message, loaded.price))
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).isEnabled = loaded != null
+        }
     }
 }

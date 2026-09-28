@@ -118,10 +118,16 @@ class ProjectUIManager(
         fabMode.setOnClickListener { onModeToggleCallback?.invoke() }
 
         // Undo
-        btnUndo.setOnClickListener { viewModel.undo() }
+        btnUndo.setOnClickListener {
+            if (viewModel.canUndo.value == true) {
+                viewModel.undo()
+                onUndoCallback?.invoke()
+            }
+        }
     }
 
     var onModeToggleCallback: (() -> Unit)? = null
+    var onUndoCallback: (() -> Unit)? = null
 
     fun toggleBottomSheet() {
         if (sheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {

@@ -256,7 +256,7 @@
     <string name="msg_mqtt_connected">Connected</string>
     <string name="msg_mqtt_disconnected">Disconnected</string>
     <string name="project_log_mqtt_status">MQTT Status: %1$s</string>
-    <string name="msg_invalid_topic">Invalid characters! Use (a-z, A-Z, 0-9, _)</string>
+    <string name="msg_invalid_topic">Enter a single-line Topic (up to 65535 UTF-8 bytes); null characters are not allowed.</string>
 
     <!-- Common Messages & Dialogs -->
     <string name="msg_limit_reached">Free version is limited to 1 projects.</string>

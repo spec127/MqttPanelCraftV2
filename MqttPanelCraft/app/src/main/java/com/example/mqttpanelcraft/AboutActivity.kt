@@ -69,6 +69,9 @@ class AboutActivity : BaseActivity() {
         findViewById<Button>(R.id.btnPrivacy).setOnClickListener {
             showPrivacyDialog()
         }
+        findViewById<Button>(R.id.btnAdPrivacy).setOnClickListener {
+            com.example.mqttpanelcraft.utils.AdPrivacy.showOptions(this)
+        }
 
         findViewById<Button>(R.id.btnContact).setOnClickListener {
             openSupportEmail()
@@ -149,7 +152,7 @@ class AboutActivity : BaseActivity() {
                 .replace("{VERSION_NAME}", version)
                 .replace("{BUILD_NUMBER}", build)
                 .replace("{COPYRIGHT_HOLDER}", "Spec127")
-                .replace("{EFFECTIVE_DATE}", "2026-09-13")
+                .replace("{EFFECTIVE_DATE}", "2026-09-20")
                 .replace("{SUPPORT_EMAIL}", getString(R.string.support_email_address))
         } catch (e: Exception) {
             e.printStackTrace()

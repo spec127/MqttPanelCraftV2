@@ -86,6 +86,8 @@ class UsabilityRegressionTest {
         val parsed = requireNotNull(ProjectRepository.parseProjectJson(ProjectRepository.exportProjectToJson(project)))
         assertEquals(project, parsed)
         val repaired = ProjectImportNormalizer.normalize(parsed).project
+        assertEquals("CALENDAR", repaired.components[0].type)
+        assertEquals("CLOCK", repaired.components[0].props["family_kind"])
         assertEquals("2", repaired.components[0].props["linked_components"])
         assertEquals("custom/topic", repaired.components[1].topicConfig)
     }

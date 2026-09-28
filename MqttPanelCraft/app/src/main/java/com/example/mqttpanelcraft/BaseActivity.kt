@@ -10,6 +10,25 @@ import androidx.appcompat.app.AppCompatActivity
  */
 abstract class BaseActivity : AppCompatActivity() {
 
+    override fun onResume() {
+        super.onResume()
+        com.example.mqttpanelcraft.utils.AdManager.onScreenResumed(this)
+        com.example.mqttpanelcraft.utils.PlayBillingManager.refreshPurchases(this, null)
+    }
+
+    override fun onStop() {
+        if (isFinishing && (this is ProjectViewActivity || this is WebViewActivity) &&
+            !com.example.mqttpanelcraft.utils.AdManager.isTutorial(this)) {
+            com.example.mqttpanelcraft.utils.AdManager.markNaturalReturn()
+        }
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        com.example.mqttpanelcraft.utils.AdManager.release(this)
+        super.onDestroy()
+    }
+
     private val notificationPermissionLauncher = registerForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -35,6 +54,9 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (com.example.mqttpanelcraft.utils.AdManager.isTutorial(this)) {
+            com.example.mqttpanelcraft.utils.AdManager.enterTutorial()
+        }
         
         // Enable Edge-to-Edge
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)

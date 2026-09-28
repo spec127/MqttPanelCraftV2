@@ -242,6 +242,7 @@ class SidebarManager(
                         // 1. Header (Inflate Custom Layout)
                         val headerView =
                                 inflater.inflate(R.layout.item_sidebar_header, container, false)
+                        headerView.tag = "component-group:${componentGroup.name}"
                         val tvHeader =
                                 headerView.findViewById<android.widget.TextView>(R.id.tvHeaderTitle)
                         val ivArrow =
@@ -412,9 +413,13 @@ class SidebarManager(
                                 } else if (def.type == "SWITCH") {
                                         dummyProps["state"] = "2" // Show solid ON color in thumbnail
                                 } else if (def.type == "CALENDAR") {
+                                        dummyProps["family_kind"] = "CALENDAR"
+                                        dummyProps["calendar_style"] = "BIG_DATE"
                                         dummyProps["visual_style"] = "BIG_DATE"
                                 } else if (def.type == "CLOCK") {
+                                        dummyProps["family_kind"] = "CLOCK"
                                         dummyProps["clock_mode"] = "TIME"
+                                        dummyProps["clock_style"] = "DIGITAL"
                                         dummyProps["visual_style"] = "DIGITAL"
                                         dummyProps["time_format"] = "HH:mm"
                                 }

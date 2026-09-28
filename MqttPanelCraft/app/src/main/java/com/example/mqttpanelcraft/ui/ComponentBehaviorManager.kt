@@ -9,13 +9,17 @@ import com.example.mqttpanelcraft.model.ComponentData
  */
 class ComponentBehaviorManager(
         private val sendMqtt: (topic: String, payload: String) -> Unit,
-        private val onUpdateProp: (id: Int, key: String, value: String) -> Unit
+        private val onUpdateProp: (id: Int, key: String, value: String) -> Unit,
+        private val onPublish: (id: Int, topic: String, payload: String) -> Unit = { _, _, _ -> }
 ) {
     fun attachBehavior(view: View, data: ComponentData) {
         val def =
                 com.example.mqttpanelcraft.ui.components.ComponentDefinitionRegistry.get(data.type)
         if (def != null) {
-            def.attachBehavior(view, data, sendMqtt) { key, value ->
+            def.attachBehavior(view, data, { topic, payload ->
+                onPublish(data.id, topic, payload)
+                sendMqtt(topic, payload)
+            }) { key, value ->
                 onUpdateProp(data.id, key, value)
             }
         }

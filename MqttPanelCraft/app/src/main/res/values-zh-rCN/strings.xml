@@ -228,7 +228,7 @@
     <string name="msg_mqtt_connected">已连线</string>
     <string name="msg_mqtt_disconnected">已中断</string>
     <string name="project_log_mqtt_status">MQTT 状态: %1$s</string>
-    <string name="msg_invalid_topic">字元不合法！请使用 (a-z, A-Z, 0-9, _)</string>
+    <string name="msg_invalid_topic">请输入单行 Topic（最多 65535 UTF-8 字节），不可包含空字符。</string>
     <string name="msg_limit_reached">免费版限制为 1 个专案。</string>
     <string name="title_limit_reached">达到限制</string>
     <string name="dialog_btn_upgrade">升级</string>

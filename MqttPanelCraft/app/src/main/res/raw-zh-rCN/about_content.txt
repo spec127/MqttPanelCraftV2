@@ -1,33 +1,15 @@
 MqttPanelCraft
-版本 {VERSION_NAME}（组建 {BUILD_NUMBER}）
+版本 {VERSION_NAME}（构建 {BUILD_NUMBER}）
 Copyright © 2026 {COPYRIGHT_HOLDER}
-
-隐私与法律信息
 生效日期：{EFFECTIVE_DATE}
-
-隐私政策：请点本屏幕的“隐私权政策”按钮。
 联系方式：{SUPPORT_EMAIL}
 
-商标声明：
-MQTT 为 OASIS Open 的商标。Google、AdMob、Google Play 为 Google LLC 的商标。Eclipse、Eclipse Paho 为 Eclipse Foundation 的商标。Arduino 为 Arduino S.r.l. 的商标。ESP32、ESP8266 为 Espressif Systems 的商标。其他商标、标志和品牌名称均属于其各自所有者。本应用与上述任一单位没有从属、赞助或背书关系。
+可通过本页面的按钮查看隐私政策及广告隐私选项。
 
-无专利主张：
-本应用不主张任何专利、申请中专利、独家算法，或对 MQTT、Arduino 等相关技术的专属权利。
+Premium 是 Google Play 一次性、非订阅购买，可移除广告与保存等待。App 会在购买前显示 Google 返回的当地价格，税额与总价以结账确认为准。可用相同 Google Play 账号恢复购买；付款待处理时不解锁。购买或恢复需要连接，已验证的权益可离线保留。退款与购买协助可通过 Google Play 或本页联系方式申请。
 
-重要免责：
-本软件按“现状”提供，不附带任何明示或默示保证。仅供爱好与非安全关键仪表板使用。请勿用于医疗、生命维持、工业安全、门锁、电热器、水泵，或任何故障可能导致伤亡或财产损失的设备。您须自行确保 Broker、账号密码与连接设备的安全。Google Play 购买的退款依 Google Play 退款政策办理。
+本 App 仅供爱好及非安全关键面板使用。软件或网络故障可能中断或重复命令，请勿依赖它操作医疗、生命维持、安全防护等关键设备。请保护 Broker、设备、导出文件与账号密码。在适用法律允许的范围内，软件依可用状态提供，不另作额外保证。本声明不排除法律不得排除的保修、救济、退款权利或责任。
 
-高级版：
-高级版是通过 Google Play 销售的一次性非订阅解锁，同一 Google Play 账号可还原。结账金额以 Google Play 显示为准，可能因地区与税额而异。
+第三方名称仅用于识别相关技术，其名称及商标属于各自所有者。本 App 未受 Google、Eclipse、Arduino 或其他提及的供应者赞助或背书。不主张专利所有权或申请中专利；此声明不是不侵权的法律判定。
 
-第三方服务：
-本应用可能使用 Google Mobile Ads（AdMob）显示广告，以及 Google Play Billing 处理高级版购买，并受 Google 适用条款与政策约束。购买高级版后会移除广告显示；Ads SDK 仍可能存在于应用内。
-
-开源声明：
-完整许可全文请点“开源许可证”按钮。摘要如下：
-1) AndroidX / AppCompat / Material Components / Kotlin / Coroutines — Apache License 2.0
-2) Eclipse Paho MQTT Client — EPL-2.0 / EDL-1.0
-3) Google Play services Ads / Play Billing / OSS Licenses — Google 条款
-4) 导出的 Arduino 模板可能需在微控制器端另行安装 PubSubClient（MIT）、ArduinoJson、WiFiManager 等库；这些并未打包进本 Android 应用。
-
-如有遗漏或错误，请联系 {SUPPORT_EMAIL}。
+「开源许可证」列出依赖软件包的许可声明。AndroidX、Material Components、Kotlin、Coroutines 使用 Apache-2.0；Eclipse Paho 有 EPL／EDL 声明；Google SDK 适用其相关条款。生成的 Arduino 程序可能需要另外安装第三方库，再分发前请确认其许可。App 素材的许可须另外确认，不由软件包许可页涵盖。如有标示遗漏或错误，请联系 {SUPPORT_EMAIL}。

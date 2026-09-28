@@ -114,6 +114,13 @@
                 android:layout_marginBottom="16dp"/>
 
             <!-- Real Content -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAdPrivacy"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/ads_privacy_options" />
             <TextView
                 android:id="@+id/tvContent"
                 android:layout_width="match_parent"

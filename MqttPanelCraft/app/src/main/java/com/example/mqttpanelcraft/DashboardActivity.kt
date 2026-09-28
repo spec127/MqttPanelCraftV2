@@ -19,6 +19,19 @@ class DashboardActivity : BaseActivity() {
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var projectAdapter: ProjectAdapter
     private var tutorialLaunchAttempted = false
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus && ::binding.isInitialized &&
+            com.example.mqttpanelcraft.utils.OnboardingCoordinator.isLanguageGateDone(this) &&
+            com.example.mqttpanelcraft.utils.OnboardingCoordinator.isTutorialSeeded(this)) {
+            com.example.mqttpanelcraft.utils.AdPrivacy.gather(this) {
+                if (hasWindowFocus() && !isFinishing && !isDestroyed) {
+                    com.example.mqttpanelcraft.utils.AdManager.loadBannerAd(this, binding.bannerAdContainer, binding.fabAddProject)
+                    com.example.mqttpanelcraft.utils.AdManager.onDashboardVisible(this)
+                }
+            }
+        }
+    }
 
     // v85: Sorting State
     // 0: Custom, 1: Name, 2: Date, 3: Last Opened
@@ -532,12 +545,20 @@ class DashboardActivity : BaseActivity() {
     }
 
     private fun openOrReplayTutorial() {
-        val project = com.example.mqttpanelcraft.data.TutorialProjectFactory.ensureTutorialProject(this)
-        com.example.mqttpanelcraft.utils.OnboardingCoordinator.markTutorialSeeded(this)
-        openTutorialCanvas(project.id, showTutorial = true)
+        AlertDialog.Builder(this).setTitle(R.string.drawer_item_tutorial)
+            .setMessage(R.string.guide_resume_message)
+            .setPositiveButton(R.string.guide_resume) { _, _ ->
+                val project = com.example.mqttpanelcraft.data.TutorialProjectFactory.ensureTutorialProject(this)
+                openTutorialCanvas(project.id, showTutorial = true)
+            }
+            .setNeutralButton(R.string.guide_new_copy) { _, _ ->
+                val project = com.example.mqttpanelcraft.data.TutorialProjectFactory.newTutorialProject(this)
+                openTutorialCanvas(project.id, showTutorial = true)
+            }.setNegativeButton(R.string.common_btn_cancel, null).show()
     }
 
     private fun openTutorialCanvas(projectId: String, showTutorial: Boolean) {
+        com.example.mqttpanelcraft.utils.AdManager.enterTutorial()
         val intent = Intent(this, ProjectViewActivity::class.java)
         intent.putExtra("PROJECT_ID", projectId)
         intent.putExtra(ProjectViewActivity.EXTRA_SHOW_TUTORIAL, showTutorial)

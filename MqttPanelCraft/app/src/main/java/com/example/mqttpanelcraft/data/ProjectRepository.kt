@@ -65,6 +65,7 @@ object ProjectRepository {
             
             val jsonArray = JSONArray(jsonStr)
             val newProjects = mutableListOf<Project>()
+            var migrated = false
             
             for (i in 0 until jsonArray.length()) {
                 val obj = jsonArray.getJSONObject(i)
@@ -106,7 +107,9 @@ object ProjectRepository {
                             }
                         }
 
-                        val comp = ComponentData(cId, cType, cX, cY, cW, cH, cLabel, cTopicConfig, cProps)
+                        val source = ComponentData(cId, cType, cX, cY, cW, cH, cLabel, cTopicConfig, cProps)
+                        val comp = com.example.mqttpanelcraft.ui.components.definitions.CalendarClockDefinition.mergeComponent(source)
+                        if (comp !== source) migrated = true
                         project.components.add(comp)
                     }
                 }
@@ -123,6 +126,7 @@ object ProjectRepository {
                     com.example.mqttpanelcraft.utils.DebugLogger.log("ProjectRepo", "P1[${p1.name}] has ${p1.components.size} components. C1: ${if (p1.components.isNotEmpty()) "${p1.components[0].label}(${p1.components[0].x},${p1.components[0].y})" else "None"}")
                 }
             }
+            if (migrated) saveProjects()
             
         } catch (e: Exception) {
             e.printStackTrace()

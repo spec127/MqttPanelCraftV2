@@ -733,89 +733,15 @@ class SetupActivity : BaseActivity() {
                         keepMqttInBackground = if (lockedDemo) false else cbKeepMqttInBackground.isChecked
                 )
 
-        // Unified Flow: Always Show Rewarded (unless disabled)
         val targetProjectId = newProject.id
-        var isRewardEarned = false
-
-        if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this)) {
-            // Skip Ads
+        if (com.example.mqttpanelcraft.utils.PremiumManager.isPremium(this) ||
+            com.example.mqttpanelcraft.utils.DemoBroker.isLocal(newProject.broker) ||
+            (projectId == null && ProjectRepository.countBillableProjects() == 0)) {
             saveAndFinish(newProject, targetProjectId)
             return
         }
-
-        // New Feature: First Project is Free (No Ad)
-        // If creating new project (projectId == null) AND repository is empty
-        if (projectId == null && ProjectRepository.countBillableProjects() == 0) {
-            // First Project Bonus: Ad Skipped silently
+        com.example.mqttpanelcraft.utils.SaveGate.show(this) {
             saveAndFinish(newProject, targetProjectId)
-            return
-        }
-
-        if (com.example.mqttpanelcraft.utils.AdManager.isRewardedReady()) {
-            com.example.mqttpanelcraft.utils.AdManager.showRewarded(
-                    this,
-                    onReward = { isRewardEarned = true },
-                    onClosed = {
-                        if (isRewardEarned) {
-                            saveAndFinish(newProject, targetProjectId)
-                        } else {
-                            android.widget.Toast.makeText(
-                                            this,
-                                            getString(R.string.project_save_ad_required),
-                                            android.widget.Toast.LENGTH_LONG
-                                    )
-                                    .show()
-                        }
-                    }
-            )
-        } else {
-            // Fallback: Show Placeholder UI (Non-Ad) and Proceed
-            // User Request: If ad fails, show internal placeholder instead of just waiting
-            val dialogView = layoutInflater.inflate(R.layout.layout_ad_placeholder_banner, null)
-            val dialogBuilder =
-                    androidx.appcompat.app.AlertDialog.Builder(this)
-                            .setTitle(R.string.setup_saving_project)
-                            .setView(dialogView)
-                            .setCancelable(false)
-                            .setNegativeButton(R.string.common_btn_cancel, null)
-                            .setPositiveButton(getString(R.string.setup_continue_countdown, 30)) { _, _ ->
-                                saveAndFinish(newProject, targetProjectId)
-                            }
-
-            val dialog = dialogBuilder.create()
-            dialog.show()
-
-            // Setup Countdown
-            val btnContinue = dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
-            btnContinue.isEnabled = false
-            btnContinue.setTextColor(Color.GRAY)
-
-            object : android.os.CountDownTimer(30000, 1000) {
-                        override fun onTick(millisUntilFinished: Long) {
-                            if (dialog.isShowing) {
-                                btnContinue.text =
-                                        getString(
-                                                R.string.setup_continue_countdown,
-                                                millisUntilFinished / 1000
-                                        )
-                            } else {
-                                cancel()
-                            }
-                        }
-                        override fun onFinish() {
-                            if (dialog.isShowing) {
-                                btnContinue.setText(R.string.setup_continue)
-                                btnContinue.isEnabled = true
-                                btnContinue.setTextColor(
-                                        ContextCompat.getColor(this@SetupActivity, R.color.primary)
-                                )
-                            }
-                        }
-                    }
-                    .start()
-
-            // Background Re-load for next time
-            com.example.mqttpanelcraft.utils.AdManager.loadRewarded(this)
         }
     }
 

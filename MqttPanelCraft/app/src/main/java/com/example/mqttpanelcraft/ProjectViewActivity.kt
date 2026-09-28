@@ -16,6 +16,7 @@ import com.example.mqttpanelcraft.mqtt.MqttSessionClient
 import com.example.mqttpanelcraft.ui.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.Locale
+import com.example.mqttpanelcraft.tutorial.TutorialEvent
 
 class ProjectViewActivity : BaseActivity() {
 
@@ -173,6 +174,7 @@ class ProjectViewActivity : BaseActivity() {
 
             // UI Setup
             projectUIManager.setupToolbar()
+            projectUIManager.onUndoCallback = { tutorialOverlay?.onEvent(TutorialEvent.Undo) }
             projectUIManager.updateSystemBars()
 
             // Check Prefs
@@ -259,7 +261,8 @@ class ProjectViewActivity : BaseActivity() {
                             viewModel.updateRuntimeProperty(id, key, value)?.let { updated ->
                                 renderer.updateRuntimeComponent(updated, isEditMode)
                             }
-                        }
+                        },
+                        { id, topic, payload -> tutorialOverlay?.onEvent(TutorialEvent.Sent(id, topic, payload)) }
                 )
 
         // 3. Interaction (Input)
@@ -311,6 +314,7 @@ class ProjectViewActivity : BaseActivity() {
                             }
 
                             override fun onComponentClicked(id: Int) {
+                                tutorialOverlay?.onEvent(TutorialEvent.Selected(id))
                                 if (isEditMode) {
                                     projectUIManager.setDeleteZoneState(CanvasInteractionManager.DeleteState.NONE)
                                     val sheet = findViewById<View>(R.id.bottomSheet)
@@ -360,6 +364,7 @@ class ProjectViewActivity : BaseActivity() {
                                     viewModel.saveSnapshot()
                                     val updated = comp.copy(x = newX, y = newY)
                                     viewModel.updateComponent(updated)
+                                    tutorialOverlay?.onEvent(TutorialEvent.Moved(id))
                                 }
                             }
 
@@ -369,6 +374,7 @@ class ProjectViewActivity : BaseActivity() {
                                     viewModel.saveSnapshot()
                                     val updated = comp.copy(width = newW, height = newH)
                                     viewModel.updateComponent(updated)
+                                    tutorialOverlay?.onEvent(TutorialEvent.Resized(id))
                                 }
                             }
 
@@ -395,6 +401,7 @@ class ProjectViewActivity : BaseActivity() {
                                 if (id != -1) {
                                     viewModel.saveSnapshot()
                                     viewModel.removeComponent(id)
+                                    tutorialOverlay?.onEvent(TutorialEvent.Deleted(id))
                                     if (selectedComponentId == id) {
                                         selectedComponentId = null
                                         propertiesManager.showTitleOnly()
@@ -446,6 +453,7 @@ class ProjectViewActivity : BaseActivity() {
                                 val newComp = viewModel.addComponent(finalData)
 
                                 if (newComp != null) {
+                                    tutorialOverlay?.onEvent(TutorialEvent.Added(newComp.id, newComp.type))
                                     val newId = newComp.id
                                     viewModel.selectComponent(newId)
                                     selectedComponentId = newId
@@ -905,6 +913,8 @@ class ProjectViewActivity : BaseActivity() {
                     behaviorManager.onMqttMessageReceived(view, comp, payload)
                 }
             }
+            tutorialOverlay?.onEvent(TutorialEvent.Received(topic, payload,
+                matchingComponents.filter { renderer.getView(it.id) != null }.map { it.id }.toSet()))
 
             components.forEach { comp ->
                 val linkedIds = comp.props["linked_components"].orEmpty().split(",")
@@ -1028,7 +1038,9 @@ class ProjectViewActivity : BaseActivity() {
         if (!intent.getBooleanExtra(EXTRA_SHOW_TUTORIAL, false)) return
         tutorialOverlayStarted = true
         val host = findViewById<FrameLayout>(R.id.tutorialOverlayHost)
-        tutorialOverlay = TutorialOverlayController(host)
+        tutorialOverlay = TutorialOverlayController(host, this, viewModel, { renderer.getView(it) }) { id ->
+            interactionManager.callbacks.onComponentClicked(id)
+        }
         tutorialOverlay?.onCanvasState(viewModel.components.value.orEmpty(), isEditMode)
     }
 
@@ -1047,5 +1059,10 @@ class ProjectViewActivity : BaseActivity() {
 
     companion object {
         const val EXTRA_SHOW_TUTORIAL = "SHOW_TUTORIAL"
+    }
+
+    override fun onDestroy() {
+        tutorialOverlay?.dismiss()
+        super.onDestroy()
     }
 }

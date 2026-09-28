@@ -155,6 +155,7 @@
       "SHAPE": "TEXT_DISP",
       "IMAGE": "IMAGE_SENSOR_CAM",
       "CALENDAR": "TEXT_DISP",
+      "CLOCK": "TEXT_DISP",
       "WEB_BOX": "TEXT_DISP",
       "GAUGE": "NUMBER_VAL"
    }

@@ -41,6 +41,9 @@ object ProjectImportNormalizer {
             component.props["linked_components"] = remapped
         }
 
-        return Result(project.copy(components = normalizedComponents), repaired, removedLinks)
+        val mergedComponents = normalizedComponents
+            .map(com.example.mqttpanelcraft.ui.components.definitions.CalendarClockDefinition::mergeComponent)
+            .toMutableList()
+        return Result(project.copy(components = mergedComponents), repaired, removedLinks)
     }
 }

@@ -41,6 +41,7 @@ object ClockDefinition : IComponentDefinition {
         "schedule_time" to "07:30",
         "trigger_value" to "TRIGGER",
         "linked_components" to "",
+        CalendarClockDefinition.PROP_CLOCK_STYLE to "DIGITAL",
         "visual_style" to "DIGITAL",
         "color" to "#7B1FA2"
     )
@@ -62,7 +63,7 @@ object ClockDefinition : IComponentDefinition {
             data.props["time_format"] ?: "HH:mm",
             data.props["countdown_seconds"]?.toLongOrNull() ?: 60L,
             data.props["schedule_time"] ?: "07:30",
-            data.props["visual_style"] ?: "DIGITAL",
+            CalendarClockDefinition.clockStyleOf(data),
             data.props["color"] ?: "#7B1FA2"
         )
     }
@@ -108,12 +109,30 @@ object ClockDefinition : IComponentDefinition {
                 )
         )
 
+        val clockStyle = CalendarClockDefinition.clockStyleOf(data)
+        val styleData = data.copy(props = data.props.toMutableMap().apply {
+            put(CalendarClockDefinition.PROP_CLOCK_STYLE, clockStyle)
+        })
         CommonPropBinder.bindLocalizedDropdown(
             panelView,
             R.id.spClockVisualStyle,
-            "visual_style",
-            data,
-            onUpdate,
+            CalendarClockDefinition.PROP_CLOCK_STYLE,
+            styleData,
+            { _, value ->
+                if (data.type == type || CalendarClockDefinition.isClockFamily(data)) {
+                    CalendarClockDefinition.maybeResizeForStyle(
+                        data,
+                        panelView.resources.displayMetrics.density,
+                        CalendarClockDefinition.FAMILY_CLOCK,
+                        CalendarClockDefinition.clockStyleOf(data),
+                        CalendarClockDefinition.FAMILY_CLOCK,
+                        value,
+                        onUpdate
+                    )
+                    onUpdate(CalendarClockDefinition.PROP_VISUAL_STYLE, value)
+                }
+                onUpdate(CalendarClockDefinition.PROP_CLOCK_STYLE, value)
+            },
             listOf(
                 PropertyOption("DIGITAL", R.string.clock_style_digital),
                 PropertyOption("ANALOG", R.string.clock_style_analog),

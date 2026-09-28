@@ -112,9 +112,9 @@ class PropertiesSheetManager(
                             before: Int,
                             count: Int
                     ) {
-                        // Validation: Only allow Alphanumeric + Underscore
+                        // Validate the complete address, not just a generated suffix.
                         val input = s.toString()
-                        val valid = input.matches(Regex("^[a-zA-Z0-9_]*$"))
+                        val valid = TopicEditorValue.isValid(input)
 
                         if (!valid) {
                             etTopicName.error =
@@ -136,8 +136,8 @@ class PropertiesSheetManager(
                     }
                     override fun afterTextChanged(s: android.text.Editable?) {
                         // Only save if valid
-                        val valid = s.toString().matches(Regex("^[a-zA-Z0-9_]*$"))
-                        if (!isBinding && valid) saveCurrentProps()
+                        val valid = TopicEditorValue.isValid(s.toString())
+                        if (!isBinding && valid) saveCurrentProps(updateTopic = true)
                     }
                 }
         )
@@ -186,16 +186,6 @@ class PropertiesSheetManager(
             Toast.makeText(propertyContainer.context, R.string.topic_copied, Toast.LENGTH_SHORT).show()
         }
 
-        btnTopicCopy?.setOnClickListener {
-            val full = getFullTopic()
-            val clipboard =
-                    propertyContainer.context.getSystemService(Context.CLIPBOARD_SERVICE) as
-                            ClipboardManager
-            val clip = ClipData.newPlainText("Topic", full)
-            clipboard.setPrimaryClip(clip)
-            Toast.makeText(propertyContainer.context, R.string.topic_copied, Toast.LENGTH_SHORT).show()
-        }
-
         // vPropColorPreview Listener - REMOVED
 
         // Button Props Listeners - REMOVED
@@ -225,10 +215,8 @@ class PropertiesSheetManager(
     }
 
     private fun getFullTopic(): String {
-        val prefix = tvTopicPrefix?.text.toString()
-        val name = etTopicName?.text.toString()
-        val suffix = tvTopicSuffix?.text.toString()
-        return "$prefix$name$suffix"
+        val previous = currentData?.topicConfig.orEmpty()
+        return TopicEditorValue.acceptedOrPrevious(etTopicName?.text?.toString() ?: previous, previous)
     }
 
     // ... (Existing init) ...
@@ -266,7 +254,7 @@ class PropertiesSheetManager(
         }
     }
 
-    private fun saveCurrentProps() {
+    private fun saveCurrentProps(updateTopic: Boolean = false) {
         if (selectedViewId != View.NO_ID && currentData != null) {
             try {
                 val wInput = etPropWidth?.text.toString()
@@ -284,7 +272,7 @@ class PropertiesSheetManager(
                 val hPx = (hDp * density).toInt()
 
                 val name = etPropName?.text.toString()
-                val topicConfig = getFullTopic()
+                val topicConfig = if (updateTopic) getFullTopic() else currentData!!.topicConfig
 
                 // Construct updated data
                 val updated =
@@ -296,6 +284,7 @@ class PropertiesSheetManager(
                         )
                 // Color & Button Props are now handled via callbacks from Definitions
 
+                currentData = updated
                 onPropertyUpdated(updated)
             } catch (e: Exception) {}
         }
@@ -430,44 +419,12 @@ class PropertiesSheetManager(
                 etPropHeight?.setText(hStr)
             }
 
-            // Topic Parsing
-            val topicConfig = data.topicConfig
-            val parts = topicConfig.split("/")
-
-            if (parts.size >= 2) {
-                // Reconstruct prefix (everything before the last part)
-                val prefixParts = parts.dropLast(1)
-                val nameStr = parts.last()
-
-                var prefixStr = prefixParts.joinToString("/") + "/"
-
-                // "Topic Prefix Fixed Size... Max 15 chars... Priority Hide ID"
-                // ID is usually the random string at index 1 (p27/RANDOM/name)
-                if (prefixStr.length > 15) {
-                    if (parts.size >= 3) {
-                        // Try hiding the middle ID part
-                        // Ex: p27/czr0r8jw0z/ -> p27/.../
-                        val first = parts[0]
-                        prefixStr = "$first/.../"
-                    }
-                    // If still too long, hard truncate
-                    if (prefixStr.length > 15) {
-                        prefixStr = prefixStr.take(12) + "..."
-                    }
-                }
-
-                tvTopicPrefix?.text = prefixStr
-                if (etTopicName?.text?.toString() != nameStr) {
-                    etTopicName?.setText(nameStr)
-                }
-                tvTopicSuffix?.text = ""
-            } else {
-                tvTopicPrefix?.text = ""
-                val topicVal = data.topicConfig ?: ""
-                if (etTopicName?.text?.toString() != topicVal) {
-                    etTopicName?.setText(topicVal)
-                }
-                tvTopicSuffix?.text = ""
+            // A single editable source of truth; never persist a shortened display prefix.
+            tvTopicPrefix?.text = ""
+            tvTopicPrefix?.visibility = View.GONE
+            tvTopicSuffix?.text = ""
+            if (etTopicName?.text?.toString() != data.topicConfig) {
+                etTopicName?.setText(data.topicConfig)
             }
 
             // Payload Preset Spinner
