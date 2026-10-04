@@ -29,6 +29,12 @@ class LaunchHardeningInstrumentedTest {
             project = TutorialProjectFactory.newTutorialProject(context)
         }
         try { block(project) } finally {
+            val commandLine = java.io.File("/proc/self/cmdline").readText().substringBefore('\u0000')
+            if (commandLine != context.packageName) {
+                android.os.ParcelFileDescriptor.AutoCloseInputStream(
+                    instrumentation.uiAutomation.executeShellCommand("am force-stop ${context.packageName}")
+                ).use { it.readBytes() }
+            }
             instrumentation.runOnMainSync {
                 com.example.mqttpanelcraft.mqtt.MqttSessionClient.stop(context)
                 ProjectRepository.deleteProject(project.id)
@@ -36,6 +42,10 @@ class LaunchHardeningInstrumentedTest {
                     if (previous == null) remove("project") else putString("project", previous)
                 }.commit()
             }
+            // Saves are debounced 500–2000ms. Wait so this deletion reaches disk before the process exits.
+            Thread.sleep(1_500)
+            val stored = java.io.File(context.filesDir, "projects.json").readText()
+            assertFalse("Tutorial copy ${project.id} was written back after deletion", stored.contains(project.id))
         }
     }
 
@@ -59,7 +69,8 @@ class LaunchHardeningInstrumentedTest {
                 android.graphics.Rect(60, 60, 180, 150))
             image.eraseColor(android.graphics.Color.WHITE)
             spotlight.draw(canvas)
-            assertTrue(android.graphics.Color.red(image.getPixel(10, 180)) < 120)
+            assertEquals(android.graphics.Color.WHITE, image.getPixel(10, 180))
+            assertTrue(android.graphics.Color.green(image.getPixel(50, 12)) < 180)
             for ((x, y) in listOf(40 to 40, 70 to 70, 130 to 100)) {
                 assertEquals(android.graphics.Color.WHITE, image.getPixel(x, y))
             }
@@ -67,8 +78,9 @@ class LaunchHardeningInstrumentedTest {
                 android.graphics.Rect(60, 60, 180, 150))
             image.eraseColor(android.graphics.Color.WHITE)
             spotlight.draw(canvas)
-            assertTrue(android.graphics.Color.red(image.getPixel(40, 40)) < 120)
+            assertEquals(android.graphics.Color.WHITE, image.getPixel(40, 40))
             assertEquals(android.graphics.Color.WHITE, image.getPixel(40, 175))
+            assertTrue(android.graphics.Color.green(image.getPixel(50, 137)) < 180)
         } finally { image.recycle() }
     }
 
@@ -83,7 +95,7 @@ class LaunchHardeningInstrumentedTest {
             }
             onView(allOf(isAssignableFrom(android.widget.ImageButton::class.java),
                 isDescendantOfA(withId(R.id.toolbar)))).perform(click())
-            onView(withTagValue(`is`("BUTTON" as Any))).perform(click())
+            onView(allOf(withTagValue(`is`("BUTTON" as Any)), isClickable(), isDisplayed())).perform(click())
             scenario.onActivity { activity ->
                 assertEquals(1, project.components.count { it.type == "BUTTON" })
                 assertTrue(activity.findViewById<android.widget.Button>(R.id.btnTutorialNext).isEnabled)

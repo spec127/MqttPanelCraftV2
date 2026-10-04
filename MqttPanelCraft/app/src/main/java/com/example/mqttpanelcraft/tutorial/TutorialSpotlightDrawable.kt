@@ -4,51 +4,53 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.Paint
-import android.graphics.Path
 import android.graphics.PixelFormat
 import android.graphics.Rect
-import android.graphics.RectF
 import android.graphics.drawable.Drawable
+import kotlin.math.max
 
-/** A drawing-only overlay: all touches still reach the real controls below it. */
+/** A circle around the current control. The rest of the screen stays clear and tappable. */
 class TutorialSpotlightDrawable(private val density: Float) : Drawable() {
-    private val shade = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xA6000000.toInt() }
-    private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.rgb(167, 139, 250)
+    private val under = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
         style = Paint.Style.STROKE
-        strokeWidth = 3 * density
+        strokeWidth = 8f * density
     }
-    private val dimPath = Path()
-    private val hole = Path()
+    private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.rgb(255, 87, 34)
+        style = Paint.Style.STROKE
+        strokeWidth = 4f * density
+    }
     private val targetBounds = Rect()
-    private val cardBounds = Rect()
 
-    fun update(viewport: Rect, target: Rect, card: Rect) {
-        if (bounds == viewport && targetBounds == target && cardBounds == card) return
+    fun update(viewport: Rect, target: Rect, ignoredCard: Rect) {
+        if (bounds == viewport && targetBounds == target) return
         bounds = viewport
         targetBounds.set(target)
-        cardBounds.set(card)
-        dimPath.reset()
-        dimPath.addRect(RectF(viewport), Path.Direction.CW)
-        // Subtract individually so overlapping card/target holes remain transparent.
-        for ((rect, radius) in listOf(targetBounds to 12f, cardBounds to 16f)) {
-            if (rect.isEmpty) continue
-            hole.reset()
-            hole.addRoundRect(RectF(rect), radius * density, radius * density, Path.Direction.CW)
-            dimPath.op(hole, Path.Op.DIFFERENCE)
-        }
         invalidateSelf()
     }
 
     override fun draw(canvas: Canvas) {
-        canvas.drawPath(dimPath, shade)
-        if (!targetBounds.isEmpty) {
-            canvas.drawRoundRect(RectF(targetBounds), 12 * density, 12 * density, ring)
-        }
+        if (targetBounds.isEmpty) return
+        val radius = max(targetBounds.width(), targetBounds.height()) / 2f + 8f * density
+        val cx = targetBounds.exactCenterX()
+        val cy = targetBounds.exactCenterY()
+        canvas.drawCircle(cx, cy, radius, under)
+        canvas.drawCircle(cx, cy, radius, ring)
     }
 
-    override fun setAlpha(alpha: Int) { shade.alpha = alpha; invalidateSelf() }
-    override fun setColorFilter(colorFilter: ColorFilter?) { shade.colorFilter = colorFilter; invalidateSelf() }
+    override fun setAlpha(alpha: Int) {
+        ring.alpha = alpha
+        under.alpha = alpha
+        invalidateSelf()
+    }
+
+    override fun setColorFilter(colorFilter: ColorFilter?) {
+        ring.colorFilter = colorFilter
+        under.colorFilter = colorFilter
+        invalidateSelf()
+    }
+
     @Suppress("DEPRECATION")
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 }

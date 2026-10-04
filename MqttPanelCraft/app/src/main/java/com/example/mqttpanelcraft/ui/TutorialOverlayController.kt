@@ -37,7 +37,7 @@ class TutorialOverlayController(
     private var components = viewModel.components.value.orEmpty()
     private var editMode = true
     private var dismissed = false
-    private var collapsed = false
+    private var detailsOpen = false
     private var spaceCompact = false
     private var placementKey: List<Int>? = null
     private var textAtEntry = ""
@@ -56,7 +56,7 @@ class TutorialOverlayController(
         }
         card.findViewById<MaterialButton>(R.id.btnTutorialRetry).setOnClickListener { retry() }
         counter.setOnClickListener {
-            collapsed = !collapsed
+            detailsOpen = !detailsOpen
             spaceCompact = false
             updateHighlight()
         }
@@ -197,14 +197,34 @@ class TutorialOverlayController(
     private fun addTarget(): View? {
         val toolbar = activity.findViewById<Toolbar>(R.id.toolbar)
         val drawer = activity.findViewById<DrawerLayout>(R.id.drawerLayout)
-        if (!drawer.isDrawerVisible(GravityCompat.START)) {
-            return toolbar.children.filterIsInstance<ImageButton>()
-                .firstOrNull { it.drawable === toolbar.navigationIcon }
+        if (!drawer.isDrawerVisible(GravityCompat.START)) return navigationButton(toolbar)
+        val wanted = TutorialProjectFactory.type(activeRole()!!)
+        val item = shownTagged(wanted)
+        if (item == null && root.findViewWithTag<View>(wanted)?.visibility == View.GONE) {
+            return activity.findViewById(R.id.etSearchComponents)
         }
-        val item = root.findViewWithTag<View>(TutorialProjectFactory.type(activeRole()!!))
-        if (item?.visibility == View.GONE) return activity.findViewById(R.id.etSearchComponents)
-        return item?.takeIf { it.isShown }
-            ?: root.findViewWithTag("component-group:CONTROL")
+        return item ?: shownTagged("component-group:CONTROL")
+    }
+
+    private fun navigationButton(toolbar: Toolbar): View? {
+        val icon = toolbar.navigationIcon
+        val buttons = toolbar.children.filterIsInstance<ImageButton>().filter { it.isShown }
+        return buttons.firstOrNull {
+            it.drawable === icon || (icon != null && it.drawable?.constantState == icon.constantState)
+        } ?: buttons.firstOrNull()
+    }
+
+    private fun shownTagged(tag: String): View? {
+        val matches = ArrayList<View>()
+        fun walk(view: View) {
+            if (view.tag == tag) matches.add(view)
+            if (view is ViewGroup) {
+                for (index in 0 until view.childCount) walk(view.getChildAt(index))
+            }
+        }
+        walk(root)
+        return matches.firstOrNull { it.isShown && it.isClickable }
+            ?: matches.firstOrNull { it.isShown }
     }
 
     private fun updateActionHint(target: View?) {
@@ -222,7 +242,7 @@ class TutorialOverlayController(
         lastHint = hint
         val expected = TutorialProjectFactory.topic(session, session.step == TutorialStep.TOPIC_SLIDER)
         val explanation = activity.getString(bodies[session.step.ordinal], expected)
-        body.text = if (hint == null) explanation else activity.getString(hint) + "\n\n" + explanation
+        body.text = if (hint == null) explanation else activity.getString(hint)
     }
 
     private fun updateHighlight() {
@@ -254,29 +274,64 @@ class TutorialOverlayController(
         val hasTarget = target != null && target.getGlobalVisibleRect(rect) && rect.intersect(visible)
         val rootLocation = IntArray(2)
         root.getLocationOnScreen(rootLocation)
-        val key = listOf(top, bottom, rect.top, rect.bottom, host.width, session.step.ordinal)
+        val drawer = activity.findViewById<DrawerLayout>(R.id.drawerLayout)
+        val sidebar = activity.findViewById<View>(R.id.sidebarEditMode)
+        val drawerOpen = drawer.isDrawerVisible(GravityCompat.START)
+        val freeLeft = if (drawerOpen) {
+            val sidebarLocation = IntArray(2)
+            sidebar.getLocationOnScreen(sidebarLocation)
+            (sidebarLocation[0] + sidebar.width).coerceAtLeast(visible.left)
+        } else visible.left
+        val toolbar = activity.findViewById<View>(R.id.toolbar)
+        val toolbarRect = Rect()
+        val belowToolbar = if (toolbar.getGlobalVisibleRect(toolbarRect)) toolbarRect.bottom + gap else top
+        val preferredTop = maxOf(top, belowToolbar)
+        val key = listOf(preferredTop, bottom, freeLeft, rect.top, rect.bottom, host.width, session.step.ordinal, if (detailsOpen) 1 else 0)
         if (placementKey != key) { placementKey = key; spaceCompact = false }
-        val compact = ime || collapsed || spaceCompact
-        body.visibility = if (compact) View.GONE else View.VISIBLE
-        title.visibility = if (compact) View.GONE else View.VISIBLE
+        val keyboardCompact = ime || spaceCompact
+        body.maxLines = if (detailsOpen && !keyboardCompact) 8 else 3
+        body.visibility = if (keyboardCompact) View.GONE else View.VISIBLE
+        title.visibility = if (keyboardCompact) View.GONE else View.VISIBLE
         card.findViewById<View>(R.id.tutorialSecondaryActions).visibility =
-            if (compact) View.GONE else View.VISIBLE
+            if (detailsOpen && !keyboardCompact) View.VISIBLE else View.GONE
         card.findViewById<View>(R.id.tvTutorialStatus).visibility =
-            if (!compact && ready() && session.step !in listOf(TutorialStep.WELCOME, TutorialStep.FINISH))
+            if (!keyboardCompact && ready() && session.step !in listOf(TutorialStep.WELCOME, TutorialStep.FINISH))
                 View.VISIBLE else View.GONE
-        val maxBodyHeight = ((bottom - top).coerceAtLeast(0) * 0.22f).toInt()
+        val maxBodyHeight = ((if (detailsOpen) 160 else 72) * density).toInt()
         if (body.maxHeight != maxBodyHeight) body.maxHeight = maxBodyHeight
-        val position = TutorialCardPlacement.top(top, bottom,
-            rect.top.takeIf { hasTarget }, rect.bottom.takeIf { hasTarget }, card.height, gap)
+        val params = card.layoutParams as FrameLayout.LayoutParams
+        val freeWidth = (visible.right - freeLeft - margin * 2).coerceAtLeast((160 * density).toInt())
+        if (params.width != freeWidth) {
+            params.width = freeWidth
+            card.layoutParams = params
+        }
+        fun cardOverlaps(cardTop: Int): Boolean {
+            if (!hasTarget || card.height <= 0) return false
+            val cardLeft = freeLeft + margin
+            val cardBottom = cardTop + card.height
+            return rect.top < cardBottom + gap && rect.bottom > cardTop - gap &&
+                rect.left < cardLeft + freeWidth + gap && rect.right > cardLeft - gap
+        }
+        val lowerTop = bottom - card.height
+        val position = when {
+            card.height <= 0 || bottom - preferredTop < card.height -> null
+            !cardOverlaps(preferredTop) -> preferredTop
+            lowerTop >= preferredTop && !cardOverlaps(lowerTop) -> lowerTop
+            else -> preferredTop
+        }
         if (position == null) {
-            // Re-measure compact on the next layout. If even that cannot fit, don't cover input.
-            if (!compact) { spaceCompact = true; card.requestLayout() }
-            card.visibility = View.INVISIBLE
+            if (card.height <= 0) card.requestLayout()
+            else if (!keyboardCompact) {
+                spaceCompact = true
+                card.requestLayout()
+            }
+            card.visibility = if (card.height <= 0) View.VISIBLE else View.INVISIBLE
         } else {
             card.visibility = View.VISIBLE
-            val params = card.layoutParams as FrameLayout.LayoutParams
-            val offset = (position - hostLocation[1] - params.topMargin).toFloat()
-            if (card.translationY != offset) card.translationY = offset
+            val offsetY = (position - hostLocation[1] - params.topMargin).toFloat()
+            val offsetX = (freeLeft + margin - hostLocation[0] - params.leftMargin).toFloat()
+            if (card.translationY != offsetY) card.translationY = offsetY
+            if (card.translationX != offsetX) card.translationX = offsetX
         }
         fun overlayRect(view: View?): Rect = Rect().apply {
             if (view == null || !view.isShown || !view.getGlobalVisibleRect(this) || !intersect(visible)) {
@@ -286,13 +341,27 @@ class TutorialOverlayController(
             }
         }
         val viewport = Rect(visible).apply { offset(-rootLocation[0], -rootLocation[1]) }
+        val adding = session.step in listOf(TutorialStep.ADD_BUTTON, TutorialStep.ADD_SWITCH, TutorialStep.ADD_SLIDER)
         val highlightedView = if (ready() && card.visibility == View.VISIBLE && !ime) next else target
-        val highlight = overlayRect(highlightedView)
+        val highlight = overlayRect(highlightedView).let { found ->
+            if (!found.isEmpty || !adding || drawerOpen) found else plusFallback(rootLocation) ?: found
+        }
         if (!highlight.isEmpty) {
             highlight.inset(-(4 * density).toInt(), -(4 * density).toInt())
             if (!highlight.intersect(viewport)) highlight.setEmpty()
         }
         spotlight.update(viewport, highlight, overlayRect(card))
+    }
+
+    private fun plusFallback(rootLocation: IntArray): Rect? {
+        val toolbar = activity.findViewById<View>(R.id.toolbar) ?: return null
+        val screen = Rect()
+        if (!toolbar.getGlobalVisibleRect(screen)) return null
+        val size = (56 * activity.resources.displayMetrics.density).toInt()
+        screen.right = screen.left + size
+        screen.bottom = minOf(screen.bottom, screen.top + size)
+        screen.offset(-rootLocation[0], -rootLocation[1])
+        return screen
     }
 
     private fun retry() {

@@ -26,8 +26,8 @@ android {
         applicationId = "com.spec127.mqttpanelcraft"
         minSdk = 24
         targetSdk = 36
-        versionCode = 219
-        versionName = "0.15.8"
+        versionCode = 221
+        versionName = "0.15.10"
         val playKey = providers.gradleProperty("PLAY_BILLING_PUBLIC_KEY").orElse("").get()
         require(playKey.matches(Regex("[A-Za-z0-9+/=]*"))) { "Invalid Play public key encoding" }
         buildConfigField("String", "PLAY_BILLING_PUBLIC_KEY", "\"$playKey\"")
